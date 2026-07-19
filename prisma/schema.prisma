@@ -1,0 +1,287 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js required tables
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  isAdmin       Boolean   @default(false)
+  isPremium     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Core domain
+// ---------------------------------------------------------------------------
+
+model Channel {
+  id           String   @id @default(cuid())
+  youtubeId    String   @unique
+  title        String
+  description  String?
+  thumbnailUrl String?
+  trustScore   Float    @default(0.5)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  videos Video[]
+}
+
+model Video {
+  id              String        @id @default(cuid())
+  youtubeVideoId  String        @unique
+  title           String
+  description     String?
+  channelId       String
+  publishedAt     DateTime
+  thumbnailUrl    String?
+  durationSeconds Int?
+  viewCount       Int?
+  likeCount       Int?
+  commentCount    Int?
+  trendScore      Float         @default(0)
+  relevanceScore  Float         @default(0)
+  evidenceScore   Float?
+  riskLevel       RiskLevel     @default(LOW)
+  status          PublishStatus @default(PENDING)
+  slug            String        @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  channel       Channel       @relation(fields: [channelId], references: [id])
+  summaries     Summary[]
+  claims        Claim[]
+  topics        VideoTopic[]
+  adminReviews  AdminReview[]
+  processingJob ProcessingJob?
+}
+
+model Topic {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  description String?
+  isHighRisk  Boolean @default(false)
+
+  videos VideoTopic[]
+}
+
+model VideoTopic {
+  videoId String
+  topicId String
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, topicId])
+}
+
+model Summary {
+  id              String   @id @default(cuid())
+  videoId         String
+  shortSummary    String
+  longSummary     String
+  takeaways       Json
+  warnings        Json?
+  targetAudience  String?
+  redFlags        Json?
+  modelUsed       String?
+  reviewedByHuman Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+model Claim {
+  id             String         @id @default(cuid())
+  videoId        String
+  text           String
+  category       ClaimCategory  @default(OTHER)
+  riskLevel      RiskLevel
+  evidenceStatus EvidenceStatus @default(NOT_CHECKED)
+  explanation    String?
+  createdAt      DateTime       @default(now())
+
+  video   Video            @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  sources EvidenceSource[]
+}
+
+model EvidenceSource {
+  id      String  @id @default(cuid())
+  claimId String
+  title   String
+  url     String
+  source  String
+  year    Int?
+  summary String?
+
+  claim Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Newsletter
+// ---------------------------------------------------------------------------
+
+model NewsletterSubscriber {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  confirmedAt     DateTime?
+  unsubscribedAt  DateTime?
+  resendContactId String?
+  createdAt       DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Monetization
+// ---------------------------------------------------------------------------
+
+model AffiliateLink {
+  id          String   @id @default(cuid())
+  label       String
+  url         String
+  productName String
+  commission  String?
+  isActive    Boolean  @default(true)
+  topicSlug   String?
+  createdAt   DateTime @default(now())
+}
+
+model Sponsor {
+  id        String    @id @default(cuid())
+  name      String
+  copyText  String
+  ctaText   String
+  ctaUrl    String
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Admin workflow
+// ---------------------------------------------------------------------------
+
+model AdminReview {
+  id        String       @id @default(cuid())
+  videoId   String
+  action    ReviewAction
+  note      String?
+  createdAt DateTime     @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+model ProcessingJob {
+  id           String    @id @default(cuid())
+  videoId      String    @unique
+  status       JobStatus @default(QUEUED)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum PublishStatus {
+  PENDING
+  PROCESSED
+  REJECTED
+  PUBLISHED
+}
+
+enum EvidenceStatus {
+  SUPPORTED
+  MIXED
+  WEAK
+  UNSUPPORTED
+  NOT_CHECKED
+}
+
+enum ClaimCategory {
+  NUTRITION
+  EXERCISE
+  HORMONES
+  MENTAL_HEALTH
+  SUPPLEMENTS
+  LONGEVITY
+  SEXUAL_HEALTH
+  OTHER
+}
+
+enum ReviewAction {
+  APPROVED
+  REJECTED
+  FLAGGED_HIGH_RISK
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+}
