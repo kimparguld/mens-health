@@ -151,7 +151,7 @@ export default async function AdminVideoDetailPage({
                 Extracted claims ({video.claims.length})
               </h2>
               <div className="space-y-3">
-                {video.claims.map((claim) => (
+                {video.claims.map((claim: (typeof video.claims)[number]) => (
                   <div key={claim.id} className="rounded border p-3 text-sm">
                     <div className="mb-1 flex items-center gap-2">
                       <span
@@ -188,18 +188,20 @@ export default async function AdminVideoDetailPage({
                 Topics
               </h3>
               <div className="flex flex-wrap gap-1.5">
-                {video.topics.map(({ topic }) => (
-                  <span
-                    key={topic.id}
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      topic.isHighRisk
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {topic.name}
-                  </span>
-                ))}
+                {video.topics.map(
+                  ({ topic }: (typeof video.topics)[number]) => (
+                    <span
+                      key={topic.id}
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        topic.isHighRisk
+                          ? "bg-red-100 text-red-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {topic.name}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
           )}
@@ -234,21 +236,23 @@ export default async function AdminVideoDetailPage({
                 Review history
               </h3>
               <ol className="space-y-2">
-                {video.adminReviews.map((review) => (
-                  <li key={review.id} className="text-gray-600">
-                    <span className="font-medium text-gray-800">
-                      {review.action}
-                    </span>
-                    {review.note && (
-                      <span className="ml-1 text-gray-500">
-                        — {review.note}
+                {video.adminReviews.map(
+                  (review: (typeof video.adminReviews)[number]) => (
+                    <li key={review.id} className="text-gray-600">
+                      <span className="font-medium text-gray-800">
+                        {review.action}
                       </span>
-                    )}
-                    <span className="ml-1 text-xs text-gray-400">
-                      {review.createdAt.toLocaleDateString()}
-                    </span>
-                  </li>
-                ))}
+                      {review.note && (
+                        <span className="ml-1 text-gray-500">
+                          — {review.note}
+                        </span>
+                      )}
+                      <span className="ml-1 text-xs text-gray-400">
+                        {review.createdAt.toLocaleDateString()}
+                      </span>
+                    </li>
+                  ),
+                )}
               </ol>
             </div>
           )}

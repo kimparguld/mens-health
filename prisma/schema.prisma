@@ -185,6 +185,14 @@ model NewsletterSubscriber {
   createdAt       DateTime  @default(now())
 }
 
+model NewsletterDigest {
+  id          String   @id @default(cuid())
+  subject     String
+  sentCount   Int      @default(0)
+  failedCount Int      @default(0)
+  sentAt      DateTime @default(now())
+}
+
 // ---------------------------------------------------------------------------
 // Monetization
 // ---------------------------------------------------------------------------

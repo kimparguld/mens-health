@@ -2,8 +2,7 @@
   "crons": [
     {
       "path": "/api/youtube/sync",
-      "schedule": "0 6 * * 1",
-      "comment": "Weekly Monday 06:00 UTC. YouTube Data API v3 quota: ~100 units/search + ~1 unit/video = ~500 units per run (well under 10,000/day limit)."
+      "schedule": "0 6 * * 1"
     },
     {
       "path": "/api/ai/process-video",
@@ -11,8 +10,11 @@
     },
     {
       "path": "/api/seo/refresh-faqs",
-      "schedule": "0 8 * * 1",
-      "comment": "Weekly Monday 08:00 UTC — regenerate topic FAQs from latest published video content."
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/newsletter/send-digest",
+      "schedule": "0 10 * * 4"
     }
   ]
 }

@@ -15,7 +15,7 @@ const APP_URL =
 
 type Params = Promise<{ slug: string }>;
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -205,7 +205,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             Health Claims in This Video
           </h2>
           <div className="space-y-4">
-            {video.claims.map((claim) => (
+            {video.claims.map((claim: (typeof video.claims)[number]) => (
               <div
                 key={claim.id}
                 className="rounded-lg border border-gray-200 p-4"
@@ -245,7 +245,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <section className="mb-8">
           <h2 className="mb-3 text-xl font-semibold text-gray-900">Topics</h2>
           <div className="flex flex-wrap gap-2">
-            {video.topics.map((vt) => (
+            {video.topics.map((vt: (typeof video.topics)[number]) => (
               <Link
                 key={vt.topicId}
                 href={`/topics/${vt.topic.slug}`}

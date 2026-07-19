@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db/prisma";
+import { env } from "@/env";
 
 const SubscribeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -35,15 +36,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: true, alreadySubscribed: true });
   }
 
-  await db.newsletterSubscriber.upsert({
+  const subscriber = await db.newsletterSubscriber.upsert({
     where: { email },
     create: { email },
     update: { unsubscribedAt: null },
   });
 
-  // TODO Phase 6: add to Resend audience
-  // const resend = new Resend(env.RESEND_API_KEY);
-  // await resend.contacts.create({ email, audienceId: env.RESEND_AUDIENCE_ID });
+  // Sync to Resend — add contact and optionally assign to a segment
+  if (env.RESEND_API_KEY) {
+    try {
+      const { resend } = await import("@/lib/resend/client");
+      const segmentId = env.RESEND_SEGMENT_ID;
+      const result = await resend.contacts.create({
+        email,
+        unsubscribed: false,
+        ...(segmentId ? { segments: [{ id: segmentId }] } : {}),
+      });
+      if (result.data?.id && !subscriber.resendContactId) {
+        await db.newsletterSubscriber.update({
+          where: { email },
+          data: { resendContactId: result.data.id },
+        });
+      }
+    } catch {
+      // Non-fatal: subscription is recorded in DB regardless
+    }
+  }
 
   return NextResponse.json({ ok: true, alreadySubscribed: false });
 }

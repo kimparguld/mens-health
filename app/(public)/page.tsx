@@ -3,6 +3,8 @@ import { db } from "@/lib/db/prisma";
 import { VideoCard } from "@/components/video/VideoCard";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
   description:
@@ -64,7 +66,7 @@ export default async function HomePage() {
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video) => (
+          {videos.map((video: (typeof videos)[number]) => (
             <VideoCard
               key={video.id}
               slug={video.slug}
@@ -73,7 +75,9 @@ export default async function HomePage() {
               thumbnailUrl={video.thumbnailUrl}
               shortSummary={video.summaries[0]?.shortSummary ?? null}
               trendScore={video.trendScore}
-              topicNames={video.topics.map((vt) => vt.topic.name)}
+              topicNames={video.topics.map(
+                (vt: (typeof video.topics)[number]) => vt.topic.name,
+              )}
             />
           ))}
         </div>
