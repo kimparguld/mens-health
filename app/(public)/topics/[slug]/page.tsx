@@ -11,6 +11,7 @@ import {
   buildItemListSchema,
 } from "@/lib/seo/json-ld";
 import { getTopicSeo } from "@/lib/seo/topic-faq";
+import type { FaqEntry } from "@/lib/seo/json-ld";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
@@ -60,9 +61,16 @@ export default async function TopicPage({ params }: { params: Params }) {
   const topicSeed = TOPIC_SEEDS.find((t) => t.slug === slug);
   if (!topicSeed) notFound();
 
-  const seo = getTopicSeo(slug);
+  const staticSeo = getTopicSeo(slug);
 
   const topic = await db.topic.findUnique({ where: { slug } });
+
+  // Merge DB-generated FAQs over static fallback
+  const dbFaq = topic?.faqJson != null ? (topic.faqJson as FaqEntry[]) : null;
+  const seo = {
+    intro: topic?.faqIntro ?? staticSeo?.intro ?? topicSeed.description,
+    faq: dbFaq ?? staticSeo?.faq ?? [],
+  };
 
   const publishedVideos = topic
     ? await db.video.findMany({

@@ -108,11 +108,14 @@ model Video {
 }
 
 model Topic {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  name        String
-  description String?
-  isHighRisk  Boolean @default(false)
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  name         String
+  description  String?
+  isHighRisk   Boolean   @default(false)
+  faqIntro     String?
+  faqJson      Json?
+  faqUpdatedAt DateTime?
 
   videos VideoTopic[]
 }
