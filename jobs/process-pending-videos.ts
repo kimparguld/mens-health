@@ -90,11 +90,30 @@ export async function processPendingVideos(): Promise<{
         }
       }
 
-      // Mark as PROCESSED — admin must explicitly publish
+      // Re-fetch the video to get the latest riskLevel (may have been escalated above)
+      const latestVideo = await db.video.findUnique({
+        where: { id: video.id },
+        select: { riskLevel: true },
+      });
+
+      // LOW risk videos auto-publish; anything else requires admin review
+      const finalStatus =
+        latestVideo?.riskLevel === "LOW" ? "PUBLISHED" : "PROCESSED";
+
       await db.video.update({
         where: { id: video.id },
-        data: { status: "PROCESSED" },
+        data: { status: finalStatus },
       });
+
+      if (finalStatus === "PUBLISHED") {
+        await db.adminReview.create({
+          data: {
+            videoId: video.id,
+            action: "PUBLISHED",
+            note: "Auto-published: no high-risk claims detected (risk level LOW)",
+          },
+        });
+      }
 
       await db.processingJob.update({
         where: { id: job.id },
