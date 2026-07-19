@@ -1,0 +1,195 @@
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { db } from "@/lib/db/prisma";
+import { TOPIC_SEEDS } from "@/lib/youtube/topics";
+import { VideoCard } from "@/components/video/VideoCard";
+import { Disclaimer } from "@/components/ui/Disclaimer";
+import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildItemListSchema,
+} from "@/lib/seo/json-ld";
+import { getTopicSeo } from "@/lib/seo/topic-faq";
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
+
+type Params = Promise<{ slug: string }>;
+
+export const revalidate = 3600; // ISR: regenerate every hour
+
+export async function generateStaticParams() {
+  return TOPIC_SEEDS.map((topic) => ({ slug: topic.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const topic = TOPIC_SEEDS.find((t) => t.slug === slug);
+  if (!topic) return { title: "Topic Not Found" };
+
+  const seo = getTopicSeo(slug);
+  const description = seo?.intro ?? topic.description;
+  const canonical = `${APP_URL}/topics/${slug}`;
+
+  return {
+    title: `${topic.name} — Men's Health Guide`,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${topic.name} — MenHealth Digest`,
+      description,
+      url: canonical,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${topic.name} — MenHealth Digest`,
+      description,
+    },
+    keywords: [topic.name, "men's health", "health guide", "evidence-based"],
+  };
+}
+
+export default async function TopicPage({ params }: { params: Params }) {
+  const { slug } = await params;
+  const topicSeed = TOPIC_SEEDS.find((t) => t.slug === slug);
+  if (!topicSeed) notFound();
+
+  const seo = getTopicSeo(slug);
+
+  const topic = await db.topic.findUnique({ where: { slug } });
+
+  const publishedVideos = topic
+    ? await db.video.findMany({
+        where: {
+          status: "PUBLISHED",
+          topics: { some: { topicId: topic.id } },
+        },
+        orderBy: { trendScore: "desc" },
+        take: 20,
+        include: {
+          channel: true,
+          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          topics: { include: { topic: true } },
+        },
+      })
+    : [];
+
+  // JSON-LD schemas
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: "Home", url: APP_URL },
+    { name: topicSeed.name, url: `${APP_URL}/topics/${slug}` },
+  ]);
+
+  const itemListSchema =
+    publishedVideos.length > 0
+      ? buildItemListSchema(
+          `${topicSeed.name} Videos`,
+          publishedVideos.map((v) => ({
+            name: v.title,
+            url: `${APP_URL}/videos/${v.slug}`,
+          })),
+        )
+      : null;
+
+  const faqSchema = seo && seo.faq.length > 0 ? buildFaqSchema(seo.faq) : null;
+
+  const schemas = [
+    breadcrumbSchema,
+    ...(itemListSchema ? [itemListSchema] : []),
+    ...(faqSchema ? [faqSchema] : []),
+  ];
+
+  return (
+    <main className="mx-auto max-w-4xl px-4 py-10">
+      {/* Inject JSON-LD */}
+      {schemas.map((schema, i) => (
+        <JsonLd key={i} schema={schema} />
+      ))}
+
+      {/* Hero */}
+      <header className="mb-8">
+        <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
+          <a href="/" className="hover:underline">
+            Home
+          </a>{" "}
+          / <span className="text-gray-900">{topicSeed.name}</span>
+        </nav>
+
+        <div className="mb-2 flex items-center gap-2">
+          {topicSeed.isHighRisk && (
+            <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+              High-risk topic
+            </span>
+          )}
+        </div>
+
+        <h1 className="text-4xl font-bold text-gray-900">{topicSeed.name}</h1>
+
+        {seo ? (
+          <p className="mt-3 text-lg leading-relaxed text-gray-600">
+            {seo.intro}
+          </p>
+        ) : (
+          <p className="mt-2 text-lg text-gray-600">{topicSeed.description}</p>
+        )}
+      </header>
+
+      {/* Video grid */}
+      {publishedVideos.length === 0 ? (
+        <p className="text-gray-500">No published videos for this topic yet.</p>
+      ) : (
+        <section className="mb-12">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            Top Videos
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {publishedVideos.map((video) => (
+              <VideoCard
+                key={video.id}
+                slug={video.slug}
+                title={video.title}
+                channelTitle={video.channel?.title ?? ""}
+                thumbnailUrl={video.thumbnailUrl}
+                shortSummary={video.summaries[0]?.shortSummary ?? null}
+                trendScore={video.trendScore}
+                topicNames={video.topics.map((vt) => vt.topic.name)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* FAQ section */}
+      {seo && seo.faq.length > 0 && (
+        <section className="mb-12">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">
+            Frequently Asked Questions
+          </h2>
+          <div className="divide-y rounded-xl border bg-white">
+            {seo.faq.map((item, i) => (
+              <details key={i} className="group px-5 py-4">
+                <summary className="cursor-pointer list-none text-base font-medium text-gray-900 group-open:text-blue-700">
+                  <span className="mr-2 inline-block transition-transform group-open:rotate-90">
+                    ›
+                  </span>
+                  {item.question}
+                </summary>
+                <p className="mt-3 pl-5 text-sm leading-relaxed text-gray-600">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <Disclaimer />
+    </main>
+  );
+}

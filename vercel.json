@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/youtube/sync",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/ai/process-video",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}
