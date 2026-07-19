@@ -6,5 +6,5 @@ const { auth: proxy } = NextAuth(edgeAuthConfig);
 export default proxy;
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/account/:path*"],
 };

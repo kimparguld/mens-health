@@ -1,10 +1,20 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 
-export default function PublicLayout({
+type SessionUser = {
+  name?: string | null;
+  email?: string | null;
+  isPremium?: boolean;
+};
+
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  const user = session?.user as SessionUser | undefined;
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
@@ -15,7 +25,7 @@ export default function PublicLayout({
           >
             MenHealth Digest
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-4 text-sm">
             <Link
               href="/topics/testosterone"
               className="text-gray-600 hover:text-gray-900"
@@ -25,6 +35,29 @@ export default function PublicLayout({
             <Link href="/digest" className="text-gray-600 hover:text-gray-900">
               Newsletter
             </Link>
+            {user ? (
+              <Link
+                href="/account"
+                className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                {user.name ?? user.email ?? "Account"}
+              </Link>
+            ) : (
+              <Link
+                href="/signin"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Sign in
+              </Link>
+            )}
+            {!user?.isPremium && (
+              <Link
+                href="/upgrade"
+                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Go premium
+              </Link>
+            )}
           </nav>
         </div>
       </header>
