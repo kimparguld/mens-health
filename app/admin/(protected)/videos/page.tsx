@@ -1,5 +1,6 @@
 import { db } from "@/lib/db/prisma";
 import Link from "next/link";
+import BulkPublishTable from "./BulkPublishTable";
 
 export const dynamic = "force-dynamic";
 
@@ -47,12 +48,6 @@ export default async function AdminVideoQueuePage({
     { label: "Pending", value: "PENDING" },
   ];
 
-  const riskColors: Record<string, string> = {
-    LOW: "bg-green-100 text-green-700",
-    MEDIUM: "bg-yellow-100 text-yellow-700",
-    HIGH: "bg-red-100 text-red-700",
-  };
-
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold text-gray-900">Review queue</h1>
@@ -77,65 +72,12 @@ export default async function AdminVideoQueuePage({
       {videos.length === 0 ? (
         <p className="text-sm text-gray-500">No videos in this queue.</p>
       ) : (
-        <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">
-                  Title
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">
-                  Channel
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">
-                  Risk
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">
-                  Claims
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-500">
-                  Updated
-                </th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {videos.map((video) => (
-                <tr key={video.id} className="hover:bg-gray-50">
-                  <td className="max-w-xs px-4 py-3">
-                    <p className="truncate font-medium text-gray-900">
-                      {video.title}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {video.channel.title}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[video.riskLevel] ?? ""}`}
-                    >
-                      {video.riskLevel}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {video._count.claims}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {video.updatedAt.toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/videos/${video.id}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Review
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <BulkPublishTable
+          videos={videos}
+          showBulkActions={
+            safeStatus === "PENDING" || safeStatus === "PROCESSED"
+          }
+        />
       )}
 
       {/* Pagination */}
