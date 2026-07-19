@@ -12,13 +12,14 @@ import {
 } from "@/lib/seo/json-ld";
 import { getTopicSeo } from "@/lib/seo/topic-faq";
 import type { FaqEntry } from "@/lib/seo/json-ld";
+import Link from "next/link";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
 
 type Params = Promise<{ slug: string }>;
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   return TOPIC_SEEDS.map((topic) => ({ slug: topic.slug }));
@@ -98,7 +99,7 @@ export default async function TopicPage({ params }: { params: Params }) {
     publishedVideos.length > 0
       ? buildItemListSchema(
           `${topicSeed.name} Videos`,
-          publishedVideos.map((v) => ({
+          publishedVideos.map((v: (typeof publishedVideos)[number]) => ({
             name: v.title,
             url: `${APP_URL}/videos/${v.slug}`,
           })),
@@ -123,9 +124,9 @@ export default async function TopicPage({ params }: { params: Params }) {
       {/* Hero */}
       <header className="mb-8">
         <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
-          <a href="/" className="hover:underline">
+          <Link href="/" className="hover:underline">
             Home
-          </a>{" "}
+          </Link>{" "}
           / <span className="text-gray-900">{topicSeed.name}</span>
         </nav>
 
@@ -157,7 +158,7 @@ export default async function TopicPage({ params }: { params: Params }) {
             Top Videos
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {publishedVideos.map((video) => (
+            {publishedVideos.map((video: (typeof publishedVideos)[number]) => (
               <VideoCard
                 key={video.id}
                 slug={video.slug}
@@ -166,7 +167,9 @@ export default async function TopicPage({ params }: { params: Params }) {
                 thumbnailUrl={video.thumbnailUrl}
                 shortSummary={video.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
-                topicNames={video.topics.map((vt) => vt.topic.name)}
+                topicNames={video.topics.map(
+                  (vt: (typeof video.topics)[number]) => vt.topic.name,
+                )}
               />
             ))}
           </div>

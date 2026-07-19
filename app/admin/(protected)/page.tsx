@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
-import type { PublishStatus } from "@prisma/client";
+
+type PublishStatus = "PENDING" | "PROCESSED" | "REJECTED" | "PUBLISHED";
 
 export const dynamic = "force-dynamic";
 

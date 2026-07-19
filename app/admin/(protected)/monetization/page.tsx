@@ -45,7 +45,7 @@ export default async function MonetizationPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
-                {sponsors.map((s) => (
+                {sponsors.map((s: (typeof sponsors)[number]) => (
                   <tr key={s.id}>
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {s.name}
@@ -128,7 +128,7 @@ export default async function MonetizationPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
-                {affiliateLinks.map((link) => (
+                {affiliateLinks.map((link: (typeof affiliateLinks)[number]) => (
                   <tr key={link.id}>
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {link.productName}
