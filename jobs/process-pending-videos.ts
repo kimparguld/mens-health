@@ -2,6 +2,17 @@ import { db } from "@/lib/db/prisma";
 import { summarizeVideo } from "@/lib/ai/summarize-video";
 import { extractClaims } from "@/lib/ai/extract-claims";
 
+function generateClaimSlug(text: string, id: string): string {
+  const base = text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 60)
+    .replace(/-+$/, "");
+  return `${base}-${id.slice(-6)}`;
+}
+
 const BATCH_SIZE = 5;
 
 export async function processPendingVideos(): Promise<{
@@ -70,16 +81,24 @@ export async function processPendingVideos(): Promise<{
           (c) => c.riskLevel === "HIGH",
         );
 
-        await db.claim.createMany({
-          data: claimsResult.value.map((claim) => ({
-            videoId: video.id,
-            text: claim.text,
-            category: claim.category,
-            riskLevel: claim.riskLevel,
-            evidenceStatus: "NOT_CHECKED",
-            explanation: claim.explanation,
-          })),
-        });
+        // Create claims individually so we can generate a human-readable slug
+        // from the claim text + a short id suffix for uniqueness.
+        for (const claim of claimsResult.value) {
+          const created = await db.claim.create({
+            data: {
+              videoId: video.id,
+              text: claim.text,
+              category: claim.category,
+              riskLevel: claim.riskLevel,
+              evidenceStatus: "NOT_CHECKED",
+              explanation: claim.explanation,
+            },
+          });
+          await db.claim.update({
+            where: { id: created.id },
+            data: { slug: generateClaimSlug(claim.text, created.id) },
+          });
+        }
 
         // Escalate risk level if high-risk claims found
         if (hasHighRiskClaims && video.riskLevel === "LOW") {

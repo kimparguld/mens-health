@@ -16,7 +16,14 @@ export const env = createEnv({
     AUTH_FROM_EMAIL: z.string().min(1).optional(),
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-    STRIPE_PRICE_ID: z.string().min(1).optional(),
+    STRIPE_PRICE_ID: z
+      .string()
+      .min(1)
+      .refine((v) => v.startsWith("price_"), {
+        message:
+          "STRIPE_PRICE_ID must be a Stripe price ID (starts with 'price_'), not a product ID ('prod_'). Find the price ID in your Stripe dashboard under Products → select the product → Pricing.",
+      })
+      .optional(),
     CRON_SECRET: z.string().min(32),
   },
   client: {

@@ -22,7 +22,7 @@ export const authConfig: NextAuthConfig = {
       apiKey: env.RESEND_API_KEY ?? "",
       from:
         env.AUTH_FROM_EMAIL ??
-        "MenHealth Digest <no-reply@menhealthdigest.com>",
+        "MenHealth Digest <no-reply@menhealth-digest.com>",
     }),
   ],
   callbacks: {

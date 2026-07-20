@@ -39,3 +39,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 curl -X POST http://localhost:3000/api/youtube/sync \
 -H "x-cron-secret: ffJrM9bNXRXjHDWfBBxuqvngJEDkq0n8"
+
+curl -X POST https://www.menhealth-digest.com/api/youtube/sync \
+-H "x-cron-secret: ffJrM9bNXRXjHDWfBBxuqvngJEDkq0n8"

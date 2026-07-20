@@ -1,11 +1,21 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { SiteHeader } from "@/components/ui/SiteHeader";
 
 type SessionUser = {
   name?: string | null;
   email?: string | null;
   isPremium?: boolean;
 };
+
+const FOOTER_TOPICS = [
+  { slug: "testosterone", name: "Testosterone" },
+  { slug: "sleep", name: "Sleep" },
+  { slug: "fitness-over-40", name: "Fitness Over 40" },
+  { slug: "nutrition", name: "Nutrition" },
+  { slug: "longevity", name: "Longevity" },
+  { slug: "supplements", name: "Supplements" },
+];
 
 export default async function PublicLayout({
   children,
@@ -16,62 +26,121 @@ export default async function PublicLayout({
   const user = session?.user as SessionUser | undefined;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link
-            href="/"
-            className="text-xl font-bold text-gray-900 hover:text-blue-700"
-          >
-            MenHealth Digest
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link
-              href="/topics/testosterone"
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Topics
-            </Link>
-            <Link href="/digest" className="text-gray-600 hover:text-gray-900">
-              Newsletter
-            </Link>
-            {user ? (
-              <Link
-                href="/account"
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-              >
-                {user.name ?? user.email ?? "Account"}
-              </Link>
-            ) : (
-              <Link
-                href="/signin"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Sign in
-              </Link>
-            )}
-            {!user?.isPremium && (
-              <Link
-                href="/upgrade"
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700"
-              >
-                Go premium
-              </Link>
-            )}
-          </nav>
-        </div>
-      </header>
+    <div className="flex min-h-screen flex-col bg-white">
+      <SiteHeader user={user} />
 
       <div className="flex-1">{children}</div>
 
-      <footer className="border-t border-gray-200 bg-white py-8">
-        <div className="mx-auto max-w-6xl px-4 text-center text-sm text-gray-400">
-          <p>
-            MenHealth Digest — Educational content only. Not medical advice.
-          </p>
-          <p className="mt-1">
-            © {new Date().getFullYear()} MenHealth Digest. All rights reserved.
-          </p>
+      <footer className="border-t border-gray-200 bg-gray-50">
+        <div className="mx-auto max-w-[1120px] px-4 py-12">
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+            {/* Brand */}
+            <div>
+              <Link
+                href="/"
+                className="text-lg font-bold tracking-tight text-gray-900"
+              >
+                MenHealth Digest
+              </Link>
+              <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                Evidence-aware summaries of trending men&apos;s health content —
+                without the hype.
+              </p>
+              <ul className="mt-4 space-y-1 text-xs text-gray-500">
+                <li>✓ Educational content only. Not medical advice.</li>
+                <li>✓ We do not host or restream YouTube videos.</li>
+                <li>✓ Affiliate links are clearly disclosed.</li>
+              </ul>
+            </div>
+
+            {/* About links */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">About</h3>
+              <ul className="mt-3 space-y-2 text-sm text-gray-500">
+                <li>
+                  <Link href="/about" className="hover:text-gray-900">
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/how-we-rate-evidence"
+                    className="hover:text-gray-900"
+                  >
+                    How We Rate Evidence
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/editorial-process"
+                    className="hover:text-gray-900"
+                  >
+                    Editorial Process
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/medical-disclaimer"
+                    className="hover:text-gray-900"
+                  >
+                    Medical Disclaimer
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/affiliate-disclosure"
+                    className="hover:text-gray-900"
+                  >
+                    Affiliate Disclosure
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-gray-900">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-gray-900">
+                    Contact
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Top topics */}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">
+                Top Topics
+              </h3>
+              <ul className="mt-3 space-y-2 text-sm text-gray-500">
+                {FOOTER_TOPICS.map((topic) => (
+                  <li key={topic.slug}>
+                    <Link
+                      href={`/topics/${topic.slug}`}
+                      className="hover:text-gray-900"
+                    >
+                      {topic.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-6 text-xs text-gray-400">
+            <p>
+              © {new Date().getFullYear()} MenHealth Digest. All rights
+              reserved.
+            </p>
+            <div className="flex gap-4">
+              <Link href="/privacy" className="hover:text-gray-600">
+                Privacy
+              </Link>
+              <Link href="/contact" className="hover:text-gray-600">
+                Contact
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
