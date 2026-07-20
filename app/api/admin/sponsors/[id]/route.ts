@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
+import { z } from "zod";
+
+const UpdateSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  copyText: z.string().min(1).max(500).optional(),
+  ctaText: z.string().min(1).max(60).optional(),
+  ctaUrl: z.string().url().optional(),
+  startDate: z.string().datetime().nullable().optional(),
+  endDate: z.string().datetime().nullable().optional(),
+  isActive: z.boolean().optional(),
+});
 
 async function requireAdmin() {
   const session = await auth();
@@ -17,16 +28,25 @@ export async function PATCH(
   }
   const { id } = await params;
   const body: unknown = await req.json();
-  const isActive = (body as { isActive?: boolean }).isActive;
-  if (typeof isActive !== "boolean") {
+  const parsed = UpdateSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "isActive must be boolean" },
+      { error: parsed.error.flatten() },
       { status: 422 },
     );
   }
+  const { startDate, endDate, ...rest } = parsed.data;
   const sponsor = await db.sponsor.update({
     where: { id },
-    data: { isActive },
+    data: {
+      ...rest,
+      ...(startDate !== undefined && {
+        startDate: startDate ? new Date(startDate) : null,
+      }),
+      ...(endDate !== undefined && {
+        endDate: endDate ? new Date(endDate) : null,
+      }),
+    },
   });
   return NextResponse.json(sponsor);
 }

@@ -4,6 +4,8 @@ import { db } from "@/lib/db/prisma";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
+import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildBreadcrumbSchema,
@@ -13,6 +15,10 @@ import {
 import { getTopicSeo } from "@/lib/seo/topic-faq";
 import type { FaqEntry } from "@/lib/seo/json-ld";
 import Link from "next/link";
+import {
+  getActiveSponsor,
+  getAffiliateLinksForTopic,
+} from "@/lib/monetization/resolvers";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
@@ -88,6 +94,11 @@ export default async function TopicPage({ params }: { params: Params }) {
         },
       })
     : [];
+
+  const [sponsor, affiliateLinks] = await Promise.all([
+    getActiveSponsor(),
+    getAffiliateLinksForTopic(slug),
+  ]);
 
   // JSON-LD schemas
   const breadcrumbSchema = buildBreadcrumbSchema([
@@ -197,6 +208,47 @@ export default async function TopicPage({ params }: { params: Params }) {
               </details>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Sponsor placement */}
+      {sponsor && (
+        <div className="mb-10">
+          <SponsorBlock
+            name={sponsor.name}
+            copyText={sponsor.copyText}
+            ctaText={sponsor.ctaText}
+            ctaUrl={sponsor.ctaUrl}
+          />
+        </div>
+      )}
+
+      {/* Affiliate links */}
+      {affiliateLinks.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">
+            Recommended products
+          </h2>
+          <ul className="mb-3 space-y-2">
+            {affiliateLinks.map((link) => (
+              <li key={link.id}>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
+                  {link.label}
+                </a>
+                {link.commission && (
+                  <span className="ml-2 text-xs text-gray-400">
+                    ({link.commission} commission)
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <AffiliateDisclosure />
         </section>
       )}
 

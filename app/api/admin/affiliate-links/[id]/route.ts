@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
+import { z } from "zod";
+
+const UpdateSchema = z.object({
+  label: z.string().min(1).max(120).optional(),
+  url: z.string().url().optional(),
+  productName: z.string().min(1).max(120).optional(),
+  commission: z.string().max(50).nullable().optional(),
+  topicSlug: z.string().max(80).nullable().optional(),
+  isActive: z.boolean().optional(),
+});
 
 async function requireAdmin() {
   const session = await auth();
@@ -17,16 +27,16 @@ export async function PATCH(
   }
   const { id } = await params;
   const body: unknown = await req.json();
-  const isActive = (body as { isActive?: boolean }).isActive;
-  if (typeof isActive !== "boolean") {
+  const parsed = UpdateSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "isActive must be boolean" },
+      { error: parsed.error.flatten() },
       { status: 422 },
     );
   }
   const link = await db.affiliateLink.update({
     where: { id },
-    data: { isActive },
+    data: parsed.data,
   });
   return NextResponse.json(link);
 }
