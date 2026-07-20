@@ -17,9 +17,9 @@ const makeVideo = (overrides: Partial<DigestVideo> = {}): DigestVideo => ({
   ...overrides,
 });
 
-const APP_URL = "https://menhealthdigest.com";
+const APP_URL = "https://menhealth-digest.com";
 const UNSUB_URL =
-  "https://menhealthdigest.com/api/newsletter/unsubscribe?id=sub_123";
+  "https://menhealth-digest.com/api/newsletter/unsubscribe?id=sub_123";
 
 describe("buildDigestSubject", () => {
   it("returns a generic subject when no videos are provided", () => {

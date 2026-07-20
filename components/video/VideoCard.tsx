@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { RiskBadge } from "@/components/ui/RiskBadge";
 
 type VideoCardProps = {
   slug: string;
@@ -9,6 +10,9 @@ type VideoCardProps = {
   shortSummary: string | null;
   trendScore: number;
   topicNames: string[];
+  riskLevel?: string;
+  evidenceLabel?: string;
+  durationSeconds?: number;
 };
 
 export function VideoCard({
@@ -18,11 +22,16 @@ export function VideoCard({
   thumbnailUrl,
   shortSummary,
   topicNames,
+  riskLevel,
+  evidenceLabel,
+  durationSeconds,
 }: VideoCardProps) {
+  const watchTimeMin = durationSeconds ? Math.ceil(durationSeconds / 60) : null;
+
   return (
     <Link
       href={`/videos/${slug}`}
-      className="group flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       {thumbnailUrl && (
         <div className="relative aspect-video w-full bg-gray-100">
@@ -36,17 +45,25 @@ export function VideoCard({
         </div>
       )}
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap items-center gap-1.5">
           {topicNames.slice(0, 2).map((name) => (
             <span
               key={name}
-              className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800"
+              className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800"
             >
               {name}
             </span>
           ))}
+          {riskLevel && riskLevel !== "LOW" && <RiskBadge level={riskLevel} />}
         </div>
-        <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-blue-700">
+        {(evidenceLabel || watchTimeMin) && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+            {evidenceLabel && <span>Evidence: {evidenceLabel}</span>}
+            {evidenceLabel && watchTimeMin && <span>·</span>}
+            {watchTimeMin && <span>{watchTimeMin} min watch</span>}
+          </div>
+        )}
+        <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-emerald-700">
           {title}
         </h3>
         {shortSummary && (

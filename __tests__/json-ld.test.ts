@@ -14,7 +14,7 @@ describe("buildVideoObjectSchema", () => {
     publishedAt: new Date("2024-01-15T10:00:00Z"),
     channelTitle: "Health Lab",
     youtubeVideoId: "abc123",
-    appUrl: "https://menhealthdigest.com",
+    appUrl: "https://menhealth-digest.com",
     slug: "how-to-boost-testosterone-naturally",
   };
 
@@ -43,17 +43,17 @@ describe("buildVideoObjectSchema", () => {
 describe("buildBreadcrumbSchema", () => {
   it("sets @type to BreadcrumbList", () => {
     const schema = buildBreadcrumbSchema([
-      { name: "Home", url: "https://menhealthdigest.com" },
+      { name: "Home", url: "https://menhealth-digest.com" },
     ]);
     expect(schema["@type"]).toBe("BreadcrumbList");
   });
 
   it("assigns correct positions", () => {
     const items = [
-      { name: "Home", url: "https://menhealthdigest.com" },
+      { name: "Home", url: "https://menhealth-digest.com" },
       {
         name: "Testosterone",
-        url: "https://menhealthdigest.com/topics/testosterone",
+        url: "https://menhealth-digest.com/topics/testosterone",
       },
     ];
     const schema = buildBreadcrumbSchema(items) as {

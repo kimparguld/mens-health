@@ -6,6 +6,8 @@ import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
+import { RiskBadge } from "@/components/ui/RiskBadge";
+import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildBreadcrumbSchema,
@@ -142,11 +144,7 @@ export default async function TopicPage({ params }: { params: Params }) {
         </nav>
 
         <div className="mb-2 flex items-center gap-2">
-          {topicSeed.isHighRisk && (
-            <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-              High-risk topic
-            </span>
-          )}
+          {topicSeed.isHighRisk && <RiskBadge level="HIGH" />}
         </div>
 
         <h1 className="text-4xl font-bold text-gray-900">{topicSeed.name}</h1>
@@ -165,24 +163,55 @@ export default async function TopicPage({ params }: { params: Params }) {
         <p className="text-gray-500">No published videos for this topic yet.</p>
       ) : (
         <section className="mb-12">
+          {/* Featured this week: top 3 */}
+          {publishedVideos.length >= 3 && (
+            <>
+              <h2 className="mb-4 text-xl font-semibold text-gray-900">
+                Featured this week
+              </h2>
+              <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                {publishedVideos.slice(0, 3).map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    slug={video.slug}
+                    title={video.title}
+                    channelTitle={video.channel?.title ?? ""}
+                    thumbnailUrl={video.thumbnailUrl}
+                    shortSummary={video.summaries[0]?.shortSummary ?? null}
+                    trendScore={video.trendScore}
+                    topicNames={video.topics.map(
+                      (vt: (typeof video.topics)[number]) => vt.topic.name,
+                    )}
+                    riskLevel={video.riskLevel}
+                    durationSeconds={video.durationSeconds ?? undefined}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
           <h2 className="mb-4 text-xl font-semibold text-gray-900">
-            Top Videos
+            All videos
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {publishedVideos.map((video: (typeof publishedVideos)[number]) => (
-              <VideoCard
-                key={video.id}
-                slug={video.slug}
-                title={video.title}
-                channelTitle={video.channel?.title ?? ""}
-                thumbnailUrl={video.thumbnailUrl}
-                shortSummary={video.summaries[0]?.shortSummary ?? null}
-                trendScore={video.trendScore}
-                topicNames={video.topics.map(
-                  (vt: (typeof video.topics)[number]) => vt.topic.name,
-                )}
-              />
-            ))}
+            {publishedVideos
+              .slice(publishedVideos.length >= 3 ? 3 : 0)
+              .map((video: (typeof publishedVideos)[number]) => (
+                <VideoCard
+                  key={video.id}
+                  slug={video.slug}
+                  title={video.title}
+                  channelTitle={video.channel?.title ?? ""}
+                  thumbnailUrl={video.thumbnailUrl}
+                  shortSummary={video.summaries[0]?.shortSummary ?? null}
+                  trendScore={video.trendScore}
+                  topicNames={video.topics.map(
+                    (vt: (typeof video.topics)[number]) => vt.topic.name,
+                  )}
+                  riskLevel={video.riskLevel}
+                  durationSeconds={video.durationSeconds ?? undefined}
+                />
+              ))}
           </div>
         </section>
       )}
@@ -196,7 +225,7 @@ export default async function TopicPage({ params }: { params: Params }) {
           <div className="divide-y rounded-xl border bg-white">
             {seo.faq.map((item, i) => (
               <details key={i} className="group px-5 py-4">
-                <summary className="cursor-pointer list-none text-base font-medium text-gray-900 group-open:text-blue-700">
+                <summary className="cursor-pointer list-none text-base font-medium text-gray-900 group-open:text-emerald-700">
                   <span className="mr-2 inline-block transition-transform group-open:rotate-90">
                     ›
                   </span>
@@ -251,6 +280,19 @@ export default async function TopicPage({ params }: { params: Params }) {
           <AffiliateDisclosure />
         </section>
       )}
+
+      {/* Newsletter CTA */}
+      <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+        <h2 className="text-lg font-bold text-gray-900">
+          Get the weekly digest
+        </h2>
+        <p className="mt-1 text-sm text-gray-600">
+          5 videos summarised · 3 claims checked · 1 practical takeaway
+        </p>
+        <div className="mt-4">
+          <NewsletterSignupForm />
+        </div>
+      </section>
 
       <Disclaimer />
     </main>

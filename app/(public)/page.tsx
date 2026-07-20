@@ -1,6 +1,11 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { db } from "@/lib/db/prisma";
 import { VideoCard } from "@/components/video/VideoCard";
+import { HowWeRateClaims } from "@/components/ui/HowWeRateClaims";
+import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
+import { RiskBadge } from "@/components/ui/RiskBadge";
+import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 
 export const dynamic = "force-dynamic";
@@ -23,11 +28,45 @@ export const metadata: Metadata = {
   },
 };
 
+function deriveEvidenceLabel(score: number | null | undefined): string {
+  if (score == null) return "Not reviewed";
+  if (score < 0.35) return "Weak";
+  if (score < 0.6) return "Mixed";
+  if (score < 0.8) return "Moderate";
+  return "Strong";
+}
+
+const FEATURED_TOPIC_SLUGS = [
+  "testosterone",
+  "sleep",
+  "fitness-over-40",
+  "nutrition",
+  "longevity",
+  "supplements",
+  "weight-loss",
+  "muscle-gain",
+];
+
 export default async function HomePage() {
-  const videos = await db.video.findMany({
+  // Top-ranked video for the "Today's top insight" section
+  const featuredVideo = await db.video.findFirst({
     where: { status: "PUBLISHED" },
     orderBy: { trendScore: "desc" },
-    take: 20,
+    include: {
+      summaries: { take: 1, orderBy: { createdAt: "desc" } },
+      claims: { take: 1, orderBy: { riskLevel: "desc" } },
+      topics: { include: { topic: true } },
+    },
+  });
+
+  // Remaining trending videos (exclude featured to avoid duplication)
+  const videos = await db.video.findMany({
+    where: {
+      status: "PUBLISHED",
+      ...(featuredVideo ? { id: { not: featuredVideo.id } } : {}),
+    },
+    orderBy: { trendScore: "desc" },
+    take: 12,
     include: {
       channel: true,
       summaries: { take: 1, orderBy: { createdAt: "desc" } },
@@ -35,53 +74,205 @@ export default async function HomePage() {
     },
   });
 
+  const featuredSummary = featuredVideo?.summaries[0] ?? null;
+  const featuredClaim = featuredVideo?.claims[0] ?? null;
+  const featuredWatchMin = featuredVideo?.durationSeconds
+    ? Math.ceil(featuredVideo.durationSeconds / 60)
+    : null;
+
+  const featuredTopics = TOPIC_SEEDS.filter((t) =>
+    FEATURED_TOPIC_SLUGS.includes(t.slug),
+  );
+  const remainingTopics = TOPIC_SEEDS.filter(
+    (t) => !FEATURED_TOPIC_SLUGS.includes(t.slug),
+  );
+
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <header className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-          MenHealth Digest
-        </h1>
-        <p className="mt-2 text-lg text-gray-600">
-          Evidence-aware summaries of trending men&apos;s health content —
-          without the hype.
-        </p>
-      </header>
-
-      {/* Topic navigation */}
-      <nav className="mb-8 flex flex-wrap gap-2" aria-label="Topics">
-        {TOPIC_SEEDS.map((topic) => (
-          <a
-            key={topic.slug}
-            href={`/topics/${topic.slug}`}
-            className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-700 hover:border-blue-400 hover:text-blue-700"
-          >
-            {topic.name}
-          </a>
-        ))}
-      </nav>
-
-      {videos.length === 0 ? (
-        <p className="text-gray-500">
-          No published summaries yet. Check back soon.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video: (typeof videos)[number]) => (
-            <VideoCard
-              key={video.id}
-              slug={video.slug}
-              title={video.title}
-              channelTitle={video.channel?.title ?? ""}
-              thumbnailUrl={video.thumbnailUrl}
-              shortSummary={video.summaries[0]?.shortSummary ?? null}
-              trendScore={video.trendScore}
-              topicNames={video.topics.map(
-                (vt: (typeof video.topics)[number]) => vt.topic.name,
-              )}
-            />
-          ))}
+    <main>
+      {/* Hero */}
+      <section className="border-b border-gray-100 bg-white py-16">
+        <div className="mx-auto max-w-[1120px] px-4">
+          <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            Men&apos;s health trends,{" "}
+            <span className="text-emerald-600">
+              explained without the hype.
+            </span>
+          </h1>
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-gray-600">
+            We scan trending YouTube videos about fitness, sleep, testosterone,
+            nutrition, longevity, and men&apos;s wellness — then summarise the
+            key claims and check them against available evidence.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/digest"
+              className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+            >
+              Get the free digest
+            </Link>
+            <Link
+              href="#trending"
+              className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              Explore trending videos
+            </Link>
+          </div>
+          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
+            <li>✓ Official YouTube embeds</li>
+            <li>✓ AI-assisted summaries</li>
+            <li>✓ Evidence-aware claim checks</li>
+          </ul>
         </div>
+      </section>
+
+      {/* Today's top insight */}
+      {featuredVideo && featuredSummary && (
+        <section className="bg-slate-50 py-12">
+          <div className="mx-auto max-w-[1120px] px-4">
+            <p className="mb-5 text-xs font-semibold tracking-widest text-emerald-600 uppercase">
+              Today&apos;s top insight
+            </p>
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+              {featuredClaim && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                    The claim
+                  </p>
+                  <p className="mt-1 text-lg font-semibold text-gray-900">
+                    &ldquo;{featuredClaim.text}&rdquo;
+                  </p>
+                </div>
+              )}
+              <div className="mb-5">
+                <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                  Our take
+                </p>
+                <p className="mt-1 leading-relaxed text-gray-700">
+                  {featuredSummary.shortSummary}
+                </p>
+              </div>
+              <div className="mb-5 flex flex-wrap items-center gap-2">
+                {featuredClaim ? (
+                  <EvidenceBadge status={featuredClaim.evidenceStatus} />
+                ) : (
+                  <EvidenceBadge status="NOT_CHECKED" />
+                )}
+                <RiskBadge level={featuredVideo.riskLevel} />
+                {featuredWatchMin && (
+                  <span className="text-xs text-gray-400">
+                    {featuredWatchMin} min watch
+                  </span>
+                )}
+                <span className="text-xs text-gray-400">~2 min read</span>
+              </div>
+              <Link
+                href={`/videos/${featuredVideo.slug}`}
+                className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700"
+              >
+                Read the breakdown →
+              </Link>
+            </div>
+          </div>
+        </section>
       )}
+
+      {/* Topic cards */}
+      <section id="topics" className="py-14">
+        <div className="mx-auto max-w-[1120px] px-4">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">
+            Browse by topic
+          </h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {featuredTopics.map((topic) => (
+              <Link
+                key={topic.slug}
+                href={`/topics/${topic.slug}`}
+                className="group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:border-emerald-300 hover:shadow-sm"
+              >
+                <p className="font-semibold text-gray-900 group-hover:text-emerald-700">
+                  {topic.name}
+                </p>
+                <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-500">
+                  {topic.description}
+                </p>
+                <p className="mt-3 text-xs font-medium text-emerald-600">
+                  Explore →
+                </p>
+              </Link>
+            ))}
+          </div>
+          {remainingTopics.length > 0 && (
+            <p className="mt-4 text-sm text-gray-500">
+              More topics:{" "}
+              {remainingTopics.map((t, i) => (
+                <span key={t.slug}>
+                  <Link
+                    href={`/topics/${t.slug}`}
+                    className="text-gray-600 hover:text-emerald-600"
+                  >
+                    {t.name}
+                  </Link>
+                  {i < remainingTopics.length - 1 && ", "}
+                </span>
+              ))}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* How we rate claims */}
+      <HowWeRateClaims />
+
+      {/* Trending summaries */}
+      <section id="trending" className="py-14">
+        <div className="mx-auto max-w-[1120px] px-4">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">
+            Trending summaries
+          </h2>
+          {videos.length === 0 ? (
+            <p className="text-gray-500">
+              No published summaries yet. Check back soon.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {videos.map((video) => (
+                <VideoCard
+                  key={video.id}
+                  slug={video.slug}
+                  title={video.title}
+                  channelTitle={video.channel?.title ?? ""}
+                  thumbnailUrl={video.thumbnailUrl}
+                  shortSummary={video.summaries[0]?.shortSummary ?? null}
+                  trendScore={video.trendScore}
+                  topicNames={video.topics.map((vt) => vt.topic.name)}
+                  riskLevel={video.riskLevel}
+                  evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
+                  durationSeconds={video.durationSeconds ?? undefined}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="bg-emerald-50 py-16">
+        <div className="mx-auto max-w-lg px-4 text-center">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Get the 5-minute Men&apos;s Health Digest
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">Every week:</p>
+          <ul className="mt-2 space-y-0.5 text-sm text-gray-600">
+            <li>5 trending videos summarised</li>
+            <li>3 claims checked</li>
+            <li>1 practical takeaway</li>
+            <li>No miracle-cure nonsense</li>
+          </ul>
+          <div className="mt-6">
+            <NewsletterSignupForm />
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

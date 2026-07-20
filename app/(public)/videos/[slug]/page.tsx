@@ -8,6 +8,9 @@ import { Disclaimer } from "@/components/ui/Disclaimer";
 import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
 import { PremiumGate } from "@/components/ui/PremiumGate";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
+import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
+import { RiskBadge } from "@/components/ui/RiskBadge";
+import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildVideoObjectSchema,
@@ -19,7 +22,7 @@ import {
 } from "@/lib/monetization/resolvers";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
 
@@ -138,6 +141,23 @@ export default async function VideoPage({ params }: { params: Params }) {
         <span className="text-gray-900">{video.title}</span>
       </nav>
 
+      {/* Metadata badges */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {video.topics.slice(0, 2).map((vt) => (
+          <Link
+            key={vt.topicId}
+            href={`/topics/${vt.topic.slug}`}
+            className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 hover:bg-emerald-200"
+          >
+            {vt.topic.name}
+          </Link>
+        ))}
+        <EvidenceBadge
+          status={video.claims[0]?.evidenceStatus ?? "NOT_CHECKED"}
+        />
+        <RiskBadge level={video.riskLevel} />
+      </div>
+
       {/* Title */}
       <h1 className="mb-2 text-3xl leading-tight font-bold text-gray-900">
         {video.title}
@@ -182,6 +202,24 @@ export default async function VideoPage({ params }: { params: Params }) {
         </div>
       )}
 
+      {/* Target audience + warnings teaser */}
+      {summary && (
+        <div className="mb-8 space-y-3">
+          {summary.targetAudience && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+              <span className="font-semibold">Best for: </span>
+              {summary.targetAudience}
+            </div>
+          )}
+          {warnings.length > 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <span className="font-semibold">Be careful: </span>
+              {warnings[0]}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Summary */}
       {summary && (
         <>
@@ -200,7 +238,7 @@ export default async function VideoPage({ params }: { params: Params }) {
               <ul className="space-y-2">
                 {takeaways.map((item, index) => (
                   <li key={index} className="flex gap-2 text-gray-700">
-                    <span className="mt-0.5 text-blue-500">✓</span>
+                    <span className="mt-0.5 text-emerald-500">✓</span>
                     {item}
                   </li>
                 ))}
@@ -240,21 +278,9 @@ export default async function VideoPage({ params }: { params: Params }) {
                   key={claim.id}
                   className="rounded-lg border border-gray-200 p-4"
                 >
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        claim.riskLevel === "HIGH"
-                          ? "bg-red-100 text-red-800"
-                          : claim.riskLevel === "MEDIUM"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {claim.riskLevel} risk
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      Evidence: {claim.evidenceStatus.replace("_", " ")}
-                    </span>
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <RiskBadge level={claim.riskLevel} />
+                    <EvidenceBadge status={claim.evidenceStatus} />
                   </div>
                   <p className="text-sm font-medium text-gray-900">
                     {claim.text}
@@ -278,21 +304,9 @@ export default async function VideoPage({ params }: { params: Params }) {
                         key={claim.id}
                         className="rounded-lg border border-gray-200 p-4"
                       >
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                              claim.riskLevel === "HIGH"
-                                ? "bg-red-100 text-red-800"
-                                : claim.riskLevel === "MEDIUM"
-                                  ? "bg-amber-100 text-amber-800"
-                                  : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {claim.riskLevel} risk
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            Evidence: {claim.evidenceStatus.replace("_", " ")}
-                          </span>
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          <RiskBadge level={claim.riskLevel} />
+                          <EvidenceBadge status={claim.evidenceStatus} />
                         </div>
                         <p className="text-sm font-medium text-gray-900">
                           {claim.text}
@@ -320,7 +334,7 @@ export default async function VideoPage({ params }: { params: Params }) {
               <Link
                 key={vt.topicId}
                 href={`/topics/${vt.topic.slug}`}
-                className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 hover:bg-blue-200"
+                className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-800 hover:bg-emerald-200"
               >
                 {vt.topic.name}
               </Link>
@@ -357,6 +371,19 @@ export default async function VideoPage({ params }: { params: Params }) {
           <AffiliateDisclosure />
         </section>
       )}
+
+      {/* Newsletter CTA */}
+      <section className="mb-8 rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+        <h2 className="text-lg font-bold text-gray-900">
+          Get the weekly digest
+        </h2>
+        <p className="mt-1 text-sm text-gray-600">
+          5 videos summarised · 3 claims checked · 1 practical takeaway
+        </p>
+        <div className="mt-4">
+          <NewsletterSignupForm />
+        </div>
+      </section>
 
       {/* Disclaimer — required on every video page */}
       <Disclaimer />

@@ -40,10 +40,21 @@ export async function POST() {
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
     // Log the raw error server-side for debugging; never expose Stripe internals to the client.
-    console.error(
-      "[stripe/checkout]",
-      err instanceof Error ? err.message : err,
-    );
+    const message = err instanceof Error ? err.message : String(err);
+
+    // Detect the common misconfiguration of passing a product ID instead of a price ID.
+    if (
+      message.includes("No such price") &&
+      env.STRIPE_PRICE_ID?.startsWith("prod_")
+    ) {
+      console.error(
+        "[stripe/checkout] Misconfiguration: STRIPE_PRICE_ID is set to a product ID ('%s'). It must be a price ID (starts with 'price_'). Update the environment variable in Vercel.",
+        env.STRIPE_PRICE_ID,
+      );
+    } else {
+      console.error("[stripe/checkout]", message);
+    }
+
     return NextResponse.json(
       { error: "Payment service unavailable. Please try again shortly." },
       { status: 502 },
