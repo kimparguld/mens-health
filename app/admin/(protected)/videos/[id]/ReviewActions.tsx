@@ -27,7 +27,7 @@ type ActionKey = (typeof ACTIONS)[number]["key"];
 
 export default function ReviewActions({
   videoId,
-  currentStatus,
+  currentStatus: _currentStatus,
 }: {
   videoId: string;
   currentStatus: PublishStatus;

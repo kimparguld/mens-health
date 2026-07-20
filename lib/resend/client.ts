@@ -2,7 +2,6 @@ import { Resend } from "resend";
 import { env } from "@/env";
 
 declare global {
-  // eslint-disable-next-line no-var
   var __resend: Resend | undefined;
 }
 

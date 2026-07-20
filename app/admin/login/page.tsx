@@ -1,8 +1,6 @@
 import { signIn } from "@/lib/auth";
 
-export default function AdminLoginPage({
-  searchParams,
-}: {
+export default function AdminLoginPage(_props: {
   searchParams: Promise<{ error?: string }>;
 }) {
   return (

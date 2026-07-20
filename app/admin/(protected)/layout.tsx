@@ -16,6 +16,9 @@ export default async function AdminLayout({
   const nav = [
     { label: "Dashboard", href: "/admin" },
     { label: "Review queue", href: "/admin/videos" },
+    { label: "Social drafts", href: "/admin/social/drafts" },
+    { label: "Social calendar", href: "/admin/social/calendar" },
+    { label: "Social accounts", href: "/admin/social/accounts" },
   ];
 
   return (
