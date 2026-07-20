@@ -2,6 +2,7 @@ import { db } from "@/lib/db/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReviewActions from "./ReviewActions";
+import GenerateSocialButton from "./GenerateSocialButton";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +72,12 @@ export default async function AdminVideoDetailPage({
         </div>
 
         {/* Review action buttons */}
-        <ReviewActions videoId={video.id} currentStatus={video.status} />
+        <div className="flex flex-col items-end gap-2">
+          <ReviewActions videoId={video.id} currentStatus={video.status} />
+          {video.status === "PUBLISHED" && (
+            <GenerateSocialButton videoId={video.id} />
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">

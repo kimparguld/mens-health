@@ -319,3 +319,110 @@ enum SubscriptionStatus {
   INCOMPLETE
   PAUSED
 }
+
+// ---------------------------------------------------------------------------
+// Social Content Engine
+// ---------------------------------------------------------------------------
+
+enum Platform {
+  YOUTUBE_SHORTS
+  TIKTOK
+  INSTAGRAM_REELS
+  REDDIT
+  LINKEDIN
+  X
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+  FAILED
+}
+
+enum SourceType {
+  VIDEO_SUMMARY
+  CLAIM
+  TOPIC_PAGE
+  WEEKLY_DIGEST
+}
+
+enum MediaType {
+  VIDEO
+  TEXT
+  IMAGE
+}
+
+model SocialPost {
+  id             String     @id @default(cuid())
+  platform       Platform
+  status         PostStatus @default(DRAFT)
+  sourceType     SourceType
+  sourceId       String
+  hook           String
+  script         String
+  caption        String
+  hashtags       String[]
+  utmUrl         String
+  riskLevel      RiskLevel  @default(LOW)
+  requiresReview Boolean    @default(true)
+  scheduledAt    DateTime?
+  publishedAt    DateTime?
+  platformPostId String?
+  platformUrl    String?
+  templateId     String?
+  template       SocialTemplate?        @relation(fields: [templateId], references: [id])
+  attempts       SocialPublishAttempt[]
+  metrics        SocialMetric[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model SocialTemplate {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  platform  Platform?
+  hook      String
+  script    String
+  caption   String
+  hashtags  String[]
+  posts     SocialPost[]
+  createdAt DateTime  @default(now())
+}
+
+model SocialAccount {
+  id           String    @id @default(cuid())
+  platform     Platform  @unique
+  handle       String?
+  /// Encrypted access token — never returned to client
+  accessToken  String
+  refreshToken String?
+  tokenExpiry  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model SocialPublishAttempt {
+  id          String     @id @default(cuid())
+  postId      String
+  post        SocialPost @relation(fields: [postId], references: [id])
+  success     Boolean
+  errorCode   String?
+  errorMsg    String?
+  response    Json?
+  attemptedAt DateTime   @default(now())
+}
+
+model SocialMetric {
+  id         String     @id @default(cuid())
+  postId     String
+  post       SocialPost @relation(fields: [postId], references: [id])
+  views      Int        @default(0)
+  likes      Int        @default(0)
+  shares     Int        @default(0)
+  clicks     Int        @default(0)
+  recordedAt DateTime   @default(now())
+}

@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 
-export default function SignInPage({
-  searchParams,
-}: {
+export default function SignInPage(_props: {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 }) {
   // searchParams is a Promise in Next.js 15 App Router — resolve via state
