@@ -9,8 +9,10 @@ import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
 
-function deriveEvidenceLabel(score: number | null | undefined): string {
-  if (score == null) return "Not reviewed";
+function deriveEvidenceLabel(
+  score: number | null | undefined,
+): string | undefined {
+  if (score == null) return undefined;
   if (score < 0.35) return "Weak";
   if (score < 0.6) return "Mixed";
   if (score < 0.8) return "Moderate";

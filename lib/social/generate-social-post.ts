@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { env } from "@/env";
 import { anthropic, DEFAULT_MODEL } from "@/lib/ai/client";
 import { db } from "@/lib/db/prisma";
 import { buildUtmUrl } from "./utm";
@@ -6,6 +7,7 @@ import {
   checkForbiddenPatterns,
   detectHighRiskTopic,
   validatePlatformConstraints,
+  PLATFORM_CONSTRAINTS,
 } from "./platform-rules";
 import { SocialPostAiOutputSchema } from "./validation";
 import type { Platform, RiskLevel } from "@prisma/client";
@@ -77,6 +79,7 @@ function buildPrompt(
   platform: Platform,
   utmUrl: string,
 ): string {
+  const constraints = PLATFORM_CONSTRAINTS[platform];
   return `You are the social content writer for MenHealth Digest.
 
 Generate a social media post for the following men's health video summary.
@@ -91,6 +94,12 @@ Risk level: ${riskLabel(ctx.riskLevel)}
 Topics: ${ctx.topicNames.join(", ")}
 UTM link: ${utmUrl}
 
+Platform limits (HARD — do not exceed):
+- Caption: ${constraints.maxCaptionChars} characters max
+- Hook: ${constraints.maxHookChars} characters max
+- Hashtags: ${constraints.maxHashtags} max
+- Script: ${constraints.maxScriptWords} words max
+
 Rules:
 - Do NOT write fear-based copy ("fix your testosterone", "this cures", "doctors don't want you to know").
 - Do NOT imply the reader has a medical condition.
@@ -98,7 +107,8 @@ Rules:
 - End caption with: "Educational only. Not medical advice."
 - Include the UTM link in the caption.
 - Include evidence label and risk level in the caption.
-- Keep hook under 100 characters for video platforms.
+- Keep hook under ${constraints.maxHookChars} characters.
+- For text-only platforms (X, REDDIT, LINKEDIN), set "script" to an empty string "".
 - Set requiresReview to true if the content involves TRT, medications, supplements, cancer, mental health, or ED.
 
 Respond ONLY with a JSON object:
@@ -134,6 +144,15 @@ export async function generateSocialPost(
     path: `/videos/${ctx.slug}`,
     campaign,
   });
+
+  if (!env.GROQ_API_KEY) {
+    return {
+      ok: false,
+      error: new Error(
+        "GROQ_API_KEY is not configured. Add it to your environment variables to enable AI-generated social posts.",
+      ),
+    };
+  }
 
   let aiOutput: z.infer<typeof SocialPostAiOutputSchema>;
   try {

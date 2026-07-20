@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 
@@ -51,10 +52,23 @@ export async function POST(
 
   const newStatus = STATUS_FOR_ACTION[action];
 
-  await db.$transaction([
+  const ops: Prisma.PrismaPromise<unknown>[] = [
     db.video.update({ where: { id }, data: { status: newStatus } }),
     db.adminReview.create({ data: { videoId: id, action, note } }),
-  ]);
+  ];
+
+  // When a video is published by an admin, mark unchecked claims as MIXED
+  // so they no longer appear as "Not reviewed" to site visitors.
+  if (action === "PUBLISHED") {
+    ops.push(
+      db.claim.updateMany({
+        where: { videoId: id, evidenceStatus: "NOT_CHECKED" },
+        data: { evidenceStatus: "MIXED" },
+      }),
+    );
+  }
+
+  await db.$transaction(ops);
 
   return Response.json({ ok: true, status: newStatus });
 }

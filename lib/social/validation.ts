@@ -8,9 +8,11 @@ export const SocialPostAiOutputSchema = z.object({
   hook: z.string().min(5).max(300).describe("Opening hook to stop the scroll"),
   script: z
     .string()
-    .min(20)
+    .min(0)
     .max(3000)
-    .describe("Full spoken script or body copy"),
+    .describe(
+      "Full spoken script or body copy — empty string for text-only platforms (X, Reddit, LinkedIn)",
+    ),
   caption: z
     .string()
     .min(10)

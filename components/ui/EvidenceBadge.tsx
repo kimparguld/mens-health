@@ -22,7 +22,8 @@ const EVIDENCE_CONFIG: Record<string, { label: string; className: string }> = {
 };
 
 export function EvidenceBadge({ status }: { status: string }) {
-  const config = EVIDENCE_CONFIG[status] ?? EVIDENCE_CONFIG["NOT_CHECKED"];
+  if (status === "NOT_CHECKED" || !(status in EVIDENCE_CONFIG)) return null;
+  const config = EVIDENCE_CONFIG[status];
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config.className}`}

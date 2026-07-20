@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReviewActions from "./ReviewActions";
 import GenerateSocialButton from "./GenerateSocialButton";
+import GenerateSummaryButton from "./GenerateSummaryButton";
 
 export const dynamic = "force-dynamic";
 
@@ -145,8 +146,11 @@ export default async function AdminVideoDetailPage({
               )}
             </section>
           ) : (
-            <div className="rounded-lg border bg-gray-50 p-5 text-sm text-gray-500">
-              No AI summary generated yet.
+            <div className="rounded-lg border bg-gray-50 p-5">
+              <p className="mb-3 text-sm text-gray-500">
+                No AI summary generated yet.
+              </p>
+              <GenerateSummaryButton videoId={video.id} />
             </div>
           )}
 

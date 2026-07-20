@@ -61,7 +61,7 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+        className="rounded-md border px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
       >
         Generate social drafts
       </button>
@@ -70,7 +70,9 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
 
   return (
     <div className="space-y-3 rounded-lg border bg-white p-4">
-      <p className="text-sm font-medium">Generate social drafts for:</p>
+      <p className="mb-2 text-sm font-semibold text-gray-700">
+        Generate social drafts for:
+      </p>
       <div className="flex flex-wrap gap-2">
         {PLATFORMS.map((p) => (
           <label
@@ -122,7 +124,7 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
         </button>
         <button
           onClick={() => setOpen(false)}
-          className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+          className="rounded-md border px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
         >
           Cancel
         </button>

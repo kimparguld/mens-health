@@ -27,3 +27,13 @@ body {
     -apple-system,
     sans-serif;
 }
+
+input,
+textarea,
+label {
+  color: var(--color-gray-600);
+}
+
+button {
+  cursor: pointer;
+}
