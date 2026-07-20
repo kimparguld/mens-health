@@ -76,7 +76,7 @@ export default function ReviewActions({
             key={key}
             onClick={() => handleAction(key)}
             disabled={loading !== null}
-            className={`rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50 ${className}`}
+            className={`self-end rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap disabled:opacity-50 ${className}`}
           >
             {loading === key ? "…" : label}
           </button>

@@ -22,7 +22,7 @@
     },
     {
       "path": "/api/cron/publish-scheduled-social",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 9 * * *"
     }
   ]
 }

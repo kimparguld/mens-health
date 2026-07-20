@@ -28,8 +28,10 @@ export const metadata: Metadata = {
   },
 };
 
-function deriveEvidenceLabel(score: number | null | undefined): string {
-  if (score == null) return "Not reviewed";
+function deriveEvidenceLabel(
+  score: number | null | undefined,
+): string | undefined {
+  if (score == null) return undefined;
   if (score < 0.35) return "Weak";
   if (score < 0.6) return "Mixed";
   if (score < 0.8) return "Moderate";
@@ -152,10 +154,8 @@ export default async function HomePage() {
                 </p>
               </div>
               <div className="mb-5 flex flex-wrap items-center gap-2">
-                {featuredClaim ? (
+                {featuredClaim && (
                   <EvidenceBadge status={featuredClaim.evidenceStatus} />
-                ) : (
-                  <EvidenceBadge status="NOT_CHECKED" />
                 )}
                 <RiskBadge level={featuredVideo.riskLevel} />
                 {featuredWatchMin && (
@@ -189,13 +189,13 @@ export default async function HomePage() {
                 href={`/topics/${topic.slug}`}
                 className="group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:border-emerald-300 hover:shadow-sm"
               >
-                <p className="font-semibold text-gray-900 group-hover:text-emerald-700">
+                <p className="font-semibold text-gray-900 group-hover:text-emerald-700!">
                   {topic.name}
                 </p>
                 <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-500">
                   {topic.description}
                 </p>
-                <p className="mt-3 text-xs font-medium text-emerald-600">
+                <p className="mt-3 text-xs font-medium text-emerald-600!">
                   Explore →
                 </p>
               </Link>

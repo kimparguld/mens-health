@@ -108,7 +108,7 @@ export default async function SocialAccountsPage({
 
   return (
     <div className="max-w-3xl space-y-6">
-      <h1 className="text-xl font-semibold">Social accounts</h1>
+      <h1 className="text-xl font-semibold text-gray-900">Social accounts</h1>
 
       {connected && (
         <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
