@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { SignOutButton } from "./SignOutButton";
+import { ManageSubscriptionButton } from "./ManageSubscriptionButton";
 
 export const dynamic = "force-dynamic";
 
@@ -70,6 +71,7 @@ export default async function AccountPage() {
                   : `Renews on ${periodEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`}
               </p>
             )}
+            <ManageSubscriptionButton />
           </div>
         ) : (
           <div className="space-y-3">

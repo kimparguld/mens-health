@@ -2,13 +2,21 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db/prisma";
+import { auth } from "@/lib/auth";
 import { YouTubePlayer } from "@/components/video/YouTubePlayer";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
+import { PremiumGate } from "@/components/ui/PremiumGate";
+import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildVideoObjectSchema,
   buildBreadcrumbSchema,
 } from "@/lib/seo/json-ld";
+import {
+  getActiveSponsor,
+  getAffiliateLinksForTopic,
+} from "@/lib/monetization/resolvers";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
@@ -77,6 +85,14 @@ export default async function VideoPage({ params }: { params: Params }) {
     : [];
 
   const firstTopic = video.topics[0]?.topic;
+
+  const [session, sponsor, affiliateLinks] = await Promise.all([
+    auth(),
+    getActiveSponsor(),
+    getAffiliateLinksForTopic(firstTopic?.slug ?? null),
+  ]);
+  const isPremium =
+    (session?.user as { isPremium?: boolean } | undefined)?.isPremium === true;
 
   const videoSchema = buildVideoObjectSchema({
     title: video.title,
@@ -154,6 +170,18 @@ export default async function VideoPage({ params }: { params: Params }) {
         <YouTubePlayer videoId={video.youtubeVideoId} title={video.title} />
       </div>
 
+      {/* Sponsor placement */}
+      {sponsor && (
+        <div className="mb-8">
+          <SponsorBlock
+            name={sponsor.name}
+            copyText={sponsor.copyText}
+            ctaText={sponsor.ctaText}
+            ctaUrl={sponsor.ctaUrl}
+          />
+        </div>
+      )}
+
       {/* Summary */}
       {summary && (
         <>
@@ -205,38 +233,81 @@ export default async function VideoPage({ params }: { params: Params }) {
             Health Claims in This Video
           </h2>
           <div className="space-y-4">
-            {video.claims.map((claim: (typeof video.claims)[number]) => (
-              <div
-                key={claim.id}
-                className="rounded-lg border border-gray-200 p-4"
-              >
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      claim.riskLevel === "HIGH"
-                        ? "bg-red-100 text-red-800"
-                        : claim.riskLevel === "MEDIUM"
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {claim.riskLevel} risk
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    Evidence: {claim.evidenceStatus.replace("_", " ")}
-                  </span>
-                </div>
-                <p className="text-sm font-medium text-gray-900">
-                  {claim.text}
-                </p>
-                {claim.explanation && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    {claim.explanation}
+            {video.claims
+              .slice(0, 3)
+              .map((claim: (typeof video.claims)[number]) => (
+                <div
+                  key={claim.id}
+                  className="rounded-lg border border-gray-200 p-4"
+                >
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                        claim.riskLevel === "HIGH"
+                          ? "bg-red-100 text-red-800"
+                          : claim.riskLevel === "MEDIUM"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {claim.riskLevel} risk
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      Evidence: {claim.evidenceStatus.replace("_", " ")}
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {claim.text}
                   </p>
-                )}
-              </div>
-            ))}
+                  {claim.explanation && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      {claim.explanation}
+                    </p>
+                  )}
+                </div>
+              ))}
           </div>
+          {video.claims.length > 3 && (
+            <div className="mt-4">
+              <PremiumGate isPremium={isPremium}>
+                <div className="space-y-4">
+                  {video.claims
+                    .slice(3)
+                    .map((claim: (typeof video.claims)[number]) => (
+                      <div
+                        key={claim.id}
+                        className="rounded-lg border border-gray-200 p-4"
+                      >
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                              claim.riskLevel === "HIGH"
+                                ? "bg-red-100 text-red-800"
+                                : claim.riskLevel === "MEDIUM"
+                                  ? "bg-amber-100 text-amber-800"
+                                  : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {claim.riskLevel} risk
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            Evidence: {claim.evidenceStatus.replace("_", " ")}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {claim.text}
+                        </p>
+                        {claim.explanation && (
+                          <p className="mt-1 text-xs text-gray-500">
+                            {claim.explanation}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </PremiumGate>
+            </div>
+          )}
         </section>
       )}
 
@@ -255,6 +326,35 @@ export default async function VideoPage({ params }: { params: Params }) {
               </Link>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Affiliate links */}
+      {affiliateLinks.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">
+            Recommended products
+          </h2>
+          <ul className="mb-3 space-y-2">
+            {affiliateLinks.map((link) => (
+              <li key={link.id}>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
+                  {link.label}
+                </a>
+                {link.commission && (
+                  <span className="ml-2 text-xs text-gray-400">
+                    ({link.commission} commission)
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <AffiliateDisclosure />
         </section>
       )}
 
