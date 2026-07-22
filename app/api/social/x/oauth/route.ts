@@ -27,12 +27,20 @@ export async function GET(req: NextRequest) {
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
 
+  const state = crypto.randomBytes(32).toString("base64url");
   const cookieStore = await cookies();
   cookieStore.set("x_code_verifier", codeVerifier, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 600, // 10 minutes
+    maxAge: 600,
+    path: "/",
+  });
+  cookieStore.set("oauth_state_x", state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 600,
     path: "/",
   });
 
@@ -41,7 +49,7 @@ export async function GET(req: NextRequest) {
     client_id: env.X_CLIENT_ID,
     redirect_uri: env.X_REDIRECT_URI,
     scope: "tweet.read tweet.write users.read offline.access",
-    state: "x_oauth",
+    state,
     code_challenge: codeChallenge,
     code_challenge_method: "S256",
   });

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { env } from "@/env";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -14,13 +16,23 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const state = crypto.randomBytes(32).toString("base64url");
+  const cookieStore = await cookies();
+  cookieStore.set("oauth_state_instagram", state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 600,
+    path: "/",
+  });
+
   const params = new URLSearchParams({
     client_id: env.META_CLIENT_ID,
     redirect_uri: env.META_REDIRECT_URI,
     scope:
       "instagram_basic,instagram_content_publish,pages_show_list,pages_read_engagement",
     response_type: "code",
-    state: "instagram_oauth",
+    state,
   });
 
   return NextResponse.redirect(

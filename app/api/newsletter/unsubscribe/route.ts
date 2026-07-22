@@ -46,11 +46,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   });
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 function unsubscribeHtml(email: string, wasAlready: boolean): string {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  const safeEmail = escapeHtml(email);
+  const safeAppUrl = escapeHtml(appUrl);
   const message = wasAlready
-    ? `${email} was already unsubscribed.`
-    : `${email} has been unsubscribed from MenHealth Digest.`;
+    ? `${safeEmail} was already unsubscribed.`
+    : `${safeEmail} has been unsubscribed from MenHealth Digest.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -59,7 +70,7 @@ function unsubscribeHtml(email: string, wasAlready: boolean): string {
   <h1 style="font-size:24px;">✓ Unsubscribed</h1>
   <p>${message}</p>
   <p style="margin-top:32px;">
-    <a href="${appUrl}" style="color:#2563eb;">Back to MenHealth Digest</a>
+    <a href="${safeAppUrl}" style="color:#2563eb;">Back to MenHealth Digest</a>
   </p>
 </body>
 </html>`;
