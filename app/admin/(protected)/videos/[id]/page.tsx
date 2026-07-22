@@ -5,7 +5,6 @@ import ReviewActions from "./ReviewActions";
 import GenerateSocialButton from "./GenerateSocialButton";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
-export const dynamic = "force-dynamic";
 
 const riskColors: Record<string, string> = {
   LOW: "bg-green-100 text-green-700",

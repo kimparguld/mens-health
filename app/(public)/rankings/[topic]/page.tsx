@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db/prisma";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema, buildItemListSchema } from "@/lib/seo/json-ld";
+import { getTopicBySlug, getWeeklyRankingVideos } from "@/lib/db/queries";
 
 function deriveEvidenceLabel(
   score: number | null | undefined,
@@ -23,8 +23,6 @@ const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
 
 type Params = Promise<{ topic: string }>;
-
-export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   return TOPIC_SEEDS.map((t) => ({ topic: t.slug }));
@@ -67,48 +65,12 @@ export default async function WeeklyRankingPage({
   const seed = TOPIC_SEEDS.find((t) => t.slug === topic);
   if (!seed) notFound();
 
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const topicRecord = await getTopicBySlug(topic);
 
-  const topicRecord = await db.topic.findUnique({ where: { slug: topic } });
-
-  const videos = topicRecord
-    ? await db.video.findMany({
-        where: {
-          status: "PUBLISHED",
-          topics: { some: { topicId: topicRecord.id } },
-          createdAt: { gte: sevenDaysAgo },
-        },
-        orderBy: { trendScore: "desc" },
-        take: 10,
-        include: {
-          channel: true,
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
-          topics: { include: { topic: true } },
-        },
-      })
+  const displayVideos = topicRecord
+    ? await getWeeklyRankingVideos(topicRecord.id, topic)
     : [];
-
-  // Fall back to all-time top if nothing was added this week
-  const fallbackVideos =
-    videos.length === 0 && topicRecord
-      ? await db.video.findMany({
-          where: {
-            status: "PUBLISHED",
-            topics: { some: { topicId: topicRecord.id } },
-          },
-          orderBy: { trendScore: "desc" },
-          take: 10,
-          include: {
-            channel: true,
-            summaries: { take: 1, orderBy: { createdAt: "desc" } },
-            topics: { include: { topic: true } },
-          },
-        })
-      : [];
-
-  const displayVideos = videos.length > 0 ? videos : fallbackVideos;
-  const isFallback = videos.length === 0;
+  const isFallback = false;
 
   const breadcrumb = buildBreadcrumbSchema([
     { name: "Home", url: APP_URL },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 
 const UpdateSchema = z.object({
   label: z.string().min(1).max(120).optional(),
@@ -38,6 +39,7 @@ export async function PATCH(
     where: { id },
     data: parsed.data,
   });
+  revalidateTag("affiliate-links", "max");
   return NextResponse.json(link);
 }
 
@@ -50,5 +52,6 @@ export async function DELETE(
   }
   const { id } = await params;
   await db.affiliateLink.delete({ where: { id } });
+  revalidateTag("affiliate-links", "max");
   return new NextResponse(null, { status: 204 });
 }

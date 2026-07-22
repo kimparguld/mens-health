@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { summarizeVideo } from "@/lib/ai/summarize-video";
 import { extractClaims } from "@/lib/ai/extract-claims";
+import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
@@ -100,6 +101,9 @@ export async function POST(
       });
     }
   }
+
+  revalidateTag("videos", "max");
+  revalidateTag(`video:${video.slug}`, "max");
 
   return NextResponse.json({ ok: true });
 }

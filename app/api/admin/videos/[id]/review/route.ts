@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 
 const ReviewBodySchema = z.object({
@@ -69,6 +70,9 @@ export async function POST(
   }
 
   await db.$transaction(ops);
+
+  revalidateTag("videos", "max");
+  if (video.slug) revalidateTag(`video:${video.slug}`, "max");
 
   return Response.json({ ok: true, status: newStatus });
 }

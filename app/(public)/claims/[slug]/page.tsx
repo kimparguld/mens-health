@@ -9,12 +9,12 @@ import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
 
+export const dynamic = "force-dynamic";
+
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
-
-export const dynamic = "force-dynamic";
 
 async function getClaim(slug: string) {
   // Try slug first, then fall back to id for older claims without a slug

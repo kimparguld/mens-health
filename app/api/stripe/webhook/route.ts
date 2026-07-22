@@ -5,7 +5,6 @@ import { db } from "@/lib/db/prisma";
 import { env } from "@/env";
 
 // Stripe requires the raw request body to verify webhook signatures.
-export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   if (!env.STRIPE_WEBHOOK_SECRET) {

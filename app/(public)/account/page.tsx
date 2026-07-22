@@ -1,11 +1,11 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { SignOutButton } from "./SignOutButton";
 import { ManageSubscriptionButton } from "./ManageSubscriptionButton";
-
-export const dynamic = "force-dynamic";
 
 type SessionUser = {
   id?: string;

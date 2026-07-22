@@ -1,6 +1,5 @@
 import { db } from "@/lib/db/prisma";
 
-export const dynamic = "force-dynamic";
 
 export default async function MonetizationPage() {
   const [affiliateLinks, sponsors] = await Promise.all([

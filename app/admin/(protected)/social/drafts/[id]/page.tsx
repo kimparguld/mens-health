@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import DraftActions from "./DraftActions";
 
-export const dynamic = "force-dynamic";
 
 const RISK_COLORS: Record<string, string> = {
   HIGH: "bg-red-100 text-red-800",

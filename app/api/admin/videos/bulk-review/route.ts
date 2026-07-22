@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 
 const BulkReviewBodySchema = z.object({
@@ -41,6 +42,8 @@ export async function POST(request: NextRequest) {
       db.adminReview.create({ data: { videoId, action, note } }),
     ),
   ]);
+
+  revalidateTag("videos", "max");
 
   return Response.json({ ok: true, count: ids.length, status: newStatus });
 }

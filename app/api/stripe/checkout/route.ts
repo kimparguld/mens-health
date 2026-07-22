@@ -4,7 +4,6 @@ import { getStripe } from "@/lib/stripe/client";
 import { env } from "@/env";
 
 // Stripe SDK requires Node.js runtime (uses Node crypto/http internals).
-export const runtime = "nodejs";
 
 export async function POST() {
   const session = await auth();
