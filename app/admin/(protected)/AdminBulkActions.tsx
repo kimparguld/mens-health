@@ -56,7 +56,7 @@ export default function AdminBulkActions() {
           className="rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50"
         >
           {loading === "generate-all-summaries"
-            ? "Queuing…"
+            ? "Generating…"
             : "Generate summaries for all videos"}
         </button>
         <button
