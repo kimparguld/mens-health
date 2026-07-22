@@ -2,15 +2,14 @@ import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 import BulkPublishTable from "./BulkPublishTable";
 
-
 const PAGE_SIZE = 25;
 
 export default async function AdminVideoQueuePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; q?: string }>;
 }) {
-  const { page: pageStr, status = "PROCESSED" } = await searchParams;
+  const { page: pageStr, status = "PENDING", q = "" } = await searchParams;
   const page = Math.max(1, parseInt(pageStr ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
@@ -25,27 +24,44 @@ export default async function AdminVideoQueuePage({
     allowedStatuses as readonly string[]
   ).includes(status)
     ? (status as VideoStatus)
-    : "PROCESSED";
+    : "PENDING";
+
+  const searchableStatuses: VideoStatus[] = ["PENDING", "PUBLISHED"];
+  const showSearch = searchableStatuses.includes(safeStatus);
+  const safeQ = showSearch ? q.trim() : "";
+
+  const where = {
+    status: safeStatus,
+    ...(safeQ
+      ? { title: { contains: safeQ, mode: "insensitive" as const } }
+      : {}),
+  };
 
   const [videos, total] = await Promise.all([
     db.video.findMany({
-      where: { status: safeStatus },
+      where,
       orderBy: { updatedAt: "desc" },
       skip,
       take: PAGE_SIZE,
       include: { channel: true, _count: { select: { claims: true } } },
     }),
-    db.video.count({ where: { status: safeStatus } }),
+    db.video.count({ where }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const statusTabs: Array<{ label: string; value: string }> = [
-    { label: "Processed", value: "PROCESSED" },
+    { label: "Pending", value: "PENDING" },
     { label: "Published", value: "PUBLISHED" },
     { label: "Rejected", value: "REJECTED" },
-    { label: "Pending", value: "PENDING" },
+    { label: "Processed", value: "PROCESSED" },
   ];
+
+  function pageHref(p: number) {
+    const params = new URLSearchParams({ status: safeStatus, page: String(p) });
+    if (safeQ) params.set("q", safeQ);
+    return `/admin/videos?${params.toString()}`;
+  }
 
   return (
     <div>
@@ -68,8 +84,40 @@ export default async function AdminVideoQueuePage({
         ))}
       </div>
 
+      {/* Search — only on tabs that support it */}
+      {showSearch && (
+        <form method="GET" action="/admin/videos" className="mb-4 flex gap-2">
+          <input type="hidden" name="status" value={safeStatus} />
+          <input
+            name="q"
+            type="search"
+            defaultValue={safeQ}
+            placeholder="Search by title…"
+            className="w-72 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            Search
+          </button>
+          {safeQ && (
+            <Link
+              href={`/admin/videos?status=${safeStatus}`}
+              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50"
+            >
+              Clear
+            </Link>
+          )}
+        </form>
+      )}
+
       {videos.length === 0 ? (
-        <p className="text-sm text-gray-500">No videos in this queue.</p>
+        <p className="text-sm text-gray-500">
+          {safeQ
+            ? `No videos matching "${safeQ}".`
+            : "No videos in this queue."}
+        </p>
       ) : (
         <BulkPublishTable
           videos={videos}
@@ -88,7 +136,7 @@ export default async function AdminVideoQueuePage({
           <div className="flex gap-2">
             {page > 1 && (
               <Link
-                href={`/admin/videos?status=${safeStatus}&page=${page - 1}`}
+                href={pageHref(page - 1)}
                 className="rounded border px-3 py-1 hover:bg-gray-50"
               >
                 Previous
@@ -96,7 +144,7 @@ export default async function AdminVideoQueuePage({
             )}
             {page < totalPages && (
               <Link
-                href={`/admin/videos?status=${safeStatus}&page=${page + 1}`}
+                href={pageHref(page + 1)}
                 className="rounded border px-3 py-1 hover:bg-gray-50"
               >
                 Next

@@ -5,7 +5,6 @@ import ReviewActions from "./ReviewActions";
 import GenerateSocialButton from "./GenerateSocialButton";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
-
 const riskColors: Record<string, string> = {
   LOW: "bg-green-100 text-green-700",
   MEDIUM: "bg-yellow-100 text-yellow-700",
@@ -174,7 +173,9 @@ export default async function AdminVideoDetailPage({
                       <span
                         className={`ml-auto text-xs font-medium ${evidenceColors[claim.evidenceStatus] ?? ""}`}
                       >
-                        {claim.evidenceStatus}
+                        {claim.evidenceStatus === "NOT_CHECKED"
+                          ? "Not checked"
+                          : claim.evidenceStatus}
                       </span>
                     </div>
                     <p className="text-gray-800">{claim.text}</p>
