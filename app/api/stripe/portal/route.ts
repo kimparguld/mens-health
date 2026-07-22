@@ -5,7 +5,6 @@ import { db } from "@/lib/db/prisma";
 import { env } from "@/env";
 
 // Stripe SDK requires Node.js runtime.
-export const runtime = "nodejs";
 
 export async function POST() {
   const session = await auth();

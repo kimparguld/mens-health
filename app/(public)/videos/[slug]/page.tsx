@@ -1,7 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/lib/db/prisma";
 import { auth } from "@/lib/auth";
 import { YouTubePlayer } from "@/components/video/YouTubePlayer";
 import { Disclaimer } from "@/components/ui/Disclaimer";
@@ -20,13 +21,12 @@ import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from "@/lib/monetization/resolvers";
+import { getVideoBySlug, getVideoBySlugForMeta } from "@/lib/db/queries";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
-
-export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -34,10 +34,7 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const video = await db.video.findUnique({
-    where: { slug, status: "PUBLISHED" },
-    include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
-  });
+  const video = await getVideoBySlugForMeta(slug);
 
   if (!video) return { title: "Video Not Found" };
 
@@ -67,15 +64,7 @@ export async function generateMetadata({
 
 export default async function VideoPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const video = await db.video.findUnique({
-    where: { slug, status: "PUBLISHED" },
-    include: {
-      channel: true,
-      summaries: { take: 1, orderBy: { createdAt: "desc" } },
-      claims: { include: { sources: true }, orderBy: { riskLevel: "desc" } },
-      topics: { include: { topic: true } },
-    },
-  });
+  const video = await getVideoBySlug(slug);
 
   if (!video) notFound();
 

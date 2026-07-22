@@ -1,14 +1,14 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import Link from "next/link";
-import { db } from "@/lib/db/prisma";
 import { VideoCard } from "@/components/video/VideoCard";
 import { HowWeRateClaims } from "@/components/ui/HowWeRateClaims";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-
-export const dynamic = "force-dynamic";
+import { getFeaturedVideo, getTrendingVideos } from "@/lib/db/queries";
 
 export const metadata: Metadata = {
   title: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
@@ -51,30 +51,10 @@ const FEATURED_TOPIC_SLUGS = [
 
 export default async function HomePage() {
   // Top-ranked video for the "Today's top insight" section
-  const featuredVideo = await db.video.findFirst({
-    where: { status: "PUBLISHED" },
-    orderBy: { trendScore: "desc" },
-    include: {
-      summaries: { take: 1, orderBy: { createdAt: "desc" } },
-      claims: { take: 1, orderBy: { riskLevel: "desc" } },
-      topics: { include: { topic: true } },
-    },
-  });
+  const featuredVideo = await getFeaturedVideo();
 
   // Remaining trending videos (exclude featured to avoid duplication)
-  const videos = await db.video.findMany({
-    where: {
-      status: "PUBLISHED",
-      ...(featuredVideo ? { id: { not: featuredVideo.id } } : {}),
-    },
-    orderBy: { trendScore: "desc" },
-    take: 12,
-    include: {
-      channel: true,
-      summaries: { take: 1, orderBy: { createdAt: "desc" } },
-      topics: { include: { topic: true } },
-    },
-  });
+  const videos = await getTrendingVideos(featuredVideo?.id);
 
   const featuredSummary = featuredVideo?.summaries[0] ?? null;
   const featuredClaim = featuredVideo?.claims[0] ?? null;

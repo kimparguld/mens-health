@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/env";
 import { syncYouTubeVideos } from "@/jobs/sync-youtube";
+import { revalidateTag } from "next/cache";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const cronSecret = request.headers.get("x-cron-secret");
@@ -10,6 +11,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   try {
     const result = await syncYouTubeVideos();
+    revalidateTag("videos", "max");
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

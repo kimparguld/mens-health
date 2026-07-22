@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 
 const CreateSchema = z.object({
   name: z.string().min(1).max(120),
@@ -48,5 +49,6 @@ export async function POST(req: NextRequest) {
       endDate: endDate ? new Date(endDate) : null,
     },
   });
+  revalidateTag("sponsors", "max");
   return NextResponse.json(sponsor, { status: 201 });
 }

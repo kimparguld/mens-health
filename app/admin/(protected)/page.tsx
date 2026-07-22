@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
+import AdminBulkActions from "./AdminBulkActions";
 
 type PublishStatus = "PENDING" | "PROCESSED" | "REJECTED" | "PUBLISHED";
-
-export const dynamic = "force-dynamic";
 
 type StatusCounts = Record<string, number>;
 
@@ -107,6 +106,8 @@ export default async function AdminDashboardPage() {
           Review queue &rarr;
         </Link>
       </div>
+
+      <AdminBulkActions />
     </div>
   );
 }

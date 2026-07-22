@@ -4,7 +4,6 @@ import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { CREATOR_SEEDS } from "@/lib/youtube/creators";
 
 // Serve at request time so the build doesn't need a DB connection.
-export const dynamic = "force-dynamic";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";

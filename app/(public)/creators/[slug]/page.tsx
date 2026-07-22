@@ -24,7 +24,6 @@ const APP_URL =
 
 type Params = Promise<{ slug: string }>;
 
-export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   return CREATOR_SEEDS.map((c) => ({ slug: c.slug }));

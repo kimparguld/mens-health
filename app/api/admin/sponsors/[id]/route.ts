@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { z } from "zod";
+import { revalidateTag } from "next/cache";
 
 const UpdateSchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -48,6 +49,7 @@ export async function PATCH(
       }),
     },
   });
+  revalidateTag("sponsors", "max");
   return NextResponse.json(sponsor);
 }
 
@@ -60,5 +62,6 @@ export async function DELETE(
   }
   const { id } = await params;
   await db.sponsor.delete({ where: { id } });
+  revalidateTag("sponsors", "max");
   return new NextResponse(null, { status: 204 });
 }

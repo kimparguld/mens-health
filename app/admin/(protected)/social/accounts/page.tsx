@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Platform, SocialAccount } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
 
 type PlatformConfig = {
   label: string;

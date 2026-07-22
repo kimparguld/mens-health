@@ -2,7 +2,6 @@ import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 import BulkPublishTable from "./BulkPublishTable";
 
-export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 25;
 

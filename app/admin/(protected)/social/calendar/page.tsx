@@ -2,7 +2,6 @@ import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 import type { Platform } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
 
 const PLATFORM_COLORS: Record<Platform, string> = {
   YOUTUBE_SHORTS: "bg-red-100 text-red-800",

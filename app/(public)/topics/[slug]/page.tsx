@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db/prisma";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
@@ -21,13 +20,13 @@ import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from "@/lib/monetization/resolvers";
+import { getTopicBySlug, getTopicVideos } from "@/lib/db/queries";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
 
 type Params = Promise<{ slug: string }>;
-
-export const dynamic = "force-dynamic";
+type SearchParams = Promise<{ page?: string }>;
 
 export async function generateStaticParams() {
   return TOPIC_SEEDS.map((topic) => ({ slug: topic.slug }));
@@ -65,14 +64,22 @@ export async function generateMetadata({
   };
 }
 
-export default async function TopicPage({ params }: { params: Params }) {
+export default async function TopicPage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
   const { slug } = await params;
+  const { page: pageStr } = await searchParams;
+  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
   const topicSeed = TOPIC_SEEDS.find((t) => t.slug === slug);
   if (!topicSeed) notFound();
 
   const staticSeo = getTopicSeo(slug);
 
-  const topic = await db.topic.findUnique({ where: { slug } });
+  const topic = await getTopicBySlug(slug);
 
   // Merge DB-generated FAQs over static fallback
   const dbFaq = topic?.faqJson != null ? (topic.faqJson as FaqEntry[]) : null;
@@ -81,21 +88,9 @@ export default async function TopicPage({ params }: { params: Params }) {
     faq: dbFaq ?? staticSeo?.faq ?? [],
   };
 
-  const publishedVideos = topic
-    ? await db.video.findMany({
-        where: {
-          status: "PUBLISHED",
-          topics: { some: { topicId: topic.id } },
-        },
-        orderBy: { trendScore: "desc" },
-        take: 20,
-        include: {
-          channel: true,
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
-          topics: { include: { topic: true } },
-        },
-      })
-    : [];
+  const topicResult = topic ? await getTopicVideos(topic.id, slug, page) : null;
+  const publishedVideos = topicResult?.videos ?? [];
+  const totalPages = topicResult?.totalPages ?? 1;
 
   const [sponsor, affiliateLinks] = await Promise.all([
     getActiveSponsor(),
@@ -216,7 +211,35 @@ export default async function TopicPage({ params }: { params: Params }) {
         </section>
       )}
 
-      {/* FAQ section */}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <nav
+          className="mb-12 flex items-center justify-between text-sm"
+          aria-label="Pagination"
+        >
+          <span className="text-gray-500">
+            Page {page} of {totalPages}
+          </span>
+          <div className="flex gap-2">
+            {page > 1 && (
+              <Link
+                href={`/topics/${slug}?page=${page - 1}`}
+                className="rounded border px-4 py-2 text-gray-700 hover:bg-gray-50"
+              >
+                ← Previous
+              </Link>
+            )}
+            {page < totalPages && (
+              <Link
+                href={`/topics/${slug}?page=${page + 1}`}
+                className="rounded border px-4 py-2 text-gray-700 hover:bg-gray-50"
+              >
+                Next →
+              </Link>
+            )}
+          </div>
+        </nav>
+      )}
       {seo && seo.faq.length > 0 && (
         <section className="mb-12">
           <h2 className="mb-6 text-2xl font-bold text-gray-900">
