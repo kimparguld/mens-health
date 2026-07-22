@@ -13,6 +13,12 @@ const TokenResponse = z.object({
   scope: z.string().optional(),
 });
 
+function errorRedirect(req: NextRequest, error: string): NextResponse {
+  const url = new URL("/admin/social/accounts", req.url);
+  url.searchParams.set("error", error);
+  return NextResponse.redirect(url);
+}
+
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
@@ -22,22 +28,24 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const error = searchParams.get("error");
-
-  if (error || !code) {
-    return NextResponse.redirect(
-      new URL(
-        `/admin/social/accounts?error=${error ?? "missing_code"}`,
-        req.url,
-      ),
-    );
-  }
+  const stateParam = searchParams.get("state");
 
   const cookieStore = await cookies();
+  const expectedState = cookieStore.get("oauth_state_x")?.value;
   const codeVerifier = cookieStore.get("x_code_verifier")?.value;
+  cookieStore.delete("oauth_state_x");
+  cookieStore.delete("x_code_verifier");
+
+  if (!expectedState || stateParam !== expectedState) {
+    return errorRedirect(req, "invalid_state");
+  }
+
+  if (error || !code) {
+    return errorRedirect(req, error ?? "missing_code");
+  }
+
   if (!codeVerifier) {
-    return NextResponse.redirect(
-      new URL("/admin/social/accounts?error=missing_code_verifier", req.url),
-    );
+    return errorRedirect(req, "missing_code_verifier");
   }
 
   // X requires Basic auth with client_id:client_secret for confidential clients
@@ -59,23 +67,16 @@ export async function GET(req: NextRequest) {
     }).toString(),
   });
 
-  // Clear the verifier cookie
-  cookieStore.delete("x_code_verifier");
-
   if (!tokenRes.ok) {
     const body = await tokenRes.text();
     console.error("[x-oauth-callback] token exchange failed", body);
-    return NextResponse.redirect(
-      new URL("/admin/social/accounts?error=token_exchange_failed", req.url),
-    );
+    return errorRedirect(req, "token_exchange_failed");
   }
 
   const raw = (await tokenRes.json()) as unknown;
   const parsed = TokenResponse.safeParse(raw);
   if (!parsed.success) {
-    return NextResponse.redirect(
-      new URL("/admin/social/accounts?error=invalid_token_response", req.url),
-    );
+    return errorRedirect(req, "invalid_token_response");
   }
 
   const { access_token, refresh_token, expires_in } = parsed.data;

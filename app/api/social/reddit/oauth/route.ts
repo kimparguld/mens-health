@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { env } from "@/env";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -14,10 +16,20 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const state = crypto.randomBytes(32).toString("base64url");
+  const cookieStore = await cookies();
+  cookieStore.set("oauth_state_reddit", state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 600,
+    path: "/",
+  });
+
   const params = new URLSearchParams({
     client_id: env.REDDIT_CLIENT_ID,
     response_type: "code",
-    state: "reddit_oauth",
+    state,
     redirect_uri: env.REDDIT_REDIRECT_URI,
     duration: "permanent",
     scope: "submit read identity",
