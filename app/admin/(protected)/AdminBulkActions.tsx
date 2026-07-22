@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Action = "generate-all-summaries" | "auto-publish-low-risk";
+type Action =
+  "generate-all-summaries" | "auto-publish-low-risk" | "youtube-sync";
 
 export default function AdminBulkActions() {
   const router = useRouter();
@@ -14,7 +15,11 @@ export default function AdminBulkActions() {
     setLoading(action);
     setResult(null);
 
-    const res = await fetch(`/api/admin/videos/${action}`, { method: "POST" });
+    const endpoint =
+      action === "youtube-sync"
+        ? "/api/admin/youtube/sync"
+        : `/api/admin/videos/${action}`;
+    const res = await fetch(endpoint, { method: "POST" });
     const data = (await res.json().catch(() => null)) as {
       ok?: boolean;
       queued?: number;
@@ -29,6 +34,8 @@ export default function AdminBulkActions() {
       setResult(
         data.message ?? `Queued ${data.queued} video(s) for summary generation`,
       );
+    } else if (action === "youtube-sync") {
+      setResult(data.message ?? "YouTube sync completed");
     } else {
       setResult(
         data.message ?? `Published ${data.published} low-risk video(s)`,
@@ -51,6 +58,13 @@ export default function AdminBulkActions() {
           {loading === "generate-all-summaries"
             ? "Queuing…"
             : "Generate summaries for all videos"}
+        </button>
+        <button
+          onClick={() => runAction("youtube-sync")}
+          disabled={loading !== null}
+          className="rounded-lg border border-gray-400 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          {loading === "youtube-sync" ? "Syncing…" : "Sync YouTube videos"}
         </button>
         <button
           onClick={() => runAction("auto-publish-low-risk")}
