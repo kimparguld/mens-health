@@ -7,6 +7,26 @@ import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 // Helpers
 // ---------------------------------------------------------------------------
 
+function cleanTitle(raw: string): string {
+  return (
+    raw
+      // Decode numeric HTML entities (&#39; &#x27; etc.)
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
+        String.fromCharCode(parseInt(hex, 16)),
+      )
+      .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+      // Decode common named HTML entities
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, '"')
+      .replace(/&apos;/gi, "'")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">")
+      // Strip leading Markdown heading markers (# Title, ## Title, etc.)
+      .replace(/^#{1,6}\s+/, "")
+      .trim()
+  );
+}
+
 function generateSlug(title: string, videoId: string): string {
   const base = title
     .toLowerCase()
@@ -51,7 +71,7 @@ export async function syncYouTubeVideos(): Promise<{
       const videos = await searchAndEnrichVideos(topic.query, 20);
 
       for (const video of videos) {
-        // Skip videos already in the database
+        const cleanedTitle = cleanTitle(video.title);
         const existing = await db.video.findUnique({
           where: { youtubeVideoId: video.videoId },
         });
@@ -68,7 +88,7 @@ export async function syncYouTubeVideos(): Promise<{
               topicMatch: 0.8,
               containsHighRiskClaims: topic.isHighRisk,
             },
-            video.title,
+            cleanedTitle,
           );
           await db.video.update({
             where: { id: existing.id },
@@ -105,10 +125,10 @@ export async function syncYouTubeVideos(): Promise<{
             topicMatch: 0.8,
             containsHighRiskClaims: topic.isHighRisk,
           },
-          video.title,
+          cleanedTitle,
         );
 
-        const isClickbait = detectsClickbait(video.title);
+        const isClickbait = detectsClickbait(cleanedTitle);
         const riskLevel =
           topic.isHighRisk || isClickbait
             ? ("HIGH" as const)
@@ -117,7 +137,7 @@ export async function syncYouTubeVideos(): Promise<{
         const newVideo = await db.video.create({
           data: {
             youtubeVideoId: video.videoId,
-            title: video.title,
+            title: cleanedTitle,
             description: video.description,
             channelId: channel.id,
             publishedAt: video.publishedAt,
@@ -129,7 +149,7 @@ export async function syncYouTubeVideos(): Promise<{
             trendScore: scores.trendScore,
             relevanceScore: scores.relevanceScore,
             riskLevel,
-            slug: generateSlug(video.title, video.videoId),
+            slug: generateSlug(cleanedTitle, video.videoId),
             status: "PENDING",
           },
         });

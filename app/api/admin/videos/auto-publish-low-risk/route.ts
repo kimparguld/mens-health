@@ -10,16 +10,23 @@ export async function POST(_request: NextRequest) {
   }
 
   // Find all PROCESSED videos with LOW risk that haven't been published
-  const videos = await db.video.findMany({
-    where: { status: "PROCESSED", riskLevel: "LOW" },
-    select: { id: true },
-  });
+  const [videos, pendingLowRiskCount] = await Promise.all([
+    db.video.findMany({
+      where: { status: "PROCESSED", riskLevel: "LOW" },
+      select: { id: true },
+    }),
+    db.video.count({ where: { status: "PENDING", riskLevel: "LOW" } }),
+  ]);
 
   if (videos.length === 0) {
+    const hint =
+      pendingLowRiskCount > 0
+        ? ` (${pendingLowRiskCount} low-risk video(s) are still PENDING — run "Generate summaries" first to process them)`
+        : "";
     return Response.json({
       ok: true,
       published: 0,
-      message: "No eligible videos found",
+      message: `No eligible videos found${hint}`,
     });
   }
 

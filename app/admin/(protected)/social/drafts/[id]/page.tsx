@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import DraftActions from "./DraftActions";
 
-
 const RISK_COLORS: Record<string, string> = {
   HIGH: "bg-red-100 text-red-800",
   MEDIUM: "bg-amber-100 text-amber-800",
@@ -105,7 +104,11 @@ export default async function SocialDraftDetailPage({
               Scheduled for
             </h2>
             <p className="text-sm text-gray-900">
-              {new Date(post.scheduledAt).toLocaleString()}
+              {new Date(post.scheduledAt)
+                .toISOString()
+                .replace("T", " ")
+                .replace(/\..+$/, "")}{" "}
+              UTC
             </p>
           </section>
         )}
@@ -134,6 +137,7 @@ export default async function SocialDraftDetailPage({
             status={post.status}
             riskLevel={post.riskLevel}
             requiresReview={post.requiresReview}
+            initialScheduledAt={post.scheduledAt?.toISOString() ?? null}
           />
         </section>
 

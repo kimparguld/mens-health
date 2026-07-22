@@ -10,7 +10,7 @@ type VideoRow = {
   riskLevel: string;
   updatedAt: Date;
   channel: { title: string };
-  _count: { claims: number };
+  _count: { claims: number; summaries: number };
 };
 
 const riskColors: Record<string, string> = {
@@ -22,14 +22,19 @@ const riskColors: Record<string, string> = {
 export default function BulkPublishTable({
   videos,
   showBulkActions,
+  showPublishAction,
+  showSummaryColumn,
 }: {
   videos: VideoRow[];
   showBulkActions: boolean;
+  showPublishAction: boolean;
+  showSummaryColumn: boolean;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<"publish" | "summaries" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   const allSelected = videos.length > 0 && selected.size === videos.length;
   const someSelected = selected.size > 0;
@@ -52,8 +57,9 @@ export default function BulkPublishTable({
 
   async function bulkPublish() {
     if (!someSelected) return;
-    setLoading(true);
+    setLoading("publish");
     setError(null);
+    setMessage(null);
 
     const res = await fetch("/api/admin/videos/bulk-review", {
       method: "POST",
@@ -66,12 +72,55 @@ export default function BulkPublishTable({
         error?: string;
       } | null;
       setError(data?.error ?? "Request failed");
-      setLoading(false);
+      setLoading(null);
       return;
     }
 
     setSelected(new Set());
-    setLoading(false);
+    setLoading(null);
+    router.refresh();
+  }
+
+  async function bulkGenerateSummaries() {
+    if (!someSelected) return;
+    setLoading("summaries");
+    setError(null);
+    setMessage(null);
+
+    // Only send IDs for videos that don't have a summary yet
+    const idsWithoutSummary = videos
+      .filter((v) => selected.has(v.id) && v._count.summaries === 0)
+      .map((v) => v.id);
+
+    if (idsWithoutSummary.length === 0) {
+      setMessage("All selected videos already have a summary.");
+      setLoading(null);
+      return;
+    }
+
+    const res = await fetch("/api/admin/videos/bulk-generate-summaries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: idsWithoutSummary }),
+    });
+
+    const data = (await res.json().catch(() => null)) as {
+      ok?: boolean;
+      message?: string;
+      error?: string;
+    } | null;
+
+    if (!res.ok || !data?.ok) {
+      setError(data?.error ?? "Request failed");
+      setLoading(null);
+      return;
+    }
+
+    setMessage(
+      data.message ?? `Queued ${selected.size} video(s) for summary generation`,
+    );
+    setSelected(new Set());
+    setLoading(null);
     router.refresh();
   }
 
@@ -82,18 +131,34 @@ export default function BulkPublishTable({
           <span className="text-sm text-gray-500">
             {someSelected
               ? `${selected.size} selected`
-              : "Select rows to bulk publish"}
+              : `Select rows to ${showPublishAction ? "bulk publish" : ""}${showPublishAction && showSummaryColumn ? " or " : ""}${showSummaryColumn ? "generate summaries" : ""}.`}
           </span>
           {someSelected && (
-            <button
-              onClick={bulkPublish}
-              disabled={loading}
-              className="rounded-lg bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
-            >
-              {loading ? "Publishing…" : `Publish ${selected.size}`}
-            </button>
+            <>
+              <button
+                onClick={bulkGenerateSummaries}
+                disabled={loading !== null}
+                className="rounded-lg border border-blue-600 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50"
+              >
+                {loading === "summaries"
+                  ? "Generating…"
+                  : `Generate summaries (${selected.size})`}
+              </button>
+              {showPublishAction && (
+                <button
+                  onClick={bulkPublish}
+                  disabled={loading !== null}
+                  className="rounded-lg bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                >
+                  {loading === "publish"
+                    ? "Publishing…"
+                    : `Publish ${selected.size}`}
+                </button>
+              )}
+            </>
           )}
           {error && <span className="text-xs text-red-600">{error}</span>}
+          {message && <span className="text-xs text-gray-600">{message}</span>}
         </div>
       )}
 
@@ -127,6 +192,11 @@ export default function BulkPublishTable({
               <th className="px-4 py-3 text-left font-medium text-gray-500">
                 Claims
               </th>
+              {showSummaryColumn && (
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
+                  Has summary
+                </th>
+              )}
               <th className="px-4 py-3 text-left font-medium text-gray-500">
                 Updated
               </th>
@@ -168,6 +238,19 @@ export default function BulkPublishTable({
                 <td className="px-4 py-3 text-gray-600">
                   {video._count.claims}
                 </td>
+                {showSummaryColumn && (
+                  <td className="px-4 py-3">
+                    {video._count.summaries > 0 ? (
+                      <span className="text-xs font-medium text-green-700">
+                        Yes
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium text-red-600">
+                        No
+                      </span>
+                    )}
+                  </td>
+                )}
                 <td className="px-4 py-3 text-gray-500">
                   {new Date(video.updatedAt).toLocaleDateString()}
                 </td>

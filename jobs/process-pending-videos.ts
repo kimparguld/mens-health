@@ -15,7 +15,9 @@ function generateClaimSlug(text: string, id: string): string {
 
 const BATCH_SIZE = 5;
 
-export async function processPendingVideos(): Promise<{
+export async function processPendingVideos(options?: {
+  videoIds?: string[];
+}): Promise<{
   processed: number;
   failed: number;
 }> {
@@ -23,8 +25,11 @@ export async function processPendingVideos(): Promise<{
   let failed = 0;
 
   const jobs = await db.processingJob.findMany({
-    where: { status: "QUEUED" },
-    take: BATCH_SIZE,
+    where: {
+      status: "QUEUED",
+      ...(options?.videoIds ? { videoId: { in: options.videoIds } } : {}),
+    },
+    take: options?.videoIds ? options.videoIds.length : BATCH_SIZE,
     include: { video: true },
   });
 

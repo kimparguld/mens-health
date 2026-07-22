@@ -4,7 +4,7 @@ export type VideoObjectInput = {
   title: string;
   description: string;
   thumbnailUrl: string | null;
-  publishedAt: Date;
+  publishedAt: Date | string;
   channelTitle: string;
   youtubeVideoId: string;
   appUrl: string;
@@ -18,7 +18,7 @@ export function buildVideoObjectSchema(input: VideoObjectInput) {
     name: input.title,
     description: input.description,
     thumbnailUrl: input.thumbnailUrl ?? undefined,
-    uploadDate: input.publishedAt.toISOString(),
+    uploadDate: new Date(input.publishedAt).toISOString(),
     publisher: {
       "@type": "Organization",
       name: input.channelTitle,
