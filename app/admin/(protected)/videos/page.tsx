@@ -1,15 +1,26 @@
 import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 import BulkPublishTable from "./BulkPublishTable";
+import NoSummaryCheckbox from "./NoSummaryCheckbox";
 
 const PAGE_SIZE = 25;
 
 export default async function AdminVideoQueuePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; status?: string; q?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    status?: string;
+    q?: string;
+    noSummary?: string;
+  }>;
 }) {
-  const { page: pageStr, status = "PENDING", q = "" } = await searchParams;
+  const {
+    page: pageStr,
+    status = "PENDING",
+    q = "",
+    noSummary,
+  } = await searchParams;
   const page = Math.max(1, parseInt(pageStr ?? "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
@@ -29,12 +40,15 @@ export default async function AdminVideoQueuePage({
   const searchableStatuses: VideoStatus[] = ["PENDING", "PUBLISHED"];
   const showSearch = searchableStatuses.includes(safeStatus);
   const safeQ = showSearch ? q.trim() : "";
+  const showNoSummaryFilter = showSearch;
+  const filterNoSummary = showNoSummaryFilter && noSummary === "true";
 
   const where = {
     status: safeStatus,
     ...(safeQ
       ? { title: { contains: safeQ, mode: "insensitive" as const } }
       : {}),
+    ...(filterNoSummary ? { summaries: { none: {} } } : {}),
   };
 
   const [videos, total] = await Promise.all([
@@ -43,7 +57,10 @@ export default async function AdminVideoQueuePage({
       orderBy: { updatedAt: "desc" },
       skip,
       take: PAGE_SIZE,
-      include: { channel: true, _count: { select: { claims: true } } },
+      include: {
+        channel: true,
+        _count: { select: { claims: true, summaries: true } },
+      },
     }),
     db.video.count({ where }),
   ]);
@@ -60,6 +77,7 @@ export default async function AdminVideoQueuePage({
   function pageHref(p: number) {
     const params = new URLSearchParams({ status: safeStatus, page: String(p) });
     if (safeQ) params.set("q", safeQ);
+    if (filterNoSummary) params.set("noSummary", "true");
     return `/admin/videos?${params.toString()}`;
   }
 
@@ -86,7 +104,11 @@ export default async function AdminVideoQueuePage({
 
       {/* Search — only on tabs that support it */}
       {showSearch && (
-        <form method="GET" action="/admin/videos" className="mb-4 flex gap-2">
+        <form
+          method="GET"
+          action="/admin/videos"
+          className="mb-4 flex flex-wrap items-center gap-2"
+        >
           <input type="hidden" name="status" value={safeStatus} />
           <input
             name="q"
@@ -109,6 +131,7 @@ export default async function AdminVideoQueuePage({
               Clear
             </Link>
           )}
+          <NoSummaryCheckbox checked={filterNoSummary} />
         </form>
       )}
 
@@ -122,7 +145,17 @@ export default async function AdminVideoQueuePage({
         <BulkPublishTable
           videos={videos}
           showBulkActions={
+            safeStatus === "PENDING" ||
+            safeStatus === "PROCESSED" ||
+            safeStatus === "PUBLISHED"
+          }
+          showPublishAction={
             safeStatus === "PENDING" || safeStatus === "PROCESSED"
+          }
+          showSummaryColumn={
+            safeStatus === "PENDING" ||
+            safeStatus === "PUBLISHED" ||
+            safeStatus === "PROCESSED"
           }
         />
       )}

@@ -9,6 +9,7 @@ type Props = {
   status: string;
   riskLevel: string;
   requiresReview: boolean;
+  initialScheduledAt?: string | null;
 };
 
 export default function DraftActions({
@@ -17,11 +18,16 @@ export default function DraftActions({
   status,
   riskLevel,
   requiresReview,
+  initialScheduledAt,
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [scheduledAt, setScheduledAt] = useState("");
+  const [scheduledAt, setScheduledAt] = useState(
+    initialScheduledAt
+      ? new Date(initialScheduledAt).toISOString().slice(0, 16)
+      : "",
+  );
   const [manualUrl, setManualUrl] = useState("");
   const videoInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +42,8 @@ export default function DraftActions({
   const canMarkManuallyPublished =
     isTextPlatform && (isApproved || isScheduled);
   // Reddit is manual-only; YouTube needs a file upload — neither supports scheduling
-  const canSchedule = isApproved && !isReddit && !isYouTube;
+  // Both APPROVED and SCHEDULED posts can be (re)scheduled
+  const canSchedule = (isApproved || isScheduled) && !isReddit && !isYouTube;
 
   async function callJson(action: string, body: object = {}) {
     setLoading(action);
@@ -62,11 +69,12 @@ export default function DraftActions({
 
   async function handleSchedule() {
     if (!scheduledAt) {
-      setError("Pick a date and time first");
+      setError("Pick a date and time (UTC) first");
       return;
     }
+    // Treat the datetime-local value as UTC by appending Z
     await callJson("schedule", {
-      scheduledAt: new Date(scheduledAt).toISOString(),
+      scheduledAt: new Date(scheduledAt + "Z").toISOString(),
     });
   }
 
@@ -145,10 +153,13 @@ export default function DraftActions({
         </div>
       )}
 
-      {/* Schedule — not available for Reddit (manual-only) or YouTube (file upload needed) */}
+      {/* Schedule / Reschedule — not available for Reddit (manual-only) or YouTube (file upload needed) */}
       {canSchedule && (
         <div className="space-y-2 rounded-lg border p-3">
-          <p className="text-xs font-semibold text-gray-600">Schedule</p>
+          <p className="text-xs font-semibold text-gray-600">
+            {isScheduled ? "Reschedule" : "Schedule"}
+          </p>
+          <p className="text-xs text-gray-500">All times are UTC.</p>
           <div className="flex gap-2">
             <input
               type="datetime-local"
@@ -161,7 +172,13 @@ export default function DraftActions({
               disabled={loading !== null}
               className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
             >
-              {loading === "schedule" ? "Scheduling…" : "Schedule"}
+              {loading === "schedule"
+                ? isScheduled
+                  ? "Rescheduling…"
+                  : "Scheduling…"
+                : isScheduled
+                  ? "Reschedule"
+                  : "Schedule"}
             </button>
           </div>
         </div>

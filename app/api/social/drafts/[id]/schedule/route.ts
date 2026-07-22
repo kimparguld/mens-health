@@ -38,9 +38,9 @@ export async function POST(
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  if (post.status !== "APPROVED") {
+  if (post.status !== "APPROVED" && post.status !== "SCHEDULED") {
     return NextResponse.json(
-      { error: "Only APPROVED posts can be scheduled" },
+      { error: "Only APPROVED or SCHEDULED posts can be scheduled" },
       { status: 409 },
     );
   }
