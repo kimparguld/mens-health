@@ -28,8 +28,15 @@ export default function DraftActions({
   const isApprovable = status === "PENDING_REVIEW" || status === "DRAFT";
   const isRejectable = status !== "PUBLISHED" && status !== "REJECTED";
   const isApproved = status === "APPROVED";
+  const isScheduled = status === "SCHEDULED";
   const isYouTube = platform === "YOUTUBE_SHORTS";
+  const isReddit = platform === "REDDIT";
   const isTextPlatform = ["REDDIT", "LINKEDIN", "X"].includes(platform);
+  // Text platforms have no auto-publisher yet — admin posts manually and records the URL
+  const canMarkManuallyPublished =
+    isTextPlatform && (isApproved || isScheduled);
+  // Reddit is manual-only; YouTube needs a file upload — neither supports scheduling
+  const canSchedule = isApproved && !isReddit && !isYouTube;
 
   async function callJson(action: string, body: object = {}) {
     setLoading(action);
@@ -138,8 +145,8 @@ export default function DraftActions({
         </div>
       )}
 
-      {/* Schedule */}
-      {isApproved && (
+      {/* Schedule — not available for Reddit (manual-only) or YouTube (file upload needed) */}
+      {canSchedule && (
         <div className="space-y-2 rounded-lg border p-3">
           <p className="text-xs font-semibold text-gray-600">Schedule</p>
           <div className="flex gap-2">
@@ -188,11 +195,25 @@ export default function DraftActions({
         </div>
       )}
 
-      {/* Mark manually published (text platforms) */}
-      {isTextPlatform && isApproved && (
+      {/* Scheduled info note */}
+      {isScheduled && (
+        <p className="rounded bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
+          This post is scheduled and will be processed by the daily cron at
+          09:00 UTC. Text platform posts (Reddit, LinkedIn, X) do not have an
+          auto-publisher yet — use the option below to post manually and record
+          the URL.
+        </p>
+      )}
+
+      {/* Record manually posted URL (text platforms only) */}
+      {canMarkManuallyPublished && (
         <div className="space-y-2 rounded-lg border p-3">
           <p className="text-xs font-semibold text-gray-600">
-            Mark as manually published
+            I&apos;ve posted this manually
+          </p>
+          <p className="text-xs text-gray-500">
+            Copy the content above, post it on {platform.replace("_", " ")},
+            then paste the link to the live post here to mark it as published.
           </p>
           <div className="flex gap-2">
             <input
