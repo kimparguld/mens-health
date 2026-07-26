@@ -3,7 +3,22 @@ import Link from "next/link";
 import BulkPublishTable from "./BulkPublishTable";
 import NoSummaryCheckbox from "./NoSummaryCheckbox";
 
-const PAGE_SIZE = 25;
+const ALLOWED_PAGE_SIZES = ["25", "50", "100", "all"] as const;
+type PageSizeOption = (typeof ALLOWED_PAGE_SIZES)[number];
+
+const ALLOWED_SORT_FIELDS = ["risk", "claims", "summary", "updated"] as const;
+type SortField = (typeof ALLOWED_SORT_FIELDS)[number];
+type SortDir = "asc" | "desc";
+
+function buildOrderBy(
+  sort: SortField,
+  dir: SortDir,
+): Parameters<typeof db.video.findMany>[0]["orderBy"] {
+  if (sort === "risk") return { riskLevel: dir };
+  if (sort === "claims") return { claims: { _count: dir } };
+  if (sort === "summary") return { summaries: { _count: dir } };
+  return { updatedAt: dir };
+}
 
 export default async function AdminVideoQueuePage({
   searchParams,
@@ -13,6 +28,9 @@ export default async function AdminVideoQueuePage({
     status?: string;
     q?: string;
     noSummary?: string;
+    sort?: string;
+    dir?: string;
+    pageSize?: string;
   }>;
 }) {
   const {
@@ -20,9 +38,27 @@ export default async function AdminVideoQueuePage({
     status = "PENDING",
     q = "",
     noSummary,
+    sort: sortParam,
+    dir: dirParam,
+    pageSize: pageSizeParam,
   } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
-  const skip = (page - 1) * PAGE_SIZE;
+
+  const pageSize: PageSizeOption = (
+    ALLOWED_PAGE_SIZES as readonly string[]
+  ).includes(pageSizeParam ?? "")
+    ? (pageSizeParam as PageSizeOption)
+    : "25";
+  const take = pageSize === "all" ? undefined : parseInt(pageSize, 10);
+
+  const sortField: SortField = (
+    ALLOWED_SORT_FIELDS as readonly string[]
+  ).includes(sortParam ?? "")
+    ? (sortParam as SortField)
+    : "updated";
+  const sortDir: SortDir = dirParam === "asc" ? "asc" : "desc";
+  const page =
+    pageSize === "all" ? 1 : Math.max(1, parseInt(pageStr ?? "1", 10));
+  const skip = take !== undefined ? (page - 1) * take : 0;
 
   const allowedStatuses = [
     "PROCESSED",
@@ -54,9 +90,10 @@ export default async function AdminVideoQueuePage({
   const [videos, total] = await Promise.all([
     db.video.findMany({
       where,
-      orderBy: { updatedAt: "desc" },
+      orderBy: buildOrderBy(sortField, sortDir),
       skip,
-      take: PAGE_SIZE,
+      ...(take !== undefined ? { take } : {}),
+      // take omitted means no limit ("all")
       include: {
         channel: true,
         _count: { select: { claims: true, summaries: true } },
@@ -65,7 +102,7 @@ export default async function AdminVideoQueuePage({
     db.video.count({ where }),
   ]);
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = take !== undefined ? Math.ceil(total / take) : 1;
 
   const statusTabs: Array<{ label: string; value: string }> = [
     { label: "Pending", value: "PENDING" },
@@ -78,8 +115,26 @@ export default async function AdminVideoQueuePage({
     const params = new URLSearchParams({ status: safeStatus, page: String(p) });
     if (safeQ) params.set("q", safeQ);
     if (filterNoSummary) params.set("noSummary", "true");
+    if (sortField !== "updated") params.set("sort", sortField);
+    if (sortDir !== "desc") params.set("dir", sortDir);
+    if (pageSize !== "25") params.set("pageSize", pageSize);
     return `/admin/videos?${params.toString()}`;
   }
+
+  function pageSizeHref(size: PageSizeOption) {
+    const params = new URLSearchParams({ status: safeStatus });
+    if (safeQ) params.set("q", safeQ);
+    if (filterNoSummary) params.set("noSummary", "true");
+    if (sortField !== "updated") params.set("sort", sortField);
+    if (sortDir !== "desc") params.set("dir", sortDir);
+    if (size !== "25") params.set("pageSize", size);
+    return `/admin/videos?${params.toString()}`;
+  }
+
+  const baseQuery: Record<string, string> = { status: safeStatus };
+  if (safeQ) baseQuery.q = safeQ;
+  if (filterNoSummary) baseQuery.noSummary = "true";
+  if (pageSize !== "25") baseQuery.pageSize = pageSize;
 
   return (
     <div>
@@ -157,35 +212,64 @@ export default async function AdminVideoQueuePage({
             safeStatus === "PUBLISHED" ||
             safeStatus === "PROCESSED"
           }
+          sortField={sortField}
+          sortDir={sortDir}
+          baseQuery={baseQuery}
         />
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-          <span>
-            Page {page} of {totalPages} ({total} total)
-          </span>
-          <div className="flex gap-2">
-            {page > 1 && (
-              <Link
-                href={pageHref(page - 1)}
-                className="rounded border px-3 py-1 hover:bg-gray-50"
-              >
-                Previous
-              </Link>
-            )}
-            {page < totalPages && (
-              <Link
-                href={pageHref(page + 1)}
-                className="rounded border px-3 py-1 hover:bg-gray-50"
-              >
-                Next
-              </Link>
-            )}
+      {/* Pagination + page size */}
+      <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+        {total > 0 && (
+          <div className="flex items-center gap-2">
+            <span>Show:</span>
+            {ALLOWED_PAGE_SIZES.map((size) => {
+              if (parseInt(size) > total || (size === "all" && total < 25)) {
+                return null;
+              }
+              return (
+                <Link
+                  key={size}
+                  href={pageSizeHref(size)}
+                  className={`rounded border px-2 py-0.5 capitalize ${
+                    pageSize === size
+                      ? "border-blue-600 bg-blue-50 text-blue-600"
+                      : "hover:bg-gray-50"
+                  }`}
+                >
+                  {size}
+                </Link>
+              );
+            })}
+            <span className="ml-2 text-gray-400">({total} total)</span>
           </div>
-        </div>
-      )}
+        )}
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <span>
+              Page {page} of {totalPages}
+            </span>
+            <div className="flex gap-2">
+              {page > 1 && (
+                <Link
+                  href={pageHref(page - 1)}
+                  className="rounded border px-3 py-1 hover:bg-gray-50"
+                >
+                  Previous
+                </Link>
+              )}
+              {page < totalPages && (
+                <Link
+                  href={pageHref(page + 1)}
+                  className="rounded border px-3 py-1 hover:bg-gray-50"
+                >
+                  Next
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

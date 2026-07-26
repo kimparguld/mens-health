@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
+    "@flags-sdk/vercel": "^1.4.5",
     "@google/generative-ai": "^0.24.1",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
@@ -33,6 +34,7 @@
     "react-dom": "19.2.4",
     "resend": "^6.17.2",
     "stripe": "^22.3.2",
+    "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -24,17 +24,43 @@ export default function BulkPublishTable({
   showBulkActions,
   showPublishAction,
   showSummaryColumn,
+  sortField = "updated",
+  sortDir = "desc",
+  baseQuery = {},
 }: {
   videos: VideoRow[];
   showBulkActions: boolean;
   showPublishAction: boolean;
   showSummaryColumn: boolean;
+  sortField?: string;
+  sortDir?: "asc" | "desc";
+  baseQuery?: Record<string, string>;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState<"publish" | "summaries" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+
+  function sortHref(field: string) {
+    const newDir = sortField === field && sortDir === "asc" ? "desc" : "asc";
+    const params = new URLSearchParams({
+      ...baseQuery,
+      sort: field,
+      dir: newDir,
+    });
+    return `/admin/videos?${params.toString()}`;
+  }
+
+  function SortIcon({ field }: { field: string }) {
+    if (sortField !== field)
+      return <span className="ml-1 text-gray-300">↕</span>;
+    return (
+      <span className="ml-1 text-blue-600">
+        {sortDir === "asc" ? "↑" : "↓"}
+      </span>
+    );
+  }
 
   const allSelected = videos.length > 0 && selected.size === videos.length;
   const someSelected = selected.size > 0;
@@ -187,18 +213,38 @@ export default function BulkPublishTable({
                 Channel
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Risk
+                <Link
+                  href={sortHref("risk")}
+                  className="inline-flex items-center hover:text-gray-800"
+                >
+                  Risk <SortIcon field="risk" />
+                </Link>
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Claims
+                <Link
+                  href={sortHref("claims")}
+                  className="inline-flex items-center hover:text-gray-800"
+                >
+                  Claims <SortIcon field="claims" />
+                </Link>
               </th>
               {showSummaryColumn && (
                 <th className="px-4 py-3 text-left font-medium text-gray-500">
-                  Has summary
+                  <Link
+                    href={sortHref("summary")}
+                    className="inline-flex items-center hover:text-gray-800"
+                  >
+                    Has summary <SortIcon field="summary" />
+                  </Link>
                 </th>
               )}
               <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Updated
+                <Link
+                  href={sortHref("updated")}
+                  className="inline-flex items-center hover:text-gray-800"
+                >
+                  Updated <SortIcon field="updated" />
+                </Link>
               </th>
               <th className="px-4 py-3" />
             </tr>

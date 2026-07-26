@@ -8,7 +8,7 @@ const OPENROUTER_MODELS = [
   env.OPENROUTER_MODEL_3 ?? "microsoft/phi-3-mini-128k-instruct:free",
   env.OPENROUTER_MODEL_4 ?? "meta-llama/llama-3.2-3b-instruct:free",
 ];
-const GEMINI_MODEL = "gemini-1.5-flash";
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 const groq = new Groq({ apiKey: env.GROQ_API_KEY ?? "" });
 
