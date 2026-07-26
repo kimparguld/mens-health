@@ -8,10 +8,10 @@ export type PlatformConstraints = {
 };
 
 export const PLATFORM_CONSTRAINTS: Record<Platform, PlatformConstraints> = {
-  YOUTUBE_SHORTS: {
+  YOUTUBE_COMMUNITY: {
     maxCaptionChars: 5000,
     maxHashtags: 15,
-    maxScriptWords: 200,
+    maxScriptWords: 500,
     maxHookChars: 100,
   },
   TIKTOK: {

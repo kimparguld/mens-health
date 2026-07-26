@@ -33,6 +33,20 @@ export async function POST(request: NextRequest) {
   const { ids, action, note } = parsed.data;
   const newStatus = STATUS_FOR_ACTION[action];
 
+  if (action === "PUBLISHED") {
+    const withoutSummary = await db.video.count({
+      where: { id: { in: ids }, summaries: { none: {} } },
+    });
+    if (withoutSummary > 0) {
+      return Response.json(
+        {
+          error: `${withoutSummary} video(s) have no summary. Generate summaries before publishing.`,
+        },
+        { status: 422 },
+      );
+    }
+  }
+
   await db.$transaction([
     db.video.updateMany({
       where: { id: { in: ids } },

@@ -18,6 +18,8 @@ export default async function AdminLayout({
   const nav = [
     { label: "Dashboard", href: "/admin" },
     { label: "Review queue", href: "/admin/videos" },
+    { label: "Processing jobs", href: "/admin/jobs" },
+    { label: "Subscribers", href: "/admin/subscribers" },
     { label: "Social drafts", href: "/admin/social/drafts" },
     { label: "Social calendar", href: "/admin/social/calendar" },
     { label: "Social accounts", href: "/admin/social/accounts" },
@@ -42,7 +44,7 @@ export default async function AdminLayout({
               >
                 {label}
               </Link>
-              {i === 1 && <div className="border-b" />}
+              {(i === 1 || i === 3) && <div className="border-b" />}
             </Fragment>
           ))}
         </nav>

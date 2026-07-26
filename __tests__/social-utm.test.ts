@@ -2,14 +2,14 @@ import { describe, it, expect } from "vitest";
 import { buildUtmUrl } from "@/lib/social/utm";
 
 describe("buildUtmUrl", () => {
-  it("produces the correct UTM parameters for YouTube Shorts", () => {
+  it("produces the correct UTM parameters for YouTube Community", () => {
     const url = buildUtmUrl({
-      platform: "YOUTUBE_SHORTS",
+      platform: "YOUTUBE_COMMUNITY",
       path: "/videos/my-video",
       campaign: "claim_check",
     });
     expect(url).toBe(
-      "https://www.menhealth-digest.com/videos/my-video?utm_source=youtube&utm_medium=shorts&utm_campaign=claim_check",
+      "https://www.menhealth-digest.com/videos/my-video?utm_source=youtube&utm_medium=community&utm_campaign=claim_check",
     );
   });
 
@@ -55,7 +55,7 @@ describe("buildUtmUrl", () => {
 
   it("covers all platform values without throwing", () => {
     const platforms = [
-      "YOUTUBE_SHORTS",
+      "YOUTUBE_COMMUNITY",
       "TIKTOK",
       "INSTAGRAM_REELS",
       "REDDIT",

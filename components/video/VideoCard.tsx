@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 
 type VideoCardProps = {
@@ -57,10 +58,13 @@ export function VideoCard({
           {riskLevel && riskLevel !== "LOW" && <RiskBadge level={riskLevel} />}
         </div>
         {(evidenceLabel || watchTimeMin) && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-400">
-            {evidenceLabel && <span>Evidence: {evidenceLabel}</span>}
-            {evidenceLabel && watchTimeMin && <span>·</span>}
-            {watchTimeMin && <span>{watchTimeMin} min watch</span>}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {evidenceLabel && <EvidenceBadge status={evidenceLabel} />}
+            {watchTimeMin && (
+              <span className="text-xs text-gray-400">
+                {watchTimeMin} min watch
+              </span>
+            )}
           </div>
         )}
         <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-emerald-700">

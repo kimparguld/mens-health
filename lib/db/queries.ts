@@ -30,7 +30,7 @@ const _getTrendingVideosCached = unstable_cache(
         ...(excludeId ? { id: { not: excludeId } } : {}),
       },
       orderBy: [{ publishedAt: "desc" }, { trendScore: "desc" }],
-      take: 12,
+      take: 13,
       include: {
         channel: true,
         summaries: { take: 1, orderBy: { createdAt: "desc" } },
@@ -74,7 +74,7 @@ const _getVideoBySlugForMetaCached = unstable_cache(
 export const getVideoBySlugForMeta = (slug: string) =>
   _getVideoBySlugForMetaCached(slug);
 
-const TOPIC_PAGE_SIZE = 20;
+const TOPIC_PAGE_SIZE = 18;
 
 const _getTopicVideosCached = unstable_cache(
   async (topicId: string, topicSlug: string, page: number) => {

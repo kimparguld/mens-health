@@ -61,7 +61,11 @@ export default async function AdminDashboardPage() {
 
       <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {statuses.map(({ label, key, color }) => (
-          <div key={key} className="rounded-lg border bg-white p-5 shadow-sm">
+          <Link
+            key={key}
+            href={`/admin/videos?status=${key}`}
+            className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+          >
             <p className="text-sm font-medium text-gray-500">{label}</p>
             <p className="mt-1 text-3xl font-semibold text-gray-900">
               {stats.byCounts[key] ?? 0}
@@ -71,7 +75,7 @@ export default async function AdminDashboardPage() {
             >
               {key}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -82,20 +86,26 @@ export default async function AdminDashboardPage() {
             {stats.total}
           </p>
         </div>
-        <div className="rounded-lg border bg-white p-5 shadow-sm">
+        <Link
+          href="/admin/jobs"
+          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+        >
           <p className="text-sm font-medium text-gray-500">Processing jobs</p>
           <p className="mt-1 text-3xl font-semibold text-gray-900">
             {stats.pendingJobs}
           </p>
-        </div>
-        <div className="rounded-lg border bg-white p-5 shadow-sm">
+        </Link>
+        <Link
+          href="/admin/subscribers"
+          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+        >
           <p className="text-sm font-medium text-gray-500">
             Newsletter subscribers
           </p>
           <p className="mt-1 text-3xl font-semibold text-gray-900">
             {stats.subscribers}
           </p>
-        </div>
+        </Link>
       </div>
 
       <div className="mt-8">

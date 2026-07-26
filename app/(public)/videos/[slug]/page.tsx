@@ -1,13 +1,13 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { Suspense } from "react";
 import { YouTubePlayer } from "@/components/video/YouTubePlayer";
+import { PremiumSection } from "./PremiumSection";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
-import { PremiumGate } from "@/components/ui/PremiumGate";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { RiskBadge } from "@/components/ui/RiskBadge";
@@ -46,11 +46,19 @@ export async function generateMetadata({
     title: video.title,
     description,
     alternates: { canonical },
+    keywords: [
+      "men's health",
+      "health video summary",
+      "evidence-based health",
+      video.title,
+    ],
     openGraph: {
       title: video.title,
       description,
       url: canonical,
       type: "article",
+      publishedTime: new Date(video.publishedAt).toISOString(),
+      modifiedTime: new Date(video.updatedAt).toISOString(),
       images: video.thumbnailUrl ? [{ url: video.thumbnailUrl }] : [],
     },
     twitter: {
@@ -78,13 +86,10 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const firstTopic = video.topics[0]?.topic;
 
-  const [session, sponsor, affiliateLinks] = await Promise.all([
-    auth(),
+  const [sponsor, affiliateLinks] = await Promise.all([
     getActiveSponsor(),
     getAffiliateLinksForTopic(firstTopic?.slug ?? null),
   ]);
-  const isPremium =
-    (session?.user as { isPremium?: boolean } | undefined)?.isPremium === true;
 
   const videoSchema = buildVideoObjectSchema({
     title: video.title,
@@ -176,7 +181,11 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Official YouTube embed */}
       <div className="mb-8">
-        <YouTubePlayer videoId={video.youtubeVideoId} title={video.title} />
+        <YouTubePlayer
+          videoId={video.youtubeVideoId}
+          title={video.title}
+          loading="eager"
+        />
       </div>
 
       {/* Sponsor placement */}
@@ -284,31 +293,17 @@ export default async function VideoPage({ params }: { params: Params }) {
           </div>
           {video.claims.length > 3 && (
             <div className="mt-4">
-              <PremiumGate isPremium={isPremium}>
-                <div className="space-y-4">
-                  {video.claims
-                    .slice(3)
-                    .map((claim: (typeof video.claims)[number]) => (
-                      <div
-                        key={claim.id}
-                        className="rounded-lg border border-gray-200 p-4"
-                      >
-                        <div className="mb-2 flex flex-wrap items-center gap-2">
-                          <RiskBadge level={claim.riskLevel} />
-                          <EvidenceBadge status={claim.evidenceStatus} />
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {claim.text}
-                        </p>
-                        {claim.explanation && (
-                          <p className="mt-1 text-xs text-gray-500">
-                            {claim.explanation}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              </PremiumGate>
+              <Suspense fallback={null}>
+                <PremiumSection
+                  claims={video.claims.slice(3).map((c) => ({
+                    id: c.id,
+                    text: c.text,
+                    riskLevel: c.riskLevel,
+                    evidenceStatus: c.evidenceStatus,
+                    explanation: c.explanation ?? null,
+                  }))}
+                />
+              </Suspense>
             </div>
           )}
         </section>

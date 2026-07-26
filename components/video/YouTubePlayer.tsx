@@ -5,9 +5,14 @@ import { useEffect, useRef } from "react";
 type YouTubePlayerProps = {
   videoId: string;
   title: string;
+  loading?: "lazy" | "eager";
 };
 
-export function YouTubePlayer({ videoId, title }: YouTubePlayerProps) {
+export function YouTubePlayer({
+  videoId,
+  title,
+  loading = "lazy",
+}: YouTubePlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +33,7 @@ export function YouTubePlayer({ videoId, title }: YouTubePlayerProps) {
         allowFullScreen
         className="h-full w-full"
         ref={containerRef as React.RefObject<HTMLIFrameElement>}
-        loading="lazy"
+        loading={loading}
       />
     </div>
   );

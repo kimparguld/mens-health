@@ -13,7 +13,7 @@ type SortDir = "asc" | "desc";
 function buildOrderBy(
   sort: SortField,
   dir: SortDir,
-): Parameters<typeof db.video.findMany>[0]["orderBy"] {
+): NonNullable<Parameters<typeof db.video.findMany>[0]>["orderBy"] {
   if (sort === "risk") return { riskLevel: dir };
   if (sort === "claims") return { claims: { _count: dir } };
   if (sort === "summary") return { summaries: { _count: dir } };

@@ -309,6 +309,7 @@ enum JobStatus {
   RUNNING
   COMPLETED
   FAILED
+  CANCELLED
 }
 
 enum SubscriptionStatus {
@@ -325,7 +326,7 @@ enum SubscriptionStatus {
 // ---------------------------------------------------------------------------
 
 enum Platform {
-  YOUTUBE_SHORTS
+  YOUTUBE_COMMUNITY
   TIKTOK
   INSTAGRAM_REELS
   REDDIT

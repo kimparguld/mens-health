@@ -1,7 +1,6 @@
 import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 
-
 const PAGE_SIZE = 25;
 
 const RISK_COLORS: Record<string, string> = {
@@ -31,7 +30,7 @@ const ALL_STATUSES = [
 ] as const;
 
 const ALL_PLATFORMS = [
-  "YOUTUBE_SHORTS",
+  "YOUTUBE_COMMUNITY",
   "TIKTOK",
   "INSTAGRAM_REELS",
   "REDDIT",

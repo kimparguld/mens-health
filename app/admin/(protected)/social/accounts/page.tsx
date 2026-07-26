@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Platform, SocialAccount } from "@prisma/client";
 
-
 type PlatformConfig = {
   label: string;
   oauthPath: string;
@@ -34,8 +33,8 @@ export default async function SocialAccountsPage({
   ) as Partial<Record<Platform, SocialAccount>>;
 
   const platforms: Record<Platform, PlatformConfig> = {
-    YOUTUBE_SHORTS: {
-      label: "YouTube Shorts",
+    YOUTUBE_COMMUNITY: {
+      label: "YouTube Community",
       oauthPath: "/api/social/youtube/oauth",
       configured: !!(
         env.YOUTUBE_OAUTH_CLIENT_ID && env.YOUTUBE_OAUTH_REDIRECT_URI

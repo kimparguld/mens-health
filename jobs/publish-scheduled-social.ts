@@ -2,6 +2,7 @@ import { db } from "@/lib/db/prisma";
 import { LinkedInAdapter } from "@/lib/social/adapters/linkedin";
 import { XAdapter } from "@/lib/social/adapters/x";
 import { RedditAdapter } from "@/lib/social/adapters/reddit";
+import { YouTubeCommunityAdapter } from "@/lib/social/adapters/youtube";
 import type { SocialPublisher } from "@/lib/social/adapters/publisher";
 import type { Platform } from "@prisma/client";
 
@@ -9,8 +10,7 @@ import type { Platform } from "@prisma/client";
  * Processes all SCHEDULED social posts whose scheduledAt time has passed.
  *
  * Platform behaviour:
- * - YOUTUBE_SHORTS — requires a user-created video file; reverts to APPROVED
- *   so the admin receives it in the review queue with a reminder to upload.
+ * - YOUTUBE_COMMUNITY — auto-published as a text community post (no video required).
  * - LINKEDIN / X — auto-published via their respective adapters.
  * - REDDIT — manual-only by policy; reverts to APPROVED with an attempt record
  *   explaining the manual workflow.
@@ -18,6 +18,7 @@ import type { Platform } from "@prisma/client";
  */
 
 const ADAPTERS: Partial<Record<Platform, SocialPublisher>> = {
+  YOUTUBE_COMMUNITY: new YouTubeCommunityAdapter(),
   LINKEDIN: new LinkedInAdapter(),
   X: new XAdapter(),
   REDDIT: new RedditAdapter(),
@@ -40,16 +41,6 @@ export async function publishScheduledPosts(): Promise<{
   let failed = 0;
 
   for (const post of posts) {
-    // YouTube requires a video file — return to APPROVED so admin can upload
-    if (post.platform === "YOUTUBE_SHORTS") {
-      await db.socialPost.update({
-        where: { id: post.id },
-        data: { status: "APPROVED" },
-      });
-      processed++;
-      continue;
-    }
-
     const adapter = ADAPTERS[post.platform];
 
     // No adapter yet (TikTok, Instagram) — mark as FAILED

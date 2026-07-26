@@ -9,10 +9,10 @@ export async function POST(_request: NextRequest) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Find all PROCESSED videos with LOW risk that haven't been published
+  // Find all PROCESSED videos with LOW risk that haven't been published and have a summary
   const [videos, pendingLowRiskCount] = await Promise.all([
     db.video.findMany({
-      where: { status: "PROCESSED", riskLevel: "LOW" },
+      where: { status: "PROCESSED", riskLevel: "LOW", summaries: { some: {} } },
       select: { id: true },
     }),
     db.video.count({ where: { status: "PENDING", riskLevel: "LOW" } }),

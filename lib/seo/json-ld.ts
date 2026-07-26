@@ -82,3 +82,48 @@ export function buildItemListSchema(
     })),
   };
 }
+
+export function buildWebSiteSchema(siteUrl: string): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "MenHealth Digest",
+    url: siteUrl,
+  };
+}
+
+export function buildOrganizationSchema(
+  siteUrl: string,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "MenHealth Digest",
+    url: siteUrl,
+    logo: `${siteUrl}/icon-192.png`,
+    description:
+      "Evidence-aware summaries of trending men's health content — without the hype.",
+  };
+}
+
+export type PersonSchemaInput = {
+  name: string;
+  description: string;
+  url: string;
+  credentials?: string;
+  jobTitle?: string;
+};
+
+export function buildPersonSchema(
+  input: PersonSchemaInput,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    ...(input.credentials ? { honorificSuffix: input.credentials } : {}),
+    ...(input.jobTitle ? { jobTitle: input.jobTitle } : {}),
+  };
+}

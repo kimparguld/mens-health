@@ -7,7 +7,7 @@ import crypto from "crypto";
 const YOUTUBE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 
 const SCOPES = [
-  "https://www.googleapis.com/auth/youtube.upload",
+  "https://www.googleapis.com/auth/youtube",
   "https://www.googleapis.com/auth/youtube.readonly",
 ].join(" ");
 

@@ -16,8 +16,17 @@ interface SiteHeaderProps {
 }
 
 const navLinks = [
-  { href: "/how-we-rate-evidence", label: "How It Works" },
-  { href: "/digest", label: "Newsletter" },
+  {
+    href: "/how-we-rate-evidence",
+    label: "How It Works",
+    className: "text-gray-600 hover:text-emerald-700",
+  },
+  {
+    href: "/digest",
+    label: "Newsletter",
+    className:
+      "rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700",
+  },
 ];
 
 function HamburgerIcon() {
@@ -98,8 +107,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     };
   }, [nav.mounted, topics.mounted]);
 
-  console.log("isPremium:", premium?.isEnabled());
-
   return (
     <>
       <header className="border-b border-gray-200 bg-white">
@@ -121,11 +128,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               Topics
             </button>
             {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-gray-600 hover:text-emerald-700"
-              >
+              <Link key={link.href} href={link.href} className={link.className}>
                 {link.label}
               </Link>
             ))}

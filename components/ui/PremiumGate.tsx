@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { premium } from "@/lib/flags/feature-flags";
 
 interface PremiumGateProps {
   isPremium: boolean;
@@ -6,7 +7,7 @@ interface PremiumGateProps {
 }
 
 export function PremiumGate({ isPremium, children }: PremiumGateProps) {
-  if (isPremium) return <>{children}</>;
+  if (isPremium || !premium?.isEnabled()) return <>{children}</>;
 
   return (
     <div className="relative overflow-hidden rounded-lg">

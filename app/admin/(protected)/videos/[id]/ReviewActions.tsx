@@ -1,4 +1,5 @@
 "use client";
+import { twMerge } from "tailwind-merge";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -28,9 +29,11 @@ type ActionKey = (typeof ACTIONS)[number]["key"];
 export default function ReviewActions({
   videoId,
   currentStatus: _currentStatus,
+  hasSummary,
 }: {
   videoId: string;
   currentStatus: PublishStatus;
+  hasSummary: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState<ActionKey | null>(null);
@@ -75,8 +78,11 @@ export default function ReviewActions({
           <button
             key={key}
             onClick={() => handleAction(key)}
-            disabled={loading !== null}
-            className={`self-end rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap disabled:opacity-50 ${className}`}
+            disabled={loading !== null || (key === "PUBLISHED" && !hasSummary)}
+            className={twMerge(
+              `self-end rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap disabled:opacity-50`,
+              className,
+            )}
           >
             {loading === key ? "…" : label}
           </button>
