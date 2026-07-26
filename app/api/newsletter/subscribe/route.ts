@@ -5,6 +5,11 @@ import { env } from "@/env";
 
 const SubscribeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
+  sourcePage: z.string().max(500).optional(),
+  utmSource: z.string().max(200).optional(),
+  utmMedium: z.string().max(200).optional(),
+  utmCampaign: z.string().max(200).optional(),
+  referrer: z.string().max(500).optional(),
 });
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -27,6 +32,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const { email } = parsed.data;
+  const attribution = {
+    sourcePage: parsed.data.sourcePage ?? null,
+    utmSource: parsed.data.utmSource ?? null,
+    utmMedium: parsed.data.utmMedium ?? null,
+    utmCampaign: parsed.data.utmCampaign ?? null,
+    referrer: parsed.data.referrer ?? null,
+  };
 
   const existing = await db.newsletterSubscriber.findUnique({
     where: { email },
@@ -38,7 +50,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const subscriber = await db.newsletterSubscriber.upsert({
     where: { email },
-    create: { email },
+    create: { email, ...attribution },
     update: { unsubscribedAt: null },
   });
 
