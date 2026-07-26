@@ -188,7 +188,7 @@ export default async function HomePage() {
                 <span key={t.slug}>
                   <Link
                     href={`/topics/${t.slug}`}
-                    className="text-gray-600 hover:text-emerald-600"
+                    className="text-emerald-700 hover:text-emerald-500"
                   >
                     {t.name}
                   </Link>
@@ -199,9 +199,6 @@ export default async function HomePage() {
           )}
         </div>
       </section>
-
-      {/* How we rate claims */}
-      <HowWeRateClaims />
 
       {/* Trending summaries */}
       <section id="trending" className="py-14">
@@ -253,6 +250,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* How we rate claims */}
+      <HowWeRateClaims />
     </main>
   );
 }

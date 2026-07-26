@@ -57,6 +57,7 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
   const fromEmail =
     env.RESEND_FROM_EMAIL ?? `digest@${new URL(appUrl).hostname}`;
   const subject = buildDigestSubject(digestVideos);
+  console.log("[send-digest] from=%s subject=%s videos=%d", fromEmail, subject, digestVideos.length);
 
   const subscribers = await db.newsletterSubscriber.findMany({
     where: { unsubscribedAt: null },
@@ -87,7 +88,7 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
         const unsubscribeUrl = `${appUrl}/api/newsletter/unsubscribe?id=${sub.id}`;
 
         const { error } = await resend.emails.send({
-          from: `MenHealth Digest <${fromEmail}>`,
+          from: fromEmail,
           to: [sub.email],
           subject,
           html: buildDigestHtml(digestVideos, appUrl, unsubscribeUrl),
@@ -95,6 +96,7 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
         });
 
         if (error) {
+          console.error("[send-digest] Resend error for %s:", sub.email, error);
           failedCount++;
         } else {
           sentCount++;

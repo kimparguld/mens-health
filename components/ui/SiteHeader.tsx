@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
+import { premium } from "@/lib/flags/feature-flags";
 
 type SessionUser = {
   name?: string | null;
@@ -97,6 +98,8 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     };
   }, [nav.mounted, topics.mounted]);
 
+  console.log("isPremium:", premium?.isEnabled());
+
   return (
     <>
       <header className="border-b border-gray-200 bg-white">
@@ -141,7 +144,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 Sign in
               </Link>
             )}
-            {!user?.isPremium && (
+            {!user?.isPremium && premium?.isEnabled() && (
               <Link
                 href="/upgrade"
                 className="rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700"
@@ -310,7 +313,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             </nav>
 
             {/* CTA pinned to bottom */}
-            {!user?.isPremium && (
+            {!user?.isPremium && premium?.isEnabled() && (
               <div className="px-5 pt-3 pb-8">
                 <Link
                   href="/upgrade"

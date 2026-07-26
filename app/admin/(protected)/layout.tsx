@@ -1,4 +1,6 @@
 import { auth, signOut } from "@/lib/auth";
+import { Fragment } from "react";
+import { twMerge } from "tailwind-merge";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -29,14 +31,19 @@ export default async function AdminLayout({
           <span className="text-sm font-semibold text-gray-900">MHD Admin</span>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-2">
-          {nav.map(({ label, href }) => (
-            <Link
-              key={href}
-              href={href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-            >
-              {label}
-            </Link>
+          {nav.map(({ label, href }, i) => (
+            <Fragment key={href}>
+              <Link
+                key={href}
+                href={href}
+                className={twMerge(
+                  "rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+                )}
+              >
+                {label}
+              </Link>
+              {i === 1 && <div className="border-b" />}
+            </Fragment>
           ))}
         </nav>
         <div className="border-t p-4">
