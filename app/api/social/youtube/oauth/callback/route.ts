@@ -88,9 +88,9 @@ export async function GET(req: NextRequest) {
   }
 
   await db.socialAccount.upsert({
-    where: { platform: "YOUTUBE_SHORTS" },
+    where: { platform: "YOUTUBE_COMMUNITY" },
     create: {
-      platform: "YOUTUBE_SHORTS",
+      platform: "YOUTUBE_COMMUNITY",
       handle,
       accessToken: access_token,
       refreshToken: refresh_token ?? null,

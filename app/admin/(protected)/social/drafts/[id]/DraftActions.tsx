@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -29,21 +29,19 @@ export default function DraftActions({
       : "",
   );
   const [manualUrl, setManualUrl] = useState("");
-  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const isApprovable = status === "PENDING_REVIEW" || status === "DRAFT";
   const isRejectable = status !== "PUBLISHED" && status !== "REJECTED";
   const isApproved = status === "APPROVED";
   const isScheduled = status === "SCHEDULED";
-  const isYouTube = platform === "YOUTUBE_SHORTS";
+  const isYouTube = platform === "YOUTUBE_COMMUNITY";
   const isReddit = platform === "REDDIT";
   const isTextPlatform = ["REDDIT", "LINKEDIN", "X"].includes(platform);
   // Text platforms have no auto-publisher yet — admin posts manually and records the URL
   const canMarkManuallyPublished =
     isTextPlatform && (isApproved || isScheduled);
-  // Reddit is manual-only; YouTube needs a file upload — neither supports scheduling
-  // Both APPROVED and SCHEDULED posts can be (re)scheduled
-  const canSchedule = (isApproved || isScheduled) && !isReddit && !isYouTube;
+  // Reddit is manual-only; both APPROVED and SCHEDULED posts can be (re)scheduled
+  const canSchedule = (isApproved || isScheduled) && !isReddit;
 
   async function callJson(action: string, body: object = {}) {
     setLoading(action);
@@ -79,23 +77,15 @@ export default function DraftActions({
   }
 
   async function handleYouTubePublish() {
-    const file = videoInputRef.current?.files?.[0];
-    if (!file) {
-      setError("Select a video file first");
-      return;
-    }
     setLoading("publish");
     setError(null);
     try {
-      const form = new FormData();
-      form.append("video", file);
       const res = await fetch(`/api/social/drafts/${postId}/publish`, {
         method: "POST",
-        body: form,
       });
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
-        setError(data.error ?? "Upload failed");
+        setError(data.error ?? "Publish failed");
       } else {
         router.refresh();
       }
@@ -184,31 +174,23 @@ export default function DraftActions({
         </div>
       )}
 
-      {/* YouTube upload */}
+      {/* YouTube Community Post — direct publish */}
       {isYouTube && isApproved && (
         <div className="space-y-2 rounded-lg border p-3">
           <p className="text-xs font-semibold text-gray-600">
-            Publish to YouTube (private)
+            Publish to YouTube Community (Gör inlägg)
           </p>
           <p className="text-xs text-gray-500">
-            Upload a user-created video file. Third-party YouTube footage is not
-            permitted.
+            Posts the text directly to your YouTube channel community tab. No
+            video file required.
           </p>
-          <div className="flex gap-2">
-            <input
-              ref={videoInputRef}
-              type="file"
-              accept="video/*"
-              className="text-sm"
-            />
-            <button
-              onClick={handleYouTubePublish}
-              disabled={loading !== null}
-              className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-            >
-              {loading === "publish" ? "Uploading…" : "Upload"}
-            </button>
-          </div>
+          <button
+            onClick={handleYouTubePublish}
+            disabled={loading !== null}
+            className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            {loading === "publish" ? "Publishing…" : "Publish community post"}
+          </button>
         </div>
       )}
 

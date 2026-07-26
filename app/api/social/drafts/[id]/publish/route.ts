@@ -2,7 +2,7 @@ import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
-import { YouTubeShortsAdapter } from "@/lib/social/adapters/youtube";
+import { YouTubeCommunityAdapter } from "@/lib/social/adapters/youtube";
 
 /**
  * POST /api/social/drafts/[id]/publish
@@ -10,7 +10,7 @@ import { YouTubeShortsAdapter } from "@/lib/social/adapters/youtube";
  * Publishes an approved post to its target platform.
  * Every attempt is logged in SocialPublishAttempt.
  *
- * For YouTube Shorts the caller must supply a video file as multipart/form-data.
+ * YouTube Community posts require no video file — the text is posted directly.
  * Other platform adapters are not yet implemented (stub).
  */
 export async function POST(
@@ -36,30 +36,15 @@ export async function POST(
     );
   }
 
-  if (post.platform !== "YOUTUBE_SHORTS") {
+  if (post.platform !== "YOUTUBE_COMMUNITY") {
     return NextResponse.json(
       { error: `Platform ${post.platform} publisher is not yet implemented` },
       { status: 501 },
     );
   }
 
-  // Parse video file from multipart form
-  let videoBuffer: Buffer | undefined;
-  let mimeType: string | undefined;
-  try {
-    const formData = await req.formData();
-    const file = formData.get("video");
-    if (file instanceof File) {
-      const arrayBuffer = await file.arrayBuffer();
-      videoBuffer = Buffer.from(arrayBuffer);
-      mimeType = file.type || "video/mp4";
-    }
-  } catch {
-    // No video in body — adapter will return an error
-  }
-
-  const adapter = new YouTubeShortsAdapter();
-  const result = await adapter.publish(post, videoBuffer, mimeType);
+  const adapter = new YouTubeCommunityAdapter();
+  const result = await adapter.publish(post);
 
   // Log every attempt
   await db.socialPublishAttempt.create({

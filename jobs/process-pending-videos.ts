@@ -1,6 +1,23 @@
 import { db } from "@/lib/db/prisma";
 import { summarizeVideo } from "@/lib/ai/summarize-video";
-import { extractClaims } from "@/lib/ai/extract-claims";
+import { extractClaims, type ExtractedClaim } from "@/lib/ai/extract-claims";
+
+// Heuristic evidence score (0–1) derived from extracted claim risk levels.
+// Serves as a proxy until admin claim-checking is implemented.
+// LOW claims → 0.8, MEDIUM → 0.5, HIGH → 0.2; null if no claims extracted.
+function deriveEvidenceScore(claims: ExtractedClaim[]): number | null {
+  if (claims.length === 0) return null;
+  const RISK_SCORE: Record<string, number> = {
+    LOW: 0.8,
+    MEDIUM: 0.5,
+    HIGH: 0.2,
+  };
+  const total = claims.reduce(
+    (sum, c) => sum + (RISK_SCORE[c.riskLevel] ?? 0.5),
+    0,
+  );
+  return parseFloat((total / claims.length).toFixed(4));
+}
 
 function generateClaimSlug(text: string, id: string): string {
   const base = text
@@ -124,9 +141,16 @@ export async function processPendingVideos(options?: {
       const finalStatus =
         latestVideo?.riskLevel === "LOW" ? "PUBLISHED" : "PROCESSED";
 
+      // Derive a heuristic evidenceScore from extracted claim risk levels.
+      // HIGH-risk claims drag the score down; LOW-risk claims push it up.
+      // This is a proxy until admin claim-checking is implemented.
+      const evidenceScore = deriveEvidenceScore(
+        claimsResult.ok ? claimsResult.value : [],
+      );
+
       await db.video.update({
         where: { id: video.id },
-        data: { status: finalStatus },
+        data: { status: finalStatus, evidenceScore },
       });
 
       if (finalStatus === "PUBLISHED") {

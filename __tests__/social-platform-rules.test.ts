@@ -82,8 +82,8 @@ describe("validatePlatformConstraints", () => {
     hook: "A hook",
   };
 
-  it("returns no errors for valid YouTube Shorts content", () => {
-    const errors = validatePlatformConstraints("YOUTUBE_SHORTS", base);
+  it("returns no errors for valid YouTube Community content", () => {
+    const errors = validatePlatformConstraints("YOUTUBE_COMMUNITY", base);
     expect(errors).toHaveLength(0);
   });
 

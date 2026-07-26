@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 
@@ -17,17 +18,26 @@ const FOOTER_TOPICS = [
   { slug: "supplements", name: "Supplements" },
 ];
 
+async function AuthedHeader() {
+  const session = await auth();
+  const user = session?.user as SessionUser | undefined;
+  return <SiteHeader user={user} />;
+}
+
+function HeaderShell() {
+  return <SiteHeader user={undefined} />;
+}
+
 export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-  const user = session?.user as SessionUser | undefined;
-
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <SiteHeader user={user} />
+      <Suspense fallback={<HeaderShell />}>
+        <AuthedHeader />
+      </Suspense>
 
       <div className="flex-1">{children}</div>
 

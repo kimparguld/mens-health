@@ -1,14 +1,14 @@
 import Groq from "groq-sdk";
 import { env } from "@/env";
 
-export const DEFAULT_MODEL = "llama-3.3-70b-versatile";
+export const DEFAULT_MODEL = "claude-sonnet-4-6";
 const OPENROUTER_MODELS = [
   env.OPENROUTER_MODEL_1 ?? "mistralai/mistral-7b-instruct:free",
   env.OPENROUTER_MODEL_2 ?? "qwen/qwen3-8b:free",
   env.OPENROUTER_MODEL_3 ?? "microsoft/phi-3-mini-128k-instruct:free",
   env.OPENROUTER_MODEL_4 ?? "meta-llama/llama-3.2-3b-instruct:free",
 ];
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 const groq = new Groq({ apiKey: env.GROQ_API_KEY ?? "" });
 
@@ -21,6 +21,36 @@ function isRateLimit(err: unknown): boolean {
     "status" in err &&
     (err as { status: number }).status === 429
   );
+}
+
+async function callAnthropic(
+  messages: Message[],
+  maxTokens: number,
+  model: string,
+): Promise<string> {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens,
+      messages,
+      tools: [{ type: "web_search_20250305", name: "web_search" }],
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    const err = Object.assign(new Error(`Anthropic ${res.status}: ${body}`), {
+      status: res.status,
+    });
+    throw err;
+  }
+  const data = (await res.json()) as {
+    choices: Array<{ message: { content: string } }>;
+  };
+  return data.choices[0]?.message?.content ?? "";
 }
 
 async function callOpenRouter(
@@ -43,6 +73,35 @@ async function callOpenRouter(
   if (!res.ok) {
     const body = await res.text();
     const err = Object.assign(new Error(`OpenRouter ${res.status}: ${body}`), {
+      status: res.status,
+    });
+    throw err;
+  }
+  const data = (await res.json()) as {
+    choices: Array<{ message: { content: string } }>;
+  };
+  return data.choices[0]?.message?.content ?? "";
+}
+
+async function callOpenAI(
+  messages: Message[],
+  maxTokens: number,
+): Promise<string> {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      max_tokens: maxTokens,
+      messages,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    const err = Object.assign(new Error(`OpenAI ${res.status}: ${body}`), {
       status: res.status,
     });
     throw err;
@@ -103,6 +162,22 @@ export const anthropic = {
       max_tokens: number;
       messages: Message[];
     }) {
+      // 1️⃣ Anthropic
+
+      try {
+        const text = await callAnthropic(
+          messages,
+          max_tokens,
+          model ?? DEFAULT_MODEL,
+        );
+        return { content: [{ type: "text" as const, text }] };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(
+          `[AI] Anthropic rate limit hit — ${message} — falling back to Groq`,
+        );
+      }
+
       // 1️⃣ Groq
       if (env.GROQ_API_KEY) {
         try {
@@ -114,12 +189,14 @@ export const anthropic = {
           const text = completion.choices[0]?.message?.content ?? "";
           return { content: [{ type: "text" as const, text }] };
         } catch (err) {
-          if (!isRateLimit(err)) throw err;
-          console.warn("[AI] Groq rate limit hit — falling back to OpenRouter");
+          const message = err instanceof Error ? err.message : String(err);
+          console.warn(
+            `[AI] Groq rate limit hit — ${message} — falling back to OpenRouter`,
+          );
         }
       }
 
-      // 2️⃣ OpenRouter — try each model slot in order, skip on any error
+      // // 2️⃣ OpenRouter — try each model slot in order, skip on any error
       if (env.OPENROUTER_API_KEY) {
         for (const orModel of OPENROUTER_MODELS) {
           try {
@@ -133,14 +210,32 @@ export const anthropic = {
           }
         }
         console.warn(
-          "[AI] All OpenRouter models failed — falling back to Gemini",
+          "[AI] All OpenRouter models failed — falling back to OpenAI/Gemini",
         );
       }
 
-      // 3️⃣ Gemini
+      // // 3️⃣ OpenAI
+      if (env.OPENAI_API_KEY) {
+        try {
+          const text = await callOpenAI(messages, max_tokens);
+          return { content: [{ type: "text" as const, text }] };
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.warn(
+            `[AI] OpenAI rate limit hit — ${message} — falling back to Gemini`,
+          );
+        }
+      }
+
+      // 4️⃣ Gemini
       if (env.GEMINI_API_KEY) {
-        const text = await callGemini(messages, max_tokens);
-        return { content: [{ type: "text" as const, text }] };
+        try {
+          const text = await callGemini(messages, max_tokens);
+          return { content: [{ type: "text" as const, text }] };
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.warn(`[AI] Gemini rate limit hit — ${message}`);
+        }
       }
 
       throw new Error(

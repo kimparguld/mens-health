@@ -23,7 +23,7 @@ import {
 import { getTopicBySlug, getTopicVideos } from "@/lib/db/queries";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealthdigest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -88,9 +88,19 @@ export default async function TopicPage({
     faq: dbFaq ?? staticSeo?.faq ?? [],
   };
 
-  const topicResult = topic ? await getTopicVideos(topic.id, slug, page) : null;
+  const [topicResult, featuredResult] = await Promise.all([
+    topic ? getTopicVideos(topic.id, slug, page) : null,
+    topic && page > 1 ? getTopicVideos(topic.id, slug, 1) : null,
+  ]);
   const publishedVideos = topicResult?.videos ?? [];
   const totalPages = topicResult?.totalPages ?? 1;
+  // Always show the same top-3 featured videos regardless of current page
+  const featuredVideos =
+    page === 1
+      ? publishedVideos.slice(0, 3)
+      : (featuredResult?.videos ?? []).slice(0, 3);
+  // On page 1, exclude featured from the "All videos" grid to avoid duplication
+  const allVideos = page === 1 ? publishedVideos.slice(3) : publishedVideos;
 
   const [sponsor, affiliateLinks] = await Promise.all([
     getActiveSponsor(),
@@ -158,14 +168,14 @@ export default async function TopicPage({
         <p className="text-gray-500">No published videos for this topic yet.</p>
       ) : (
         <section className="mb-12">
-          {/* Featured this week: top 3 */}
-          {publishedVideos.length >= 3 && (
+          {/* Featured this week: always top 3 across all pages */}
+          {featuredVideos.length >= 3 && (
             <>
               <h2 className="mb-4 text-xl font-semibold text-gray-900">
                 Featured this week
               </h2>
               <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {publishedVideos.slice(0, 3).map((video) => (
+                {featuredVideos.map((video) => (
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
@@ -189,24 +199,22 @@ export default async function TopicPage({
             All videos
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {publishedVideos
-              .slice(publishedVideos.length >= 3 ? 3 : 0)
-              .map((video: (typeof publishedVideos)[number]) => (
-                <VideoCard
-                  key={video.id}
-                  slug={video.slug}
-                  title={video.title}
-                  channelTitle={video.channel?.title ?? ""}
-                  thumbnailUrl={video.thumbnailUrl}
-                  shortSummary={video.summaries[0]?.shortSummary ?? null}
-                  trendScore={video.trendScore}
-                  topicNames={video.topics.map(
-                    (vt: (typeof video.topics)[number]) => vt.topic.name,
-                  )}
-                  riskLevel={video.riskLevel}
-                  durationSeconds={video.durationSeconds ?? undefined}
-                />
-              ))}
+            {allVideos.map((video: (typeof publishedVideos)[number]) => (
+              <VideoCard
+                key={video.id}
+                slug={video.slug}
+                title={video.title}
+                channelTitle={video.channel?.title ?? ""}
+                thumbnailUrl={video.thumbnailUrl}
+                shortSummary={video.summaries[0]?.shortSummary ?? null}
+                trendScore={video.trendScore}
+                topicNames={video.topics.map(
+                  (vt: (typeof video.topics)[number]) => vt.topic.name,
+                )}
+                riskLevel={video.riskLevel}
+                durationSeconds={video.durationSeconds ?? undefined}
+              />
+            ))}
           </div>
         </section>
       )}

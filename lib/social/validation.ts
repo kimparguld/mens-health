@@ -53,7 +53,7 @@ export const SchedulePostSchema = z.object({
 export const GeneratePostSchema = z.object({
   videoId: z.string().cuid(),
   platform: z.enum([
-    "YOUTUBE_SHORTS",
+    "YOUTUBE_COMMUNITY",
     "TIKTOK",
     "INSTAGRAM_REELS",
     "REDDIT",

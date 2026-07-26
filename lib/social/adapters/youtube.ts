@@ -10,7 +10,7 @@ import type {
 } from "./publisher";
 
 // ---------------------------------------------------------------------------
-// YouTube Data API v3 upload helper
+// YouTube Data API v3 — Community Posts ("Gör inlägg")
 // ---------------------------------------------------------------------------
 
 type YouTubeTokenResponse = {
@@ -51,7 +51,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string> {
 
 async function getValidAccessToken(): Promise<string> {
   const account = await db.socialAccount.findUnique({
-    where: { platform: "YOUTUBE_SHORTS" },
+    where: { platform: "YOUTUBE_COMMUNITY" },
   });
 
   if (!account) {
@@ -74,7 +74,7 @@ async function getValidAccessToken(): Promise<string> {
 
   // Update stored token
   await db.socialAccount.update({
-    where: { platform: "YOUTUBE_SHORTS" },
+    where: { platform: "YOUTUBE_COMMUNITY" },
     data: {
       accessToken: newToken,
       tokenExpiry: new Date(Date.now() + 3600 * 1000),
@@ -85,84 +85,55 @@ async function getValidAccessToken(): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
-// Resumable upload — only for user-created content
+// Community Post creation via YouTube Data API v3 posts.insert
 // ---------------------------------------------------------------------------
 
-type YouTubeVideoResource = {
+type YouTubeCommunityPostResource = {
+  kind: string;
+  etag: string;
   id: string;
-  status: { uploadStatus: string };
 };
 
-async function uploadVideo(
+async function createCommunityPost(
   accessToken: string,
-  metadata: { title: string; description: string; privacyStatus: string },
-  videoBuffer: Buffer,
-  mimeType: string,
-): Promise<YouTubeVideoResource> {
-  // Step 1: initiate resumable upload
-  const initRes = await fetch(
-    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+  text: string,
+): Promise<YouTubeCommunityPostResource> {
+  const res = await fetch(
+    "https://www.googleapis.com/youtube/v3/posts?part=id,snippet",
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json; charset=UTF-8",
-        "X-Upload-Content-Type": mimeType,
-        "X-Upload-Content-Length": videoBuffer.byteLength.toString(),
       },
       body: JSON.stringify({
         snippet: {
-          title: metadata.title,
-          description: metadata.description,
-        },
-        status: {
-          privacyStatus: metadata.privacyStatus,
-          selfDeclaredMadeForKids: false,
+          text,
+          type: "textPost",
         },
       }),
     },
   );
 
-  if (!initRes.ok) {
+  if (!res.ok) {
+    const body = await res.text();
     throw new Error(
-      `YouTube upload init failed: ${initRes.status} ${initRes.statusText}`,
+      `YouTube community post failed: ${res.status} ${res.statusText} — ${body}`,
     );
   }
 
-  const uploadUrl = initRes.headers.get("Location");
-  if (!uploadUrl) {
-    throw new Error("YouTube upload init did not return a Location header");
-  }
-
-  // Step 2: upload the video data
-  const uploadRes = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: {
-      "Content-Type": mimeType,
-      "Content-Length": videoBuffer.byteLength.toString(),
-    },
-    // Convert Buffer to Uint8Array for fetch compatibility
-    body: new Uint8Array(videoBuffer),
-  });
-
-  if (!uploadRes.ok) {
-    throw new Error(
-      `YouTube video upload failed: ${uploadRes.status} ${uploadRes.statusText}`,
-    );
-  }
-
-  return (await uploadRes.json()) as YouTubeVideoResource;
+  return (await res.json()) as YouTubeCommunityPostResource;
 }
 
 // ---------------------------------------------------------------------------
 // Adapter implementation
 // ---------------------------------------------------------------------------
 
-export class YouTubeShortsAdapter implements SocialPublisher {
-  readonly platform = "YOUTUBE_SHORTS" as const;
+export class YouTubeCommunityAdapter implements SocialPublisher {
+  readonly platform = "YOUTUBE_COMMUNITY" as const;
 
   async validate(post: SocialPost): Promise<ValidationResult> {
-    const errors = validatePlatformConstraints("YOUTUBE_SHORTS", {
+    const errors = validatePlatformConstraints("YOUTUBE_COMMUNITY", {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
@@ -179,19 +150,12 @@ export class YouTubeShortsAdapter implements SocialPublisher {
   }
 
   /**
-   * Publish an approved Short to YouTube as private/unlisted.
+   * Publish a community post to the connected YouTube channel.
    *
-   * NOTE: This method uploads only user-created generated video files.
-   * It must never be used to upload third-party YouTube footage.
-   *
-   * The videoBuffer must be provided by the caller from a user-generated source.
-   * This adapter does not fetch or re-encode any video from YouTube or other platforms.
+   * The post body is composed from the hook, caption, hashtags, and UTM URL.
+   * No video file is required.
    */
-  async publish(
-    post: SocialPost,
-    videoBuffer?: Buffer,
-    mimeType?: string,
-  ): Promise<PublishResult> {
+  async publish(post: SocialPost): Promise<PublishResult> {
     const validation = await this.validate(post);
     if (!validation.ok) {
       return {
@@ -201,45 +165,41 @@ export class YouTubeShortsAdapter implements SocialPublisher {
       };
     }
 
-    if (!videoBuffer) {
-      return {
-        ok: false,
-        errorCode: "NO_VIDEO",
-        errorMsg:
-          "A video buffer must be supplied. This adapter does not render videos.",
-      };
-    }
+    const hashtags = post.hashtags
+      .map((h) => (h.startsWith("#") ? h : `#${h}`))
+      .join(" ");
+    const postText = [
+      post.hook,
+      "",
+      post.caption,
+      "",
+      hashtags,
+      "",
+      post.utmUrl,
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     try {
       const accessToken = await getValidAccessToken();
-      const resource = await uploadVideo(
-        accessToken,
-        {
-          title: post.hook.slice(0, 100),
-          description: `${post.caption}\n\n${post.utmUrl}`,
-          // Default to private; admin can change visibility in YouTube Studio
-          privacyStatus: "private",
-        },
-        videoBuffer,
-        mimeType ?? "video/mp4",
-      );
+      const resource = await createCommunityPost(accessToken, postText);
 
       const platformPostId = resource.id;
-      const platformUrl = `https://www.youtube.com/watch?v=${platformPostId}`;
+      const platformUrl = `https://www.youtube.com/@MenHealthDigest/community`;
 
       return { ok: true, platformPostId, platformUrl };
     } catch (err) {
       return {
         ok: false,
-        errorCode: "UPLOAD_ERROR",
+        errorCode: "PUBLISH_ERROR",
         errorMsg: err instanceof Error ? err.message : String(err),
       };
     }
   }
 
   /**
-   * YouTube does not support remote draft creation via the API.
-   * Use publish() with privacyStatus "private" instead.
+   * YouTube community posts have no draft API.
+   * Delegates to publish() — the post is live immediately.
    */
   async createDraft(post: SocialPost): Promise<PublishResult> {
     return this.publish(post);

@@ -72,7 +72,11 @@ export default async function AdminVideoDetailPage({
 
         {/* Review action buttons */}
         <div className="flex flex-col items-end gap-2">
-          <ReviewActions videoId={video.id} currentStatus={video.status} />
+          <ReviewActions
+            videoId={video.id}
+            currentStatus={video.status}
+            hasSummary={!!summary}
+          />
           {video.status === "PUBLISHED" && (
             <GenerateSocialButton videoId={video.id} />
           )}

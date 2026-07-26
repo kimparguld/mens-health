@@ -2,9 +2,8 @@ import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 import type { Platform } from "@prisma/client";
 
-
 const PLATFORM_COLORS: Record<Platform, string> = {
-  YOUTUBE_SHORTS: "bg-red-100 text-red-800",
+  YOUTUBE_COMMUNITY: "bg-red-100 text-red-800",
   TIKTOK: "bg-black text-white",
   INSTAGRAM_REELS: "bg-pink-100 text-pink-800",
   REDDIT: "bg-orange-100 text-orange-800",

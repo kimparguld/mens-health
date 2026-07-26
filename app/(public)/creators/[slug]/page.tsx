@@ -7,23 +7,22 @@ import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
+import { buildBreadcrumbSchema, buildPersonSchema } from "@/lib/seo/json-ld";
 
 function deriveEvidenceLabel(
   score: number | null | undefined,
 ): string | undefined {
   if (score == null) return undefined;
-  if (score < 0.35) return "Weak";
-  if (score < 0.6) return "Mixed";
-  if (score < 0.8) return "Moderate";
-  return "Strong";
+  if (score < 0.35) return "WEAK";
+  if (score < 0.6) return "MIXED";
+  if (score < 0.8) return "MODERATE";
+  return "SUPPORTED";
 }
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
-
 
 export async function generateStaticParams() {
   return CREATOR_SEEDS.map((c) => ({ slug: c.slug }));
@@ -87,9 +86,17 @@ export default async function CreatorPage({ params }: { params: Params }) {
     { name: creator.name, url: `${APP_URL}/creators/${slug}` },
   ]);
 
+  const personSchema = buildPersonSchema({
+    name: creator.name,
+    description: creator.description,
+    url: `${APP_URL}/creators/${slug}`,
+    credentials: creator.credentials,
+    jobTitle: creator.specialty.split(", ")[0],
+  });
+
   return (
     <>
-      <JsonLd schema={breadcrumb} />
+      <JsonLd schema={[breadcrumb, personSchema]} />
       <main>
         {/* Header */}
         <section className="border-b border-gray-100 bg-white py-12">

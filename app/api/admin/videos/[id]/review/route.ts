@@ -46,9 +46,22 @@ export async function POST(
 
   const { action, note } = parsed.data;
 
-  const video = await db.video.findUnique({ where: { id } });
+  const video = await db.video.findUnique({
+    where: { id },
+    include: { _count: { select: { summaries: true } } },
+  });
   if (!video) {
     return Response.json({ error: "Video not found" }, { status: 404 });
+  }
+
+  if (action === "PUBLISHED" && video._count.summaries === 0) {
+    return Response.json(
+      {
+        error:
+          "Cannot publish a video without a summary. Generate a summary first.",
+      },
+      { status: 422 },
+    );
   }
 
   const newStatus = STATUS_FOR_ACTION[action];

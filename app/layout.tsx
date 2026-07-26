@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildWebSiteSchema, buildOrganizationSchema } from "@/lib/seo/json-ld";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,6 +24,9 @@ export const metadata: Metadata = {
   },
   description:
     "Daily summaries of the most important men's health videos, ranked and fact-checked. Fitness, testosterone, sleep, nutrition, longevity — without the hype.",
+  alternates: {
+    canonical: APP_URL,
+  },
   openGraph: {
     siteName: "MenHealth Digest",
     type: "website",
@@ -29,11 +34,17 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@menhealth-digest",
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
   },
 };
 
@@ -46,6 +57,12 @@ export default function RootLayout({
     <>
       <html lang="en" className={`${inter.variable} h-full antialiased`}>
         <body className="flex min-h-full flex-col">
+          <JsonLd
+            schema={[
+              buildWebSiteSchema(APP_URL),
+              buildOrganizationSchema(APP_URL),
+            ]}
+          />
           {children}
           <Suspense fallback={null}>
             <Analytics />

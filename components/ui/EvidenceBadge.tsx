@@ -3,6 +3,10 @@ const EVIDENCE_CONFIG: Record<string, { label: string; className: string }> = {
     label: "Strong evidence",
     className: "bg-emerald-100 text-emerald-800",
   },
+  MODERATE: {
+    label: "Moderate evidence",
+    className: "bg-teal-100 text-teal-800",
+  },
   MIXED: {
     label: "Mixed / early",
     className: "bg-amber-100 text-amber-800",
