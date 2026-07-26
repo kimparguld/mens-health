@@ -59,13 +59,51 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     }));
 
+  const weeklyUrls: MetadataRoute.Sitemap = TOPIC_SEEDS.map((topic) => ({
+    url: `${BASE_URL}/weekly/${topic.slug}`,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  const staticUrls: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/newsletter`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    { url: `${BASE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
+    {
+      url: `${BASE_URL}/editorial-process`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/medical-disclaimer`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/how-we-rate-evidence`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/affiliate-disclosure`,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    { url: `${BASE_URL}/privacy`, changeFrequency: "monthly", priority: 0.4 },
+  ];
+
   return [
     {
       url: BASE_URL,
       changeFrequency: "daily",
       priority: 1.0,
     },
+    ...staticUrls,
     ...topicUrls,
+    ...weeklyUrls,
     ...rankingUrls,
     ...creatorUrls,
     ...videoUrls,

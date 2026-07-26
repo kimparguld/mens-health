@@ -183,6 +183,12 @@ model NewsletterSubscriber {
   confirmedAt     DateTime?
   unsubscribedAt  DateTime?
   resendContactId String?
+  // Attribution fields
+  sourcePage      String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  referrer        String?
   createdAt       DateTime  @default(now())
 }
 
@@ -426,4 +432,66 @@ model SocialMetric {
   shares     Int        @default(0)
   clicks     Int        @default(0)
   recordedAt DateTime   @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Growth — Outreach CRM
+// ---------------------------------------------------------------------------
+
+enum OutreachContactType {
+  YOUTUBE_CREATOR
+  NEWSLETTER_PUBLISHER
+  FITNESS_BLOGGER
+  COACH
+  PODCAST_HOST
+  SPONSOR_PROSPECT
+  HEALTH_TECH_FOUNDER
+}
+
+enum OutreachStatus {
+  NOT_CONTACTED
+  EMAIL_SENT
+  REPLIED
+  MEETING_BOOKED
+  DEAL_IN_PROGRESS
+  CLOSED_WON
+  CLOSED_LOST
+  FOLLOW_UP_NEEDED
+}
+
+model OutreachContact {
+  id              String              @id @default(cuid())
+  name            String
+  contactType     OutreachContactType
+  email           String?
+  socialUrl       String?
+  relatedContentUrl String?
+  status          OutreachStatus      @default(NOT_CONTACTED)
+  lastContactedAt DateTime?
+  nextFollowUpAt  DateTime?
+  notes           String?
+  result          String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Growth — Marketing Campaigns
+// ---------------------------------------------------------------------------
+
+model MarketingCampaign {
+  id          String   @id @default(cuid())
+  name        String
+  platform    String
+  budget      Float?
+  landingPage String?
+  utmUrl      String?
+  clicks      Int      @default(0)
+  signups     Int      @default(0)
+  notes       String?
+  isActive    Boolean  @default(true)
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
