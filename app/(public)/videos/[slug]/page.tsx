@@ -1,5 +1,3 @@
-export const revalidate = 60;
-
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -21,7 +19,12 @@ import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from "@/lib/monetization/resolvers";
-import { getVideoBySlug, getVideoBySlugForMeta } from "@/lib/db/queries";
+import { redirect } from "next/navigation";
+import {
+  getVideoBySlug,
+  getVideoBySlugForMeta,
+  getPublishedVideoSlugByYouTubeId,
+} from "@/lib/db/queries";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
@@ -70,11 +73,32 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Extracts the YouTube video ID from a slug.
+ * Slugs are generated as `${titleBase}-${youtubeVideoId}` where videoId is 11 chars.
+ */
+function extractYouTubeId(slug: string): string | null {
+  // YouTube IDs are exactly 11 chars: letters, digits, - and _
+  const match = slug.match(/[-_a-zA-Z0-9]{11}$/);
+  return match?.[0] ?? null;
+}
+
 export default async function VideoPage({ params }: { params: Params }) {
   const { slug } = await params;
   const video = await getVideoBySlug(slug);
 
-  if (!video) notFound();
+  if (!video) {
+    // Slug may have changed (e.g. after clean-video-titles migration).
+    // Try to find the video by its YouTube ID embedded at the end of the slug.
+    const youtubeId = extractYouTubeId(slug);
+    if (youtubeId) {
+      const canonicalSlug = await getPublishedVideoSlugByYouTubeId(youtubeId);
+      if (canonicalSlug && canonicalSlug !== slug) {
+        redirect(`/videos/${canonicalSlug}`);
+      }
+    }
+    notFound();
+  }
 
   const summary = video.summaries[0];
   const takeaways: string[] = Array.isArray(summary?.takeaways)
@@ -272,9 +296,10 @@ export default async function VideoPage({ params }: { params: Params }) {
             {video.claims
               .slice(0, 3)
               .map((claim: (typeof video.claims)[number]) => (
-                <div
+                <Link
                   key={claim.id}
-                  className="rounded-lg border border-gray-200 p-4"
+                  href={`/claims/${claim.slug ?? claim.id}`}
+                  className="block rounded-lg border border-gray-200 p-4 transition-colors hover:border-emerald-300"
                 >
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <RiskBadge level={claim.riskLevel} />
@@ -288,7 +313,10 @@ export default async function VideoPage({ params }: { params: Params }) {
                       {claim.explanation}
                     </p>
                   )}
-                </div>
+                  <p className="mt-2 text-xs font-medium text-emerald-600">
+                    View evidence review →
+                  </p>
+                </Link>
               ))}
           </div>
           {video.claims.length > 3 && (
