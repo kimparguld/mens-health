@@ -75,7 +75,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
           ]}
         />
 
-        <header className="mb-8">
+        <header className="mb-12">
           <p className="mb-1 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
             {weekLabel}
           </p>
@@ -93,17 +93,15 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             No videos published this week yet. Check back soon.
           </p>
         ) : (
-          <ol className="space-y-10">
+          <ol className="space-y-16">
             {videos.map((video, i) => {
               const summary = video.summaries[0];
               const topicNames = video.topics.map((vt) => vt.topic.name);
 
               return (
-                <li key={video.id}>
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-sm font-bold text-white">
-                      {i + 1}
-                    </span>
+                <li key={video.id} className="relative">
+                  <div className="absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white bg-emerald-700 text-lg font-bold text-white">
+                    {i + 1}
                   </div>
                   <VideoCard
                     slug={video.slug}
@@ -118,20 +116,21 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       video.evidenceScore != null ? "SUPPORTED" : "NOT_CHECKED"
                     }
                     durationSeconds={video.durationSeconds ?? undefined}
+                    customSizes="100vw"
                   />
                   {summary?.takeaways &&
                     Array.isArray(summary.takeaways) &&
                     (summary.takeaways as string[]).length > 0 && (
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-3 ml-3 text-sm text-gray-600">
                         <span className="font-medium">Takeaway: </span>
                         {(summary.takeaways as string[])[0]}
                       </p>
                     )}
                   <Link
                     href={`/videos/${video.slug}`}
-                    className="mt-2 inline-block text-sm font-medium text-emerald-700 hover:underline"
+                    className="mt-2 ml-3 inline-block text-sm font-medium text-emerald-700 hover:underline"
                   >
-                    Full summary →
+                    Read full summary →
                   </Link>
                 </li>
               );

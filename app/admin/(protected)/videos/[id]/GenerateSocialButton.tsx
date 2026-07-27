@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 const PLATFORMS = [
   { value: "YOUTUBE_COMMUNITY", label: "YouTube Community" },
   { value: "REDDIT", label: "Reddit" },
-  { value: "LINKEDIN", label: "LinkedIn" },
   { value: "X", label: "X (Twitter)" },
 ] as const;
 

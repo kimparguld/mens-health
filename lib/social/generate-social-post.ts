@@ -108,7 +108,7 @@ Rules:
 - Include the UTM link in the caption.
 - Include evidence label and risk level in the caption.
 - Keep hook under ${constraints.maxHookChars} characters.
-- For text-only platforms (X, REDDIT, LINKEDIN), set "script" to an empty string "".
+- For text-only platforms (X, REDDIT), set "script" to an empty string "".
 - Set requiresReview to true if the content involves TRT, medications, supplements, cancer, mental health, or ED.
 
 Respond ONLY with a JSON object:
@@ -200,13 +200,17 @@ export async function generateSocialPost(
     };
   }
 
-  // Safety: validate platform constraints
+  // Safety: validate platform constraints.
+  // For X, caption-length violations are intentionally ignored here — the
+  // XAdapter.publish() path truncates the caption to fit 280 chars automatically.
   const constraintErrors = validatePlatformConstraints(input.platform, {
     caption: aiOutput.caption,
     hashtags: aiOutput.hashtags,
     script: aiOutput.script,
     hook: aiOutput.hook,
-  });
+  }).filter(
+    (e) => !(input.platform === "X" && e.startsWith("Caption exceeds")),
+  );
   if (constraintErrors.length > 0) {
     return {
       ok: false,

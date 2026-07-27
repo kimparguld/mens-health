@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LinkedInAdapter } from "@/lib/social/adapters/linkedin";
 import { XAdapter } from "@/lib/social/adapters/x";
 import { RedditAdapter } from "@/lib/social/adapters/reddit";
 
@@ -32,15 +31,14 @@ type PartialPost = Partial<{
 function makePost(overrides: PartialPost = {}) {
   return {
     id: "post_123",
-    platform: "LINKEDIN",
+    platform: "X",
     status: "APPROVED",
-    caption:
-      "New research on sleep and testosterone. Not medical advice. Educational purposes only.",
+    caption: "New research on sleep and testosterone. Not medical advice.",
     hook: "Sleep affects testosterone levels more than most men realise.",
-    script: "A detailed script about the research findings.",
-    hashtags: ["MensHealth", "Sleep"],
+    script: "",
+    hashtags: ["MensHealth"],
     utmUrl:
-      "https://menhealth-digest.com/videos/sleep-testosterone?utm_source=linkedin",
+      "https://menhealth-digest.com/videos/sleep-testosterone?utm_source=x",
     riskLevel: "LOW",
     requiresReview: false,
     sourceType: "VIDEO_SUMMARY",
@@ -56,47 +54,6 @@ function makePost(overrides: PartialPost = {}) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
-
-// ---------------------------------------------------------------------------
-// LinkedIn adapter — validate()
-// ---------------------------------------------------------------------------
-
-describe("LinkedInAdapter.validate()", () => {
-  const adapter = new LinkedInAdapter();
-
-  it("accepts a valid post", async () => {
-    const result = await adapter.validate(makePost());
-    expect(result.ok).toBe(true);
-  });
-
-  it("rejects a caption that exceeds 3000 chars", async () => {
-    const result = await adapter.validate(
-      makePost({ caption: "x".repeat(3001) }),
-    );
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.errors[0]).toMatch(/3000/);
-    }
-  });
-
-  it("rejects when utmUrl is empty", async () => {
-    const result = await adapter.validate(makePost({ utmUrl: "" }));
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.errors[0]).toMatch(/UTM URL/);
-    }
-  });
-
-  it("rejects when too many hashtags are present", async () => {
-    const result = await adapter.validate(
-      makePost({ hashtags: Array.from({ length: 6 }, (_, i) => `tag${i}`) }),
-    );
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.errors[0]).toMatch(/hashtag/i);
-    }
-  });
-});
 
 // ---------------------------------------------------------------------------
 // X adapter — validate()
@@ -187,17 +144,10 @@ describe("RedditAdapter", () => {
 });
 
 // ---------------------------------------------------------------------------
-// LinkedIn / X createDraft() — NOT_SUPPORTED
+// X createDraft() — NOT_SUPPORTED
 // ---------------------------------------------------------------------------
 
-describe("LinkedIn and X createDraft() — not supported", () => {
-  it("LinkedInAdapter.createDraft() returns NOT_SUPPORTED", async () => {
-    const adapter = new LinkedInAdapter();
-    const result = await adapter.createDraft(makePost());
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errorCode).toBe("NOT_SUPPORTED");
-  });
-
+describe("XAdapter.createDraft() — not supported", () => {
   it("XAdapter.createDraft() returns NOT_SUPPORTED", async () => {
     const adapter = new XAdapter();
     const result = await adapter.createDraft(

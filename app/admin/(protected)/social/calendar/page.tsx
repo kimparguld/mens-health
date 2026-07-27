@@ -5,9 +5,7 @@ import type { Platform } from "@prisma/client";
 const PLATFORM_COLORS: Record<Platform, string> = {
   YOUTUBE_COMMUNITY: "bg-red-100 text-red-800",
   TIKTOK: "bg-black text-white",
-  INSTAGRAM_REELS: "bg-pink-100 text-pink-800",
   REDDIT: "bg-orange-100 text-orange-800",
-  LINKEDIN: "bg-blue-100 text-blue-800",
   X: "bg-gray-900 text-white",
 };
 
@@ -98,8 +96,8 @@ export default async function SocialCalendarPage({
 
       {/* Recommended cadence note */}
       <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-        Recommended cadence: 3 Shorts/Reels/TikToks · 1 Reddit · 1 LinkedIn/X
-        per week. Start light — learn what performs before scaling up.
+        Recommended cadence: 3 Shorts/TikToks · 1 Reddit · 1 X per week. Start
+        light — learn what performs before scaling up.
       </div>
 
       <div className="grid grid-cols-7 gap-2">

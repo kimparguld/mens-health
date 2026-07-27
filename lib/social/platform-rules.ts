@@ -20,23 +20,11 @@ export const PLATFORM_CONSTRAINTS: Record<Platform, PlatformConstraints> = {
     maxScriptWords: 200,
     maxHookChars: 100,
   },
-  INSTAGRAM_REELS: {
-    maxCaptionChars: 2200,
-    maxHashtags: 30,
-    maxScriptWords: 200,
-    maxHookChars: 100,
-  },
   REDDIT: {
     maxCaptionChars: 40000,
     maxHashtags: 0,
     maxScriptWords: 500,
     maxHookChars: 300,
-  },
-  LINKEDIN: {
-    maxCaptionChars: 3000,
-    maxHashtags: 5,
-    maxScriptWords: 300,
-    maxHookChars: 150,
   },
   X: {
     maxCaptionChars: 280,

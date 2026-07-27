@@ -97,9 +97,10 @@ describe("validatePlatformConstraints", () => {
   });
 
   it("returns error when hashtag count exceeds platform max", () => {
-    const tooManyTags = Array.from({ length: 6 }, (_, i) => `#tag${i}`);
-    const errors = validatePlatformConstraints("LINKEDIN", {
+    const tooManyTags = Array.from({ length: 4 }, (_, i) => `#tag${i}`);
+    const errors = validatePlatformConstraints("X", {
       ...base,
+      caption: "A".repeat(200),
       hashtags: tooManyTags,
     });
     expect(errors.some((e) => e.includes("hashtags"))).toBe(true);

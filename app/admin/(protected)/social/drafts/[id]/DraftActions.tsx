@@ -36,7 +36,7 @@ export default function DraftActions({
   const isScheduled = status === "SCHEDULED";
   const isYouTube = platform === "YOUTUBE_COMMUNITY";
   const isReddit = platform === "REDDIT";
-  const isTextPlatform = ["REDDIT", "LINKEDIN", "X"].includes(platform);
+  const isTextPlatform = ["REDDIT", "X"].includes(platform);
   // Text platforms have no auto-publisher yet — admin posts manually and records the URL
   const canMarkManuallyPublished =
     isTextPlatform && (isApproved || isScheduled);
@@ -198,7 +198,7 @@ export default function DraftActions({
       {isScheduled && (
         <p className="rounded bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
           This post is scheduled and will be processed by the daily cron at
-          09:00 UTC. Text platform posts (Reddit, LinkedIn, X) do not have an
+          09:00 UTC. Text platform posts (Reddit, X) do not have an
           auto-publisher yet — use the option below to post manually and record
           the URL.
         </p>

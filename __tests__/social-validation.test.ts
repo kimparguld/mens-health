@@ -56,7 +56,7 @@ describe("SocialPostAiOutputSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts empty script (text-only platforms such as X, Reddit, LinkedIn have no video script)", () => {
+  it("accepts empty script (text-only platforms such as X and Reddit have no video script)", () => {
     const result = SocialPostAiOutputSchema.safeParse({ ...valid, script: "" });
     expect(result.success).toBe(true);
   });

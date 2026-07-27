@@ -11,7 +11,7 @@ export const SocialPostAiOutputSchema = z.object({
     .min(0)
     .max(3000)
     .describe(
-      "Full spoken script or body copy — empty string for text-only platforms (X, Reddit, LinkedIn)",
+      "Full spoken script or body copy — empty string for text-only platforms (X, Reddit)",
     ),
   caption: z
     .string()
@@ -52,14 +52,7 @@ export const SchedulePostSchema = z.object({
 
 export const GeneratePostSchema = z.object({
   videoId: z.string().cuid(),
-  platform: z.enum([
-    "YOUTUBE_COMMUNITY",
-    "TIKTOK",
-    "INSTAGRAM_REELS",
-    "REDDIT",
-    "LINKEDIN",
-    "X",
-  ]),
+  platform: z.enum(["YOUTUBE_COMMUNITY", "TIKTOK", "REDDIT", "X"]),
   templateId: z.string().cuid().optional(),
   campaign: z.string().min(1).default("social"),
 });
