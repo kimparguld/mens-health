@@ -62,6 +62,21 @@ const _getVideoBySlugCached = unstable_cache(
 );
 export const getVideoBySlug = (slug: string) => _getVideoBySlugCached(slug);
 
+/**
+ * Fallback: look up a published video by its YouTube video ID.
+ * Used when a slug has changed (e.g. after the clean-video-titles migration)
+ * so old social/SEO URLs can redirect to the current canonical slug.
+ */
+export async function getPublishedVideoSlugByYouTubeId(
+  youtubeVideoId: string,
+): Promise<string | null> {
+  const video = await db.video.findUnique({
+    where: { youtubeVideoId, status: "PUBLISHED" },
+    select: { slug: true },
+  });
+  return video?.slug ?? null;
+}
+
 const _getVideoBySlugForMetaCached = unstable_cache(
   async (slug: string) =>
     db.video.findUnique({

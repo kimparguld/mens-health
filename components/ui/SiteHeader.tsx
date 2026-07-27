@@ -17,6 +17,21 @@ interface SiteHeaderProps {
 
 const navLinks = [
   {
+    href: "/rankings",
+    label: "Rankings",
+    className: "text-gray-600 hover:text-emerald-700",
+  },
+  {
+    href: "/creators",
+    label: "Creators",
+    className: "text-gray-600 hover:text-emerald-700",
+  },
+  {
+    href: "/weekly",
+    label: "Weekly",
+    className: "text-gray-600 hover:text-emerald-700",
+  },
+  {
     href: "/how-we-rate-evidence",
     label: "How It Works",
     className: "text-gray-600 hover:text-emerald-700",

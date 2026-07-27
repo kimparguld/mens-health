@@ -142,12 +142,15 @@ export default async function WeeklyRankingPage({
                 </p>
               </div>
             ) : (
-              <ol className="space-y-4">
+              <ol className="space-y-12">
                 {displayVideos.map((video, index) => (
-                  <li key={video.id} className="flex items-start gap-4">
-                    <span className="mt-4 w-8 shrink-0 text-center text-xl font-bold text-gray-200">
+                  <li
+                    key={video.id}
+                    className="relative flex items-start gap-4"
+                  >
+                    <div className="absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white bg-emerald-700 text-lg font-bold text-white">
                       {index + 1}
-                    </span>
+                    </div>
                     <div className="min-w-0 flex-1">
                       <VideoCard
                         slug={video.slug}
@@ -160,6 +163,7 @@ export default async function WeeklyRankingPage({
                         riskLevel={video.riskLevel}
                         evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
                         durationSeconds={video.durationSeconds ?? undefined}
+                        customSizes="100vw"
                       />
                     </div>
                   </li>

@@ -32,6 +32,7 @@ function generateSlug(title: string, videoId: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
+    .replace(/-{2,}/g, "-")
     .slice(0, 60)
     .replace(/-+$/, "");
   return `${base}-${videoId}`;
