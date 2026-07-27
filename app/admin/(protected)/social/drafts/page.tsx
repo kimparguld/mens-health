@@ -29,14 +29,7 @@ const ALL_STATUSES = [
   "FAILED",
 ] as const;
 
-const ALL_PLATFORMS = [
-  "YOUTUBE_COMMUNITY",
-  "TIKTOK",
-  "INSTAGRAM_REELS",
-  "REDDIT",
-  "LINKEDIN",
-  "X",
-] as const;
+const ALL_PLATFORMS = ["YOUTUBE_COMMUNITY", "TIKTOK", "REDDIT", "X"] as const;
 
 type PostStatus = (typeof ALL_STATUSES)[number];
 type Platform = (typeof ALL_PLATFORMS)[number];

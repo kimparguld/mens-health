@@ -9,9 +9,7 @@ type UtmParams = {
 const PLATFORM_UTM: Record<Platform, UtmParams> = {
   YOUTUBE_COMMUNITY: { source: "youtube", medium: "community", campaign: "" },
   TIKTOK: { source: "tiktok", medium: "video", campaign: "" },
-  INSTAGRAM_REELS: { source: "instagram", medium: "reels", campaign: "" },
   REDDIT: { source: "reddit", medium: "post", campaign: "" },
-  LINKEDIN: { source: "linkedin", medium: "post", campaign: "" },
   X: { source: "x", medium: "post", campaign: "" },
 };
 

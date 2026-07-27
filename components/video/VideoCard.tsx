@@ -14,6 +14,7 @@ type VideoCardProps = {
   riskLevel?: string;
   evidenceLabel?: string;
   durationSeconds?: number;
+  customSizes?: string;
 };
 
 export function VideoCard({
@@ -26,8 +27,12 @@ export function VideoCard({
   riskLevel,
   evidenceLabel,
   durationSeconds,
+  customSizes,
 }: VideoCardProps) {
   const watchTimeMin = durationSeconds ? Math.ceil(durationSeconds / 60) : null;
+
+  const sizes =
+    customSizes ?? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw";
 
   return (
     <Link
@@ -41,7 +46,7 @@ export function VideoCard({
             alt={title}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes={sizes}
           />
         </div>
       )}

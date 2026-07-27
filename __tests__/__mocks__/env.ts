@@ -6,10 +6,6 @@ export const env = {
   ADMIN_EMAILS: "admin@test.com",
   YOUTUBE_API_KEY: "yt-test-key",
   CRON_SECRET: "test-cron-secret-32-chars-padding",
-  LINKEDIN_CLIENT_ID: "linkedin-client-id",
-  LINKEDIN_CLIENT_SECRET: "linkedin-client-secret",
-  LINKEDIN_REDIRECT_URI:
-    "https://example.com/api/social/linkedin/oauth/callback",
   X_CLIENT_ID: "x-client-id",
   X_CLIENT_SECRET: "x-client-secret",
   X_REDIRECT_URI: "https://example.com/api/social/x/oauth/callback",

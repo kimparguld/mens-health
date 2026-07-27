@@ -34,6 +34,29 @@ async function getToken(): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Build the final tweet text, truncating the caption if needed so the combined
+ * caption + UTM URL always fits within X's 280-character limit.
+ */
+function buildTweetText(post: SocialPost): string {
+  const hasUrl = post.caption.includes(post.utmUrl);
+  const suffix = hasUrl ? "" : ` ${post.utmUrl}`;
+  const maxCaptionLen = 280 - suffix.length;
+
+  if (post.caption.length <= maxCaptionLen) {
+    return post.caption + suffix;
+  }
+
+  // Truncate caption, reserving 1 char for the ellipsis character
+  const truncated =
+    post.caption.slice(0, maxCaptionLen - 1).trimEnd() + "\u2026";
+  return truncated + suffix;
+}
+
+// ---------------------------------------------------------------------------
 // Adapter
 // ---------------------------------------------------------------------------
 
@@ -41,28 +64,16 @@ export class XAdapter implements SocialPublisher {
   readonly platform = "X" as const;
 
   async validate(post: SocialPost): Promise<ValidationResult> {
+    // Run all platform checks except caption length — captions that are too
+    // long are truncated automatically in buildTweetText rather than rejected.
     const errors = validatePlatformConstraints("X", {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
       hook: post.hook,
-    });
+    }).filter((e) => !e.startsWith("Caption exceeds"));
+
     if (errors.length > 0) return { ok: false, errors };
-
-    // For X, the tweet text is the caption. Check the combined length including
-    // UTM URL if it's not already in the caption.
-    const tweetText = post.caption.includes(post.utmUrl)
-      ? post.caption
-      : `${post.caption} ${post.utmUrl}`;
-
-    if (tweetText.length > 280) {
-      return {
-        ok: false,
-        errors: [
-          `Tweet text exceeds 280 characters (got ${tweetText.length}). Shorten the caption to leave room for the UTM URL.`,
-        ],
-      };
-    }
 
     return { ok: true };
   }
@@ -88,9 +99,7 @@ export class XAdapter implements SocialPublisher {
     try {
       const accessToken = await getToken();
 
-      const tweetText = post.caption.includes(post.utmUrl)
-        ? post.caption
-        : `${post.caption} ${post.utmUrl}`;
+      const tweetText = buildTweetText(post);
 
       const res = await fetch("https://api.twitter.com/2/tweets", {
         method: "POST",
@@ -101,21 +110,33 @@ export class XAdapter implements SocialPublisher {
         body: JSON.stringify({ text: tweetText }),
       });
 
+      const responseText = await res.text();
+
       if (!res.ok) {
-        const errorText = await res.text();
         return {
           ok: false,
           errorCode: `X_${res.status}`,
-          errorMsg: `X API error ${res.status}: ${errorText}`,
+          errorMsg: `X API error ${res.status}: ${responseText}`,
         };
       }
 
-      const parsed = TweetResponse.safeParse(await res.json());
+      let responseJson: unknown;
+      try {
+        responseJson = JSON.parse(responseText);
+      } catch {
+        return {
+          ok: false,
+          errorCode: "X_INVALID_RESPONSE",
+          errorMsg: `X API returned non-JSON response: ${responseText}`,
+        };
+      }
+
+      const parsed = TweetResponse.safeParse(responseJson);
       if (!parsed.success) {
         return {
           ok: false,
           errorCode: "X_INVALID_RESPONSE",
-          errorMsg: "X API returned an unexpected response shape",
+          errorMsg: `X API returned an unexpected response shape: ${responseText}`,
         };
       }
 

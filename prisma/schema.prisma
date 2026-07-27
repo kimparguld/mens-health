@@ -334,9 +334,7 @@ enum SubscriptionStatus {
 enum Platform {
   YOUTUBE_COMMUNITY
   TIKTOK
-  INSTAGRAM_REELS
   REDDIT
-  LINKEDIN
   X
 }
 
@@ -478,6 +476,54 @@ model OutreachContact {
 // ---------------------------------------------------------------------------
 // Growth — Marketing Campaigns
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Growth — 90-Day Plan
+// ---------------------------------------------------------------------------
+
+enum GrowthPhase {
+  FOUNDATION
+  DISTRIBUTION
+  OPTIMISATION
+  SCALE
+}
+
+enum GrowthTaskPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum GrowthTaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  SKIPPED
+}
+
+model GrowthPlanTask {
+  id          String            @id @default(cuid())
+  uniqueKey   String            @unique
+  phase       GrowthPhase
+  sortOrder   Int               @default(0)
+  dayStart    Int
+  dayEnd      Int
+  title       String
+  description String?
+  adminPath   String?
+  priority    GrowthTaskPriority @default(MEDIUM)
+  status      GrowthTaskStatus  @default(TODO)
+  notes       String?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
 
 model MarketingCampaign {
   id          String   @id @default(cuid())

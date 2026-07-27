@@ -57,13 +57,6 @@ export default async function SocialAccountsPage({
         "TIKTOK_REDIRECT_URI",
       ],
     },
-    INSTAGRAM_REELS: {
-      label: "Instagram Reels",
-      oauthPath: "/api/social/instagram/oauth",
-      configured: !!(env.META_CLIENT_ID && env.META_REDIRECT_URI),
-      setupDocs: "https://developers.facebook.com/apps",
-      envVars: ["META_CLIENT_ID", "META_CLIENT_SECRET", "META_REDIRECT_URI"],
-    },
     REDDIT: {
       label: "Reddit",
       oauthPath: "/api/social/reddit/oauth",
@@ -73,17 +66,6 @@ export default async function SocialAccountsPage({
         "REDDIT_CLIENT_ID",
         "REDDIT_CLIENT_SECRET",
         "REDDIT_REDIRECT_URI",
-      ],
-    },
-    LINKEDIN: {
-      label: "LinkedIn",
-      oauthPath: "/api/social/linkedin/oauth",
-      configured: !!(env.LINKEDIN_CLIENT_ID && env.LINKEDIN_REDIRECT_URI),
-      setupDocs: "https://www.linkedin.com/developers/apps",
-      envVars: [
-        "LINKEDIN_CLIENT_ID",
-        "LINKEDIN_CLIENT_SECRET",
-        "LINKEDIN_REDIRECT_URI",
       ],
     },
     X: {
@@ -98,10 +80,8 @@ export default async function SocialAccountsPage({
   const connectedPlatformLabel: Partial<Record<string, string>> = {
     youtube: "YouTube",
     reddit: "Reddit",
-    linkedin: "LinkedIn",
     x: "X",
     tiktok: "TikTok",
-    instagram: "Instagram",
   };
 
   return (

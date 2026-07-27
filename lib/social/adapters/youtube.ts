@@ -1,6 +1,4 @@
 import "server-only";
-import { env } from "@/env";
-import { db } from "@/lib/db/prisma";
 import { validatePlatformConstraints } from "@/lib/social/platform-rules";
 import type { SocialPost } from "@prisma/client";
 import type {
@@ -10,123 +8,15 @@ import type {
 } from "./publisher";
 
 // ---------------------------------------------------------------------------
-// YouTube Data API v3 — Community Posts ("Gör inlägg")
-// ---------------------------------------------------------------------------
-
-type YouTubeTokenResponse = {
-  access_token: string;
-  refresh_token?: string;
-  expires_in: number;
-  token_type: string;
-};
-
-async function refreshAccessToken(refreshToken: string): Promise<string> {
-  const clientId = env.YOUTUBE_OAUTH_CLIENT_ID;
-  const clientSecret = env.YOUTUBE_OAUTH_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    throw new Error(
-      "YOUTUBE_OAUTH_CLIENT_ID and YOUTUBE_OAUTH_CLIENT_SECRET must be set",
-    );
-  }
-
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      refresh_token: refreshToken,
-      grant_type: "refresh_token",
-    }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Token refresh failed: ${res.status} ${res.statusText}`);
-  }
-
-  const data = (await res.json()) as YouTubeTokenResponse;
-  return data.access_token;
-}
-
-async function getValidAccessToken(): Promise<string> {
-  const account = await db.socialAccount.findUnique({
-    where: { platform: "YOUTUBE_COMMUNITY" },
-  });
-
-  if (!account) {
-    throw new Error(
-      "No YouTube account connected. Connect via /admin/social/youtube/connect.",
-    );
-  }
-
-  const isExpired = !account.tokenExpiry || account.tokenExpiry <= new Date();
-
-  if (!isExpired) {
-    return account.accessToken;
-  }
-
-  if (!account.refreshToken) {
-    throw new Error("YouTube token expired and no refresh token stored.");
-  }
-
-  const newToken = await refreshAccessToken(account.refreshToken);
-
-  // Update stored token
-  await db.socialAccount.update({
-    where: { platform: "YOUTUBE_COMMUNITY" },
-    data: {
-      accessToken: newToken,
-      tokenExpiry: new Date(Date.now() + 3600 * 1000),
-    },
-  });
-
-  return newToken;
-}
-
-// ---------------------------------------------------------------------------
-// Community Post creation via YouTube Data API v3 posts.insert
-// ---------------------------------------------------------------------------
-
-type YouTubeCommunityPostResource = {
-  kind: string;
-  etag: string;
-  id: string;
-};
-
-async function createCommunityPost(
-  accessToken: string,
-  text: string,
-): Promise<YouTubeCommunityPostResource> {
-  const res = await fetch(
-    "https://www.googleapis.com/youtube/v3/posts?part=id,snippet",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify({
-        snippet: {
-          text,
-          type: "textPost",
-        },
-      }),
-    },
-  );
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(
-      `YouTube community post failed: ${res.status} ${res.statusText} — ${body}`,
-    );
-  }
-
-  return (await res.json()) as YouTubeCommunityPostResource;
-}
-
-// ---------------------------------------------------------------------------
-// Adapter implementation
+// YouTube Community Posts — Draft-only adapter
+//
+// The YouTube Data API v3 `POST /youtube/v3/posts` endpoint is NOT publicly
+// available. It is restricted to YouTube first-party apps and select partners
+// and returns 404 for standard OAuth clients.
+//
+// This adapter generates the post text for manual copy-paste into YouTube
+// Studio (https://studio.youtube.com → Create → Community post).
+// Admins mark the post as manually published after posting.
 // ---------------------------------------------------------------------------
 
 export class YouTubeCommunityAdapter implements SocialPublisher {
@@ -150,10 +40,15 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
   }
 
   /**
-   * Publish a community post to the connected YouTube channel.
+   * YouTube Community Posts cannot be created via the public API.
+   * Returns a draft result with the composed post text so admins can
+   * copy-paste it into YouTube Studio manually.
    *
-   * The post body is composed from the hook, caption, hashtags, and UTM URL.
-   * No video file is required.
+   * Workflow:
+   * 1. Copy the post text shown in the admin UI.
+   * 2. Go to https://studio.youtube.com → Create → Community post.
+   * 3. Paste, review, and publish.
+   * 4. Mark the post as manually published in the admin dashboard.
    */
   async publish(post: SocialPost): Promise<PublishResult> {
     const validation = await this.validate(post);
@@ -165,43 +60,39 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
       };
     }
 
-    const hashtags = post.hashtags
-      .map((h) => (h.startsWith("#") ? h : `#${h}`))
-      .join(" ");
-    const postText = [
-      post.hook,
-      "",
-      post.caption,
-      "",
-      hashtags,
-      "",
-      post.utmUrl,
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    try {
-      const accessToken = await getValidAccessToken();
-      const resource = await createCommunityPost(accessToken, postText);
-
-      const platformPostId = resource.id;
-      const platformUrl = `https://www.youtube.com/@MenHealthDigest/community`;
-
-      return { ok: true, platformPostId, platformUrl };
-    } catch (err) {
-      return {
-        ok: false,
-        errorCode: "PUBLISH_ERROR",
-        errorMsg: err instanceof Error ? err.message : String(err),
-      };
-    }
+    return {
+      ok: false,
+      errorCode: "MANUAL_PUBLISH_REQUIRED",
+      errorMsg:
+        "YouTube Community Posts cannot be published via the public API. " +
+        "Copy the post text and publish manually via YouTube Studio " +
+        "(https://studio.youtube.com → Create → Community post), " +
+        "then mark this post as manually published.",
+    };
   }
 
   /**
-   * YouTube community posts have no draft API.
-   * Delegates to publish() — the post is live immediately.
+   * Composes and returns the post text as a draft for manual publishing.
+   * The platformPostId and platformUrl are placeholder values that the admin
+   * should overwrite after manually publishing in YouTube Studio.
    */
   async createDraft(post: SocialPost): Promise<PublishResult> {
-    return this.publish(post);
+    const validation = await this.validate(post);
+    if (!validation.ok) {
+      return {
+        ok: false,
+        errorCode: "VALIDATION_FAILED",
+        errorMsg: validation.errors.join("; "),
+      };
+    }
+
+    // YouTube Community Posts have no API for draft creation.
+    // Return a stable draft identifier so the admin UI can track the post
+    // and surface the composed text for manual copy-paste into YouTube Studio.
+    return {
+      ok: true,
+      platformPostId: `draft:${post.id}`,
+      platformUrl: `https://studio.youtube.com`,
+    };
   }
 }

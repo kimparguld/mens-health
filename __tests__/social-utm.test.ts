@@ -35,7 +35,7 @@ describe("buildUtmUrl", () => {
 
   it("handles paths without a leading slash", () => {
     const url = buildUtmUrl({
-      platform: "LINKEDIN",
+      platform: "X",
       path: "videos/no-slash",
       campaign: "test",
     });
@@ -54,14 +54,7 @@ describe("buildUtmUrl", () => {
   });
 
   it("covers all platform values without throwing", () => {
-    const platforms = [
-      "YOUTUBE_COMMUNITY",
-      "TIKTOK",
-      "INSTAGRAM_REELS",
-      "REDDIT",
-      "LINKEDIN",
-      "X",
-    ] as const;
+    const platforms = ["YOUTUBE_COMMUNITY", "TIKTOK", "REDDIT", "X"] as const;
     for (const platform of platforms) {
       expect(() =>
         buildUtmUrl({ platform, path: "/test", campaign: "test" }),

@@ -15,9 +15,7 @@ const PRESET_SOURCES = [
   { label: "Google (CPC)", source: "google", medium: "cpc" },
   { label: "Reddit", source: "reddit", medium: "post" },
   { label: "Twitter / X", source: "x", medium: "post" },
-  { label: "Instagram Reels", source: "instagram", medium: "reels" },
   { label: "TikTok", source: "tiktok", medium: "video" },
-  { label: "LinkedIn", source: "linkedin", medium: "post" },
   { label: "Newsletter", source: "newsletter", medium: "email" },
   { label: "YouTube Community", source: "youtube", medium: "community" },
 ];

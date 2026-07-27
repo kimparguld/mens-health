@@ -1,5 +1,4 @@
 import { db } from "@/lib/db/prisma";
-import { LinkedInAdapter } from "@/lib/social/adapters/linkedin";
 import { XAdapter } from "@/lib/social/adapters/x";
 import { RedditAdapter } from "@/lib/social/adapters/reddit";
 import { YouTubeCommunityAdapter } from "@/lib/social/adapters/youtube";
@@ -10,16 +9,15 @@ import type { Platform } from "@prisma/client";
  * Processes all SCHEDULED social posts whose scheduledAt time has passed.
  *
  * Platform behaviour:
- * - YOUTUBE_COMMUNITY — auto-published as a text community post (no video required).
- * - LINKEDIN / X — auto-published via their respective adapters.
+ * - YOUTUBE_COMMUNITY — manual publish required (no public API for community posts).
+ * - X — auto-published via the X adapter.
  * - REDDIT — manual-only by policy; reverts to APPROVED with an attempt record
  *   explaining the manual workflow.
- * - TIKTOK / INSTAGRAM_REELS — adapters not yet implemented; marked FAILED.
+ * - TIKTOK — adapter not yet implemented; marked FAILED.
  */
 
 const ADAPTERS: Partial<Record<Platform, SocialPublisher>> = {
   YOUTUBE_COMMUNITY: new YouTubeCommunityAdapter(),
-  LINKEDIN: new LinkedInAdapter(),
   X: new XAdapter(),
   REDDIT: new RedditAdapter(),
 };
@@ -43,7 +41,7 @@ export async function publishScheduledPosts(): Promise<{
   for (const post of posts) {
     const adapter = ADAPTERS[post.platform];
 
-    // No adapter yet (TikTok, Instagram) — mark as FAILED
+    // No adapter yet (TikTok) — mark as FAILED
     if (!adapter) {
       await db.$transaction([
         db.socialPublishAttempt.create({
