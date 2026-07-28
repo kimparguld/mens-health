@@ -167,7 +167,7 @@ const _getWeeklyRankingVideosCached = unstable_cache(
   ["weekly-ranking"],
   { revalidate: 3600, tags: ["videos"] },
 );
-export function getWeeklyRankingVideos(topicId: string, topicSlug: string) {
+export function getWeeklyRankingVideos(topicId: string) {
   return _getWeeklyRankingVideosCached(topicId);
 }
 

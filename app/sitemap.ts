@@ -6,7 +6,7 @@ import { CREATOR_SEEDS } from "@/lib/youtube/creators";
 // Serve at request time so the build doesn't need a DB connection.
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let videos: { slug: string; updatedAt: Date }[] = [];

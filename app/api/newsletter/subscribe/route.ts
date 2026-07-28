@@ -12,7 +12,47 @@ const SubscribeSchema = z.object({
   referrer: z.string().max(500).optional(),
 });
 
+// ---------------------------------------------------------------------------
+// In-memory rate limiter (resets on cold start — sufficient for edge abuse).
+// For production scale, replace with a Redis-backed store.
+// ---------------------------------------------------------------------------
+const ipAttempts = new Map<string, { count: number; windowStart: number }>();
+const emailAttempts = new Map<string, { count: number; windowStart: number }>();
+
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_ATTEMPTS_PER_IP = 10;
+const MAX_ATTEMPTS_PER_EMAIL = 3;
+
+function isRateLimited(
+  map: Map<string, { count: number; windowStart: number }>,
+  key: string,
+  maxAttempts: number,
+): boolean {
+  const now = Date.now();
+  const entry = map.get(key);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    map.set(key, { count: 1, windowStart: now });
+    return false;
+  }
+
+  entry.count += 1;
+  if (entry.count > maxAttempts) return true;
+  return false;
+}
+
+// Generic response so attackers cannot enumerate subscribers.
+const GENERIC_OK = NextResponse.json({ ok: true });
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  // Rate limit by IP
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (isRateLimited(ipAttempts, ip, MAX_ATTEMPTS_PER_IP)) {
+    // Return generic success to prevent enumeration
+    return GENERIC_OK;
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -31,7 +71,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const { email } = parsed.data;
+  // Normalize email to lowercase before storing / looking up.
+  const email = parsed.data.email.toLowerCase().trim();
+
+  // Rate limit by normalised email address
+  if (isRateLimited(emailAttempts, email, MAX_ATTEMPTS_PER_EMAIL)) {
+    return GENERIC_OK;
+  }
+
   const attribution = {
     sourcePage: parsed.data.sourcePage ?? null,
     utmSource: parsed.data.utmSource ?? null,
@@ -45,7 +92,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   });
 
   if (existing && !existing.unsubscribedAt) {
-    return NextResponse.json({ ok: true, alreadySubscribed: true });
+    // Return generic success — do not reveal that the address is already subscribed.
+    return GENERIC_OK;
   }
 
   const subscriber = await db.newsletterSubscriber.upsert({

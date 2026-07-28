@@ -12,7 +12,7 @@ import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
 export const dynamic = "force-dynamic";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
 
@@ -136,12 +136,21 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
           {/* Badges */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <EvidenceBadge status={claim.evidenceStatus} />
+            <EvidenceBadge status={claim.evidenceStatus} showNotChecked />
             <RiskBadge level={claim.riskLevel} />
             <span className="text-xs text-gray-400 capitalize">
               {claim.category.replace(/_/g, " ").toLowerCase()}
             </span>
           </div>
+
+          {/* Not-checked notice */}
+          {claim.evidenceStatus === "NOT_CHECKED" && (
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              This claim has been extracted from the video but has not yet been
+              fully reviewed against published evidence. Treat with appropriate
+              caution.
+            </div>
+          )}
 
           {/* Evidence summary */}
           <section className="mt-8">

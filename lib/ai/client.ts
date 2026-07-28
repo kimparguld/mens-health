@@ -14,15 +14,6 @@ const groq = new Groq({ apiKey: env.GROQ_API_KEY ?? "" });
 
 type Message = { role: string; content: string };
 
-function isRateLimit(err: unknown): boolean {
-  return (
-    typeof err === "object" &&
-    err !== null &&
-    "status" in err &&
-    (err as { status: number }).status === 429
-  );
-}
-
 async function callAnthropic(
   messages: Message[],
   maxTokens: number,

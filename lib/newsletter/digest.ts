@@ -70,10 +70,7 @@ function escapeHtml(str: string): string {
 
 // --- Subject ---
 
-export function buildDigestSubject(
-  videos: DigestVideo[],
-  meta?: WeeklyDigestMeta,
-): string {
+export function buildDigestSubject(videos: DigestVideo[]): string {
   const totalClaims = videos.reduce(
     (sum, v) => sum + (v.checkedClaims?.length ?? 0),
     0,
@@ -184,7 +181,7 @@ export function buildDigestHtml(
     claimsBody = `<p style="margin:0;font-size:14px;color:#374151;">
         No claims were fully checked this week. Browse the latest
         <a href="${u("/rankings")}" style="color:#2563eb;">rankings</a> and
-        <a href="${u("/topics")}" style="color:#2563eb;">topic pages</a> for new summaries.
+        <a href="${u("#topics")}" style="color:#2563eb;">topic pages</a> for new summaries.
       </p>`;
   } else {
     const claimRows = allClaims

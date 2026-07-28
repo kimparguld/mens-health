@@ -48,7 +48,8 @@ export function GrowthPlanBoard({ initialTasks, initialStartDate }: Props) {
 
   const today = parsedStartDate
     ? Math.floor(
-        (Date.now() - parsedStartDate.getTime()) / (1000 * 60 * 60 * 24),
+        (new Date().getTime() - parsedStartDate.getTime()) /
+          (1000 * 60 * 60 * 24),
       ) + 1
     : null;
 

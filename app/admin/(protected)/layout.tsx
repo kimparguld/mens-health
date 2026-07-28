@@ -22,6 +22,8 @@ export default async function AdminLayout({
       classes: "font-semibold pl-0",
     },
     { label: "Review queue", href: "/admin/videos" },
+    { label: "Claims", href: "/admin/claims" },
+    { label: "Topics", href: "/admin/topics" },
     {
       label: "Processing jobs",
       href: "/admin/jobs",
@@ -56,7 +58,7 @@ export default async function AdminLayout({
     { label: "Growth analytics", href: "/admin/analytics/growth" },
     { label: "90-day plan", href: "/admin/growth-plan" },
     { label: "Weekly workflow", href: "/admin/weekly-growth" },
-    { label: "Monetisation", href: "/admin/monetisation" },
+    { label: "Monetization", href: "/admin/monetization" },
   ];
 
   // Divider indices (after these 0-based indices)

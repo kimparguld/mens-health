@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 export type CreateMetadataInput = {
   title: string;

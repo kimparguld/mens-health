@@ -20,7 +20,7 @@ function deriveEvidenceLabel(
 }
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 type Params = Promise<{ topic: string }>;
 
@@ -68,7 +68,7 @@ export default async function WeeklyRankingPage({
   const topicRecord = await getTopicBySlug(topic);
 
   const displayVideos = topicRecord
-    ? await getWeeklyRankingVideos(topicRecord.id, topic)
+    ? await getWeeklyRankingVideos(topicRecord.id)
     : [];
   const isFallback = false;
 
@@ -129,6 +129,54 @@ export default async function WeeklyRankingPage({
           </div>
         </section>
 
+        {/* How rankings work */}
+        <section className="border-b border-gray-100 bg-gray-50 py-8">
+          <div className="mx-auto max-w-[1120px] px-4">
+            <details className="group">
+              <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-gray-700">
+                <span className="transition-transform group-open:rotate-90">
+                  ›
+                </span>
+                How rankings work
+              </summary>
+              <div className="mt-3 grid gap-3 pl-5 text-xs text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  {
+                    icon: "📅",
+                    label: "Recency",
+                    desc: "Videos published this week rank higher — fresh content first.",
+                  },
+                  {
+                    icon: "📊",
+                    label: "Engagement",
+                    desc: "Views, likes, and comments relative to channel size.",
+                  },
+                  {
+                    icon: "🎯",
+                    label: "Topic relevance",
+                    desc: "How closely the video matches this topic's core questions.",
+                  },
+                  {
+                    icon: "⚠️",
+                    label: "Risk penalties",
+                    desc: "High-risk or unsubstantiated claims reduce a video's score.",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-lg border border-gray-200 bg-white px-4 py-3"
+                  >
+                    <p className="font-semibold text-gray-800">
+                      {item.icon} {item.label}
+                    </p>
+                    <p className="mt-1 text-gray-500">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          </div>
+        </section>
+
         {/* Video list */}
         <section className="py-10">
           <div className="mx-auto max-w-[1120px] px-4">
@@ -170,6 +218,24 @@ export default async function WeeklyRankingPage({
                 ))}
               </ol>
             )}
+          </div>
+        </section>
+
+        {/* Navigation links */}
+        <section className="border-t border-gray-100 bg-gray-50 py-8">
+          <div className="mx-auto flex max-w-[1120px] flex-wrap gap-4 px-4">
+            <Link
+              href={`/topics/${topic}`}
+              className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+            >
+              ← {seed.name} topic hub
+            </Link>
+            <Link
+              href={`/weekly/${topic}`}
+              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-emerald-300"
+            >
+              Weekly {seed.name} picks →
+            </Link>
           </div>
         </section>
 

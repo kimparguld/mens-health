@@ -5,6 +5,7 @@ import { db } from "@/lib/db/prisma";
 import { CREATOR_SEEDS } from "@/lib/youtube/creators";
 import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema, buildPersonSchema } from "@/lib/seo/json-ld";
@@ -20,7 +21,7 @@ function deriveEvidenceLabel(
 }
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
 
@@ -79,6 +80,50 @@ export default async function CreatorPage({ params }: { params: Params }) {
         },
       })
     : [];
+
+  // Derive most common topics from indexed videos
+  const topicFrequency = new Map<
+    string,
+    { name: string; slug: string; count: number }
+  >();
+  for (const video of videos) {
+    for (const vt of video.topics) {
+      const existing = topicFrequency.get(vt.topic.id);
+      if (existing) {
+        existing.count++;
+      } else {
+        topicFrequency.set(vt.topic.id, {
+          name: vt.topic.name,
+          slug: vt.topic.slug,
+          count: 1,
+        });
+      }
+    }
+  }
+  const topTopics = Array.from(topicFrequency.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
+
+  // Fetch extracted claims from this creator's videos
+  const videoIds = videos.map((v) => v.id);
+  const claims =
+    videoIds.length > 0
+      ? await db.claim.findMany({
+          where: {
+            videoId: { in: videoIds },
+            slug: { not: null },
+          },
+          take: 6,
+          orderBy: { riskLevel: "desc" },
+          select: {
+            id: true,
+            text: true,
+            evidenceStatus: true,
+            riskLevel: true,
+            slug: true,
+          },
+        })
+      : [];
 
   const breadcrumb = buildBreadcrumbSchema([
     { name: "Home", url: APP_URL },
@@ -218,6 +263,69 @@ export default async function CreatorPage({ params }: { params: Params }) {
         {/* Other creators */}
         <section className="border-t border-gray-100 bg-gray-50 py-10">
           <div className="mx-auto max-w-[1120px] px-4">
+            {/* Most common topics */}
+            {topTopics.length > 0 && (
+              <div className="mb-8">
+                <h2 className="mb-3 text-sm font-semibold text-gray-700">
+                  Most covered topics
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {topTopics.map((t) => (
+                    <Link
+                      key={t.slug}
+                      href={`/topics/${t.slug}`}
+                      className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-emerald-300 hover:text-emerald-700"
+                    >
+                      {t.name}{" "}
+                      <span className="text-gray-400">({t.count})</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Extracted claims */}
+            {claims.length > 0 && (
+              <div className="mb-8">
+                <h2 className="mb-3 text-sm font-semibold text-gray-700">
+                  Claims extracted from {creator.name}&apos;s videos
+                </h2>
+                <ul className="space-y-2">
+                  {claims.map((claim) => (
+                    <li
+                      key={claim.id}
+                      className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm"
+                    >
+                      <span className="flex-1 text-gray-800">
+                        &ldquo;{claim.text}&rdquo;
+                      </span>
+                      <EvidenceBadge
+                        status={claim.evidenceStatus}
+                        showNotChecked
+                      />
+                      {claim.slug && (
+                        <Link
+                          href={`/claims/${claim.slug}`}
+                          className="text-xs text-emerald-700 hover:underline"
+                        >
+                          See evidence →
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Creator disclaimer */}
+            <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+              MenHealth Digest does not endorse, represent, or have an
+              affiliation with {creator.name}. This page presents an independent
+              summary of publicly available content. Always evaluate health
+              information critically and consult a qualified healthcare
+              professional for personal medical decisions.
+            </div>
+
             <h2 className="mb-4 text-sm font-semibold text-gray-700">
               More creators
             </h2>
