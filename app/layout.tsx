@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),

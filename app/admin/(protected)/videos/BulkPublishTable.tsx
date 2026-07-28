@@ -52,7 +52,7 @@ export default function BulkPublishTable({
     return `/admin/videos?${params.toString()}`;
   }
 
-  function SortIcon({ field }: { field: string }) {
+  const sortIcon = ({ field }: { field: string }) => {
     if (sortField !== field)
       return <span className="ml-1 text-gray-300">↕</span>;
     return (
@@ -60,7 +60,7 @@ export default function BulkPublishTable({
         {sortDir === "asc" ? "↑" : "↓"}
       </span>
     );
-  }
+  };
 
   const allSelected = videos.length > 0 && selected.size === videos.length;
   const someSelected = selected.size > 0;
@@ -83,6 +83,19 @@ export default function BulkPublishTable({
 
   async function bulkPublish() {
     if (!someSelected) return;
+
+    // Safety check: warn before publishing high-risk videos
+    const highRiskSelected = videos.filter(
+      (v) => selected.has(v.id) && v.riskLevel === "HIGH",
+    );
+    if (highRiskSelected.length > 0) {
+      const names = highRiskSelected.map((v) => v.title).join(", ");
+      const confirmed = window.confirm(
+        `⚠️ Warning: ${highRiskSelected.length} high-risk video(s) are selected:\n\n${names}\n\nHigh-risk videos require explicit admin approval. Are you sure you want to publish them?`,
+      );
+      if (!confirmed) return;
+    }
+
     setLoading("publish");
     setError(null);
     setMessage(null);
@@ -153,38 +166,53 @@ export default function BulkPublishTable({
   return (
     <>
       {showBulkActions && (
-        <div className="mb-3 flex items-center gap-3">
-          <span className="text-sm text-gray-500">
-            {someSelected
-              ? `${selected.size} selected`
-              : `Select rows to ${showPublishAction ? "bulk publish" : ""}${showPublishAction && showSummaryColumn ? " or " : ""}${showSummaryColumn ? "generate summaries" : ""}.`}
-          </span>
-          {someSelected && (
-            <>
-              <button
-                onClick={bulkGenerateSummaries}
-                disabled={loading !== null}
-                className="rounded-lg border border-blue-600 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50"
-              >
-                {loading === "summaries"
-                  ? "Generating…"
-                  : `Generate summaries (${selected.size})`}
-              </button>
-              {showPublishAction && (
+        <div className="mb-3 flex flex-col gap-2">
+          {/* High-risk warning banner */}
+          {someSelected &&
+            showPublishAction &&
+            videos.some(
+              (v) => selected.has(v.id) && v.riskLevel === "HIGH",
+            ) && (
+              <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-800">
+                ⚠️ One or more selected videos is HIGH risk. High-risk videos
+                require explicit admin review before publishing.
+              </div>
+            )}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">
+              {someSelected
+                ? `${selected.size} selected`
+                : `Select rows to ${showPublishAction ? "bulk publish" : ""}${showPublishAction && showSummaryColumn ? " or " : ""}${showSummaryColumn ? "generate summaries" : ""}.`}
+            </span>
+            {someSelected && (
+              <>
                 <button
-                  onClick={bulkPublish}
+                  onClick={bulkGenerateSummaries}
                   disabled={loading !== null}
-                  className="rounded-lg bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                  className="rounded-lg border border-blue-600 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50"
                 >
-                  {loading === "publish"
-                    ? "Publishing…"
-                    : `Publish ${selected.size}`}
+                  {loading === "summaries"
+                    ? "Generating…"
+                    : `Generate summaries (${selected.size})`}
                 </button>
-              )}
-            </>
-          )}
-          {error && <span className="text-xs text-red-600">{error}</span>}
-          {message && <span className="text-xs text-gray-600">{message}</span>}
+                {showPublishAction && (
+                  <button
+                    onClick={bulkPublish}
+                    disabled={loading !== null}
+                    className="rounded-lg bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {loading === "publish"
+                      ? "Publishing…"
+                      : `Publish ${selected.size}`}
+                  </button>
+                )}
+              </>
+            )}
+            {error && <span className="text-xs text-red-600">{error}</span>}
+            {message && (
+              <span className="text-xs text-gray-600">{message}</span>
+            )}
+          </div>
         </div>
       )}
 
@@ -217,7 +245,7 @@ export default function BulkPublishTable({
                   href={sortHref("risk")}
                   className="inline-flex items-center hover:text-gray-800"
                 >
-                  Risk <SortIcon field="risk" />
+                  Risk {sortIcon({ field: "risk" })}
                 </Link>
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
@@ -225,7 +253,7 @@ export default function BulkPublishTable({
                   href={sortHref("claims")}
                   className="inline-flex items-center hover:text-gray-800"
                 >
-                  Claims <SortIcon field="claims" />
+                  Claims {sortIcon({ field: "claims" })}
                 </Link>
               </th>
               {showSummaryColumn && (
@@ -234,7 +262,7 @@ export default function BulkPublishTable({
                     href={sortHref("summary")}
                     className="inline-flex items-center hover:text-gray-800"
                   >
-                    Has summary <SortIcon field="summary" />
+                    Has summary {sortIcon({ field: "summary" })}
                   </Link>
                 </th>
               )}
@@ -243,7 +271,7 @@ export default function BulkPublishTable({
                   href={sortHref("updated")}
                   className="inline-flex items-center hover:text-gray-800"
                 >
-                  Updated <SortIcon field="updated" />
+                  Updated {sortIcon({ field: "updated" })}
                 </Link>
               </th>
               <th className="px-4 py-3" />

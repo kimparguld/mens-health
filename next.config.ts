@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
       new URL("https://assets.example.com/account123/**"),
       new URL("https://i.ytimg.com/**"),
     ],
+    unoptimized: true,
   },
   async headers() {
     return [

@@ -30,6 +30,14 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
     include: {
       summaries: { take: 1, orderBy: { createdAt: "desc" } },
       channel: true,
+      claims: {
+        where: {
+          // Only include claims that have been actively evidence-reviewed.
+          evidenceStatus: { not: "NOT_CHECKED" },
+        },
+        take: 3,
+        orderBy: { riskLevel: "desc" },
+      },
     },
     orderBy: [{ trendScore: "desc" }, { relevanceScore: "desc" }],
     take: 5,
@@ -51,13 +59,32 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
     thumbnailUrl: v.thumbnailUrl,
     shortSummary: v.summaries[0]?.shortSummary ?? null,
     trendScore: v.trendScore,
+    // Only claims with an explicit evidence verdict are included.
+    checkedClaims: v.claims.map((c) => ({
+      claim: c.text,
+      verdict:
+        c.evidenceStatus.charAt(0) + c.evidenceStatus.slice(1).toLowerCase(),
+      summary: c.explanation ?? c.text,
+      slug: c.slug ?? c.id,
+    })),
+    practicalTakeaway:
+      v.summaries[0]?.takeaways &&
+      Array.isArray(v.summaries[0].takeaways) &&
+      (v.summaries[0].takeaways as string[]).length > 0
+        ? (v.summaries[0].takeaways as string[])[0]
+        : null,
   }));
 
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const fromEmail =
     env.RESEND_FROM_EMAIL ?? `digest@${new URL(appUrl).hostname}`;
   const subject = buildDigestSubject(digestVideos);
-  console.log("[send-digest] from=%s subject=%s videos=%d", fromEmail, subject, digestVideos.length);
+  console.log(
+    "[send-digest] from=%s subject=%s videos=%d",
+    fromEmail,
+    subject,
+    digestVideos.length,
+  );
 
   const subscribers = await db.newsletterSubscriber.findMany({
     where: { unsubscribedAt: null },

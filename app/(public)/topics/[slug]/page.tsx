@@ -6,6 +6,7 @@ import { Disclaimer } from "@/components/ui/Disclaimer";
 import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { RiskBadge } from "@/components/ui/RiskBadge";
+import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -14,6 +15,7 @@ import {
   buildItemListSchema,
 } from "@/lib/seo/json-ld";
 import { getTopicSeo } from "@/lib/seo/topic-faq";
+import { getTopicContent } from "@/lib/seo/topic-content";
 import type { FaqEntry } from "@/lib/seo/json-ld";
 import Link from "next/link";
 import {
@@ -21,9 +23,10 @@ import {
   getAffiliateLinksForTopic,
 } from "@/lib/monetization/resolvers";
 import { getTopicBySlug, getTopicVideos } from "@/lib/db/queries";
+import { db } from "@/lib/db/prisma";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -78,6 +81,7 @@ export default async function TopicPage({
   if (!topicSeed) notFound();
 
   const staticSeo = getTopicSeo(slug);
+  const staticContent = getTopicContent(slug);
 
   const topic = await getTopicBySlug(slug);
 
@@ -87,6 +91,22 @@ export default async function TopicPage({
     intro: topic?.faqIntro ?? staticSeo?.intro ?? topicSeed.description,
     faq: dbFaq ?? staticSeo?.faq ?? [],
   };
+
+  // Fetch up to 3 related claims for this topic
+  const topicClaims = topic
+    ? await db.claim.findMany({
+        where: {
+          video: {
+            status: "PUBLISHED",
+            topics: { some: { topicId: topic.id } },
+          },
+          slug: { not: null },
+        },
+        take: 3,
+        orderBy: { riskLevel: "desc" },
+        select: { id: true, text: true, evidenceStatus: true, slug: true },
+      })
+    : [];
 
   const [topicResult, featuredResult] = await Promise.all([
     topic ? getTopicVideos(topic.id, slug, page) : null,
@@ -162,6 +182,116 @@ export default async function TopicPage({
           <p className="mt-2 text-lg text-gray-600">{topicSeed.description}</p>
         )}
       </header>
+
+      {/* Beginner Guide */}
+      {staticContent?.beginnerGuide && (
+        <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-6">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            {staticContent.beginnerGuide.heading}
+          </h2>
+          <ol className="space-y-2">
+            {staticContent.beginnerGuide.steps.map((step, i) => (
+              <li key={i} className="flex gap-3 text-sm text-gray-700">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+                  {i + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {/* Top Claims */}
+      {(topicClaims.length > 0 ||
+        (staticContent?.topClaims?.length ?? 0) > 0) && (
+        <section className="mb-10">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            Top claims in this topic
+          </h2>
+          <ul className="space-y-3">
+            {topicClaims.length > 0
+              ? topicClaims.map((claim) => (
+                  <li
+                    key={claim.id}
+                    className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-4"
+                  >
+                    <span className="flex-1 text-sm text-gray-800">
+                      &ldquo;{claim.text}&rdquo;
+                    </span>
+                    <EvidenceBadge
+                      status={claim.evidenceStatus}
+                      showNotChecked
+                    />
+                    {claim.slug && (
+                      <Link
+                        href={`/claims/${claim.slug}`}
+                        className="text-xs font-medium text-emerald-700 hover:underline"
+                      >
+                        See evidence →
+                      </Link>
+                    )}
+                  </li>
+                ))
+              : staticContent?.topClaims?.map((claim, i) => (
+                  <li
+                    key={i}
+                    className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-4"
+                  >
+                    <span className="flex-1 text-sm text-gray-800">
+                      &ldquo;{claim.text}&rdquo;
+                    </span>
+                    <EvidenceBadge status={claim.evidenceStatus} />
+                  </li>
+                ))}
+          </ul>
+          <Link
+            href={`/rankings/${slug}`}
+            className="mt-3 inline-block text-sm font-medium text-emerald-700 hover:underline"
+          >
+            See top-ranked videos for {topicSeed.name} →
+          </Link>
+        </section>
+      )}
+
+      {/* Common Myths */}
+      {staticContent?.commonMyths && staticContent.commonMyths.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            Common myths about {topicSeed.name.toLowerCase()}
+          </h2>
+          <div className="divide-y rounded-xl border bg-white">
+            {staticContent.commonMyths.map((item, i) => (
+              <div key={i} className="px-5 py-4">
+                <p className="text-sm font-semibold text-red-700">
+                  Myth: &ldquo;{item.myth}&rdquo;
+                </p>
+                <p className="mt-1 text-sm text-gray-600">
+                  <span className="font-medium text-emerald-700">Reality:</span>{" "}
+                  {item.reality}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Evidence-Aware Takeaways */}
+      {staticContent?.takeaways && staticContent.takeaways.length > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            Evidence-aware takeaways
+          </h2>
+          <ul className="space-y-2">
+            {staticContent.takeaways.map((takeaway, i) => (
+              <li key={i} className="flex gap-3 text-sm text-gray-700">
+                <span className="mt-0.5 text-emerald-600">✓</span>
+                {takeaway}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Video grid */}
       {publishedVideos.length === 0 ? (

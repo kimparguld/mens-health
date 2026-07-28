@@ -12,6 +12,43 @@ export type SeedTask = {
   priority: GrowthTaskPriority;
 };
 
+/**
+ * All known admin routes in app/admin/(protected).
+ * When adding a new admin page, add its path here so the validator can check
+ * adminPath values in GROWTH_PLAN_TASKS.
+ */
+export const KNOWN_ADMIN_ROUTES = new Set([
+  "/admin",
+  "/admin/videos",
+  "/admin/claims",
+  "/admin/topics",
+  "/admin/jobs",
+  "/admin/subscribers",
+  "/admin/social/drafts",
+  "/admin/social/calendar",
+  "/admin/social/accounts",
+  "/admin/growth",
+  "/admin/content-calendar",
+  "/admin/community",
+  "/admin/outreach",
+  "/admin/marketing/utm-builder",
+  "/admin/marketing/campaigns",
+  "/admin/analytics/growth",
+  "/admin/growth-plan",
+  "/admin/weekly-growth",
+  "/admin/monetization",
+]);
+
+/**
+ * Returns true when the given adminPath is a known admin route.
+ * Paths starting with "/" that are NOT in KNOWN_ADMIN_ROUTES are broken links.
+ */
+export function isAdminPathValid(adminPath: string | null): boolean {
+  if (adminPath === null) return true; // null means "no admin link"
+  if (adminPath === "/") return true; // homepage
+  return KNOWN_ADMIN_ROUTES.has(adminPath);
+}
+
 export const GROWTH_PLAN_TASKS: SeedTask[] = [
   // ---- Phase 1: Foundation (Day 1–14) ----
   {

@@ -80,25 +80,183 @@ export default function NewsletterPage() {
         </ul>
       </section>
 
-      {/* Example digest section */}
-      <section className="mb-12 rounded-xl border border-gray-200 bg-gray-50 px-6 py-6">
-        <h2 className="mb-3 text-base font-semibold text-gray-900">
-          Example issue
+      {/* Sample issue preview */}
+      <section className="mb-12">
+        <h2 className="mb-4 text-xl font-bold text-gray-900">
+          What a typical issue looks like
         </h2>
-        <div className="space-y-3 text-sm text-gray-700">
-          <p>
-            <strong>This week&apos;s top claim:</strong> &ldquo;Sleep matters
-            more than supplements for testosterone.&rdquo; — Evidence: moderate.
-            What the data actually says…
-          </p>
-          <p>
-            <strong>Trending video:</strong> Andrew Huberman on morning
-            sunlight. Main claim, evidence level, practical takeaway.
-          </p>
-          <p>
-            <strong>Practical takeaway:</strong> One concrete action from this
-            week&apos;s best evidence.
-          </p>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+          {/* Issue header */}
+          <div className="border-b border-emerald-100 bg-emerald-50 px-6 py-4">
+            <p className="text-xs font-semibold tracking-widest text-emerald-700 uppercase">
+              Sample issue · Week of 16 June 2025
+            </p>
+            <p className="mt-1 text-sm text-gray-600">
+              Men&apos;s health intel, without the noise.
+            </p>
+          </div>
+
+          <div className="divide-y divide-gray-100 text-sm">
+            {/* Top Video */}
+            <div className="px-6 py-5">
+              <p className="mb-2 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                Top Video This Week
+              </p>
+              <p className="font-semibold text-gray-900">
+                &ldquo;Morning Sunlight for Testosterone — Does It Actually
+                Work?&rdquo;
+              </p>
+              <p className="mt-1 text-gray-500">
+                Andrew Huberman Lab · 2.4M views
+              </p>
+              <p className="mt-2 text-gray-700">
+                Claims morning light exposure boosts testosterone via cortisol
+                rhythm. Mechanistic plausibility is solid; direct RCT evidence
+                in humans is limited.
+              </p>
+            </div>
+
+            {/* 3 Claims Checked */}
+            <div className="px-6 py-5">
+              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                3 Claims Checked
+              </p>
+              <ul className="space-y-3">
+                {[
+                  {
+                    claim:
+                      "Sleep matters more than supplements for testosterone.",
+                    badge: "Claim checked — strong evidence",
+                    color: "bg-emerald-100 text-emerald-800",
+                  },
+                  {
+                    claim:
+                      "Cold showers significantly raise testosterone levels.",
+                    badge: "Claim checked — weak evidence",
+                    color: "bg-orange-100 text-orange-800",
+                  },
+                  {
+                    claim: "Creatine accelerates hair loss in young men.",
+                    badge: "Claim checked — mixed / early",
+                    color: "bg-amber-100 text-amber-800",
+                  },
+                ].map((item) => (
+                  <li
+                    key={item.claim}
+                    className="flex flex-wrap items-start gap-2"
+                  >
+                    <span
+                      className={`mt-0.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${item.color}`}
+                    >
+                      {item.badge}
+                    </span>
+                    <span className="text-gray-700">
+                      &ldquo;{item.claim}&rdquo;
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Practical Takeaway */}
+            <div className="bg-emerald-50 px-6 py-5">
+              <p className="mb-1 text-[11px] font-semibold tracking-widest text-emerald-600 uppercase">
+                Practical Takeaway
+              </p>
+              <p className="font-medium text-emerald-900">
+                Prioritise 7–9 hours of sleep before adding any supplement
+                stack. The evidence for sleep is substantially stronger than for
+                most marketed testosterone boosters.
+              </p>
+            </div>
+
+            {/* Most Overhyped */}
+            <div className="bg-red-50 px-6 py-5">
+              <p className="mb-1 text-[11px] font-semibold tracking-widest text-red-600 uppercase">
+                Most Overhyped Claim This Week
+              </p>
+              <p className="text-gray-700">
+                &ldquo;This one herb doubled testosterone in 30 days.&rdquo; —
+                <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                  Claim checked — not supported
+                </span>
+              </p>
+            </div>
+
+            {/* Explore More */}
+            <div className="px-6 py-5">
+              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+                Explore More
+              </p>
+              <div className="flex flex-wrap gap-3 text-sm">
+                <Link
+                  href="/topics/testosterone"
+                  className="text-emerald-700 hover:underline"
+                >
+                  Testosterone hub →
+                </Link>
+                <Link
+                  href="/rankings/testosterone"
+                  className="text-emerald-700 hover:underline"
+                >
+                  Weekly rankings →
+                </Link>
+                <Link href="/topics" className="text-gray-500 hover:underline">
+                  All topics →
+                </Link>
+                <Link
+                  href="/creators"
+                  className="text-gray-500 hover:underline"
+                >
+                  All creators →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="mt-3 text-center text-xs text-gray-400">
+          Sample only. Actual claims and evidence ratings are generated from
+          real published videos and reviewed before sending.
+        </p>
+      </section>
+
+      {/* Explore links */}
+      <section className="mb-12">
+        <h2 className="mb-4 text-base font-semibold text-gray-900">
+          Browse while you wait for the next issue
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            {
+              href: "/topics",
+              title: "Topic Hubs",
+              desc: "Deep dives into testosterone, sleep, longevity, and more.",
+            },
+            {
+              href: "/rankings",
+              title: "Weekly Rankings",
+              desc: "Top-ranked men's health videos scored by evidence quality.",
+            },
+            {
+              href: "/creators",
+              title: "Creators",
+              desc: "See which channels we cover and their claim track record.",
+            },
+            {
+              href: "/weekly/testosterone",
+              title: "This Week's Picks",
+              desc: "Top videos, claims checked, and a practical takeaway.",
+            },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-xl border border-gray-200 bg-white px-5 py-4 hover:border-emerald-300 hover:shadow-sm"
+            >
+              <p className="font-semibold text-gray-900">{item.title} →</p>
+              <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -139,7 +297,7 @@ export default function NewsletterPage() {
           Ready to get the digest?
         </h2>
         <p className="mb-6 text-sm text-emerald-700">
-          Join readers who want clear, evidence-aware men's health content.
+          Join readers who want clear, evidence-aware men&apos;s health content.
         </p>
         <div className="mx-auto max-w-sm">
           <NewsletterSignupForm />

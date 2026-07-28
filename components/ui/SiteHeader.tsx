@@ -37,7 +37,7 @@ const navLinks = [
     className: "text-gray-600 hover:text-emerald-700",
   },
   {
-    href: "/digest",
+    href: "/newsletter",
     label: "Newsletter",
     className:
       "rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700",

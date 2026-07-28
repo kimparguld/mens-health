@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 type YouTubePlayerProps = {
   videoId: string;
@@ -13,26 +13,17 @@ export function YouTubePlayer({
   title,
   loading = "lazy",
 }: YouTubePlayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }
-  }, [videoId]);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   return (
     <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
       <iframe
+        ref={iframeRef}
         src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
         className="h-full w-full"
-        ref={containerRef as React.RefObject<HTMLIFrameElement>}
         loading={loading}
       />
     </div>
