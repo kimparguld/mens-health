@@ -1,15 +1,15 @@
-import { db } from "@/lib/db/prisma";
-import Link from "next/link";
-import type { Platform } from "@prisma/client";
+import { db } from '@/lib/db/prisma';
+import type { Platform } from '@prisma/client';
+import Link from 'next/link';
 
 const PLATFORM_COLORS: Record<Platform, string> = {
-  YOUTUBE_COMMUNITY: "bg-red-100 text-red-800",
-  TIKTOK: "bg-black text-white",
-  REDDIT: "bg-orange-100 text-orange-800",
-  X: "bg-gray-900 text-white",
+  YOUTUBE_COMMUNITY: 'bg-red-100 text-red-800',
+  TIKTOK: 'bg-black text-white',
+  REDDIT: 'bg-orange-100 text-orange-800',
+  X: 'bg-gray-900 text-white',
 };
 
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getWeekDays(anchor: Date): Date[] {
   const day = anchor.getDay();
@@ -30,18 +30,18 @@ export default async function SocialCalendarPage({
 }) {
   const { week } = await searchParams;
   const anchor = week ? new Date(week) : new Date();
-  const days = getWeekDays(anchor);
+  const days: Date[] = getWeekDays(anchor);
 
   const weekStart = days[0];
-  const weekEnd = new Date(days[6]);
+  const weekEnd = new Date(days[6] as Date);
   weekEnd.setHours(23, 59, 59, 999);
 
   const posts = await db.socialPost.findMany({
     where: {
       scheduledAt: { gte: weekStart, lte: weekEnd },
-      status: { in: ["SCHEDULED", "PUBLISHED"] },
+      status: { in: ['SCHEDULED', 'PUBLISHED'] },
     },
-    orderBy: { scheduledAt: "asc" },
+    orderBy: { scheduledAt: 'asc' },
   });
 
   function postsForDay(day: Date) {
@@ -56,11 +56,11 @@ export default async function SocialCalendarPage({
     });
   }
 
-  const prevWeek = new Date(weekStart);
-  prevWeek.setDate(weekStart.getDate() - 7);
+  const prevWeek = new Date(weekStart as Date);
+  prevWeek.setDate(weekStart ? weekStart.getDate() - 7 : -7);
 
-  const nextWeek = new Date(weekStart);
-  nextWeek.setDate(weekStart.getDate() + 7);
+  const nextWeek = new Date(weekStart as Date);
+  nextWeek.setDate(weekStart ? weekStart.getDate() + 7 : 7);
 
   return (
     <div>
@@ -68,25 +68,25 @@ export default async function SocialCalendarPage({
         <h1 className="text-2xl font-bold text-gray-900">Social calendar</h1>
         <div className="flex items-center gap-3">
           <Link
-            href={`/admin/social/calendar?week=${prevWeek.toISOString().split("T")[0]}`}
+            href={`/admin/social/calendar?week=${prevWeek.toISOString().split('T')[0]}`}
             className="rounded border px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
           >
             ← Prev
           </Link>
           <span className="text-sm text-gray-600">
-            {weekStart.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}{" "}
-            –{" "}
-            {days[6].toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
+            {weekStart?.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            })}{' '}
+            –{' '}
+            {days[6]?.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
             })}
           </span>
           <Link
-            href={`/admin/social/calendar?week=${nextWeek.toISOString().split("T")[0]}`}
+            href={`/admin/social/calendar?week=${nextWeek.toISOString().split('T')[0]}`}
             className="rounded border px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
           >
             Next →
@@ -107,10 +107,10 @@ export default async function SocialCalendarPage({
           return (
             <div
               key={day.toISOString()}
-              className={`min-h-32 rounded-lg border bg-white p-2 ${isToday ? "ring-2 ring-blue-400" : ""}`}
+              className={`min-h-32 rounded-lg border bg-white p-2 ${isToday ? 'ring-2 ring-blue-400' : ''}`}
             >
               <p
-                className={`mb-2 text-xs font-medium ${isToday ? "text-blue-600" : "text-gray-500"}`}
+                className={`mb-2 text-xs font-medium ${isToday ? 'text-blue-600' : 'text-gray-500'}`}
               >
                 {DAY_NAMES[(day.getDay() + 1) % 7]} {day.getDate()}
               </p>
@@ -121,17 +121,17 @@ export default async function SocialCalendarPage({
                     href={`/admin/social/drafts/${post.id}`}
                     className={`block truncate rounded px-1.5 py-1 text-xs font-medium ${
                       PLATFORM_COLORS[post.platform] ??
-                      "bg-gray-100 text-gray-700"
+                      'bg-gray-100 text-gray-700'
                     }`}
                     title={post.hook}
                   >
-                    {post.platform.replace("_", " ")} ·{" "}
+                    {post.platform.replace('_', ' ')} ·{' '}
                     {post.scheduledAt
                       ? new Date(post.scheduledAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })
-                      : ""}
+                      : ''}
                   </Link>
                 ))}
                 {dayPosts.length === 0 && (

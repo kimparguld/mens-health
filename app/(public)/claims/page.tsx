@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { createMetadata } from "@/lib/seo/createMetadata";
 import { db } from "@/lib/db/prisma";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";

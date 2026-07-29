@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 
 export const metadata: Metadata = {

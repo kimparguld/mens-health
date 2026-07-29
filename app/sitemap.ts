@@ -1,12 +1,12 @@
-import { MetadataRoute } from "next";
-import { db } from "@/lib/db/prisma";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { CREATOR_SEEDS } from "@/lib/youtube/creators";
+import { db } from '@/lib/db/prisma';
+import { CREATOR_SEEDS } from '@/lib/youtube/creators';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { type MetadataRoute } from 'next';
 
 // Serve at request time so the build doesn't need a DB connection.
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let videos: { slug: string; updatedAt: Date }[] = [];
@@ -14,11 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     [videos, claims] = await Promise.all([
       db.video.findMany({
-        where: { status: "PUBLISHED" },
+        where: { status: 'PUBLISHED' },
         select: { slug: true, updatedAt: true },
       }),
       db.claim.findMany({
-        where: { video: { status: "PUBLISHED" } },
+        where: { video: { status: 'PUBLISHED' } },
         select: { slug: true, id: true, createdAt: true },
       }),
     ]);
@@ -29,25 +29,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const videoUrls: MetadataRoute.Sitemap = videos.map((video) => ({
     url: `${BASE_URL}/videos/${video.slug}`,
     lastModified: video.updatedAt,
-    changeFrequency: "weekly",
+    changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
   const topicUrls: MetadataRoute.Sitemap = TOPIC_SEEDS.map((topic) => ({
     url: `${BASE_URL}/topics/${topic.slug}`,
-    changeFrequency: "daily",
+    changeFrequency: 'daily',
     priority: 0.8,
   }));
 
   const rankingUrls: MetadataRoute.Sitemap = TOPIC_SEEDS.map((topic) => ({
     url: `${BASE_URL}/rankings/${topic.slug}`,
-    changeFrequency: "weekly",
+    changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
   const creatorUrls: MetadataRoute.Sitemap = CREATOR_SEEDS.map((creator) => ({
     url: `${BASE_URL}/creators/${creator.slug}`,
-    changeFrequency: "weekly",
+    changeFrequency: 'weekly',
     priority: 0.6,
   }));
 
@@ -55,50 +55,50 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((c) => c.slug != null)
     .map((c) => ({
       url: `${BASE_URL}/claims/${c.slug}`,
-      changeFrequency: "monthly" as const,
+      changeFrequency: 'monthly' as const,
       priority: 0.5,
     }));
 
   const weeklyUrls: MetadataRoute.Sitemap = TOPIC_SEEDS.map((topic) => ({
     url: `${BASE_URL}/weekly/${topic.slug}`,
-    changeFrequency: "weekly" as const,
+    changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
 
   const staticUrls: MetadataRoute.Sitemap = [
     {
       url: `${BASE_URL}/newsletter`,
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.8,
     },
-    { url: `${BASE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
     {
       url: `${BASE_URL}/editorial-process`,
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${BASE_URL}/medical-disclaimer`,
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${BASE_URL}/how-we-rate-evidence`,
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${BASE_URL}/affiliate-disclosure`,
-      changeFrequency: "monthly",
+      changeFrequency: 'monthly',
       priority: 0.4,
     },
-    { url: `${BASE_URL}/privacy`, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${BASE_URL}/privacy`, changeFrequency: 'monthly', priority: 0.4 },
   ];
 
   return [
     {
       url: BASE_URL,
-      changeFrequency: "daily",
+      changeFrequency: 'daily',
       priority: 1.0,
     },
     ...staticUrls,

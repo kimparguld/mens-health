@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { HowWeRateClaims } from "@/components/ui/HowWeRateClaims";
 
 export const metadata: Metadata = {

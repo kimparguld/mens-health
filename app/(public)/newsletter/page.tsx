@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { createMetadata } from "@/lib/seo/createMetadata";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
 import { Disclaimer } from "@/components/ui/Disclaimer";
