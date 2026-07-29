@@ -4,6 +4,7 @@ import Link from "next/link";
 import ReviewActions from "./ReviewActions";
 import GenerateSocialButton from "./GenerateSocialButton";
 import GenerateSummaryButton from "./GenerateSummaryButton";
+import ReviewerForm from "./ReviewerForm";
 
 const riskColors: Record<string, string> = {
   LOW: "bg-green-100 text-green-700",
@@ -146,6 +147,12 @@ export default async function AdminVideoDetailPage({
                   </ul>
                 </div>
               )}
+
+              <ReviewerForm
+                videoId={video.id}
+                initialName={summary.reviewerName}
+                initialCredentials={summary.reviewerCredentials}
+              />
             </section>
           ) : (
             <div className="rounded-lg border bg-gray-50 p-5">

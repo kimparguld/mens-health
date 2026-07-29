@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildWebSiteSchema, buildOrganizationSchema } from "@/lib/seo/json-ld";
+import { env } from "@/env";
 import "./globals.css";
 
 const inter = Inter({
@@ -26,6 +27,9 @@ export const metadata: Metadata = {
     "Daily summaries of the most important men's health videos, ranked and fact-checked. Fitness, testosterone, sleep, nutrition, longevity — without the hype.",
   alternates: {
     canonical: APP_URL,
+    types: {
+      "application/rss+xml": `${APP_URL}/feed.xml`,
+    },
   },
   openGraph: {
     siteName: "MenHealth Digest",
@@ -34,6 +38,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+  },
+  verification: {
+    ...(env.GOOGLE_SITE_VERIFICATION
+      ? { google: env.GOOGLE_SITE_VERIFICATION }
+      : {}),
+    ...(env.BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": env.BING_SITE_VERIFICATION } }
+      : {}),
   },
   robots: {
     index: true,

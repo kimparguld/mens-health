@@ -14,6 +14,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildVideoObjectSchema,
   buildBreadcrumbSchema,
+  buildArticleSchema,
 } from "@/lib/seo/json-ld";
 import {
   getActiveSponsor,
@@ -24,6 +25,7 @@ import {
   getVideoBySlug,
   getVideoBySlugForMeta,
   getPublishedVideoSlugByYouTubeId,
+  getRelatedVideos,
 } from "@/lib/db/queries";
 
 const APP_URL =
@@ -44,9 +46,10 @@ export async function generateMetadata({
   const description =
     video.summaries[0]?.shortSummary ?? video.description ?? "";
   const canonical = `${APP_URL}/videos/${slug}`;
+  const displayTitle = video.editorialTitle ?? video.title;
 
   return {
-    title: video.title,
+    title: displayTitle,
     description,
     alternates: { canonical },
     keywords: [
@@ -56,7 +59,7 @@ export async function generateMetadata({
       video.title,
     ],
     openGraph: {
-      title: video.title,
+      title: displayTitle,
       description,
       url: canonical,
       type: "article",
@@ -66,7 +69,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: video.title,
+      title: displayTitle,
       description,
       images: video.thumbnailUrl ? [video.thumbnailUrl] : [],
     },
@@ -110,9 +113,10 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const firstTopic = video.topics[0]?.topic;
 
-  const [sponsor, affiliateLinks] = await Promise.all([
+  const [sponsor, affiliateLinks, relatedVideos] = await Promise.all([
     getActiveSponsor(),
     getAffiliateLinksForTopic(firstTopic?.slug ?? null),
+    getRelatedVideos(firstTopic?.id, video.id),
   ]);
 
   const videoSchema = buildVideoObjectSchema({
@@ -126,18 +130,31 @@ export default async function VideoPage({ params }: { params: Params }) {
     slug: video.slug,
   });
 
+  const displayTitle = video.editorialTitle ?? video.title;
+
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Home", url: APP_URL },
     ...(firstTopic
       ? [{ name: firstTopic.name, url: `${APP_URL}/topics/${firstTopic.slug}` }]
       : []),
-    { name: video.title, url: `${APP_URL}/videos/${video.slug}` },
+    { name: displayTitle, url: `${APP_URL}/videos/${video.slug}` },
   ]);
+
+  const articleSchema = buildArticleSchema({
+    headline: displayTitle,
+    description: summary?.shortSummary ?? video.description ?? "",
+    imageUrl: video.thumbnailUrl,
+    publishedAt: video.publishedAt,
+    updatedAt: video.updatedAt,
+    authorName: summary?.reviewerName ?? undefined,
+    url: `${APP_URL}/videos/${video.slug}`,
+  });
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <JsonLd schema={videoSchema} />
       <JsonLd schema={breadcrumbSchema} />
+      <JsonLd schema={articleSchema} />
 
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm text-gray-500">
@@ -156,7 +173,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             /{" "}
           </>
         )}
-        <span className="text-gray-900">{video.title}</span>
+        <span className="text-gray-900">{displayTitle}</span>
       </nav>
 
       {/* Metadata badges */}
@@ -178,11 +195,16 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Title */}
       <h1 className="mb-2 text-3xl leading-tight font-bold text-gray-900">
-        {video.title}
+        {displayTitle}
       </h1>
+      {video.editorialTitle && video.editorialTitle !== video.title && (
+        <p className="mb-2 text-sm text-gray-400">
+          Originally titled: &ldquo;{video.title}&rdquo;
+        </p>
+      )}
 
       {/* Meta */}
-      <p className="mb-6 text-sm text-gray-500">
+      <p className="mb-1 text-sm text-gray-500">
         Channel:{" "}
         <a
           href={`https://www.youtube.com/channel/${video.channel.youtubeId}`}
@@ -201,6 +223,17 @@ export default async function VideoPage({ params }: { params: Params }) {
         >
           Watch on YouTube ↗
         </a>
+      </p>
+      {summary?.reviewerName && (
+        <p className="mb-1 text-sm text-gray-500">
+          Reviewed by {summary.reviewerName}
+          {summary.reviewerCredentials ? `, ${summary.reviewerCredentials}` : ""}
+        </p>
+      )}
+      <p className="mb-6 text-xs text-gray-400">
+        Published {new Date(video.publishedAt).toLocaleDateString()}
+        {video.updatedAt.getTime() !== video.publishedAt.getTime() &&
+          ` · Updated ${new Date(video.updatedAt).toLocaleDateString()}`}
       </p>
 
       {/* Official YouTube embed */}
@@ -354,6 +387,54 @@ export default async function VideoPage({ params }: { params: Params }) {
           </div>
         </section>
       )}
+
+      {/* Related reviews */}
+      {relatedVideos.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">
+            Related reviews
+          </h2>
+          <ul className="space-y-2">
+            {relatedVideos.map((rv) => (
+              <li key={rv.id}>
+                <Link
+                  href={`/videos/${rv.slug}`}
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
+                  {rv.title}
+                </Link>
+                <span className="ml-2 text-xs text-gray-400">
+                  {rv.channel.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Embeddable badge */}
+      <section className="mb-8 rounded-lg border border-gray-200 p-4">
+        <h2 className="mb-2 text-sm font-semibold text-gray-900">
+          Are you the creator of this video?
+        </h2>
+        <p className="mb-3 text-sm text-gray-500">
+          Embed this badge on your site or in your video description to link
+          back to our review.
+        </p>
+        <img
+          src={`${APP_URL}/badge/${video.slug}`}
+          alt="Reviewed by MenHealth Digest"
+          width={210}
+          height={50}
+          className="mb-3"
+        />
+        <textarea
+          readOnly
+          rows={2}
+          className="w-full rounded border border-gray-200 bg-gray-50 p-2 font-mono text-xs text-gray-600"
+          defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by MenHealth Digest" width="210" height="50" /></a>`}
+        />
+      </section>
 
       {/* Affiliate links */}
       {affiliateLinks.length > 0 && (

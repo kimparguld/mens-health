@@ -75,13 +75,15 @@ model Channel {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  videos Video[]
+  videos               Video[]
+  creatorNotifications CreatorNotification[]
 }
 
 model Video {
   id              String        @id @default(cuid())
   youtubeVideoId  String        @unique
   title           String
+  editorialTitle  String?
   description     String?
   channelId       String
   publishedAt     DateTime
@@ -99,12 +101,13 @@ model Video {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  channel       Channel       @relation(fields: [channelId], references: [id])
-  summaries     Summary[]
-  claims        Claim[]
-  topics        VideoTopic[]
-  adminReviews  AdminReview[]
-  processingJob ProcessingJob?
+  channel             Channel              @relation(fields: [channelId], references: [id])
+  summaries           Summary[]
+  claims              Claim[]
+  topics              VideoTopic[]
+  adminReviews        AdminReview[]
+  processingJob       ProcessingJob?
+  creatorNotification CreatorNotification?
 }
 
 model Topic {
@@ -131,17 +134,19 @@ model VideoTopic {
 }
 
 model Summary {
-  id              String   @id @default(cuid())
-  videoId         String
-  shortSummary    String
-  longSummary     String
-  takeaways       Json
-  warnings        Json?
-  targetAudience  String?
-  redFlags        Json?
-  modelUsed       String?
-  reviewedByHuman Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  id                  String   @id @default(cuid())
+  videoId             String
+  shortSummary        String
+  longSummary         String
+  takeaways           Json
+  warnings            Json?
+  targetAudience      String?
+  redFlags            Json?
+  modelUsed           String?
+  reviewedByHuman     Boolean  @default(false)
+  reviewerName        String?
+  reviewerCredentials String?
+  createdAt           DateTime @default(now())
 
   video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
 }
@@ -194,10 +199,33 @@ model NewsletterSubscriber {
 
 model NewsletterDigest {
   id          String   @id @default(cuid())
+  slug        String?  @unique
   subject     String
+  html        String?
+  text        String?
   sentCount   Int      @default(0)
   failedCount Int      @default(0)
   sentAt      DateTime @default(now())
+}
+
+model CreatorNotification {
+  id        String   @id @default(cuid())
+  videoId   String   @unique
+  channelId String
+  email     String
+  sentAt    DateTime @default(now())
+
+  video   Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references: [id])
+}
+
+model MonthlyReport {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  periodStart DateTime
+  periodEnd   DateTime
+  stats       Json
+  createdAt   DateTime @default(now())
 }
 
 // ---------------------------------------------------------------------------
@@ -362,9 +390,9 @@ enum MediaType {
 }
 
 model SocialPost {
-  id             String     @id @default(cuid())
+  id             String                 @id @default(cuid())
   platform       Platform
-  status         PostStatus @default(DRAFT)
+  status         PostStatus             @default(DRAFT)
   sourceType     SourceType
   sourceId       String
   hook           String
@@ -372,8 +400,8 @@ model SocialPost {
   caption        String
   hashtags       String[]
   utmUrl         String
-  riskLevel      RiskLevel  @default(LOW)
-  requiresReview Boolean    @default(true)
+  riskLevel      RiskLevel              @default(LOW)
+  requiresReview Boolean                @default(true)
   scheduledAt    DateTime?
   publishedAt    DateTime?
   platformPostId String?
@@ -382,20 +410,20 @@ model SocialPost {
   template       SocialTemplate?        @relation(fields: [templateId], references: [id])
   attempts       SocialPublishAttempt[]
   metrics        SocialMetric[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 }
 
 model SocialTemplate {
-  id        String    @id @default(cuid())
-  name      String    @unique
+  id        String       @id @default(cuid())
+  name      String       @unique
   platform  Platform?
   hook      String
   script    String
   caption   String
   hashtags  String[]
   posts     SocialPost[]
-  createdAt DateTime  @default(now())
+  createdAt DateTime     @default(now())
 }
 
 model SocialAccount {
@@ -458,19 +486,19 @@ enum OutreachStatus {
 }
 
 model OutreachContact {
-  id              String              @id @default(cuid())
-  name            String
-  contactType     OutreachContactType
-  email           String?
-  socialUrl       String?
+  id                String              @id @default(cuid())
+  name              String
+  contactType       OutreachContactType
+  email             String?
+  socialUrl         String?
   relatedContentUrl String?
-  status          OutreachStatus      @default(NOT_CONTACTED)
-  lastContactedAt DateTime?
-  nextFollowUpAt  DateTime?
-  notes           String?
-  result          String?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  status            OutreachStatus      @default(NOT_CONTACTED)
+  lastContactedAt   DateTime?
+  nextFollowUpAt    DateTime?
+  notes             String?
+  result            String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 }
 
 // ---------------------------------------------------------------------------
@@ -502,21 +530,21 @@ enum GrowthTaskStatus {
 }
 
 model GrowthPlanTask {
-  id          String            @id @default(cuid())
-  uniqueKey   String            @unique
+  id          String             @id @default(cuid())
+  uniqueKey   String             @unique
   phase       GrowthPhase
-  sortOrder   Int               @default(0)
+  sortOrder   Int                @default(0)
   dayStart    Int
   dayEnd      Int
   title       String
   description String?
   adminPath   String?
   priority    GrowthTaskPriority @default(MEDIUM)
-  status      GrowthTaskStatus  @default(TODO)
+  status      GrowthTaskStatus   @default(TODO)
   notes       String?
   completedAt DateTime?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 }
 
 model Setting {
@@ -526,18 +554,18 @@ model Setting {
 }
 
 model MarketingCampaign {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   platform    String
   budget      Float?
   landingPage String?
   utmUrl      String?
-  clicks      Int      @default(0)
-  signups     Int      @default(0)
+  clicks      Int       @default(0)
+  signups     Int       @default(0)
   notes       String?
-  isActive    Boolean  @default(true)
-  startedAt   DateTime @default(now())
+  isActive    Boolean   @default(true)
+  startedAt   DateTime  @default(now())
   endedAt     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

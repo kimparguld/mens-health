@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/createMetadata";
+import { createMetadata, createCanonicalUrl } from "@/lib/seo/createMetadata";
 import { CREATOR_SEEDS } from "@/lib/youtube/creators";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildItemListSchema } from "@/lib/seo/json-ld";
 import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
@@ -11,8 +13,17 @@ export const metadata: Metadata = createMetadata({
 });
 
 export default function CreatorsIndexPage() {
+  const itemListSchema = buildItemListSchema(
+    "Men's Health Video Creators",
+    CREATOR_SEEDS.map((creator) => ({
+      name: creator.name,
+      url: createCanonicalUrl(`/creators/${creator.slug}`),
+    })),
+  );
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Creators
       </h1>
