@@ -37,11 +37,11 @@ What's your experience been? Has the advice held up in practice?`,
 
 Happy to dig into any of these if helpful. What do people here usually find most useful?`,
   },
-];
+] as const;
 
 export default function CommunityDraftsPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(0);
-  const [draft, setDraft] = useState(DRAFT_TEMPLATES[0].body);
+  const [draft, setDraft] = useState<string>(DRAFT_TEMPLATES[0].body);
   const [community, setCommunity] = useState("");
   const [notes, setNotes] = useState("");
   const [checklist, setChecklist] = useState<boolean[]>(
@@ -52,7 +52,9 @@ export default function CommunityDraftsPage() {
 
   function loadTemplate(i: number) {
     setSelectedTemplate(i);
-    setDraft(DRAFT_TEMPLATES[i].body);
+    if (DRAFT_TEMPLATES && DRAFT_TEMPLATES[i]?.body) {
+      setDraft(DRAFT_TEMPLATES[i].body);
+    }
   }
 
   function toggleCheck(i: number) {

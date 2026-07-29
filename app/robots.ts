@@ -1,15 +1,15 @@
-import { MetadataRoute } from "next";
+import { type MetadataRoute } from 'next';
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: "*",
-        allow: "/",
-        disallow: ["/admin/", "/api/"],
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,

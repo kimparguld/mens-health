@@ -35,6 +35,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  reactCompiler: true,
+  turbopack: {},
   images: {
     remotePatterns: [
       new URL("https://assets.example.com/account123/**"),

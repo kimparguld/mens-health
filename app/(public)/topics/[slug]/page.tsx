@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { VideoCard } from "@/components/video/VideoCard";

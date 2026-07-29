@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { createMetadata } from "@/lib/seo/createMetadata";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import Link from "next/link";

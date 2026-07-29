@@ -1,13 +1,13 @@
-import { Metadata } from "next";
-import Link from "next/link";
-import { Suspense } from "react";
-import { VideoCard } from "@/components/video/VideoCard";
-import { HowWeRateClaims } from "@/components/ui/HowWeRateClaims";
-import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
-import { RiskBadge } from "@/components/ui/RiskBadge";
-import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { getFeaturedVideo, getTrendingVideos } from "@/lib/db/queries";
+import { EvidenceBadge } from '@/components/ui/EvidenceBadge';
+import { HowWeRateClaims } from '@/components/ui/HowWeRateClaims';
+import { NewsletterSignupForm } from '@/components/ui/NewsletterSignupForm';
+import { RiskBadge } from '@/components/ui/RiskBadge';
+import { VideoCard } from '@/components/video/VideoCard';
+import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
@@ -17,35 +17,35 @@ export const metadata: Metadata = {
     title: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
     description:
       "Daily summaries of the most important men's health videos, ranked and fact-checked.",
-    type: "website",
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "MenHealth Digest",
+    card: 'summary_large_image',
+    title: 'MenHealth Digest',
     description:
       "Evidence-aware summaries of trending men's health content — without the hype.",
   },
 };
 
 function deriveEvidenceLabel(
-  score: number | null | undefined,
+  score: number | null | undefined
 ): string | undefined {
   if (score == null) return undefined;
-  if (score < 0.35) return "WEAK";
-  if (score < 0.6) return "MIXED";
-  if (score < 0.8) return "MODERATE";
-  return "SUPPORTED";
+  if (score < 0.35) return 'WEAK';
+  if (score < 0.6) return 'MIXED';
+  if (score < 0.8) return 'MODERATE';
+  return 'SUPPORTED';
 }
 
 const FEATURED_TOPIC_SLUGS = [
-  "testosterone",
-  "sleep",
-  "fitness-over-40",
-  "nutrition",
-  "longevity",
-  "supplements",
-  "weight-loss",
-  "muscle-gain",
+  'testosterone',
+  'sleep',
+  'fitness-over-40',
+  'nutrition',
+  'longevity',
+  'supplements',
+  'weight-loss',
+  'muscle-gain',
 ];
 
 async function FeaturedInsight() {
@@ -133,7 +133,7 @@ async function TrendingVideos() {
                 key={video.id}
                 slug={video.slug}
                 title={video.title}
-                channelTitle={video.channel?.title ?? ""}
+                channelTitle={video.channel?.title ?? ''}
                 thumbnailUrl={video.thumbnailUrl}
                 shortSummary={video.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
@@ -152,10 +152,10 @@ async function TrendingVideos() {
 
 export default async function HomePage() {
   const featuredTopics = TOPIC_SEEDS.filter((t) =>
-    FEATURED_TOPIC_SLUGS.includes(t.slug),
+    FEATURED_TOPIC_SLUGS.includes(t.slug)
   );
   const remainingTopics = TOPIC_SEEDS.filter(
-    (t) => !FEATURED_TOPIC_SLUGS.includes(t.slug),
+    (t) => !FEATURED_TOPIC_SLUGS.includes(t.slug)
   );
 
   return (
@@ -164,7 +164,7 @@ export default async function HomePage() {
       <section className="border-b border-gray-100 bg-white py-16">
         <div className="mx-auto max-w-[1120px] px-4">
           <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Men&apos;s health trends,{" "}
+            Men&apos;s health trends,{' '}
             <span className="text-emerald-600">
               explained without the hype.
             </span>
@@ -196,13 +196,20 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Suspense fallback={<div className="bg-slate-50 py-12" aria-hidden />}>
+      <Suspense
+        fallback={
+          <div
+            className="min-h-[420px] bg-slate-50 py-12 lg:min-h-[358px]"
+            aria-hidden
+          />
+        }
+      >
         <FeaturedInsight />
       </Suspense>
 
       {/* Topic cards */}
       <section id="topics" className="py-14">
-        <div className="mx-auto max-w-[1120px] px-4">
+        <div className="mx-auto min-h-[652px] max-w-[1120px] px-4 lg:min-h-[354px]">
           <h2 className="mb-6 text-2xl font-bold text-gray-900">
             Browse by topic
           </h2>
@@ -227,7 +234,7 @@ export default async function HomePage() {
           </div>
           {remainingTopics.length > 0 && (
             <p className="mt-4 text-sm text-gray-500">
-              More topics:{" "}
+              More topics:{' '}
               {remainingTopics.map((t, i) => (
                 <span key={t.slug}>
                   <Link
@@ -236,7 +243,7 @@ export default async function HomePage() {
                   >
                     {t.name}
                   </Link>
-                  {i < remainingTopics.length - 1 && ", "}
+                  {i < remainingTopics.length - 1 && ', '}
                 </span>
               ))}
             </p>

@@ -218,11 +218,11 @@ export function OutreachTable({
             ))}
           </div>
           <pre className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-xs whitespace-pre-wrap text-gray-700">
-            {TEMPLATES[templateIdx].body}
+            {TEMPLATES[templateIdx]?.body}
           </pre>
           <button
             onClick={() =>
-              navigator.clipboard.writeText(TEMPLATES[templateIdx].body)
+              navigator.clipboard.writeText(TEMPLATES[templateIdx]?.body || "")
             }
             className="mt-2 text-xs text-emerald-700 underline"
           >
@@ -379,7 +379,7 @@ export function OutreachTable({
                       <select
                         value={c.status}
                         onChange={(e) => updateStatus(c.id, e.target.value)}
-                        className={`cursor-pointer rounded-full border-0 px-2 py-0.5 text-xs font-medium ${sc.color}`}
+                        className={`cursor-pointer rounded-full border-0 px-2 py-0.5 text-xs font-medium ${sc?.color}`}
                       >
                         {STATUSES.map((s) => (
                           <option key={s.value} value={s.value}>
