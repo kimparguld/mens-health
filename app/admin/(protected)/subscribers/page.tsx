@@ -1,5 +1,8 @@
 import { db } from "@/lib/db/prisma";
+import { env } from "@/env";
 import Link from "next/link";
+import { SubscribersTable } from "./SubscribersTable";
+import { BackfillButton } from "./BackfillButton";
 
 const PAGE_SIZE = 50;
 
@@ -103,78 +106,12 @@ export default async function AdminSubscribersPage({
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Email
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Subscribed
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Confirmed
-              </th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">
-                Unsubscribed
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {subscribers.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
-                  No subscribers found.
-                </td>
-              </tr>
-            ) : (
-              subscribers.map((sub) => {
-                const statusLabel = sub.unsubscribedAt
-                  ? "Unsubscribed"
-                  : sub.confirmedAt
-                    ? "Active"
-                    : "Unconfirmed";
-                const statusColor = sub.unsubscribedAt
-                  ? "bg-red-100 text-red-700"
-                  : sub.confirmedAt
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-700";
-                return (
-                  <tr key={sub.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-gray-900">
-                      {sub.email}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${statusColor}`}
-                      >
-                        {statusLabel}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-500">
-                      {new Date(sub.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-500">
-                      {sub.confirmedAt
-                        ? new Date(sub.confirmedAt).toLocaleDateString()
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-500">
-                      {sub.unsubscribedAt
-                        ? new Date(sub.unsubscribedAt).toLocaleDateString()
-                        : "—"}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      {totalUnconfirmed > 0 && <BackfillButton />}
+
+      <SubscribersTable
+        subscribers={subscribers}
+        resendConfigured={!!env.RESEND_API_KEY}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (

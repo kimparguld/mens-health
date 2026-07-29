@@ -23,6 +23,8 @@ async function callAnthropic(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'x-api-key': env.ANTHROPIC_API_KEY ?? '',
+      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
       model,
@@ -39,9 +41,12 @@ async function callAnthropic(
     throw err;
   }
   const data = (await res.json()) as {
-    choices: Array<{ message: { content: string } }>;
+    content: Array<{ type: string; text?: string }>;
   };
-  return data.choices[0]?.message?.content ?? '';
+  return data.content
+    .filter((block) => block.type === 'text')
+    .map((block) => block.text ?? '')
+    .join('');
 }
 
 async function callOpenRouter(
@@ -138,7 +143,7 @@ async function callGemini(
  * Thin adapter that exposes the same `anthropic.messages.create()` call shape
  * used across lib/ai/*.ts.
  *
- * Provider fallback chain: Groq → OpenRouter → Gemini.
+ * Provider fallback chain: Anthropic → Groq → OpenRouter → OpenAI → Gemini.
  * Each provider is skipped if its API key is not set.
  * On a 429 rate-limit error the next provider is tried automatically.
  */
@@ -154,22 +159,23 @@ export const anthropic = {
       messages: Message[];
     }) {
       // 1️⃣ Anthropic
-
-      try {
-        const text = await callAnthropic(
-          messages,
-          max_tokens,
-          model ?? DEFAULT_MODEL
-        );
-        return { content: [{ type: 'text' as const, text }] };
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        console.warn(
-          `[AI] Anthropic rate limit hit — ${message} — falling back to Groq`
-        );
+      if (env.ANTHROPIC_API_KEY) {
+        try {
+          const text = await callAnthropic(
+            messages,
+            max_tokens,
+            model ?? DEFAULT_MODEL
+          );
+          return { content: [{ type: 'text' as const, text }] };
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.warn(
+            `[AI] Anthropic rate limit hit — ${message} — falling back to Groq`
+          );
+        }
       }
 
-      // 1️⃣ Groq
+      // 2️⃣ Groq
       if (env.GROQ_API_KEY) {
         try {
           const completion = await groq.chat.completions.create({
@@ -187,7 +193,7 @@ export const anthropic = {
         }
       }
 
-      // // 2️⃣ OpenRouter — try each model slot in order, skip on any error
+      // 3️⃣ OpenRouter — try each model slot in order, skip on any error
       if (env.OPENROUTER_API_KEY) {
         for (const orModel of OPENROUTER_MODELS) {
           try {
@@ -205,7 +211,7 @@ export const anthropic = {
         );
       }
 
-      // // 3️⃣ OpenAI
+      // 4️⃣ OpenAI
       if (env.OPENAI_API_KEY) {
         try {
           const text = await callOpenAI(messages, max_tokens);
@@ -218,7 +224,7 @@ export const anthropic = {
         }
       }
 
-      // 4️⃣ Gemini
+      // 5️⃣ Gemini
       if (env.GEMINI_API_KEY) {
         try {
           const text = await callGemini(messages, max_tokens);

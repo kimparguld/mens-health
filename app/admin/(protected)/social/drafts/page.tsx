@@ -1,5 +1,6 @@
 import { db } from "@/lib/db/prisma";
 import Link from "next/link";
+import { ClearAllButton } from "./ClearAllButton";
 
 const PAGE_SIZE = 25;
 
@@ -69,7 +70,7 @@ export default async function SocialDraftsPage({
     ...(safeRisk ? { riskLevel: safeRisk } : {}),
   };
 
-  const [posts, total] = await Promise.all([
+  const [posts, total, scheduledCount, publishedCount] = await Promise.all([
     db.socialPost.findMany({
       where,
       orderBy: [{ requiresReview: "desc" }, { createdAt: "desc" }],
@@ -77,6 +78,8 @@ export default async function SocialDraftsPage({
       take: PAGE_SIZE,
     }),
     db.socialPost.count({ where }),
+    db.socialPost.count({ where: { status: "SCHEDULED" } }),
+    db.socialPost.count({ where: { status: "PUBLISHED" } }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -93,9 +96,19 @@ export default async function SocialDraftsPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Social drafts</h1>
         <span className="text-sm text-gray-500">{total} posts</span>
+      </div>
+      <p className="mb-4 text-sm text-gray-500">
+        X posts marked Scheduled post automatically. YouTube Community and
+        Reddit are always manual — copy the draft and post it yourself.
+      </p>
+      <div className="mb-6">
+        <ClearAllButton
+          scheduledCount={scheduledCount}
+          publishedCount={publishedCount}
+        />
       </div>
 
       {/* Filters */}

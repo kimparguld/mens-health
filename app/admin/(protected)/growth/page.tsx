@@ -15,14 +15,9 @@ const sections = [
         desc: "Review and approve social posts",
       },
       {
-        label: "Social calendar",
+        label: "Social schedule",
         href: "/admin/social/calendar",
-        desc: "Scheduled social posts",
-      },
-      {
-        label: "Community drafts",
-        href: "/admin/community",
-        desc: "Reddit and community post assistant",
+        desc: "Weekly view of scheduled social posts",
       },
     ],
   },

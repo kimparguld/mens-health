@@ -64,8 +64,8 @@ export default async function SocialCalendarPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Social calendar</h1>
+      <div className="mb-2 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Social schedule</h1>
         <div className="flex items-center gap-3">
           <Link
             href={`/admin/social/calendar?week=${prevWeek.toISOString().split('T')[0]}`}
@@ -93,6 +93,10 @@ export default async function SocialCalendarPage({
           </Link>
         </div>
       </div>
+      <p className="mb-4 text-sm text-gray-500">
+        Only X posts here publish automatically. YouTube Community and Reddit
+        dates are for your own planning — post them manually.
+      </p>
 
       {/* Recommended cadence note */}
       <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">

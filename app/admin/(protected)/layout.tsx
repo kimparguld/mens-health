@@ -25,7 +25,7 @@ export default async function AdminLayout({
     { label: "Claims", href: "/admin/claims" },
     { label: "Topics", href: "/admin/topics" },
     {
-      label: "Processing jobs",
+      label: "Video processing jobs",
       href: "/admin/jobs",
     },
     {
@@ -37,7 +37,7 @@ export default async function AdminLayout({
       href: "/admin/social/drafts",
     },
     {
-      label: "Social calendar",
+      label: "Social schedule",
       href: "/admin/social/calendar",
     },
     {
@@ -51,7 +51,6 @@ export default async function AdminLayout({
       classes: "font-semibold pl-0",
     },
     { label: "Content calendar", href: "/admin/content-calendar" },
-    { label: "Community drafts", href: "/admin/community" },
     { label: "Outreach CRM", href: "/admin/outreach" },
     { label: "UTM builder", href: "/admin/marketing/utm-builder" },
     { label: "Campaigns", href: "/admin/marketing/campaigns" },

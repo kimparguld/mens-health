@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const SUBREDDIT_CHECKLIST = [
+  "Post is valuable without any links",
+  "Does not directly promote the site",
+  "Follows subreddit rules (check sidebar)",
+  "Discloses affiliation if linking",
+  "Not duplicate of recent post",
+];
+
 type Props = {
   postId: string;
   platform: string;
@@ -10,6 +18,7 @@ type Props = {
   riskLevel: string;
   requiresReview: boolean;
   initialScheduledAt?: string | null;
+  caption: string;
 };
 
 export default function DraftActions({
@@ -19,6 +28,7 @@ export default function DraftActions({
   riskLevel,
   requiresReview,
   initialScheduledAt,
+  caption,
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
@@ -29,19 +39,26 @@ export default function DraftActions({
       : "",
   );
   const [manualUrl, setManualUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [checklist, setChecklist] = useState<boolean[]>(
+    SUBREDDIT_CHECKLIST.map(() => false),
+  );
 
   const isApprovable = status === "PENDING_REVIEW" || status === "DRAFT";
   const isRejectable = status !== "PUBLISHED" && status !== "REJECTED";
   const isApproved = status === "APPROVED";
   const isScheduled = status === "SCHEDULED";
-  const isYouTube = platform === "YOUTUBE_COMMUNITY";
+  const isX = platform === "X";
   const isReddit = platform === "REDDIT";
-  const isTextPlatform = ["REDDIT", "X"].includes(platform);
-  // Text platforms have no auto-publisher yet — admin posts manually and records the URL
+  // Only X has a working auto-publisher (via the scheduled cron). Everything
+  // else — YouTube Community and Reddit — is always manual: copy the text,
+  // post it yourself, then record the link here.
+  const isManualPlatform = platform === "YOUTUBE_COMMUNITY" || isReddit;
   const canMarkManuallyPublished =
-    isTextPlatform && (isApproved || isScheduled);
-  // Reddit is manual-only; both APPROVED and SCHEDULED posts can be (re)scheduled
-  const canSchedule = (isApproved || isScheduled) && !isReddit;
+    isManualPlatform && (isApproved || isScheduled);
+  const canSchedule = isX && (isApproved || isScheduled);
+  const allChecked = checklist.every(Boolean);
+  const manualActionsBlocked = isReddit && !allChecked;
 
   async function callJson(action: string, body: object = {}) {
     setLoading(action);
@@ -76,32 +93,22 @@ export default function DraftActions({
     });
   }
 
-  async function handleYouTubePublish() {
-    setLoading("publish");
-    setError(null);
-    try {
-      const res = await fetch(`/api/social/drafts/${postId}/publish`, {
-        method: "POST",
-      });
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        setError(data.error ?? "Publish failed");
-      } else {
-        router.refresh();
-      }
-    } catch {
-      setError("Network error");
-    } finally {
-      setLoading(null);
-    }
-  }
-
   async function handleMarkPublished() {
     if (!manualUrl) {
       setError("Paste the platform URL first");
       return;
     }
     await callJson("mark-published", { platformUrl: manualUrl });
+  }
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(caption);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  function toggleCheck(i: number) {
+    setChecklist((prev) => prev.map((v, j) => (j === i ? !v : v)));
   }
 
   return (
@@ -143,13 +150,16 @@ export default function DraftActions({
         </div>
       )}
 
-      {/* Schedule / Reschedule — not available for Reddit (manual-only) or YouTube (file upload needed) */}
+      {/* Schedule / Reschedule — X only, the one platform with a real auto-publisher */}
       {canSchedule && (
         <div className="space-y-2 rounded-lg border p-3">
           <p className="text-xs font-semibold text-gray-600">
             {isScheduled ? "Reschedule" : "Schedule"}
           </p>
-          <p className="text-xs text-gray-500">All times are UTC.</p>
+          <p className="text-xs text-gray-500">
+            This will be posted to X automatically at the scheduled time. All
+            times are UTC.
+          </p>
           <div className="flex gap-2">
             <input
               type="datetime-local"
@@ -174,62 +184,87 @@ export default function DraftActions({
         </div>
       )}
 
-      {/* YouTube Community Post — direct publish */}
-      {isYouTube && isApproved && (
-        <div className="space-y-2 rounded-lg border p-3">
-          <p className="text-xs font-semibold text-gray-600">
-            Publish to YouTube Community (Gör inlägg)
-          </p>
-          <p className="text-xs text-gray-500">
-            Posts the text directly to your YouTube channel community tab. No
-            video file required.
-          </p>
-          <button
-            onClick={handleYouTubePublish}
-            disabled={loading !== null}
-            className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-          >
-            {loading === "publish" ? "Publishing…" : "Publish community post"}
-          </button>
-        </div>
-      )}
-
-      {/* Scheduled info note */}
-      {isScheduled && (
+      {/* Scheduled info note — X only */}
+      {isX && isScheduled && (
         <p className="rounded bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
-          This post is scheduled and will be processed by the daily cron at
-          09:00 UTC. Text platform posts (Reddit, X) do not have an
-          auto-publisher yet — use the option below to post manually and record
-          the URL.
+          This post is scheduled and will be posted to X automatically by the
+          cron job once the scheduled time passes.
         </p>
       )}
 
-      {/* Record manually posted URL (text platforms only) */}
-      {canMarkManuallyPublished && (
-        <div className="space-y-2 rounded-lg border p-3">
+      {/* Copy + manual publish (YouTube Community, Reddit) */}
+      {isManualPlatform && (isApproved || isScheduled) && (
+        <div className="space-y-3 rounded-lg border p-3">
           <p className="text-xs font-semibold text-gray-600">
-            I&apos;ve posted this manually
+            Ready to paste — {platform.replace("_", " ")} has no auto-publish
+            API, post it yourself.
           </p>
-          <p className="text-xs text-gray-500">
-            Copy the content above, post it on {platform.replace("_", " ")},
-            then paste the link to the live post here to mark it as published.
-          </p>
-          <div className="flex gap-2">
-            <input
-              type="url"
-              placeholder="Paste the post URL"
-              value={manualUrl}
-              onChange={(e) => setManualUrl(e.target.value)}
-              className="flex-1 rounded border px-2 py-1 text-sm"
-            />
-            <button
-              onClick={handleMarkPublished}
-              disabled={loading !== null}
-              className="rounded-md bg-gray-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-900 disabled:opacity-50"
-            >
-              {loading === "mark-published" ? "Saving…" : "Mark published"}
-            </button>
-          </div>
+
+          {isReddit && (
+            <div>
+              <p className="mb-1 text-xs font-semibold text-gray-500">
+                Pre-post checklist
+              </p>
+              <ul className="space-y-1.5">
+                {SUBREDDIT_CHECKLIST.map((item, i) => (
+                  <li key={item} className="flex items-center gap-2 text-xs">
+                    <input
+                      type="checkbox"
+                      id={`check-${i}`}
+                      checked={checklist[i]}
+                      onChange={() => toggleCheck(i)}
+                      className="h-3.5 w-3.5 rounded border-gray-300 text-emerald-600"
+                    />
+                    <label htmlFor={`check-${i}`} className="text-gray-700">
+                      {item}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              {!allChecked && (
+                <p className="mt-1 text-xs text-amber-700">
+                  Complete the checklist before copying or posting.
+                </p>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={handleCopy}
+            disabled={manualActionsBlocked}
+            className="rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {copied ? "Copied!" : "Copy draft to clipboard"}
+          </button>
+
+          {canMarkManuallyPublished && (
+            <div className="space-y-2 border-t pt-3">
+              <p className="text-xs font-semibold text-gray-600">
+                I&apos;ve posted this manually
+              </p>
+              <p className="text-xs text-gray-500">
+                Once it&apos;s live, paste the link here to mark it as
+                published.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  placeholder="Paste the post URL"
+                  value={manualUrl}
+                  onChange={(e) => setManualUrl(e.target.value)}
+                  disabled={manualActionsBlocked}
+                  className="flex-1 rounded border px-2 py-1 text-sm disabled:opacity-40"
+                />
+                <button
+                  onClick={handleMarkPublished}
+                  disabled={loading !== null || manualActionsBlocked}
+                  className="rounded-md bg-gray-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-900 disabled:opacity-50"
+                >
+                  {loading === "mark-published" ? "Saving…" : "Mark published"}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

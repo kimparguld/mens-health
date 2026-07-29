@@ -72,7 +72,7 @@ export default async function ContentCalendarPage() {
             href="/admin/social/calendar"
             className="text-xs text-emerald-700 underline"
           >
-            View full calendar →
+            View social schedule →
           </Link>
         </div>
         {scheduledPosts.length === 0 ? (

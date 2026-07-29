@@ -163,15 +163,23 @@ export default async function AdminClaimsPage({
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    {claim.slug && (
+                    <div className="flex flex-col gap-1">
                       <Link
-                        href={`/claims/${claim.slug}`}
-                        target="_blank"
-                        className="text-xs text-gray-400 hover:text-blue-600"
+                        href={`/admin/claims/${claim.id}`}
+                        className="text-xs font-medium text-emerald-700 hover:underline"
                       >
-                        View →
+                        Review →
                       </Link>
-                    )}
+                      {claim.slug && (
+                        <Link
+                          href={`/claims/${claim.slug}`}
+                          target="_blank"
+                          className="text-xs text-gray-400 hover:text-blue-600"
+                        >
+                          View live →
+                        </Link>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
