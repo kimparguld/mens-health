@@ -4,6 +4,9 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
+import { submitUrlsToIndexNow } from "@/lib/seo/indexnow";
+import { notifyCreatorIfApplicable } from "@/lib/creators/notify";
+import { env } from "@/env";
 
 const ReviewBodySchema = z.object({
   action: z.enum([
@@ -86,6 +89,13 @@ export async function POST(
 
   revalidateTag("videos", "max");
   if (video.slug) revalidateTag(`video:${video.slug}`, "max");
+
+  if (action === "PUBLISHED") {
+    await submitUrlsToIndexNow([
+      `${env.NEXT_PUBLIC_APP_URL}/videos/${video.slug}`,
+    ]);
+    await notifyCreatorIfApplicable(video.id);
+  }
 
   return Response.json({ ok: true, status: newStatus });
 }

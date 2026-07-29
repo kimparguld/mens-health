@@ -100,8 +100,18 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
     };
   }
 
+  const archiveHtml = buildDigestHtml(digestVideos, appUrl, `${appUrl}/newsletter`);
+  const archiveText = buildDigestText(digestVideos, appUrl, `${appUrl}/newsletter`);
+
   const digest = await db.newsletterDigest.create({
-    data: { subject },
+    data: { subject, html: archiveHtml, text: archiveText },
+  });
+
+  const dateStr = digest.sentAt.toISOString().slice(0, 10);
+  const slug = `${dateStr}-${digest.id.slice(-6)}`;
+  await db.newsletterDigest.update({
+    where: { id: digest.id },
+    data: { slug },
   });
 
   let sentCount = 0;

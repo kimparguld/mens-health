@@ -1,6 +1,10 @@
 import { db } from "@/lib/db/prisma";
 import { summarizeVideo } from "@/lib/ai/summarize-video";
 import { extractClaims, type ExtractedClaim } from "@/lib/ai/extract-claims";
+import { generateEditorialTitle } from "@/lib/ai/generate-editorial-title";
+import { submitUrlsToIndexNow } from "@/lib/seo/indexnow";
+import { notifyCreatorIfApplicable } from "@/lib/creators/notify";
+import { env } from "@/env";
 
 // Heuristic evidence score (0–1) derived from extracted claim risk levels.
 // Serves as a proxy until admin claim-checking is implemented.
@@ -101,6 +105,26 @@ export async function processPendingVideos(options?: {
         },
       });
 
+      // --- Generate an SEO-friendly editorial title (raw YouTube title is kept as-is) ---
+      const channelForTitle = await db.channel.findUnique({
+        where: { id: video.channelId },
+      });
+      const editorialTitleResult = await generateEditorialTitle({
+        title: video.title,
+        shortSummary: summary.shortSummary,
+        channelTitle: channelForTitle?.title ?? "",
+      });
+      if (editorialTitleResult.ok) {
+        await db.video.update({
+          where: { id: video.id },
+          data: { editorialTitle: editorialTitleResult.value },
+        });
+      } else {
+        console.warn(
+          `Editorial title generation failed for video ${video.id}: ${editorialTitleResult.error.message}`,
+        );
+      }
+
       // --- Extract claims ---
       const claimsResult = await extractClaims({
         title: video.title,
@@ -176,6 +200,10 @@ export async function processPendingVideos(options?: {
             note: "Auto-published: no high-risk claims detected (risk level LOW)",
           },
         });
+        await submitUrlsToIndexNow([
+          `${env.NEXT_PUBLIC_APP_URL}/videos/${video.slug}`,
+        ]);
+        await notifyCreatorIfApplicable(video.id);
       }
 
       await db.processingJob.update({

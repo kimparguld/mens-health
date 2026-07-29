@@ -106,6 +106,42 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
   // Fetch extracted claims from this creator's videos
   const videoIds = videos.map((v) => v.id);
+
+  // Evidence scorecard: full aggregate counts (not limited like the claims list below)
+  const claimStatusCounts = videoIds.length > 0
+    ? await db.claim.groupBy({
+        by: ["evidenceStatus"],
+        where: { videoId: { in: videoIds } },
+        _count: { _all: true },
+      })
+    : [];
+  const sourcesCited =
+    videoIds.length > 0
+      ? await db.evidenceSource.count({
+          where: { claim: { videoId: { in: videoIds } } },
+        })
+      : 0;
+  const scorecard = {
+    videosReviewed: videos.length,
+    claimsAssessed: claimStatusCounts.reduce((sum, c) => sum + c._count._all, 0),
+    supported:
+      claimStatusCounts.find((c) => c.evidenceStatus === "SUPPORTED")?._count
+        ._all ?? 0,
+    mixed:
+      claimStatusCounts.find((c) => c.evidenceStatus === "MIXED")?._count
+        ._all ?? 0,
+    weak:
+      claimStatusCounts.find((c) => c.evidenceStatus === "WEAK")?._count
+        ._all ?? 0,
+    unsupported:
+      claimStatusCounts.find((c) => c.evidenceStatus === "UNSUPPORTED")
+        ?._count._all ?? 0,
+    notChecked:
+      claimStatusCounts.find((c) => c.evidenceStatus === "NOT_CHECKED")
+        ?._count._all ?? 0,
+    sourcesCited,
+  };
+
   const claims =
     videoIds.length > 0
       ? await db.claim.findMany({
@@ -214,6 +250,47 @@ export default async function CreatorPage({ params }: { params: Params }) {
             )}
           </div>
         </section>
+
+        {/* Evidence scorecard */}
+        {scorecard.claimsAssessed > 0 && (
+          <section className="border-b border-gray-100 bg-white py-10">
+            <div className="mx-auto max-w-[1120px] px-4">
+              <h2 className="mb-1 text-lg font-semibold text-gray-900">
+                Evidence Scorecard
+              </h2>
+              <p className="mb-6 text-sm text-gray-500">
+                A factual summary of claims we&apos;ve checked from{" "}
+                {creator.name}&apos;s videos — not an overall opinion of the
+                creator.
+              </p>
+              <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {[
+                  { label: "Videos reviewed", value: scorecard.videosReviewed },
+                  { label: "Claims assessed", value: scorecard.claimsAssessed },
+                  {
+                    label: "Strongly supported",
+                    value: scorecard.supported,
+                  },
+                  { label: "Mixed evidence", value: scorecard.mixed },
+                  { label: "Weak evidence", value: scorecard.weak },
+                  { label: "Unsupported", value: scorecard.unsupported },
+                  { label: "Not yet checked", value: scorecard.notChecked },
+                  { label: "Sources cited", value: scorecard.sourcesCited },
+                ].map((row) => (
+                  <div
+                    key={row.label}
+                    className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
+                  >
+                    <dt className="text-xs text-gray-500">{row.label}</dt>
+                    <dd className="mt-1 text-xl font-semibold text-gray-900">
+                      {row.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </section>
+        )}
 
         {/* Videos */}
         <section className="py-10">

@@ -247,6 +247,11 @@ export default function NewsletterPage() {
               title: "This Week's Picks",
               desc: "Top videos, claims checked, and a practical takeaway.",
             },
+            {
+              href: "/newsletter/archive",
+              title: "Newsletter Archive",
+              desc: "Every past issue, published as a permanent page.",
+            },
           ].map((item) => (
             <Link
               key={item.href}

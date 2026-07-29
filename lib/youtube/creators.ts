@@ -5,6 +5,12 @@ export type CreatorSeed = {
   description: string;
   specialty: string;
   credentials?: string;
+  /**
+   * Public business-contact email for this creator, if known. Only set this
+   * once you have a real, verified address — creator notification emails
+   * are only ever sent when this field is populated (see lib/creators/notify.ts).
+   */
+  contactEmail?: string;
 };
 
 // Well-known men's health YouTube creators.

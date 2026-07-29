@@ -171,6 +171,29 @@ export function getWeeklyRankingVideos(topicId: string) {
   return _getWeeklyRankingVideosCached(topicId);
 }
 
+const _getRelatedVideosCached = unstable_cache(
+  async (topicId: string, excludeVideoId: string) =>
+    db.video.findMany({
+      where: {
+        status: "PUBLISHED",
+        id: { not: excludeVideoId },
+        topics: { some: { topicId } },
+      },
+      orderBy: { trendScore: "desc" },
+      take: 3,
+      include: { channel: true },
+    }),
+  ["related-videos"],
+  { revalidate: 60, tags: ["videos"] },
+);
+export function getRelatedVideos(
+  topicId: string | undefined,
+  excludeVideoId: string,
+) {
+  if (!topicId) return Promise.resolve([]);
+  return _getRelatedVideosCached(topicId, excludeVideoId);
+}
+
 // ---------------------------------------------------------------------------
 // Topics
 // ---------------------------------------------------------------------------

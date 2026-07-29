@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/createMetadata";
+import { createMetadata, createCanonicalUrl } from "@/lib/seo/createMetadata";
 import { db } from "@/lib/db/prisma";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildItemListSchema } from "@/lib/seo/json-ld";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -33,8 +35,19 @@ export default async function ClaimsIndexPage() {
     },
   });
 
+  const itemListSchema = buildItemListSchema(
+    "Health Claims",
+    claims
+      .filter((c) => c.slug != null)
+      .map((c) => ({
+        name: c.text,
+        url: createCanonicalUrl(`/claims/${c.slug}`),
+      })),
+  );
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Health Claims
       </h1>

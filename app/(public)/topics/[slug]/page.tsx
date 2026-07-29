@@ -108,6 +108,38 @@ export default async function TopicPage({
       })
     : [];
 
+  // Evidence overview: aggregate claim verdicts across all videos in this topic
+  const topicClaimStatusCounts = topic
+    ? await db.claim.groupBy({
+        by: ["evidenceStatus"],
+        where: {
+          video: { status: "PUBLISHED", topics: { some: { topicId: topic.id } } },
+        },
+        _count: { _all: true },
+      })
+    : [];
+  const evidenceOverview = {
+    claimsAssessed: topicClaimStatusCounts.reduce(
+      (sum, c) => sum + c._count._all,
+      0,
+    ),
+    supported:
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === "SUPPORTED")
+        ?._count._all ?? 0,
+    mixed:
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === "MIXED")?._count
+        ._all ?? 0,
+    weak:
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === "WEAK")?._count
+        ._all ?? 0,
+    unsupported:
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === "UNSUPPORTED")
+        ?._count._all ?? 0,
+    notChecked:
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === "NOT_CHECKED")
+        ?._count._all ?? 0,
+  };
+
   const [topicResult, featuredResult] = await Promise.all([
     topic ? getTopicVideos(topic.id, slug, page) : null,
     topic && page > 1 ? getTopicVideos(topic.id, slug, 1) : null,
@@ -199,6 +231,38 @@ export default async function TopicPage({
               </li>
             ))}
           </ol>
+        </section>
+      )}
+
+      {/* Evidence overview */}
+      {evidenceOverview.claimsAssessed > 0 && (
+        <section className="mb-10">
+          <h2 className="mb-1 text-xl font-semibold text-gray-900">
+            Evidence overview
+          </h2>
+          <p className="mb-4 text-sm text-gray-500">
+            How claims about {topicSeed.name.toLowerCase()} across all
+            reviewed videos stack up against the evidence.
+          </p>
+          <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+            {[
+              { label: "Claims assessed", value: evidenceOverview.claimsAssessed },
+              { label: "Strongly supported", value: evidenceOverview.supported },
+              { label: "Mixed evidence", value: evidenceOverview.mixed },
+              { label: "Weak evidence", value: evidenceOverview.weak },
+              { label: "Unsupported", value: evidenceOverview.unsupported },
+            ].map((row) => (
+              <div
+                key={row.label}
+                className="rounded-xl border border-gray-200 bg-white px-4 py-3"
+              >
+                <dt className="text-xs text-gray-500">{row.label}</dt>
+                <dd className="mt-1 text-xl font-semibold text-gray-900">
+                  {row.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </section>
       )}
 

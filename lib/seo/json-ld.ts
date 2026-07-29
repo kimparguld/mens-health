@@ -29,6 +29,38 @@ export function buildVideoObjectSchema(input: VideoObjectInput) {
   };
 }
 
+export type ArticleInput = {
+  headline: string;
+  description: string;
+  imageUrl: string | null;
+  publishedAt: Date | string;
+  updatedAt: Date | string;
+  authorName?: string;
+  url: string;
+};
+
+export function buildArticleSchema(input: ArticleInput): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: input.headline,
+    description: input.description,
+    image: input.imageUrl ?? undefined,
+    datePublished: new Date(input.publishedAt).toISOString(),
+    dateModified: new Date(input.updatedAt).toISOString(),
+    author: {
+      "@type": "Organization",
+      name: input.authorName ?? "MenHealth Digest",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "MenHealth Digest",
+    },
+    mainEntityOfPage: input.url,
+    url: input.url,
+  };
+}
+
 export type BreadcrumbItem = { name: string; url: string };
 
 export function buildBreadcrumbSchema(
