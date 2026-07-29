@@ -96,10 +96,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return GENERIC_OK;
   }
 
+  // Single opt-in: there is no separate confirmation email/link, so being
+  // recorded here (and synced to Resend below) is what "confirmed" means.
   const subscriber = await db.newsletterSubscriber.upsert({
     where: { email },
-    create: { email, ...attribution },
-    update: { unsubscribedAt: null },
+    create: { email, confirmedAt: new Date(), ...attribution },
+    update: { unsubscribedAt: null, confirmedAt: new Date() },
   });
 
   // Sync to Resend — add contact and optionally assign to a segment

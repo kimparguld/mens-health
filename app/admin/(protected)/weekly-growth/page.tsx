@@ -31,7 +31,7 @@ const WEEKLY_SCHEDULE: Array<{
       { task: "Post short-form video (YouTube Shorts / TikTok / Reels)" },
       {
         task: "Participate in Reddit or community post",
-        link: "/admin/community",
+        link: "/admin/social/drafts",
       },
     ],
   },

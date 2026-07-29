@@ -138,6 +138,7 @@ export default async function SocialDraftDetailPage({
             riskLevel={post.riskLevel}
             requiresReview={post.requiresReview}
             initialScheduledAt={post.scheduledAt?.toISOString() ?? null}
+            caption={post.caption}
           />
         </section>
 

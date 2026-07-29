@@ -1,6 +1,7 @@
 import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 import { JobsTable } from "./JobsTable";
+import { ProcessNowButton } from "./ProcessNowButton";
 
 const PAGE_SIZE = 50;
 
@@ -52,11 +53,25 @@ export default async function AdminJobsPage({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Processing Jobs</h1>
+      <div className="mb-2 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Video Processing Jobs
+        </h1>
         <Link href="/admin" className="text-sm text-blue-600 hover:underline">
           &larr; Dashboard
         </Link>
+      </div>
+      <p className="mb-4 text-sm text-gray-500">
+        AI processing runs for individual videos (summarize + extract
+        claims) — not the Vercel Cron schedule. Cron endpoints (sync, digest,
+        social publish) run on the schedule defined in{" "}
+        <code className="font-mono text-xs">vercel.json</code>. That schedule
+        only fires on Vercel — it does not run under{" "}
+        <code className="font-mono text-xs">next dev</code>, and even in
+        production it only processes a small batch once a day.
+      </p>
+      <div className="mb-6">
+        <ProcessNowButton />
       </div>
 
       {/* Status filter tabs */}

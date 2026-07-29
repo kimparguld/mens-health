@@ -32,6 +32,13 @@ function generateClaimSlug(text: string, id: string): string {
 
 const BATCH_SIZE = 5;
 
+// A job stuck in RUNNING this long almost certainly means the previous
+// invocation crashed or timed out mid-run (e.g. a serverless function
+// timeout) without ever reaching the try/catch's success or failure path.
+// findMany() below only ever selects QUEUED jobs, so without this recovery
+// step an orphaned RUNNING row would stay stuck forever.
+const STALE_RUNNING_THRESHOLD_MS = 20 * 60 * 1000; // 20 minutes
+
 export async function processPendingVideos(options?: {
   videoIds?: string[];
 }): Promise<{
@@ -40,6 +47,14 @@ export async function processPendingVideos(options?: {
 }> {
   let processed = 0;
   let failed = 0;
+
+  await db.processingJob.updateMany({
+    where: {
+      status: "RUNNING",
+      startedAt: { lt: new Date(Date.now() - STALE_RUNNING_THRESHOLD_MS) },
+    },
+    data: { status: "QUEUED", startedAt: null },
+  });
 
   const jobs = await db.processingJob.findMany({
     where: {

@@ -29,7 +29,6 @@ export const KNOWN_ADMIN_ROUTES = new Set([
   "/admin/social/accounts",
   "/admin/growth",
   "/admin/content-calendar",
-  "/admin/community",
   "/admin/outreach",
   "/admin/marketing/utm-builder",
   "/admin/marketing/campaigns",
@@ -230,7 +229,7 @@ export const GROWTH_PLAN_TASKS: SeedTask[] = [
     title: "3 community posts per week",
     description:
       "Post 3 value-add comments or posts per week on Reddit or other communities (no spam, no direct promotion).",
-    adminPath: "/admin/community",
+    adminPath: "/admin/social/drafts",
     priority: "MEDIUM",
   },
   {

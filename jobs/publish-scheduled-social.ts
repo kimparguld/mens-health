@@ -1,7 +1,5 @@
 import { db } from "@/lib/db/prisma";
 import { XAdapter } from "@/lib/social/adapters/x";
-import { RedditAdapter } from "@/lib/social/adapters/reddit";
-import { YouTubeCommunityAdapter } from "@/lib/social/adapters/youtube";
 import type { SocialPublisher } from "@/lib/social/adapters/publisher";
 import type { Platform } from "@prisma/client";
 
@@ -9,17 +7,21 @@ import type { Platform } from "@prisma/client";
  * Processes all SCHEDULED social posts whose scheduledAt time has passed.
  *
  * Platform behaviour:
- * - YOUTUBE_COMMUNITY — manual publish required (no public API for community posts).
- * - X — auto-published via the X adapter.
- * - REDDIT — manual-only by policy; reverts to APPROVED with an attempt record
- *   explaining the manual workflow.
+ * - X — the only platform that actually auto-publishes, via the X adapter.
+ * - YOUTUBE_COMMUNITY, REDDIT — manual-only (no public API / policy);
+ *   reverts to APPROVED with an attempt record explaining the manual workflow.
  * - TIKTOK — adapter not yet implemented; marked FAILED.
  */
 
+const MANUAL_ONLY_PLATFORMS: Partial<Record<Platform, string>> = {
+  YOUTUBE_COMMUNITY:
+    "YouTube Community Posts must be published manually — the post has been returned to Approved.",
+  REDDIT:
+    "Reddit posts must be submitted manually. The post has been returned to Approved.",
+};
+
 const ADAPTERS: Partial<Record<Platform, SocialPublisher>> = {
-  YOUTUBE_COMMUNITY: new YouTubeCommunityAdapter(),
   X: new XAdapter(),
-  REDDIT: new RedditAdapter(),
 };
 
 export async function publishScheduledPosts(): Promise<{
@@ -39,6 +41,28 @@ export async function publishScheduledPosts(): Promise<{
   let failed = 0;
 
   for (const post of posts) {
+    // Manual-only platforms (YouTube Community, Reddit) — revert to APPROVED
+    // and record why, instead of ever attempting to auto-publish them.
+    const manualReason = MANUAL_ONLY_PLATFORMS[post.platform];
+    if (manualReason) {
+      await db.$transaction([
+        db.socialPublishAttempt.create({
+          data: {
+            postId: post.id,
+            success: false,
+            errorCode: "MANUAL_PUBLISH_REQUIRED",
+            errorMsg: manualReason,
+          },
+        }),
+        db.socialPost.update({
+          where: { id: post.id },
+          data: { status: "APPROVED" },
+        }),
+      ]);
+      processed++;
+      continue;
+    }
+
     const adapter = ADAPTERS[post.platform];
 
     // No adapter yet (TikTok) — mark as FAILED
@@ -58,27 +82,6 @@ export async function publishScheduledPosts(): Promise<{
         }),
       ]);
       failed++;
-      continue;
-    }
-
-    // Reddit is manual-only — revert to APPROVED and record the reason
-    if (post.platform === "REDDIT") {
-      await db.$transaction([
-        db.socialPublishAttempt.create({
-          data: {
-            postId: post.id,
-            success: false,
-            errorCode: "REDDIT_MANUAL_ONLY",
-            errorMsg:
-              "Reddit posts must be submitted manually. The post has been returned to Approved.",
-          },
-        }),
-        db.socialPost.update({
-          where: { id: post.id },
-          data: { status: "APPROVED" },
-        }),
-      ]);
-      processed++;
       continue;
     }
 
