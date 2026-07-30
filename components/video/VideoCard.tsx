@@ -15,6 +15,7 @@ type VideoCardProps = {
   evidenceLabel?: string;
   durationSeconds?: number;
   customSizes?: string;
+  priority?: boolean;
 };
 
 export function VideoCard({
@@ -28,6 +29,7 @@ export function VideoCard({
   evidenceLabel,
   durationSeconds,
   customSizes,
+  priority,
 }: VideoCardProps) {
   const watchTimeMin = durationSeconds ? Math.ceil(durationSeconds / 60) : null;
 
@@ -47,6 +49,7 @@ export function VideoCard({
             fill
             className="object-cover"
             sizes={sizes}
+            priority={priority}
           />
         </div>
       )}

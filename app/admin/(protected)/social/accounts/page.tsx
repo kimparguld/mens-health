@@ -92,12 +92,12 @@ export default async function SocialAccountsPage({
           </div>
 
           {X_CONFIG.configured ? (
-            <Link
+            <a
               href={X_CONFIG.oauthPath}
               className="rounded-md border border-gray-300 px-3 py-1.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               {xAccount ? "Reconnect" : "Connect"}
-            </Link>
+            </a>
           ) : (
             <div className="space-y-1">
               <p className="text-xs text-gray-500">

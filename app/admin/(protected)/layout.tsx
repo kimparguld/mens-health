@@ -1,8 +1,7 @@
-import { auth, signOut } from "@/lib/auth";
-import { Fragment } from "react";
-import { twMerge } from "tailwind-merge";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { auth, signOut } from '@/lib/auth';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { twMerge } from 'tailwind-merge';
 
 export default async function AdminLayout({
   children,
@@ -12,56 +11,50 @@ export default async function AdminLayout({
   const session = await auth();
 
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    redirect("/admin/login");
+    redirect('/admin/login');
   }
 
-  const nav = [
+  const navGroups = [
     {
-      label: "Dashboard",
-      href: "/admin",
-      classes: "font-semibold pl-0",
-    },
-    { label: "Review queue", href: "/admin/videos" },
-    { label: "Claims", href: "/admin/claims" },
-    { label: "Topics", href: "/admin/topics" },
-    {
-      label: "Video processing jobs",
-      href: "/admin/jobs",
+      section: null,
+      items: [{ label: 'Dashboard', href: '/admin' }],
     },
     {
-      label: "Subscribers",
-      href: "/admin/subscribers",
+      section: 'Content',
+      items: [
+        { label: 'Review queue', href: '/admin/videos' },
+        { label: 'Claims', href: '/admin/claims' },
+        { label: 'Topics', href: '/admin/topics' },
+        { label: 'Video processing jobs', href: '/admin/jobs' },
+      ],
     },
     {
-      label: "Social drafts",
-      href: "/admin/social/drafts",
+      section: 'Audience',
+      items: [
+        { label: 'Subscribers', href: '/admin/subscribers' },
+        { label: 'Social drafts', href: '/admin/social/drafts' },
+        { label: 'Social schedule', href: '/admin/social/calendar' },
+      ],
     },
     {
-      label: "Social schedule",
-      href: "/admin/social/calendar",
+      section: 'Growth',
+      items: [
+        { label: 'Growth hub', href: '/admin/growth' },
+        { label: 'Content calendar', href: '/admin/content-calendar' },
+        { label: 'Outreach CRM', href: '/admin/outreach' },
+        { label: 'UTM builder', href: '/admin/marketing/utm-builder' },
+        { label: 'Campaigns', href: '/admin/marketing/campaigns' },
+        { label: 'Growth analytics', href: '/admin/analytics/growth' },
+        { label: '90-day plan', href: '/admin/growth-plan' },
+        { label: 'Weekly workflow', href: '/admin/weekly-growth' },
+        { label: 'Monetization', href: '/admin/monetization' },
+      ],
     },
     {
-      label: "Social accounts",
-      href: "/admin/social/accounts",
+      section: 'Settings',
+      items: [{ label: 'Social accounts', href: '/admin/social/accounts' }],
     },
-    // Growth
-    {
-      label: "Growth hub",
-      href: "/admin/growth",
-      classes: "font-semibold pl-0",
-    },
-    { label: "Content calendar", href: "/admin/content-calendar" },
-    { label: "Outreach CRM", href: "/admin/outreach" },
-    { label: "UTM builder", href: "/admin/marketing/utm-builder" },
-    { label: "Campaigns", href: "/admin/marketing/campaigns" },
-    { label: "Growth analytics", href: "/admin/analytics/growth" },
-    { label: "90-day plan", href: "/admin/growth-plan" },
-    { label: "Weekly workflow", href: "/admin/weekly-growth" },
-    { label: "Monetization", href: "/admin/monetization" },
   ];
-
-  // Divider indices (after these 0-based indices)
-  const dividerAfter = new Set([3, 6]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -70,20 +63,27 @@ export default async function AdminLayout({
         <div className="flex h-14 items-center border-b px-4">
           <span className="text-nd font-semibold text-gray-900">MHD Admin</span>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
-          {nav.map(({ label, href, classes }, i) => (
-            <Fragment key={href}>
-              <Link
-                href={href}
-                className={twMerge(
-                  "rounded-md px-3 py-2 pl-3 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-900",
-                  classes,
-                )}
-              >
-                {label}
-              </Link>
-              {dividerAfter.has(i) && <div className="border-b" />}
-            </Fragment>
+        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto p-2">
+          {navGroups.map(({ section, items }, i) => (
+            <div key={section ?? `group-${i}`} className="flex flex-col gap-1">
+              {section && (
+                <span className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  {section}
+                </span>
+              )}
+              {items.map(({ label, href }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={twMerge(
+                    'rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-900',
+                    !section && 'font-semibold'
+                  )}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
           ))}
         </nav>
         <div className="border-t p-4">
@@ -92,8 +92,8 @@ export default async function AdminLayout({
           </p>
           <form
             action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/admin/login" });
+              'use server';
+              await signOut({ redirectTo: '/admin/login' });
             }}
           >
             <button

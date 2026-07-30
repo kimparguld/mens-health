@@ -23,6 +23,14 @@ const SLOT_ID_BY_PLACEMENT: Record<Props["slot"], string | undefined> = {
   sidebar: env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
 };
 
+// Reserves layout space matching the typical rendered ad size per placement,
+// so the AdSense script populating asynchronously doesn't shift surrounding content (CLS).
+const MIN_HEIGHT_BY_PLACEMENT: Record<Props["slot"], string> = {
+  "article-footer": "min-h-[100px]",
+  "between-content": "min-h-[250px]",
+  sidebar: "min-h-[250px]",
+};
+
 declare global {
   interface Window {
     adsbygoogle?: unknown[];
@@ -47,7 +55,12 @@ export function AdSlot({ slot, className }: Props) {
   if (!adsEnabled || !clientId || !slotId) return null;
 
   return (
-    <div data-ad-slot={slot} className={className}>
+    <div
+      data-ad-slot={slot}
+      className={[MIN_HEIGHT_BY_PLACEMENT[slot], className]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <AdDisclosure />
       <ins
         key={reactId}
