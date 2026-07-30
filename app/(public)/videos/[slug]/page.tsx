@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { YouTubePlayer } from "@/components/video/YouTubePlayer";
 import { PremiumSection } from "./PremiumSection";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
@@ -232,7 +233,8 @@ export default async function VideoPage({ params }: { params: Params }) {
       )}
       <p className="mb-6 text-xs text-gray-400">
         Published {new Date(video.publishedAt).toLocaleDateString()}
-        {video.updatedAt.getTime() !== video.publishedAt.getTime() &&
+        {new Date(video.updatedAt).getTime() !==
+          new Date(video.publishedAt).getTime() &&
           ` · Updated ${new Date(video.updatedAt).toLocaleDateString()}`}
       </p>
 
@@ -318,6 +320,8 @@ export default async function VideoPage({ params }: { params: Params }) {
           )}
         </>
       )}
+
+      <AdSlot slot="between-content" className="mb-8" />
 
       {/* Claims */}
       {video.claims.length > 0 && (
@@ -411,6 +415,8 @@ export default async function VideoPage({ params }: { params: Params }) {
           </ul>
         </section>
       )}
+
+      <AdSlot slot="article-footer" className="mb-8" />
 
       {/* Embeddable badge */}
       <section className="mb-8 rounded-lg border border-gray-200 p-4">
