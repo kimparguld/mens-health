@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db/prisma";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { Disclaimer } from "@/components/ui/Disclaimer";
@@ -227,6 +228,8 @@ export default async function ClaimPage({ params }: { params: Params }) {
             </Link>
           </section>
         </article>
+
+        <AdSlot slot="article-footer" className="mt-10" />
 
         {/* Newsletter */}
         <section className="mt-12 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">

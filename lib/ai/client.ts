@@ -1,12 +1,24 @@
 import { env } from '@/env';
 import Groq from 'groq-sdk';
 
-export const DEFAULT_MODEL = 'claude-sonnet-4-6';
+// Used for the Anthropic branch only — a real, currently-valid model ID.
+// Haiku is the deliberate choice here: this pipeline is high-volume
+// background content generation, not a place to default to Sonnet pricing.
+export const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
+
+// Groq has its own model catalog (open-weight only, no Claude/GPT-4o/Gemini),
+// so it needs a dedicated default rather than reusing DEFAULT_MODEL — the two
+// providers don't share a model namespace.
+const GROQ_MODEL = env.GROQ_MODEL ?? 'openai/gpt-oss-120b';
+
+// Free-tier OpenRouter models rotate frequently as providers pull/reprice
+// them — re-check https://openrouter.ai/models?max_price=0 periodically and
+// override via OPENROUTER_MODEL_1..4 if any of these get delisted.
 const OPENROUTER_MODELS = [
-  env.OPENROUTER_MODEL_1 ?? 'mistralai/mistral-7b-instruct:free',
-  env.OPENROUTER_MODEL_2 ?? 'qwen/qwen3-8b:free',
-  env.OPENROUTER_MODEL_3 ?? 'microsoft/phi-3-mini-128k-instruct:free',
-  env.OPENROUTER_MODEL_4 ?? 'meta-llama/llama-3.2-3b-instruct:free',
+  env.OPENROUTER_MODEL_1 ?? 'openai/gpt-oss-120b:free',
+  env.OPENROUTER_MODEL_2 ?? 'openai/gpt-oss-20b:free',
+  env.OPENROUTER_MODEL_3 ?? 'mistralai/mistral-7b-instruct:free',
+  env.OPENROUTER_MODEL_4 ?? 'microsoft/phi-3-mini-128k-instruct:free',
 ];
 const GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
@@ -179,7 +191,7 @@ export const anthropic = {
       if (env.GROQ_API_KEY) {
         try {
           const completion = await groq.chat.completions.create({
-            model: model ?? DEFAULT_MODEL,
+            model: GROQ_MODEL,
             max_tokens,
             messages: messages as Groq.Chat.ChatCompletionMessageParam[],
           });

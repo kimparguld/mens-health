@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -60,6 +61,9 @@ export const metadata: Metadata = {
   },
 };
 
+const adsEnabled =
+  env.NEXT_PUBLIC_ADS_ENABLED === "true" && !!env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,6 +73,14 @@ export default function RootLayout({
     <>
       <html lang="en" className={`${inter.variable} h-full antialiased`}>
         <body className="flex min-h-full flex-col">
+          {adsEnabled && (
+            <Script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+              crossOrigin="anonymous"
+              strategy="afterInteractive"
+            />
+          )}
           <JsonLd
             schema={[
               buildWebSiteSchema(APP_URL),

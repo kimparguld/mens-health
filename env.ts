@@ -10,6 +10,7 @@ export const env = createEnv({
     ADMIN_EMAILS: z.string().min(1),
     YOUTUBE_API_KEY: z.string().min(1),
     GROQ_API_KEY: z.string().min(1).optional(),
+    GROQ_MODEL: z.string().min(1).optional(),
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
     OPENROUTER_API_KEY: z.string().min(1).optional(),
     OPENROUTER_MODEL_1: z.string().min(1).optional(),
@@ -45,6 +46,11 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
+    NEXT_PUBLIC_ADS_ENABLED: z.string().optional(),
+    NEXT_PUBLIC_ADSENSE_CLIENT_ID: z.string().min(1).optional(),
+    NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_FOOTER: z.string().min(1).optional(),
+    NEXT_PUBLIC_ADSENSE_SLOT_BETWEEN_CONTENT: z.string().min(1).optional(),
+    NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR: z.string().min(1).optional(),
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -54,6 +60,7 @@ export const env = createEnv({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     YOUTUBE_API_KEY: process.env.YOUTUBE_API_KEY,
     GROQ_API_KEY: process.env.GROQ_API_KEY,
+    GROQ_MODEL: process.env.GROQ_MODEL,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     OPENROUTER_MODEL_1: process.env.OPENROUTER_MODEL_1,
@@ -81,6 +88,13 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_ADS_ENABLED: process.env.NEXT_PUBLIC_ADS_ENABLED,
+    NEXT_PUBLIC_ADSENSE_CLIENT_ID: process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID,
+    NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_FOOTER:
+      process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_FOOTER,
+    NEXT_PUBLIC_ADSENSE_SLOT_BETWEEN_CONTENT:
+      process.env.NEXT_PUBLIC_ADSENSE_SLOT_BETWEEN_CONTENT,
+    NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
   },
   skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   emptyStringAsUndefined: true,

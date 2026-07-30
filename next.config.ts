@@ -17,13 +17,13 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Next.js inline scripts, YouTube IFrame API, and Vercel observability
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://va.vercel-scripts.com",
+      // Next.js inline scripts, YouTube IFrame API, Vercel observability, and Google AdSense
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.ytimg.com https://assets.example.com",
-      // YouTube embed and Google OAuth
-      "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
-      "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com",
+      "img-src 'self' data: blob: https://i.ytimg.com https://assets.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
+      // YouTube embed, Google OAuth, and AdSense ad iframes
+      "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com",
+      "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com",
       "font-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",

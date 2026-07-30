@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { VideoCard } from "@/components/video/VideoCard";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
@@ -266,6 +267,8 @@ export default async function TopicPage({
         </section>
       )}
 
+      <AdSlot slot="between-content" className="mb-10" />
+
       {/* Top Claims */}
       {(topicClaims.length > 0 ||
         (staticContent?.topClaims?.length ?? 0) > 0) && (
@@ -464,6 +467,8 @@ export default async function TopicPage({
           </div>
         </section>
       )}
+
+      <AdSlot slot="article-footer" className="mb-10" />
 
       {/* Sponsor placement */}
       {sponsor && (
