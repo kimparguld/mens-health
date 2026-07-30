@@ -212,6 +212,7 @@ export default async function WeeklyRankingPage({
                         evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
                         durationSeconds={video.durationSeconds ?? undefined}
                         customSizes="100vw"
+                        priority={index === 0}
                       />
                     </div>
                   </li>

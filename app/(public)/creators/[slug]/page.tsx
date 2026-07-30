@@ -317,7 +317,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {videos.map((video) => (
+                {videos.map((video, index) => (
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
@@ -330,6 +330,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     riskLevel={video.riskLevel}
                     evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
                     durationSeconds={video.durationSeconds ?? undefined}
+                    priority={index === 0}
                   />
                 ))}
               </div>

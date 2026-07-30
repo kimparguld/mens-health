@@ -193,6 +193,12 @@ export const anthropic = {
           const completion = await groq.chat.completions.create({
             model: GROQ_MODEL,
             max_tokens,
+            // gpt-oss models spend hidden reasoning tokens out of the same
+            // max_tokens budget as the visible answer — on "default" effort
+            // they can burn the whole budget on reasoning and return empty
+            // content (finish_reason "length"). "low" keeps enough budget
+            // free for the actual JSON output.
+            reasoning_effort: 'low',
             messages: messages as Groq.Chat.ChatCompletionMessageParam[],
           });
           const text = completion.choices[0]?.message?.content ?? '';

@@ -9,6 +9,7 @@ import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
+import { NewsletterStickyCTA } from "@/components/newsletter/NewsletterStickyCTA";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildBreadcrumbSchema,
@@ -372,7 +373,7 @@ export default async function TopicPage({
                 Featured this week
               </h2>
               <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {featuredVideos.map((video) => (
+                {featuredVideos.map((video, index) => (
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
@@ -386,6 +387,7 @@ export default async function TopicPage({
                     )}
                     riskLevel={video.riskLevel}
                     durationSeconds={video.durationSeconds ?? undefined}
+                    priority={index === 0}
                   />
                 ))}
               </div>
@@ -525,6 +527,7 @@ export default async function TopicPage({
       </section>
 
       <Disclaimer />
+      <NewsletterStickyCTA />
     </main>
   );
 }

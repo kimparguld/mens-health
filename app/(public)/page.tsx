@@ -128,7 +128,7 @@ async function TrendingVideos() {
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {videos.map((video) => (
+            {videos.map((video, index) => (
               <VideoCard
                 key={video.id}
                 slug={video.slug}
@@ -141,6 +141,7 @@ async function TrendingVideos() {
                 riskLevel={video.riskLevel}
                 evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
                 durationSeconds={video.durationSeconds ?? undefined}
+                priority={index === 0}
               />
             ))}
           </div>

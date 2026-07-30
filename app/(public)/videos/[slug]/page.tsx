@@ -11,6 +11,7 @@ import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
+import { NewsletterStickyCTA } from "@/components/newsletter/NewsletterStickyCTA";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   buildVideoObjectSchema,
@@ -243,7 +244,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <YouTubePlayer
           videoId={video.youtubeVideoId}
           title={video.title}
-          loading="eager"
+          thumbnailUrl={video.thumbnailUrl}
         />
       </div>
 
@@ -486,6 +487,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Disclaimer — required on every video page */}
       <Disclaimer />
+      <NewsletterStickyCTA />
     </main>
   );
 }

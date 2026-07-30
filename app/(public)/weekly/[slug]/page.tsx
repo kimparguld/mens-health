@@ -163,6 +163,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                     }
                     durationSeconds={topVideo.durationSeconds ?? undefined}
                     customSizes="100vw"
+                    priority
                   />
                 </div>
                 {topVideoSummary?.takeaways &&
