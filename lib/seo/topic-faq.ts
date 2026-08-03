@@ -326,3 +326,7 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
 export function getTopicSeo(slug: string): TopicSeoData | null {
   return TOPIC_SEO[slug] ?? null;
 }
+
+export function getAllTopicSeo(): Record<string, TopicSeoData> {
+  return TOPIC_SEO;
+}

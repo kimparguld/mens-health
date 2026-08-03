@@ -180,10 +180,10 @@ describe("GROWTH_PLAN_TASKS seed data", () => {
 describe("PHASES config", () => {
   it("covers days 1–90 without gaps", () => {
     const sortedPhases = [...PHASES].sort((a, b) => a.dayStart - b.dayStart);
-    expect(sortedPhases[0].dayStart).toBe(1);
-    expect(sortedPhases[sortedPhases.length - 1].dayEnd).toBe(90);
+    expect(sortedPhases[0]?.dayStart).toBe(1);
+    expect(sortedPhases[sortedPhases.length - 1]?.dayEnd).toBe(90);
     for (let i = 1; i < sortedPhases.length; i++) {
-      expect(sortedPhases[i].dayStart).toBe(sortedPhases[i - 1].dayEnd + 1);
+      expect(sortedPhases[i]?.dayStart).toBe((sortedPhases[i - 1]?.dayEnd ?? 0) + 1);
     }
   });
 });

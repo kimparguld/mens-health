@@ -37,14 +37,30 @@ async function getToken(): Promise<string> {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const X_MAX_CHARS = 280;
+
+/**
+ * The UTM link suffix buildTweetText will append \u2014 empty if the caption
+ * already contains the link. Shared by validate() and buildTweetText so both
+ * agree on what the final tweet text will actually look like.
+ */
+function getUrlSuffix(post: SocialPost): string {
+  return post.caption.includes(post.utmUrl) ? "" : ` ${post.utmUrl}`;
+}
+
 /**
  * Build the final tweet text, truncating the caption if needed so the combined
  * caption + UTM URL always fits within X's 280-character limit.
+ *
+ * In practice this truncation branch should be unreachable: validate() now
+ * rejects any post whose caption + link would exceed the limit before it can
+ * reach publish(), which prevents required elements (e.g. the "Educational
+ * only. Not medical advice." disclaimer) from being silently cut off. Kept
+ * as a defensive fallback in case publish() is ever called without validate().
  */
 function buildTweetText(post: SocialPost): string {
-  const hasUrl = post.caption.includes(post.utmUrl);
-  const suffix = hasUrl ? "" : ` ${post.utmUrl}`;
-  const maxCaptionLen = 280 - suffix.length;
+  const suffix = getUrlSuffix(post);
+  const maxCaptionLen = X_MAX_CHARS - suffix.length;
 
   if (post.caption.length <= maxCaptionLen) {
     return post.caption + suffix;
@@ -64,14 +80,24 @@ export class XAdapter implements SocialPublisher {
   readonly platform = "X" as const;
 
   async validate(post: SocialPost): Promise<ValidationResult> {
-    // Run all platform checks except caption length — captions that are too
-    // long are truncated automatically in buildTweetText rather than rejected.
+    // Run all platform checks except the generic caption-length one — that
+    // check only looks at the raw caption, but X's real limit applies to the
+    // caption *plus* the UTM link buildTweetText will append. We replace it
+    // with the check below so validate() (used at admin-review time) is what
+    // catches over-length posts, not a silent truncation at publish time.
     const errors = validatePlatformConstraints("X", {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
       hook: post.hook,
     }).filter((e) => !e.startsWith("Caption exceeds"));
+
+    const combinedLength = post.caption.length + getUrlSuffix(post).length;
+    if (combinedLength > X_MAX_CHARS) {
+      errors.push(
+        `Caption + link exceeds ${X_MAX_CHARS} chars for X (got ${combinedLength})`,
+      );
+    }
 
     if (errors.length > 0) return { ok: false, errors };
 

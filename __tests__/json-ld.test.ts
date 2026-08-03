@@ -4,6 +4,9 @@ import {
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildItemListSchema,
+  buildDefinedTermSchema,
+  buildDefinedTermSetSchema,
+  secondsToIso8601Duration,
 } from "@/lib/seo/json-ld";
 
 describe("buildVideoObjectSchema", () => {
@@ -38,6 +41,36 @@ describe("buildVideoObjectSchema", () => {
     const schema = buildVideoObjectSchema({ ...base, thumbnailUrl: null });
     expect(schema.thumbnailUrl).toBeUndefined();
   });
+
+  it("sets duration as an ISO 8601 string when durationSeconds is provided", () => {
+    const schema = buildVideoObjectSchema({ ...base, durationSeconds: 330 });
+    expect(schema.duration).toBe("PT5M30S");
+  });
+
+  it("omits duration when durationSeconds is null or absent", () => {
+    expect(
+      buildVideoObjectSchema({ ...base, durationSeconds: null }).duration,
+    ).toBeUndefined();
+    expect(buildVideoObjectSchema(base).duration).toBeUndefined();
+  });
+});
+
+describe("secondsToIso8601Duration", () => {
+  it("formats minutes and seconds", () => {
+    expect(secondsToIso8601Duration(330)).toBe("PT5M30S");
+  });
+
+  it("formats hours, minutes, and seconds", () => {
+    expect(secondsToIso8601Duration(3725)).toBe("PT1H2M5S");
+  });
+
+  it("formats whole minutes without a trailing 0S", () => {
+    expect(secondsToIso8601Duration(300)).toBe("PT5M");
+  });
+
+  it("formats zero seconds as PT0S", () => {
+    expect(secondsToIso8601Duration(0)).toBe("PT0S");
+  });
 });
 
 describe("buildBreadcrumbSchema", () => {
@@ -59,9 +92,10 @@ describe("buildBreadcrumbSchema", () => {
     const schema = buildBreadcrumbSchema(items) as {
       itemListElement: Array<{ position: number; name: string }>;
     };
-    expect(schema.itemListElement[0].position).toBe(1);
-    expect(schema.itemListElement[1].position).toBe(2);
-    expect(schema.itemListElement[1].name).toBe("Testosterone");
+    const [home, testosterone] = schema.itemListElement;
+    expect(home?.position).toBe(1);
+    expect(testosterone?.position).toBe(2);
+    expect(testosterone?.name).toBe("Testosterone");
   });
 });
 
@@ -79,8 +113,9 @@ describe("buildFaqSchema", () => {
       { question: "Q2", answer: "A2" },
     ]) as { mainEntity: Array<{ "@type": string; name: string }> };
     expect(schema.mainEntity).toHaveLength(2);
-    expect(schema.mainEntity[0]["@type"]).toBe("Question");
-    expect(schema.mainEntity[0].name).toBe("Q1");
+    const [firstQuestion] = schema.mainEntity;
+    expect(firstQuestion?.["@type"]).toBe("Question");
+    expect(firstQuestion?.name).toBe("Q1");
   });
 });
 
@@ -95,5 +130,51 @@ describe("buildItemListSchema", () => {
 
   it("sets @type to ItemList", () => {
     expect(buildItemListSchema("test", [])["@type"]).toBe("ItemList");
+  });
+});
+
+describe("buildDefinedTermSchema", () => {
+  it("sets @type to DefinedTerm and includes inDefinedTermSet when provided", () => {
+    const schema = buildDefinedTermSchema({
+      name: "Testosterone",
+      description: "The primary male sex hormone.",
+      url: "https://example.com/glossary/testosterone",
+      inDefinedTermSetUrl: "https://example.com/glossary",
+    }) as { "@type": string; inDefinedTermSet: string };
+    expect(schema["@type"]).toBe("DefinedTerm");
+    expect(schema.inDefinedTermSet).toBe("https://example.com/glossary");
+  });
+
+  it("omits inDefinedTermSet when not provided", () => {
+    const schema = buildDefinedTermSchema({
+      name: "Testosterone",
+      description: "The primary male sex hormone.",
+      url: "https://example.com/glossary/testosterone",
+    });
+    expect(schema).not.toHaveProperty("inDefinedTermSet");
+  });
+});
+
+describe("buildDefinedTermSetSchema", () => {
+  it("sets @type to DefinedTermSet and maps terms to hasDefinedTerm", () => {
+    const schema = buildDefinedTermSetSchema({
+      name: "Men's Health Glossary",
+      url: "https://example.com/glossary",
+      terms: [
+        {
+          name: "Testosterone",
+          description: "The primary male sex hormone.",
+          url: "https://example.com/glossary/testosterone",
+        },
+      ],
+    }) as {
+      "@type": string;
+      hasDefinedTerm: Array<{ "@type": string; name: string }>;
+    };
+    expect(schema["@type"]).toBe("DefinedTermSet");
+    expect(schema.hasDefinedTerm).toHaveLength(1);
+    const [firstTerm] = schema.hasDefinedTerm;
+    expect(firstTerm?.["@type"]).toBe("DefinedTerm");
+    expect(firstTerm?.name).toBe("Testosterone");
   });
 });
