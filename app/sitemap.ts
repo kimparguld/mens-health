@@ -145,6 +145,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    { url: `${BASE_URL}/topics`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${BASE_URL}/glossary`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/faq`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
