@@ -3,7 +3,7 @@
 // heuristic at this scale.
 
 export const RELATED_TOPICS: Record<string, string[]> = {
-  testosterone: ["fertility", "erectile-dysfunction", "muscle-gain", "hair-loss"],
+  testosterone: ["fertility", "erectile-dysfunction", "muscle-gain", "hair-loss", "prostate-health"],
   "fitness-over-40": ["muscle-gain", "longevity", "sleep", "weight-loss"],
   "muscle-gain": ["nutrition", "fitness-over-40", "supplements", "weight-loss"],
   longevity: ["fitness-over-40", "sleep", "nutrition", "biohacking"],
@@ -17,7 +17,7 @@ export const RELATED_TOPICS: Record<string, string[]> = {
   "erectile-dysfunction": ["testosterone", "mental-health", "mens-health"],
   biohacking: ["longevity", "sleep", "supplements", "nutrition"],
   supplements: ["nutrition", "muscle-gain", "biohacking", "longevity"],
-  "mens-health": ["longevity", "nutrition", "sleep", "mental-health"],
+  "mens-health": ["longevity", "nutrition", "prostate-health", "mental-health"],
 };
 
 export function getRelatedTopicSlugs(slug: string): string[] {

@@ -35,6 +35,15 @@ describe("related topics", () => {
       expect(related).not.toContain(slug);
     }
   });
+
+  it("gives every topic at least one inbound link (no orphans)", () => {
+    // A topic that never appears as someone else's "related" entry has no
+    // server-rendered internal link pointing to it anywhere except
+    // sitemap.xml — it's effectively an orphan page for crawling purposes.
+    const inbound = new Set(Object.values(RELATED_TOPICS).flat());
+    const orphans = TOPIC_SEEDS.filter((t) => !inbound.has(t.slug));
+    expect(orphans.map((t) => t.slug)).toEqual([]);
+  });
 });
 
 describe("glossary", () => {
