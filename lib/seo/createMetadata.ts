@@ -28,11 +28,14 @@ export function createMetadata({
   noIndex = false,
 }: CreateMetadataInput): Metadata {
   const canonical = `${APP_URL}${path}`;
+  // No `image` fallback here: when a page doesn't supply its own ogImage, we
+  // omit `images` entirely so Next's app/opengraph-image.tsx file convention
+  // (a real, generated image) applies instead of a hardcoded URL.
   const image = ogImage
     ? ogImage.startsWith("http")
       ? ogImage
       : `${APP_URL}${ogImage}`
-    : `${APP_URL}/og-default.png`;
+    : null;
 
   return {
     title,
@@ -45,14 +48,14 @@ export function createMetadata({
       description,
       url: canonical,
       type,
-      images: [{ url: image, width: 1200, height: 630, alt: title }],
+      ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: title }] } : {}),
       siteName: "MenHealth Digest",
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      ...(image ? { images: [image] } : {}),
     },
   };
 }
