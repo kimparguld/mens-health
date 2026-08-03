@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const RefreshResponse = z.object({
   access_token: z.string(),
+  refresh_token: z.string().optional(),
   expires_in: z.number().optional(),
 });
 
@@ -82,12 +83,19 @@ export async function getValidAccessToken(
     throw new Error(`${platform} token refresh returned unexpected response`);
   }
 
-  const { access_token, expires_in } = parsed.data;
+  const { access_token, refresh_token, expires_in } = parsed.data;
   const tokenExpiry = new Date(Date.now() + (expires_in ?? 3600) * 1000);
 
+  // Some platforms (e.g. X) rotate the refresh token on every use and
+  // invalidate the old one — if we don't persist the new one here, the
+  // next refresh attempt fails and forces the admin to reconnect.
   await db.socialAccount.update({
     where: { platform },
-    data: { accessToken: access_token, tokenExpiry },
+    data: {
+      accessToken: access_token,
+      tokenExpiry,
+      ...(refresh_token ? { refreshToken: refresh_token } : {}),
+    },
   });
 
   return access_token;

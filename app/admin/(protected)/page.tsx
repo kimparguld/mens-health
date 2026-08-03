@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
@@ -7,18 +8,46 @@ type PublishStatus = "PENDING" | "PROCESSED" | "REJECTED" | "PUBLISHED";
 
 type StatusCounts = Record<string, number>;
 
+// A claim needs a human look when it has no verdict at all (NOT_CHECKED —
+// always true for HIGH-risk claims) or when it has an AI-suggested verdict
+// (MEDIUM-risk) that hasn't been confirmed yet. Mirrors the claims page's
+// tab split so the two views agree on what "needs review" means.
+const NEEDS_REVIEW_WHERE: Prisma.ClaimWhereInput = {
+  OR: [
+    { evidenceStatus: "NOT_CHECKED" },
+    {
+      autoReviewed: false,
+      humanConfirmedAt: null,
+      evidenceStatus: { not: "NOT_CHECKED" },
+    },
+  ],
+};
+
 async function getStats(): Promise<{
   total: number;
   byCounts: StatusCounts;
   pendingJobs: number;
   subscribers: number;
+  claimsNeedingReview: number;
+  claimsAutoReviewed: number;
+  claimsReviewed: number;
 }> {
-  const [statusGroups, pendingJobs, subscribers] = await Promise.all([
+  const [
+    statusGroups,
+    pendingJobs,
+    subscribers,
+    claimsNeedingReview,
+    claimsAutoReviewed,
+    claimsReviewed,
+  ] = await Promise.all([
     db.video.groupBy({ by: ["status"], _count: { _all: true } }),
     db.processingJob.count({
       where: { status: { in: ["QUEUED", "RUNNING"] } },
     }),
     db.newsletterSubscriber.count({ where: { unsubscribedAt: null } }),
+    db.claim.count({ where: NEEDS_REVIEW_WHERE }),
+    db.claim.count({ where: { autoReviewed: true } }),
+    db.claim.count({ where: { humanConfirmedAt: { not: null } } }),
   ]);
 
   const byCounts: StatusCounts = {};
@@ -28,7 +57,15 @@ async function getStats(): Promise<{
     total += row._count._all;
   }
 
-  return { total, byCounts, pendingJobs, subscribers };
+  return {
+    total,
+    byCounts,
+    pendingJobs,
+    subscribers,
+    claimsNeedingReview,
+    claimsAutoReviewed,
+    claimsReviewed,
+  };
 }
 
 export default async function AdminDashboardPage() {
@@ -77,6 +114,42 @@ export default async function AdminDashboardPage() {
             </span>
           </Link>
         ))}
+      </div>
+
+      <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <Link
+          href="/admin/claims?status=needs-review"
+          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-amber-300 hover:shadow-md"
+        >
+          <p className="text-sm font-medium text-gray-500">
+            Claims needing your review
+          </p>
+          <p className="mt-1 text-3xl font-semibold text-gray-900">
+            {stats.claimsNeedingReview}
+          </p>
+        </Link>
+        <Link
+          href="/admin/claims?status=auto-reviewed"
+          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+        >
+          <p className="text-sm font-medium text-gray-500">
+            Auto-reviewed, awaiting spot-check
+          </p>
+          <p className="mt-1 text-3xl font-semibold text-gray-900">
+            {stats.claimsAutoReviewed}
+          </p>
+        </Link>
+        <Link
+          href="/admin/claims?status=reviewed"
+          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md"
+        >
+          <p className="text-sm font-medium text-gray-500">
+            Claims reviewed by a human
+          </p>
+          <p className="mt-1 text-3xl font-semibold text-gray-900">
+            {stats.claimsReviewed}
+          </p>
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">

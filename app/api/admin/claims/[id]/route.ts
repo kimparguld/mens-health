@@ -22,6 +22,18 @@ const ClaimUpdateSchema = z.object({
     "UNSUPPORTED",
   ]),
   riskLevel: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  category: z.enum([
+    "NUTRITION",
+    "EXERCISE",
+    "HORMONES",
+    "MENTAL_HEALTH",
+    "SUPPLEMENTS",
+    "MEDICATIONS",
+    "CANCER",
+    "LONGEVITY",
+    "SEXUAL_HEALTH",
+    "OTHER",
+  ]),
   explanation: z.string().max(2000).nullable().optional(),
   sources: z.array(SourceSchema).max(20),
 });
@@ -54,7 +66,8 @@ export async function PATCH(
     return Response.json({ error: "Claim not found" }, { status: 404 });
   }
 
-  const { evidenceStatus, riskLevel, explanation, sources } = parsed.data;
+  const { evidenceStatus, riskLevel, category, explanation, sources } =
+    parsed.data;
 
   const existingIds = new Set(claim.sources.map((s) => s.id));
   const submittedIds = new Set(
@@ -68,7 +81,13 @@ export async function PATCH(
       data: {
         evidenceStatus,
         riskLevel,
+        category,
         explanation: explanation ?? null,
+        // Every manual save is a human touching this claim's verdict —
+        // satisfies the auto-publish gate's "real evidence verdict" check
+        // and clears the auto-reviewed marker regardless of prior state.
+        autoReviewed: false,
+        humanConfirmedAt: new Date(),
       },
     }),
   ];

@@ -152,15 +152,17 @@ model Summary {
 }
 
 model Claim {
-  id             String         @id @default(cuid())
-  videoId        String
-  slug           String?        @unique
-  text           String
-  category       ClaimCategory  @default(OTHER)
-  riskLevel      RiskLevel
-  evidenceStatus EvidenceStatus @default(NOT_CHECKED)
-  explanation    String?
-  createdAt      DateTime       @default(now())
+  id               String         @id @default(cuid())
+  videoId          String
+  slug             String?        @unique
+  text             String
+  category         ClaimCategory  @default(OTHER)
+  riskLevel        RiskLevel
+  evidenceStatus   EvidenceStatus @default(NOT_CHECKED)
+  explanation      String?
+  autoReviewed     Boolean        @default(false)
+  humanConfirmedAt DateTime?
+  createdAt        DateTime       @default(now())
 
   video   Video            @relation(fields: [videoId], references: [id], onDelete: Cascade)
   sources EvidenceSource[]
@@ -273,11 +275,13 @@ model Sponsor {
 // ---------------------------------------------------------------------------
 
 model AdminReview {
-  id        String       @id @default(cuid())
-  videoId   String
-  action    ReviewAction
-  note      String?
-  createdAt DateTime     @default(now())
+  id                   String       @id @default(cuid())
+  videoId              String
+  action               ReviewAction
+  note                 String?
+  acknowledgedHighRisk Boolean      @default(false)
+  acknowledgedBy       String?
+  createdAt            DateTime     @default(now())
 
   video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
 }
@@ -325,6 +329,8 @@ enum ClaimCategory {
   HORMONES
   MENTAL_HEALTH
   SUPPLEMENTS
+  MEDICATIONS
+  CANCER
   LONGEVITY
   SEXUAL_HEALTH
   OTHER

@@ -41,6 +41,8 @@ export default function BulkPublishTable({
   const [loading, setLoading] = useState<"publish" | "summaries" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [acknowledgeHighRisk, setAcknowledgeHighRisk] = useState(false);
+  const [highRiskNote, setHighRiskNote] = useState("");
 
   function sortHref(field: string) {
     const newDir = sortField === field && sortDir === "asc" ? "desc" : "asc";
@@ -81,19 +83,24 @@ export default function BulkPublishTable({
     });
   }
 
+  const highRiskSelected = videos.filter(
+    (v) => selected.has(v.id) && v.riskLevel === "HIGH",
+  );
+
   async function bulkPublish() {
     if (!someSelected) return;
 
-    // Safety check: warn before publishing high-risk videos
-    const highRiskSelected = videos.filter(
-      (v) => selected.has(v.id) && v.riskLevel === "HIGH",
-    );
-    if (highRiskSelected.length > 0) {
-      const names = highRiskSelected.map((v) => v.title).join(", ");
-      const confirmed = window.confirm(
-        `⚠️ Warning: ${highRiskSelected.length} high-risk video(s) are selected:\n\n${names}\n\nHigh-risk videos require explicit admin approval. Are you sure you want to publish them?`,
+    // Server-side enforced: any HIGH-risk video in the batch requires the
+    // acknowledgment checkbox checked and a non-empty note, not just a
+    // dismissible warning.
+    if (
+      highRiskSelected.length > 0 &&
+      (!acknowledgeHighRisk || !highRiskNote.trim())
+    ) {
+      setError(
+        "Check the high-risk acknowledgment box and add a note before publishing.",
       );
-      if (!confirmed) return;
+      return;
     }
 
     setLoading("publish");
@@ -103,7 +110,13 @@ export default function BulkPublishTable({
     const res = await fetch("/api/admin/videos/bulk-review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: Array.from(selected), action: "PUBLISHED" }),
+      body: JSON.stringify({
+        ids: Array.from(selected),
+        action: "PUBLISHED",
+        ...(highRiskSelected.length > 0
+          ? { acknowledgeHighRisk: true, note: highRiskNote.trim() }
+          : {}),
+      }),
     });
 
     if (!res.ok) {
@@ -116,6 +129,8 @@ export default function BulkPublishTable({
     }
 
     setSelected(new Set());
+    setAcknowledgeHighRisk(false);
+    setHighRiskNote("");
     setLoading(null);
     router.refresh();
   }
@@ -167,17 +182,32 @@ export default function BulkPublishTable({
     <>
       {showBulkActions && (
         <div className="mb-3 flex flex-col gap-2">
-          {/* High-risk warning banner */}
-          {someSelected &&
-            showPublishAction &&
-            videos.some(
-              (v) => selected.has(v.id) && v.riskLevel === "HIGH",
-            ) && (
-              <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-800">
-                ⚠️ One or more selected videos is HIGH risk. High-risk videos
-                require explicit admin review before publishing.
-              </div>
-            )}
+          {/* High-risk acknowledgment — required by the server before publish */}
+          {someSelected && showPublishAction && highRiskSelected.length > 0 && (
+            <div className="flex flex-col gap-2 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+              <p>
+                ⚠️ {highRiskSelected.length} selected video(s) are HIGH risk:{" "}
+                {highRiskSelected.map((v) => v.title).join(", ")}. Publishing
+                requires explicit acknowledgment and a note.
+              </p>
+              <label className="flex items-center gap-2 font-medium">
+                <input
+                  type="checkbox"
+                  checked={acknowledgeHighRisk}
+                  onChange={(e) => setAcknowledgeHighRisk(e.target.checked)}
+                  className="rounded border-red-400"
+                />
+                I acknowledge these are high-risk and approve publishing them
+              </label>
+              <textarea
+                value={highRiskNote}
+                onChange={(e) => setHighRiskNote(e.target.value)}
+                placeholder="Required note explaining the approval…"
+                rows={2}
+                className="rounded border border-red-300 px-2 py-1.5 text-sm text-gray-900"
+              />
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500">
               {someSelected

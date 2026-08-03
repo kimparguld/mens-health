@@ -17,6 +17,7 @@ const ReviewBodySchema = z.object({
     "UNPUBLISHED",
   ]),
   note: z.string().max(500).optional(),
+  acknowledgeHighRisk: z.boolean().optional(),
 });
 
 const STATUS_FOR_ACTION = {
@@ -47,7 +48,7 @@ export async function POST(
     );
   }
 
-  const { action, note } = parsed.data;
+  const { action, note, acknowledgeHighRisk } = parsed.data;
 
   const video = await db.video.findUnique({
     where: { id },
@@ -67,11 +68,41 @@ export async function POST(
     );
   }
 
+  // Server-side deny-list for HIGH-risk publish: an admin can still publish
+  // a HIGH-risk video, but only by explicitly acknowledging it with a note —
+  // this replaces the old client-side-only confirm() dialog with a check
+  // that's actually enforced.
+  if (
+    action === "PUBLISHED" &&
+    video.riskLevel === "HIGH" &&
+    (!acknowledgeHighRisk || !note?.trim())
+  ) {
+    return Response.json(
+      {
+        error:
+          "This video is HIGH risk and requires explicit acknowledgment (acknowledgeHighRisk) plus a note before publishing.",
+      },
+      { status: 422 },
+    );
+  }
+
   const newStatus = STATUS_FOR_ACTION[action];
+  const isHighRiskAck =
+    action === "PUBLISHED" &&
+    video.riskLevel === "HIGH" &&
+    acknowledgeHighRisk === true;
 
   const ops: Prisma.PrismaPromise<unknown>[] = [
     db.video.update({ where: { id }, data: { status: newStatus } }),
-    db.adminReview.create({ data: { videoId: id, action, note } }),
+    db.adminReview.create({
+      data: {
+        videoId: id,
+        action,
+        note,
+        acknowledgedHighRisk: isHighRiskAck,
+        acknowledgedBy: isHighRiskAck ? session?.user?.email : null,
+      },
+    }),
   ];
 
   // When a video is published by an admin, mark unchecked claims as MIXED

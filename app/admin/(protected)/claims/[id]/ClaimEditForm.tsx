@@ -10,6 +10,17 @@ type EvidenceStatus =
   | "WEAK"
   | "UNSUPPORTED";
 type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
+type ClaimCategory =
+  | "NUTRITION"
+  | "EXERCISE"
+  | "HORMONES"
+  | "MENTAL_HEALTH"
+  | "SUPPLEMENTS"
+  | "MEDICATIONS"
+  | "CANCER"
+  | "LONGEVITY"
+  | "SEXUAL_HEALTH"
+  | "OTHER";
 
 type Source = {
   id?: string;
@@ -28,6 +39,18 @@ const EVIDENCE_OPTIONS: EvidenceStatus[] = [
   "UNSUPPORTED",
 ];
 const RISK_OPTIONS: RiskLevel[] = ["LOW", "MEDIUM", "HIGH"];
+const CATEGORY_OPTIONS: ClaimCategory[] = [
+  "NUTRITION",
+  "EXERCISE",
+  "HORMONES",
+  "MENTAL_HEALTH",
+  "SUPPLEMENTS",
+  "MEDICATIONS",
+  "CANCER",
+  "LONGEVITY",
+  "SEXUAL_HEALTH",
+  "OTHER",
+];
 
 function emptySource(): Source {
   return { title: "", url: "", source: "", year: null, summary: null };
@@ -37,23 +60,56 @@ export function ClaimEditForm({
   claimId,
   initialEvidenceStatus,
   initialRiskLevel,
+  initialCategory,
   initialExplanation,
   initialSources,
+  autoReviewed,
+  needsConfirmation,
 }: {
   claimId: string;
   initialEvidenceStatus: EvidenceStatus;
   initialRiskLevel: RiskLevel;
+  initialCategory: ClaimCategory;
   initialExplanation: string | null;
   initialSources: Source[];
+  autoReviewed: boolean;
+  needsConfirmation: boolean;
 }) {
   const router = useRouter();
   const [evidenceStatus, setEvidenceStatus] = useState(initialEvidenceStatus);
   const [riskLevel, setRiskLevel] = useState(initialRiskLevel);
+  const [category, setCategory] = useState(initialCategory);
   const [explanation, setExplanation] = useState(initialExplanation ?? "");
   const [sources, setSources] = useState<Source[]>(initialSources);
   const [saving, setSaving] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+
+  async function handleConfirmAsIs() {
+    setConfirming(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/claims/${claimId}/confirm-ai-review`,
+        { method: "POST" },
+      );
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(data?.error ?? "Failed to confirm");
+        return;
+      }
+      setConfirmed(true);
+      router.refresh();
+    } catch {
+      setError("Network error");
+    } finally {
+      setConfirming(false);
+    }
+  }
 
   function updateSource(index: number, patch: Partial<Source>) {
     setSources((prev) =>
@@ -76,6 +132,7 @@ export function ClaimEditForm({
         body: JSON.stringify({
           evidenceStatus,
           riskLevel,
+          category,
           explanation: explanation.trim() || null,
           sources: sources
             .filter((s) => s.title && s.url && s.source)
@@ -104,11 +161,51 @@ export function ClaimEditForm({
 
   return (
     <div className="space-y-6">
+      {needsConfirmation && !confirmed && (
+        <div className="flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <p>
+            {autoReviewed
+              ? "AI-reviewed verdict — auto-applied for this low-risk claim. Spot-check and confirm, or edit below."
+              : "AI-suggested verdict — not yet confirmed by a human. Confirm as-is, or edit below."}
+          </p>
+          <button
+            onClick={handleConfirmAsIs}
+            disabled={confirming}
+            className="shrink-0 rounded-md border border-blue-400 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+          >
+            {confirming ? "Confirming…" : "Confirm as-is"}
+          </button>
+        </div>
+      )}
+      {confirmed && (
+        <p className="rounded bg-green-50 px-3 py-2 text-sm text-green-700">
+          Confirmed.
+        </p>
+      )}
+
       <section className="rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-3 text-sm font-semibold text-gray-700">
           Evidence review
         </h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-gray-600">
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(e) =>
+                setCategory(e.target.value as ClaimCategory)
+              }
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+            >
+              {CATEGORY_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-600">
               Evidence status

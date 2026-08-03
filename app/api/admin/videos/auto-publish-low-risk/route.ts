@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
+import { isEligibleForAutoPublish } from "@/lib/publishing/auto-publish-gate";
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 
@@ -9,16 +10,29 @@ export async function POST(_request: NextRequest) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Find all PROCESSED videos with LOW risk that haven't been published and have a summary
-  const [videos, pendingLowRiskCount] = await Promise.all([
+  // Sweep all PROCESSED videos with a summary through the same auto-publish
+  // gate the daily cron uses — catches LOW-risk videos and, once every claim
+  // has a real evidence verdict, clean MEDIUM-risk videos too. HIGH risk is
+  // never eligible, enforced inside the gate itself.
+  const [candidates, pendingLowRiskCount] = await Promise.all([
     db.video.findMany({
-      where: { status: "PROCESSED", riskLevel: "LOW", summaries: { some: {} } },
-      select: { id: true },
+      where: { status: "PROCESSED", summaries: { some: {} } },
+      select: {
+        id: true,
+        riskLevel: true,
+        claims: {
+          select: { evidenceStatus: true, autoReviewed: true, humanConfirmedAt: true },
+        },
+      },
     }),
     db.video.count({ where: { status: "PENDING", riskLevel: "LOW" } }),
   ]);
 
-  if (videos.length === 0) {
+  const eligible = candidates.filter((video) =>
+    isEligibleForAutoPublish(video, video.claims),
+  );
+
+  if (eligible.length === 0) {
     const hint =
       pendingLowRiskCount > 0
         ? ` (${pendingLowRiskCount} low-risk video(s) are still PENDING — run "Generate summaries" first to process them)`
@@ -30,19 +44,19 @@ export async function POST(_request: NextRequest) {
     });
   }
 
-  const ids = videos.map((v) => v.id);
+  const ids = eligible.map((v) => v.id);
 
   await db.$transaction([
     db.video.updateMany({
       where: { id: { in: ids } },
       data: { status: "PUBLISHED" },
     }),
-    ...ids.map((videoId) =>
+    ...eligible.map((video) =>
       db.adminReview.create({
         data: {
-          videoId,
+          videoId: video.id,
           action: "PUBLISHED",
-          note: "Auto-published: low risk level, no high-risk claims",
+          note: `Auto-published: risk level ${video.riskLevel}, all claims evidence-checked`,
         },
       }),
     ),
@@ -50,5 +64,5 @@ export async function POST(_request: NextRequest) {
 
   revalidateTag("videos", "max");
 
-  return Response.json({ ok: true, published: videos.length });
+  return Response.json({ ok: true, published: eligible.length });
 }

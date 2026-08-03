@@ -77,6 +77,7 @@ export default async function AdminVideoDetailPage({
             videoId={video.id}
             currentStatus={video.status}
             hasSummary={!!summary}
+            riskLevel={video.riskLevel}
           />
           {video.status === "PUBLISHED" && (
             <GenerateSocialButton videoId={video.id} />

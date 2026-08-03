@@ -1,37 +1,24 @@
+import type { RiskLevel } from "@prisma/client";
 import { db } from "@/lib/db/prisma";
-import { summarizeVideo } from "@/lib/ai/summarize-video";
-import { extractClaims, type ExtractedClaim } from "@/lib/ai/extract-claims";
+import { generateSummaryAndClaims } from "@/lib/videos/process-video-pipeline";
 import { generateEditorialTitle } from "@/lib/ai/generate-editorial-title";
+import { isEligibleForAutoPublish } from "@/lib/publishing/auto-publish-gate";
 import { submitUrlsToIndexNow } from "@/lib/seo/indexnow";
 import { notifyCreatorIfApplicable } from "@/lib/creators/notify";
 import { env } from "@/env";
 
-// Heuristic evidence score (0–1) derived from extracted claim risk levels.
-// Serves as a proxy until admin claim-checking is implemented.
+// Heuristic evidence score (0–1) derived from persisted claim risk levels.
+// Serves as a proxy until every claim has a real evidence verdict.
 // LOW claims → 0.8, MEDIUM → 0.5, HIGH → 0.2; null if no claims extracted.
-function deriveEvidenceScore(claims: ExtractedClaim[]): number | null {
+function deriveEvidenceScore(claims: { riskLevel: RiskLevel }[]): number | null {
   if (claims.length === 0) return null;
-  const RISK_SCORE: Record<string, number> = {
+  const RISK_SCORE: Record<RiskLevel, number> = {
     LOW: 0.8,
     MEDIUM: 0.5,
     HIGH: 0.2,
   };
-  const total = claims.reduce(
-    (sum, c) => sum + (RISK_SCORE[c.riskLevel] ?? 0.5),
-    0,
-  );
+  const total = claims.reduce((sum, c) => sum + RISK_SCORE[c.riskLevel], 0);
   return parseFloat((total / claims.length).toFixed(4));
-}
-
-function generateClaimSlug(text: string, id: string): string {
-  const base = text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 60)
-    .replace(/-+$/, "");
-  return `${base}-${id.slice(-6)}`;
 }
 
 const BATCH_SIZE = 5;
@@ -78,41 +65,27 @@ export async function processPendingVideos(options?: {
 
       const { video } = job;
 
-      // --- Generate summary ---
-      const summaryResult = await summarizeVideo({
-        title: video.title,
-        description: video.description ?? "",
-        channelTitle:
-          (await db.channel.findUnique({ where: { id: video.channelId } }))
-            ?.title ?? "",
-        durationSeconds: video.durationSeconds ?? 0,
-      });
-
-      if (!summaryResult.ok) {
-        throw new Error(`Summary failed: ${summaryResult.error.message}`);
-      }
-
-      const summary = await db.summary.create({
-        data: {
-          videoId: video.id,
-          shortSummary: summaryResult.value.shortSummary,
-          longSummary: summaryResult.value.longSummary,
-          takeaways: summaryResult.value.takeaways,
-          warnings: summaryResult.value.warnings ?? [],
-          targetAudience: summaryResult.value.targetAudience,
-          redFlags: summaryResult.value.redFlags ?? [],
-          modelUsed: "claude-sonnet-4-5",
-        },
-      });
-
-      // --- Generate an SEO-friendly editorial title (raw YouTube title is kept as-is) ---
-      const channelForTitle = await db.channel.findUnique({
+      const channel = await db.channel.findUnique({
         where: { id: video.channelId },
       });
+
+      const pipelineResult = await generateSummaryAndClaims(
+        video,
+        channel?.title ?? "",
+        { modelUsed: "claude-sonnet-4-5" },
+      );
+
+      if (!pipelineResult.ok) {
+        throw new Error(`Summary failed: ${pipelineResult.error.message}`);
+      }
+
+      const { claims } = pipelineResult.value;
+
+      // --- Generate an SEO-friendly editorial title (raw YouTube title is kept as-is) ---
       const editorialTitleResult = await generateEditorialTitle({
         title: video.title,
-        shortSummary: summary.shortSummary,
-        channelTitle: channelForTitle?.title ?? "",
+        shortSummary: pipelineResult.value.summary.shortSummary,
+        channelTitle: channel?.title ?? "",
       });
       if (editorialTitleResult.ok) {
         await db.video.update({
@@ -125,67 +98,20 @@ export async function processPendingVideos(options?: {
         );
       }
 
-      // --- Extract claims ---
-      const claimsResult = await extractClaims({
-        title: video.title,
-        description: video.description ?? "",
-        shortSummary: summary.shortSummary,
-      });
-
-      if (!claimsResult.ok) {
-        console.warn(
-          `Claim extraction failed for video ${video.id}: ${claimsResult.error.message}`,
-        );
-        // Non-fatal — continue without claims
-      } else {
-        const hasHighRiskClaims = claimsResult.value.some(
-          (c) => c.riskLevel === "HIGH",
-        );
-
-        // Create claims individually so we can generate a human-readable slug
-        // from the claim text + a short id suffix for uniqueness.
-        for (const claim of claimsResult.value) {
-          const created = await db.claim.create({
-            data: {
-              videoId: video.id,
-              text: claim.text,
-              category: claim.category,
-              riskLevel: claim.riskLevel,
-              evidenceStatus: "NOT_CHECKED",
-              explanation: claim.explanation,
-            },
-          });
-          await db.claim.update({
-            where: { id: created.id },
-            data: { slug: generateClaimSlug(claim.text, created.id) },
-          });
-        }
-
-        // Escalate risk level if high-risk claims found
-        if (hasHighRiskClaims && video.riskLevel === "LOW") {
-          await db.video.update({
-            where: { id: video.id },
-            data: { riskLevel: "HIGH" },
-          });
-        }
-      }
-
-      // Re-fetch the video to get the latest riskLevel (may have been escalated above)
+      // Re-fetch the video to get the latest riskLevel (may have been escalated by the pipeline)
       const latestVideo = await db.video.findUnique({
         where: { id: video.id },
         select: { riskLevel: true },
       });
 
-      // LOW risk videos auto-publish; anything else requires admin review
-      const finalStatus =
-        latestVideo?.riskLevel === "LOW" ? "PUBLISHED" : "PROCESSED";
+      const finalStatus = isEligibleForAutoPublish(
+        { riskLevel: latestVideo?.riskLevel ?? video.riskLevel },
+        claims,
+      )
+        ? "PUBLISHED"
+        : "PROCESSED";
 
-      // Derive a heuristic evidenceScore from extracted claim risk levels.
-      // HIGH-risk claims drag the score down; LOW-risk claims push it up.
-      // This is a proxy until admin claim-checking is implemented.
-      const evidenceScore = deriveEvidenceScore(
-        claimsResult.ok ? claimsResult.value : [],
-      );
+      const evidenceScore = deriveEvidenceScore(claims);
 
       await db.video.update({
         where: { id: video.id },
@@ -197,7 +123,7 @@ export async function processPendingVideos(options?: {
           data: {
             videoId: video.id,
             action: "PUBLISHED",
-            note: "Auto-published: no high-risk claims detected (risk level LOW)",
+            note: `Auto-published: risk level ${latestVideo?.riskLevel ?? video.riskLevel}, all claims evidence-checked`,
           },
         });
         await submitUrlsToIndexNow([

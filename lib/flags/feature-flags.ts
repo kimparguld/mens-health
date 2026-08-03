@@ -12,3 +12,11 @@ export const premium = {
     return false; // Change this to true to enable premium features
   },
 };
+
+// Instant kill switch for MEDIUM-risk video auto-publish (see
+// lib/publishing/auto-publish-gate.ts) — flip to false to pause it without
+// a deploy if something looks wrong. HIGH-risk auto-publish is never gated
+// behind a flag: it is hard-disabled in code with no override.
+export const mediumRiskAutoPublish = {
+  isEnabled: () => true,
+};
