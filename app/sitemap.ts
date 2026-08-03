@@ -1,6 +1,7 @@
 import { db } from '@/lib/db/prisma';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { GLOSSARY_TERMS } from '@/lib/seo/glossary';
 import { type MetadataRoute } from 'next';
 
 // Serve at request time so the build doesn't need a DB connection.
@@ -132,12 +133,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const glossaryUrls: MetadataRoute.Sitemap = GLOSSARY_TERMS.map((term) => ({
+    url: `${BASE_URL}/glossary/${term.slug}`,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
+
   const staticUrls: MetadataRoute.Sitemap = [
     {
       url: `${BASE_URL}/newsletter`,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    { url: `${BASE_URL}/glossary`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE_URL}/faq`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/about`, changeFrequency: 'monthly', priority: 0.5 },
     {
       url: `${BASE_URL}/editorial-process`,
@@ -169,6 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     ...staticUrls,
+    ...glossaryUrls,
     ...topicUrls,
     ...weeklyUrls,
     ...rankingUrls,
