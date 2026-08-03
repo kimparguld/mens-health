@@ -134,6 +134,7 @@ export default async function VideoPage({ params }: { params: Params }) {
     youtubeVideoId: video.youtubeVideoId,
     appUrl: APP_URL,
     slug: video.slug,
+    durationSeconds: video.durationSeconds,
   });
 
   const displayTitle = video.editorialTitle ?? video.title;
