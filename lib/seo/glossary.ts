@@ -265,3 +265,12 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
 export function getGlossaryTerm(slug: string): GlossaryTerm | null {
   return GLOSSARY_TERMS.find((t) => t.slug === slug) ?? null;
 }
+
+export function getGlossaryTermsForTopics(
+  topicSlugs: string[],
+  limit = 5,
+): GlossaryTerm[] {
+  return GLOSSARY_TERMS.filter((t) =>
+    t.relatedTopicSlugs.some((s) => topicSlugs.includes(s)),
+  ).slice(0, limit);
+}
