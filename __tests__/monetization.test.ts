@@ -52,7 +52,7 @@ describe("getActiveSponsor", () => {
 
     await getActiveSponsor();
 
-    const query = mockFindFirst.mock.calls[0][0] as {
+    const query = mockFindFirst.mock.calls[0]![0] as {
       where: { isActive: boolean };
     };
     expect(query.where.isActive).toBe(true);
@@ -74,7 +74,7 @@ describe("getAffiliateLinksForTopic", () => {
     const result = await getAffiliateLinksForTopic("fitness");
     expect(result).toEqual(links);
 
-    const query = mockFindMany.mock.calls[0][0] as {
+    const query = mockFindMany.mock.calls[0]![0] as {
       where: { isActive: boolean; OR: unknown[] };
     };
     expect(query.where.isActive).toBe(true);
@@ -87,7 +87,7 @@ describe("getAffiliateLinksForTopic", () => {
 
     await getAffiliateLinksForTopic(null);
 
-    const query = mockFindMany.mock.calls[0][0] as {
+    const query = mockFindMany.mock.calls[0]![0] as {
       where: { OR: unknown[] };
     };
     // Should not include a topicSlug filter entry when slug is null
@@ -118,7 +118,7 @@ describe("deactivateExpiredSponsors", () => {
 
     await deactivateExpiredSponsors();
 
-    const query = mockUpdateMany.mock.calls[0][0] as {
+    const query = mockUpdateMany.mock.calls[0]![0] as {
       where: { isActive: boolean; endDate: { lt: Date } };
       data: { isActive: boolean };
     };
