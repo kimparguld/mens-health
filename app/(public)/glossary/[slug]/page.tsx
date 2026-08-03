@@ -4,7 +4,7 @@ import Link from "next/link";
 import { GLOSSARY_TERMS, getGlossaryTerm } from "@/lib/seo/glossary";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
+import { buildBreadcrumbSchema, buildDefinedTermSchema } from "@/lib/seo/json-ld";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 
@@ -72,14 +72,12 @@ export default async function GlossaryTermPage({
     { name: term.term, url: `${APP_URL}/glossary/${slug}` },
   ]);
 
-  const definedTermSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
+  const definedTermSchema = buildDefinedTermSchema({
     name: term.term,
     description: term.longDefinition,
     url: `${APP_URL}/glossary/${slug}`,
-    inDefinedTermSet: `${APP_URL}/glossary`,
-  };
+    inDefinedTermSetUrl: `${APP_URL}/glossary`,
+  });
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">

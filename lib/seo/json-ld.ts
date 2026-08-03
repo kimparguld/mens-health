@@ -146,6 +146,51 @@ export type PersonSchemaInput = {
   jobTitle?: string;
 };
 
+export type DefinedTermInput = {
+  name: string;
+  description: string;
+  url: string;
+  inDefinedTermSetUrl?: string;
+};
+
+export function buildDefinedTermSchema(
+  input: DefinedTermInput,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    ...(input.inDefinedTermSetUrl
+      ? { inDefinedTermSet: input.inDefinedTermSetUrl }
+      : {}),
+  };
+}
+
+export type DefinedTermSetInput = {
+  name: string;
+  url: string;
+  terms: Array<{ name: string; description: string; url: string }>;
+};
+
+export function buildDefinedTermSetSchema(
+  input: DefinedTermSetInput,
+): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "DefinedTermSet",
+    name: input.name,
+    url: input.url,
+    hasDefinedTerm: input.terms.map((term) => ({
+      "@type": "DefinedTerm",
+      name: term.name,
+      description: term.description,
+      url: term.url,
+    })),
+  };
+}
+
 export function buildPersonSchema(
   input: PersonSchemaInput,
 ): Record<string, unknown> {
