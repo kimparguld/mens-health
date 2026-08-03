@@ -172,7 +172,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     relatedTopicSlugs: ["erectile-dysfunction"],
   },
   {
-    slug: "erectile-dysfunction-term",
+    slug: "erectile-dysfunction",
     term: "Erectile Dysfunction (ED)",
     shortDefinition:
       "The persistent inability to achieve or maintain an erection sufficient for sexual activity.",
