@@ -1,5 +1,14 @@
 // Pure JSON-LD schema builders. No I/O — easily unit-tested.
 
+/** Formats whole seconds as an ISO 8601 duration (e.g. 330 -> "PT5M30S"), as required by schema.org's VideoObject.duration. */
+export function secondsToIso8601Duration(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.round(totalSeconds));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+  return `PT${hours > 0 ? `${hours}H` : ""}${minutes > 0 ? `${minutes}M` : ""}${remainingSeconds > 0 || (hours === 0 && minutes === 0) ? `${remainingSeconds}S` : ""}`;
+}
+
 export type VideoObjectInput = {
   title: string;
   description: string;
@@ -9,6 +18,7 @@ export type VideoObjectInput = {
   youtubeVideoId: string;
   appUrl: string;
   slug: string;
+  durationSeconds?: number | null;
 };
 
 export function buildVideoObjectSchema(input: VideoObjectInput) {
@@ -19,6 +29,10 @@ export function buildVideoObjectSchema(input: VideoObjectInput) {
     description: input.description,
     thumbnailUrl: input.thumbnailUrl ?? undefined,
     uploadDate: new Date(input.publishedAt).toISOString(),
+    duration:
+      input.durationSeconds != null
+        ? secondsToIso8601Duration(input.durationSeconds)
+        : undefined,
     publisher: {
       "@type": "Organization",
       name: input.channelTitle,

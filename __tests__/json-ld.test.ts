@@ -6,6 +6,7 @@ import {
   buildItemListSchema,
   buildDefinedTermSchema,
   buildDefinedTermSetSchema,
+  secondsToIso8601Duration,
 } from "@/lib/seo/json-ld";
 
 describe("buildVideoObjectSchema", () => {
@@ -39,6 +40,36 @@ describe("buildVideoObjectSchema", () => {
   it("omits thumbnailUrl when null", () => {
     const schema = buildVideoObjectSchema({ ...base, thumbnailUrl: null });
     expect(schema.thumbnailUrl).toBeUndefined();
+  });
+
+  it("sets duration as an ISO 8601 string when durationSeconds is provided", () => {
+    const schema = buildVideoObjectSchema({ ...base, durationSeconds: 330 });
+    expect(schema.duration).toBe("PT5M30S");
+  });
+
+  it("omits duration when durationSeconds is null or absent", () => {
+    expect(
+      buildVideoObjectSchema({ ...base, durationSeconds: null }).duration,
+    ).toBeUndefined();
+    expect(buildVideoObjectSchema(base).duration).toBeUndefined();
+  });
+});
+
+describe("secondsToIso8601Duration", () => {
+  it("formats minutes and seconds", () => {
+    expect(secondsToIso8601Duration(330)).toBe("PT5M30S");
+  });
+
+  it("formats hours, minutes, and seconds", () => {
+    expect(secondsToIso8601Duration(3725)).toBe("PT1H2M5S");
+  });
+
+  it("formats whole minutes without a trailing 0S", () => {
+    expect(secondsToIso8601Duration(300)).toBe("PT5M");
+  });
+
+  it("formats zero seconds as PT0S", () => {
+    expect(secondsToIso8601Duration(0)).toBe("PT0S");
   });
 });
 
