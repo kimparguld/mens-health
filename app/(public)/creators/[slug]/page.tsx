@@ -306,7 +306,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 <p className="text-gray-500">
                   {channel
                     ? "Videos from this creator will appear here once they've been indexed."
-                    : "This creator has not been indexed yet. Check back soon."}
+                    : "We haven't indexed any videos from this creator yet — our system surfaces videos by topic, so coverage varies by creator."}
                 </p>
                 <Link
                   href="/"

@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import { auth } from "@/lib/auth";
-import { SiteHeader } from "@/components/ui/SiteHeader";
+import { SiteHeader } from '@/components/ui/SiteHeader';
+import { auth } from '@/lib/auth';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 type SessionUser = {
   name?: string | null;
@@ -10,12 +10,12 @@ type SessionUser = {
 };
 
 const FOOTER_TOPICS = [
-  { slug: "testosterone", name: "Testosterone" },
-  { slug: "sleep", name: "Sleep" },
-  { slug: "fitness-over-40", name: "Fitness Over 40" },
-  { slug: "nutrition", name: "Nutrition" },
-  { slug: "longevity", name: "Longevity" },
-  { slug: "supplements", name: "Supplements" },
+  { slug: 'testosterone', name: 'Testosterone' },
+  { slug: 'sleep', name: 'Sleep' },
+  { slug: 'fitness-over-40', name: 'Fitness Over 40' },
+  { slug: 'nutrition', name: 'Nutrition' },
+  { slug: 'longevity', name: 'Longevity' },
+  { slug: 'supplements', name: 'Supplements' },
 ];
 
 async function AuthedHeader() {
@@ -43,9 +43,9 @@ export default async function PublicLayout({
 
       <footer className="border-t border-gray-200 bg-gray-50">
         <div className="mx-auto max-w-[1120px] px-4 py-12">
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {/* Brand */}
-            <div>
+            <div className="col-span-2 sm:col-span-1">
               <Link
                 href="/"
                 className="text-lg font-bold tracking-tight text-gray-900"

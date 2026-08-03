@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { premium } from "@/lib/flags/feature-flags";
+import { premium } from '@/lib/flags/feature-flags';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 type SessionUser = {
   name?: string | null;
@@ -17,30 +17,30 @@ interface SiteHeaderProps {
 
 const navLinks = [
   {
-    href: "/rankings",
-    label: "Rankings",
-    className: "text-gray-600 hover:text-emerald-700",
+    href: '/rankings',
+    label: 'Rankings',
+    className: 'font-semibold text-gray-800 hover:text-emerald-700',
   },
   {
-    href: "/creators",
-    label: "Creators",
-    className: "text-gray-600 hover:text-emerald-700",
+    href: '/creators',
+    label: 'Creators',
+    className: 'font-semibold text-gray-800 hover:text-emerald-700',
   },
   {
-    href: "/weekly",
-    label: "Weekly",
-    className: "text-gray-600 hover:text-emerald-700",
+    href: '/weekly',
+    label: 'Weekly',
+    className: 'font-semibold text-gray-800 hover:text-emerald-700',
   },
   {
-    href: "/how-we-rate-evidence",
-    label: "How It Works",
-    className: "text-gray-600 hover:text-emerald-700",
+    href: '/how-we-rate-evidence',
+    label: 'How It Works',
+    className: 'font-semibold text-gray-800 hover:text-emerald-700',
   },
   {
-    href: "/newsletter",
-    label: "Newsletter",
+    href: '/newsletter',
+    label: 'Newsletter',
     className:
-      "rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700",
+      'rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700',
   },
 ];
 
@@ -116,16 +116,19 @@ export function SiteHeader({ user }: SiteHeaderProps) {
   // Lock body scroll while either drawer is open
   useEffect(() => {
     document.body.style.overflow =
-      nav.mounted || topics.mounted ? "hidden" : "";
+      nav.mounted || topics.mounted ? 'hidden' : '';
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     };
   }, [nav.mounted, topics.mounted]);
 
   return (
     <>
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-4">
+      <header
+        className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur-sm"
+        style={{ backgroundColor: '#00986663' }}
+      >
+        <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-2 lg:py-4">
           <Link
             href="/"
             className="text-xl font-bold tracking-tight text-emerald-700 hover:text-emerald-600"
@@ -138,7 +141,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             <button
               type="button"
               onClick={topics.open}
-              className="cursor-pointer text-gray-600 hover:text-emerald-700"
+              className="cursor-pointer font-semibold text-gray-800 hover:text-emerald-700"
             >
               Topics
             </button>
@@ -152,7 +155,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 href="/account"
                 className="rounded-lg border border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
               >
-                {user.name ?? user.email ?? "Account"}
+                {user.name ?? user.email ?? 'Account'}
               </Link>
             ) : (
               <Link
@@ -192,10 +195,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             onClick={closeDrawer}
             aria-hidden="true"
             className={[
-              "fixed inset-0 z-40 bg-black/60 transition-opacity md:hidden",
+              'fixed inset-0 z-40 bg-black/60 transition-opacity md:hidden',
               `duration-[${TRANSITION_MS}ms]`,
-              visible ? "opacity-100" : "opacity-0",
-            ].join(" ")}
+              visible ? 'opacity-100' : 'opacity-0',
+            ].join(' ')}
           />
 
           {/* Drawer panel — full height, 85 vw up to 360 px */}
@@ -204,10 +207,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             aria-modal="true"
             aria-label="Navigation menu"
             className={[
-              "fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col bg-white shadow-2xl md:hidden",
+              'fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col bg-white shadow-2xl md:hidden',
               `transition-transform duration-[${TRANSITION_MS}ms] ease-in-out`,
-              visible ? "translate-x-0" : "translate-x-full",
-            ].join(" ")}
+              visible ? 'translate-x-0' : 'translate-x-full',
+            ].join(' ')}
           >
             {/* Drawer header */}
             <div className="flex items-center justify-between px-6 py-5">
@@ -289,7 +292,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                   onClick={closeDrawer}
                   className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium text-gray-800 transition-colors hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
                 >
-                  {user.name ?? user.email ?? "Account"}
+                  {user.name ?? user.email ?? 'Account'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
@@ -368,10 +371,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             onClick={topics.close}
             aria-hidden="true"
             className={[
-              "fixed inset-0 z-40 bg-black/60 transition-opacity",
+              'fixed inset-0 z-40 bg-black/60 transition-opacity',
               `duration-[${TRANSITION_MS}ms]`,
-              topics.visible ? "opacity-100" : "opacity-0",
-            ].join(" ")}
+              topics.visible ? 'opacity-100' : 'opacity-0',
+            ].join(' ')}
           />
 
           {/* Drawer panel */}
@@ -380,10 +383,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             aria-modal="true"
             aria-label="Browse topics"
             className={[
-              "fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col bg-white shadow-2xl",
+              'fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col bg-white shadow-2xl',
               `transition-transform duration-[${TRANSITION_MS}ms] ease-in-out`,
-              topics.visible ? "translate-x-0" : "translate-x-full",
-            ].join(" ")}
+              topics.visible ? 'translate-x-0' : 'translate-x-full',
+            ].join(' ')}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5">
