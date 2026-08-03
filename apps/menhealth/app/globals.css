@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+input,
+textarea {
+  color: var(--color-gray-600);
+}
+
+button,
+a {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.mh-logotype {
+  --mh-logo-mark-size: 2.45rem;
+  --mh-logo-wordmark-height: 2.45rem;
+  --mh-logo-top-size: 0.66rem;
+  --mh-logo-bottom-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.62rem;
+  color: #0f766e;
+  padding-top: 0.3rem;
+}
+
+.mh-logotype-mark {
+  width: var(--mh-logo-mark-size);
+  height: var(--mh-logo-mark-size);
+  display: inline-flex;
+  filter: drop-shadow(0 5px 11px rgba(6, 95, 70, 0.22));
+}
+
+.mh-logotype-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mh-logotype-mark-wave {
+  stroke: #ecfeff;
+  stroke-width: 3.2;
+  opacity: 0.95;
+}
+
+.mh-logotype-mark-shield {
+  fill: rgba(236, 253, 245, 0.78);
+  stroke: rgba(16, 185, 129, 0.88);
+  stroke-width: 1.6;
+}
+
+.mh-logotype-wordmark {
+  min-height: var(--mh-logo-wordmark-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.06;
+  padding-block: 0.05rem 0.09rem;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.mh-logotype-top {
+  display: block;
+  font-size: var(--mh-logo-top-size);
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  color: #065f46;
+  padding-top: 0.1rem;
+  text-transform: uppercase;
+}
+
+.mh-logotype-bottom {
+  display: block;
+  line-height: 1.3;
+  font-size: var(--mh-logo-bottom-size);
+  font-family:
+    var(--font-logotype), "Iowan Old Style", "Palatino Linotype",
+    "Book Antiqua", serif;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #064e3b;
+}
+
+.mh-logotype:hover .mh-logotype-mark,
+.mh-logotype:focus-visible .mh-logotype-mark {
+  animation: mh-logo-pulse 600ms ease-out;
+}
+
+.mh-logotype:hover .mh-logotype-bottom,
+.mh-logotype:focus-visible .mh-logotype-bottom {
+  background: linear-gradient(90deg, #00150f, #00150f, #00150f);
+  background-size: 210% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mh-logo-sweep 850ms ease-out;
+}
+
+@keyframes mh-logo-sweep {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@keyframes mh-logo-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mh-logotype:hover .mh-logotype-mark,
+  .mh-logotype:focus-visible .mh-logotype-mark,
+  .mh-logotype:hover .mh-logotype-bottom,
+  .mh-logotype:focus-visible .mh-logotype-bottom {
+    animation: none;
+  }
+}

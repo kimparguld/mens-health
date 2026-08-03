@@ -22,27 +22,30 @@ Mirrors the fuller Copilot instructions in `.github/copilot-instructions.md` and
 
 ## Stack and architecture
 
-- Next.js App Router, TypeScript strict, Tailwind + shadcn/ui, PostgreSQL + Prisma, Auth.js v5.
-- AI calls go through `lib/ai/client.ts`, which exposes an `anthropic.messages.create()`-shaped wrapper but actually falls back through Groq → OpenRouter (free models) → OpenAI → Gemini. Note: the `callAnthropic` branch there is currently broken (missing auth header, and parses the response in OpenAI's `choices[]` shape instead of Anthropic's `content[]` shape) — in practice every request falls through to Groq.
+- pnpm/Turborepo monorepo. `apps/menhealth` is this site; `packages/*` hold machinery shared across sites (see `docs/adding-a-new-site.md`). Next.js App Router, TypeScript strict, Tailwind + shadcn/ui, PostgreSQL + Prisma, Auth.js v5.
+- AI calls go through `packages/core-ai`'s `createAiClient()`, instantiated once in `apps/menhealth/lib/ai/client.ts` with this site's env. It exposes an `anthropic.messages.create()`-shaped wrapper but actually falls back through Groq → OpenRouter (free models) → OpenAI → Gemini.
 - Admin routes are gated by a session check in `app/admin/(protected)/layout.tsx` (via `lib/auth`), not a root `middleware.ts`.
 - Cron/internal routes are protected by an `x-cron-secret` header check.
 - Server Components by default; `"use client"` only for interactivity. Route handlers in `app/api/`. All external API I/O validated with Zod at the boundary. AI/domain functions return `Result<T, E>` rather than throwing.
+- Topics, creators, brand strings, and compliance keyword lists live in `apps/menhealth/site.config.ts` (validated by `@menhealth/site-kit` at import time) — that's the single file a new site fills in.
 
 ## Repository structure
 
 ```
-app/(public)/          # Public-facing pages
-app/admin/(protected)/ # Admin dashboard (session-gated in its layout)
-app/api/                # Route handlers (admin/, social/, cron/, stripe/, newsletter/, youtube/, ai/, seo/)
-components/             # Shared components (ui/, video/, seo/, newsletter/, monetization/, ads/, growth-plan/)
-lib/youtube/            # YouTube API client, scoring, topic/creator seeds
-lib/ai/                 # AI abstraction layer (see fallback chain above)
-lib/social/             # Social content engine: generation, platform rules, UTM, adapters/
-lib/db/                 # Prisma singleton + queries
-lib/auth/               # Auth.js config
-lib/seo/, lib/monetization/, lib/newsletter/, lib/resend/, lib/stripe/, lib/flags/, lib/growth-plan/
-jobs/                   # Background job functions (invoked by cron API routes)
-prisma/                 # Schema and migrations
+apps/menhealth/            # This site
+  app/(public)/             # Public-facing pages
+  app/admin/(protected)/    # Admin dashboard (session-gated in its layout)
+  app/api/                  # Route handlers (admin/, social/, cron/, stripe/, newsletter/, youtube/, ai/, seo/)
+  components/                # Site-only components (BrandLogotype, SiteHeader) + growth-plan/, topic/
+  lib/                       # Thin per-concern wrappers that instantiate packages/core-* with this site's env/data
+  jobs/                      # Background job functions (invoked by cron API routes)
+  prisma/                    # Schema and migrations (this site's own DB)
+  site.config.ts             # Topics, creators, brand, compliance keyword lists
+packages/
+  ui/                        # Shared presentational components
+  core-youtube/, core-ai/, core-compliance/, core-social/   # Discovery/AI/gate/social pipeline
+  core-seo/, core-monetization/, core-newsletter/, core-auth/
+  site-kit/                   # SiteConfig type + validation used by site.config.ts
 ```
 
 ## Quality standards
