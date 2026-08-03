@@ -1,8 +1,45 @@
+import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { db } from "@/lib/db/prisma";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 
 type SearchParams = Promise<{ status?: string; page?: string }>;
+
+// A claim needs a human look when it has no verdict at all (NOT_CHECKED —
+// always true for HIGH-risk claims) or when it has an AI-suggested verdict
+// (MEDIUM-risk) that hasn't been confirmed yet.
+const NEEDS_REVIEW_WHERE: Prisma.ClaimWhereInput = {
+  OR: [
+    { evidenceStatus: "NOT_CHECKED" },
+    {
+      autoReviewed: false,
+      humanConfirmedAt: null,
+      evidenceStatus: { not: "NOT_CHECKED" },
+    },
+  ],
+};
+const AUTO_REVIEWED_WHERE: Prisma.ClaimWhereInput = { autoReviewed: true };
+const REVIEWED_WHERE: Prisma.ClaimWhereInput = {
+  humanConfirmedAt: { not: null },
+};
+
+const EVIDENCE_STATUS_VALUES = [
+  "NOT_CHECKED",
+  "SUPPORTED",
+  "MIXED",
+  "WEAK",
+  "UNSUPPORTED",
+] as const;
+
+function whereForStatus(status: string): Prisma.ClaimWhereInput {
+  if (status === "needs-review") return NEEDS_REVIEW_WHERE;
+  if (status === "auto-reviewed") return AUTO_REVIEWED_WHERE;
+  if (status === "reviewed") return REVIEWED_WHERE;
+  if ((EVIDENCE_STATUS_VALUES as readonly string[]).includes(status)) {
+    return { evidenceStatus: status as (typeof EVIDENCE_STATUS_VALUES)[number] };
+  }
+  return {};
+}
 
 export default async function AdminClaimsPage({
   searchParams,
@@ -14,48 +51,43 @@ export default async function AdminClaimsPage({
   const take = 50;
   const skip = (page - 1) * take;
 
-  const allowedStatuses = [
-    "NOT_CHECKED",
-    "SUPPORTED",
-    "MIXED",
-    "WEAK",
-    "UNSUPPORTED",
-  ] as const;
-  type EvidenceStatus = (typeof allowedStatuses)[number];
+  const where = status !== "all" ? whereForStatus(status) : {};
 
-  const where =
-    status !== "all" && (allowedStatuses as readonly string[]).includes(status)
-      ? { evidenceStatus: status as EvidenceStatus }
-      : {};
-
-  const [claims, total, notCheckedCount] = await Promise.all([
-    db.claim.findMany({
-      where,
-      skip,
-      take,
-      orderBy: { createdAt: "desc" },
-      include: {
-        video: {
-          select: {
-            title: true,
-            slug: true,
-            status: true,
+  const [claims, total, needsReviewCount, autoReviewedCount] =
+    await Promise.all([
+      db.claim.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+        include: {
+          video: {
+            select: {
+              title: true,
+              slug: true,
+              status: true,
+            },
           },
         },
-      },
-    }),
-    db.claim.count({ where }),
-    db.claim.count({ where: { evidenceStatus: "NOT_CHECKED" } }),
-  ]);
+      }),
+      db.claim.count({ where }),
+      db.claim.count({ where: NEEDS_REVIEW_WHERE }),
+      db.claim.count({ where: AUTO_REVIEWED_WHERE }),
+    ]);
 
   const totalPages = Math.ceil(total / take);
 
   const statusTabs = [
     { label: "All", value: "all" },
     {
-      label: `Not reviewed (${notCheckedCount})`,
-      value: "NOT_CHECKED",
+      label: `Needs your review (${needsReviewCount})`,
+      value: "needs-review",
     },
+    {
+      label: `Auto-reviewed, awaiting spot-check (${autoReviewedCount})`,
+      value: "auto-reviewed",
+    },
+    { label: "Reviewed", value: "reviewed" },
     { label: "Supported", value: "SUPPORTED" },
     { label: "Mixed", value: "MIXED" },
     { label: "Weak", value: "WEAK" },
@@ -66,16 +98,16 @@ export default async function AdminClaimsPage({
     <div className="max-w-5xl">
       <h1 className="mb-2 text-2xl font-bold text-gray-900">Claims</h1>
       <p className="mb-4 text-sm text-gray-500">
-        All extracted claims. Claims marked <strong>Not reviewed</strong> have
-        not been checked against evidence — review and update their status
-        before publishing.
+        Low-risk claims are fact-checked and reviewed automatically; medium-risk
+        claims get an AI-suggested verdict pending your one-click confirm;
+        high-risk claims always require full manual review.
       </p>
 
-      {notCheckedCount > 0 && (
+      {needsReviewCount > 0 && (
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          ⚠️ <strong>{notCheckedCount}</strong> claim
-          {notCheckedCount !== 1 ? "s" : ""} still need evidence review.{" "}
-          <Link href="/admin/claims?status=NOT_CHECKED" className="underline">
+          ⚠️ <strong>{needsReviewCount}</strong> claim
+          {needsReviewCount !== 1 ? "s" : ""} still need your review.{" "}
+          <Link href="/admin/claims?status=needs-review" className="underline">
             Filter to show them →
           </Link>
         </div>
@@ -136,10 +168,17 @@ export default async function AdminClaimsPage({
                     <p className="line-clamp-2 text-gray-900">{claim.text}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <EvidenceBadge
-                      status={claim.evidenceStatus}
-                      showNotChecked
-                    />
+                    <div className="flex flex-col gap-1">
+                      <EvidenceBadge
+                        status={claim.evidenceStatus}
+                        showNotChecked
+                      />
+                      {claim.autoReviewed && (
+                        <span className="inline-flex w-fit items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                          Auto-reviewed
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <span

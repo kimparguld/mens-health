@@ -57,6 +57,7 @@ export default async function AdminClaimEditPage({
         claimId={claim.id}
         initialEvidenceStatus={claim.evidenceStatus}
         initialRiskLevel={claim.riskLevel}
+        initialCategory={claim.category}
         initialExplanation={claim.explanation}
         initialSources={claim.sources.map((s) => ({
           id: s.id,
@@ -66,6 +67,11 @@ export default async function AdminClaimEditPage({
           year: s.year,
           summary: s.summary,
         }))}
+        autoReviewed={claim.autoReviewed}
+        needsConfirmation={
+          claim.humanConfirmedAt === null &&
+          claim.evidenceStatus !== "NOT_CHECKED"
+        }
       />
     </div>
   );

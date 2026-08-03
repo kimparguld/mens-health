@@ -2,6 +2,15 @@ import { z } from "zod";
 import { anthropic, DEFAULT_MODEL } from "./client";
 import type { Result } from "./summarize-video";
 
+const FactCheckSchema = z.object({
+  evidenceStatus: z.enum(["SUPPORTED", "MIXED", "WEAK", "UNSUPPORTED"]),
+  rationale: z
+    .string()
+    .min(1)
+    .max(1000)
+    .describe("Brief rationale for the evidence status"),
+});
+
 const ClaimSchema = z.object({
   text: z.string().min(1).describe("The health claim extracted from the video"),
   category: z.enum([
@@ -10,6 +19,8 @@ const ClaimSchema = z.object({
     "HORMONES",
     "MENTAL_HEALTH",
     "SUPPLEMENTS",
+    "MEDICATIONS",
+    "CANCER",
     "LONGEVITY",
     "SEXUAL_HEALTH",
     "OTHER",
@@ -19,6 +30,13 @@ const ClaimSchema = z.object({
     .string()
     .optional()
     .describe("Brief explanation of why this claim matters or is notable"),
+  // Deliberately no "sources"/citations field: the AI provider chain actually
+  // reached at runtime (Groq/OpenRouter/OpenAI/Gemini fallback) has no real
+  // web-search grounding, so any AI-authored citation would be fabricated.
+  // Real sources stay human-added via the claim edit form.
+  factCheck: FactCheckSchema.optional().describe(
+    "A preliminary fact-check verdict, used to auto-review low-risk claims and pre-fill medium-risk review",
+  ),
 });
 
 const ClaimsOutputSchema = z.object({
@@ -48,6 +66,8 @@ Risk level guide:
 - MEDIUM: Diet claims, specific supplement dosages, training frequency claims with quantified outcomes
 - LOW: General lifestyle advice, widely accepted recommendations
 
+For each claim, also provide a preliminary fact-check verdict ("factCheck") based on general medical/scientific consensus you're aware of — evidenceStatus (SUPPORTED/MIXED/WEAK/UNSUPPORTED) plus a one-sentence rationale. Omit "factCheck" entirely if you're not confident enough to give a verdict. Do not include citations or source URLs — state only the verdict and rationale.
+
 Video content:
 Title: ${input.title}
 Description: ${input.description.slice(0, 1000)}
@@ -58,9 +78,13 @@ Respond with a JSON object:
   "claims": [
     {
       "text": "string",
-      "category": "NUTRITION|EXERCISE|HORMONES|MENTAL_HEALTH|SUPPLEMENTS|LONGEVITY|SEXUAL_HEALTH|OTHER",
+      "category": "NUTRITION|EXERCISE|HORMONES|MENTAL_HEALTH|SUPPLEMENTS|MEDICATIONS|CANCER|LONGEVITY|SEXUAL_HEALTH|OTHER",
       "riskLevel": "LOW|MEDIUM|HIGH",
-      "explanation": "string (optional)"
+      "explanation": "string (optional)",
+      "factCheck": {
+        "evidenceStatus": "SUPPORTED|MIXED|WEAK|UNSUPPORTED",
+        "rationale": "string"
+      }
     }
   ]
 }
