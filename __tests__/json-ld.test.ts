@@ -4,6 +4,8 @@ import {
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildItemListSchema,
+  buildDefinedTermSchema,
+  buildDefinedTermSetSchema,
 } from "@/lib/seo/json-ld";
 
 describe("buildVideoObjectSchema", () => {
@@ -95,5 +97,51 @@ describe("buildItemListSchema", () => {
 
   it("sets @type to ItemList", () => {
     expect(buildItemListSchema("test", [])["@type"]).toBe("ItemList");
+  });
+});
+
+describe("buildDefinedTermSchema", () => {
+  it("sets @type to DefinedTerm and includes inDefinedTermSet when provided", () => {
+    const schema = buildDefinedTermSchema({
+      name: "Testosterone",
+      description: "The primary male sex hormone.",
+      url: "https://example.com/glossary/testosterone",
+      inDefinedTermSetUrl: "https://example.com/glossary",
+    }) as { "@type": string; inDefinedTermSet: string };
+    expect(schema["@type"]).toBe("DefinedTerm");
+    expect(schema.inDefinedTermSet).toBe("https://example.com/glossary");
+  });
+
+  it("omits inDefinedTermSet when not provided", () => {
+    const schema = buildDefinedTermSchema({
+      name: "Testosterone",
+      description: "The primary male sex hormone.",
+      url: "https://example.com/glossary/testosterone",
+    });
+    expect(schema).not.toHaveProperty("inDefinedTermSet");
+  });
+});
+
+describe("buildDefinedTermSetSchema", () => {
+  it("sets @type to DefinedTermSet and maps terms to hasDefinedTerm", () => {
+    const schema = buildDefinedTermSetSchema({
+      name: "Men's Health Glossary",
+      url: "https://example.com/glossary",
+      terms: [
+        {
+          name: "Testosterone",
+          description: "The primary male sex hormone.",
+          url: "https://example.com/glossary/testosterone",
+        },
+      ],
+    }) as {
+      "@type": string;
+      hasDefinedTerm: Array<{ "@type": string; name: string }>;
+    };
+    expect(schema["@type"]).toBe("DefinedTermSet");
+    expect(schema.hasDefinedTerm).toHaveLength(1);
+    const [firstTerm] = schema.hasDefinedTerm;
+    expect(firstTerm?.["@type"]).toBe("DefinedTerm");
+    expect(firstTerm?.name).toBe("Testosterone");
   });
 });

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { GLOSSARY_TERMS } from "@/lib/seo/glossary";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
+import { buildBreadcrumbSchema, buildDefinedTermSetSchema } from "@/lib/seo/json-ld";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 
 const APP_URL =
@@ -37,18 +37,15 @@ export default function GlossaryPage() {
     { name: "Glossary", url: `${APP_URL}/glossary` },
   ]);
 
-  const definedTermSetSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTermSet",
+  const definedTermSetSchema = buildDefinedTermSetSchema({
     name: "Men's Health Glossary",
     url: `${APP_URL}/glossary`,
-    hasDefinedTerm: sortedTerms.map((t) => ({
-      "@type": "DefinedTerm",
+    terms: sortedTerms.map((t) => ({
       name: t.term,
       description: t.shortDefinition,
       url: `${APP_URL}/glossary/${t.slug}`,
     })),
-  };
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
