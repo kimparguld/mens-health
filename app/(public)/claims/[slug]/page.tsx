@@ -6,7 +6,7 @@ import { AdSlot } from "@/components/ads/AdSlot";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
+import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema } from "@/lib/seo/json-ld";
 
@@ -232,15 +232,12 @@ export default async function ClaimPage({ params }: { params: Params }) {
         <AdSlot slot="article-footer" className="mt-10" />
 
         {/* Newsletter */}
-        <section className="mt-12 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          <h2 className="mb-1 text-base font-semibold text-gray-900">
-            Get the weekly evidence digest
-          </h2>
-          <p className="mb-5 text-sm text-gray-500">
-            5 claims reviewed each Friday. No hype.
-          </p>
-          <NewsletterSignupForm />
-        </section>
+        <div className="mt-12">
+          <NewsletterFooterCTA
+            headline="Get the weekly evidence digest"
+            description="5 claims reviewed each Friday. No hype."
+          />
+        </div>
 
         <div className="mt-10">
           <Disclaimer />

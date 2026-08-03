@@ -4,7 +4,7 @@ import Link from "next/link";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
+import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema, buildItemListSchema } from "@/lib/seo/json-ld";
 import { getTopicBySlug, getWeeklyRankingVideos } from "@/lib/db/queries";
@@ -263,20 +263,10 @@ export default async function WeeklyRankingPage({
         </section>
 
         {/* Newsletter */}
-        <section className="py-12">
-          <div className="mx-auto max-w-xl px-4">
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-              <h2 className="mb-1 text-base font-semibold text-gray-900">
-                Get the weekly {seed.name} digest
-              </h2>
-              <p className="mb-5 text-sm text-gray-500">
-                Top 5 videos, summarised claims, and evidence notes — every
-                Friday.
-              </p>
-              <NewsletterSignupForm />
-            </div>
-          </div>
-        </section>
+        <NewsletterFooterCTA
+          headline={`Get the weekly ${seed.name} digest`}
+          description="Top 5 videos, summarised claims, and evidence notes — every Friday."
+        />
 
         <div className="mx-auto max-w-[1120px] px-4 pb-10">
           <Disclaimer />
