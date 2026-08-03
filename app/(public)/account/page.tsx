@@ -1,11 +1,17 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { SignOutButton } from "./SignOutButton";
 import { ManageSubscriptionButton } from "./ManageSubscriptionButton";
+
+export const metadata: Metadata = {
+  title: "Your Account",
+  robots: { index: false, follow: false },
+};
 
 type SessionUser = {
   id?: string;

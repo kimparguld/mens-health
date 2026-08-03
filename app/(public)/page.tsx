@@ -10,7 +10,9 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
+  title: {
+    absolute: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
+  },
   description:
     "Daily summaries of the most important men's health videos, ranked and fact-checked. Fitness, testosterone, sleep, nutrition, longevity — without the hype.",
   openGraph: {

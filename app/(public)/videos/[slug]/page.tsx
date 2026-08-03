@@ -29,6 +29,7 @@ import {
   getPublishedVideoSlugByYouTubeId,
   getRelatedVideos,
 } from "@/lib/db/queries";
+import { getGlossaryTermsForTopics } from "@/lib/seo/glossary";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
@@ -114,6 +115,9 @@ export default async function VideoPage({ params }: { params: Params }) {
     : [];
 
   const firstTopic = video.topics[0]?.topic;
+  const glossaryTerms = getGlossaryTermsForTopics(
+    video.topics.map((vt: (typeof video.topics)[number]) => vt.topic.slug),
+  );
 
   const [sponsor, affiliateLinks, relatedVideos] = await Promise.all([
     getActiveSponsor(),
@@ -130,6 +134,7 @@ export default async function VideoPage({ params }: { params: Params }) {
     youtubeVideoId: video.youtubeVideoId,
     appUrl: APP_URL,
     slug: video.slug,
+    durationSeconds: video.durationSeconds,
   });
 
   const displayTitle = video.editorialTitle ?? video.title;
@@ -387,6 +392,27 @@ export default async function VideoPage({ params }: { params: Params }) {
                 className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-800 hover:bg-emerald-200"
               >
                 {vt.topic.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Key terms */}
+      {glossaryTerms.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold text-gray-900">
+            Key terms in this video
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {glossaryTerms.map((term) => (
+              <Link
+                key={term.slug}
+                href={`/glossary/${term.slug}`}
+                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 hover:border-emerald-300 hover:text-emerald-700"
+                title={term.shortDefinition}
+              >
+                {term.term}
               </Link>
             ))}
           </div>

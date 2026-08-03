@@ -81,6 +81,16 @@ export default async function PublicLayout({
                   </Link>
                 </li>
                 <li>
+                  <Link href="/glossary" className="hover:text-gray-900">
+                    Glossary
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="hover:text-gray-900">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
                   <Link
                     href="/editorial-process"
                     className="hover:text-gray-900"
@@ -120,7 +130,9 @@ export default async function PublicLayout({
             {/* Top topics */}
             <div>
               <h3 className="text-sm font-semibold text-gray-900">
-                Top Topics
+                <Link href="/topics" className="hover:text-emerald-700">
+                  Top Topics
+                </Link>
               </h3>
               <ul className="mt-3 space-y-2 text-sm text-gray-500">
                 {FOOTER_TOPICS.map((topic) => (
@@ -133,6 +145,14 @@ export default async function PublicLayout({
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href="/topics"
+                    className="font-medium text-emerald-700 hover:underline"
+                  >
+                    View all topics →
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
