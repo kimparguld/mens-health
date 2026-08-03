@@ -81,6 +81,16 @@ export default async function PublicLayout({
                   </Link>
                 </li>
                 <li>
+                  <Link href="/glossary" className="hover:text-gray-900">
+                    Glossary
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="hover:text-gray-900">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
                   <Link
                     href="/editorial-process"
                     className="hover:text-gray-900"
