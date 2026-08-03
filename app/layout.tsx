@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, EB_Garamond } from "next/font/google";
 import { Suspense } from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
@@ -12,6 +12,14 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const ebGaramond = EB_Garamond({
+  variable: "--font-logotype",
+  subsets: ["latin"],
+  weight: "600",
+  style: "italic",
   display: "swap",
 });
 
@@ -71,7 +79,10 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <html lang="en" className={`${inter.variable} h-full antialiased`}>
+      <html
+        lang="en"
+        className={`${inter.variable} ${ebGaramond.variable} h-full antialiased`}
+      >
         <body className="flex min-h-full flex-col">
           {adsEnabled && (
             <Script

@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { createMetadata, createCanonicalUrl } from "@/lib/seo/createMetadata";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { buildItemListSchema } from "@/lib/seo/json-ld";
-import { RiskBadge } from "@/components/ui/RiskBadge";
+import { JsonLd } from '@/components/seo/JsonLd';
+import { RiskBadge } from '@/components/ui/RiskBadge';
+import { createCanonicalUrl, createMetadata } from '@/lib/seo/createMetadata';
+import { buildItemListSchema } from '@/lib/seo/json-ld';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
   title: "Men's Health Topics — MenHealth Digest",
   description:
     "Browse every men's health topic we track — testosterone, sleep, muscle gain, longevity, and more — each with evidence-checked video summaries and FAQs.",
-  path: "/topics",
+  path: '/topics',
 });
 
 export default function TopicsIndexPage() {
@@ -19,7 +19,7 @@ export default function TopicsIndexPage() {
     TOPIC_SEEDS.map((topic) => ({
       name: topic.name,
       url: createCanonicalUrl(`/topics/${topic.slug}`),
-    })),
+    }))
   );
 
   return (
@@ -29,8 +29,8 @@ export default function TopicsIndexPage() {
         Topics
       </h1>
       <p className="mb-8 text-gray-600">
-        Every men&apos;s health topic we track, each with evidence-checked
-        video summaries, common myths, and frequently asked questions.
+        Every men&apos;s health topic we track, each with evidence-checked video
+        summaries, common myths, and frequently asked questions.
       </p>
       <ul className="grid gap-4 sm:grid-cols-2">
         {TOPIC_SEEDS.map((topic) => (

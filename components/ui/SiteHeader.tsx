@@ -1,7 +1,7 @@
 'use client';
 
+import { BrandLogotype } from '@/components/ui/BrandLogotype';
 import { premium } from '@/lib/flags/feature-flags';
-import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +16,11 @@ interface SiteHeaderProps {
 }
 
 const navLinks = [
+  {
+    href: '/topics',
+    label: 'Topics',
+    className: 'font-semibold text-gray-800 hover:text-emerald-700',
+  },
   {
     href: '/rankings',
     label: 'Rankings',
@@ -105,7 +110,6 @@ function useDrawer() {
 
 export function SiteHeader({ user }: SiteHeaderProps) {
   const nav = useDrawer();
-  const topics = useDrawer();
 
   // Convenience aliases kept for readability
   const mounted = nav.mounted;
@@ -115,36 +119,25 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
   // Lock body scroll while either drawer is open
   useEffect(() => {
-    document.body.style.overflow =
-      nav.mounted || topics.mounted ? 'hidden' : '';
+    document.body.style.overflow = nav.mounted ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
-  }, [nav.mounted, topics.mounted]);
+  }, [nav.mounted]);
 
   return (
     <>
-      <header
-        className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur-sm"
-        style={{ backgroundColor: '#00986663' }}
-      >
+      <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/60 backdrop-blur-sm">
         <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-2 lg:py-4">
           <Link
             href="/"
-            className="text-xl font-bold tracking-tight text-emerald-700 hover:text-emerald-600"
+            className="rounded-md focus-visible:ring-2 focus-visible:ring-emerald-600/40 focus-visible:outline-none"
           >
-            MenHealth Digest
+            <BrandLogotype size="md" />
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-5 text-sm md:flex">
-            <button
-              type="button"
-              onClick={topics.open}
-              className="cursor-pointer font-semibold text-gray-800 hover:text-emerald-700"
-            >
-              Topics
-            </button>
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} className={link.className}>
                 {link.label}
@@ -217,9 +210,9 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               <Link
                 href="/"
                 onClick={closeDrawer}
-                className="text-lg font-bold tracking-tight text-gray-900"
+                className="rounded-md focus-visible:ring-2 focus-visible:ring-emerald-600/40 focus-visible:outline-none"
               >
-                MenHealth Digest
+                <BrandLogotype size="sm" />
               </Link>
               <button
                 type="button"
@@ -235,30 +228,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
             {/* Nav links */}
             <nav className="flex flex-1 flex-col overflow-y-auto px-4 py-4">
-              <button
-                type="button"
-                onClick={() => {
-                  closeDrawer();
-                  topics.open();
-                }}
-                className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium text-gray-800 transition-colors hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
-              >
-                Topics
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -359,70 +328,6 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 </Link>
               </div>
             )}
-          </div>
-        </>
-      )}
-
-      {/* ── Topics Drawer ── */}
-      {topics.mounted && (
-        <>
-          {/* Backdrop */}
-          <div
-            onClick={topics.close}
-            aria-hidden="true"
-            className={[
-              'fixed inset-0 z-40 bg-black/60 transition-opacity',
-              `duration-[${TRANSITION_MS}ms]`,
-              topics.visible ? 'opacity-100' : 'opacity-0',
-            ].join(' ')}
-          />
-
-          {/* Drawer panel */}
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Browse topics"
-            className={[
-              'fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col bg-white shadow-2xl',
-              `transition-transform duration-[${TRANSITION_MS}ms] ease-in-out`,
-              topics.visible ? 'translate-x-0' : 'translate-x-full',
-            ].join(' ')}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5">
-              <span className="text-lg font-bold tracking-tight text-gray-900">
-                Browse Topics
-              </span>
-              <button
-                type="button"
-                onClick={topics.close}
-                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Close topics"
-              >
-                <CloseIcon />
-              </button>
-            </div>
-
-            <div className="mx-6 border-t border-gray-100" />
-
-            {/* Topic links */}
-            <nav className="flex flex-1 flex-col overflow-y-auto px-4 py-4">
-              {TOPIC_SEEDS.map((topic) => (
-                <Link
-                  key={topic.slug}
-                  href={`/topics/${topic.slug}`}
-                  onClick={topics.close}
-                  className="group flex flex-col rounded-xl px-4 py-3 transition-colors hover:bg-gray-100 active:bg-gray-200"
-                >
-                  <span className="text-base font-medium text-gray-800 group-hover:text-emerald-700">
-                    {topic.name}
-                  </span>
-                  <span className="mt-0.5 text-xs leading-snug text-gray-400">
-                    {topic.description}
-                  </span>
-                </Link>
-              ))}
-            </nav>
           </div>
         </>
       )}

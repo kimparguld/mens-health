@@ -1,3 +1,4 @@
+import { BrandLogotype } from '@/components/ui/BrandLogotype';
 import { SiteHeader } from '@/components/ui/SiteHeader';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
@@ -42,15 +43,15 @@ export default async function PublicLayout({
       <div className="flex-1">{children}</div>
 
       <footer className="border-t border-gray-200 bg-gray-50">
-        <div className="mx-auto max-w-[1120px] px-4 py-12">
+        <div className="mx-auto max-w-280 px-4 py-12">
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {/* Brand */}
             <div className="col-span-2 sm:col-span-1">
               <Link
                 href="/"
-                className="text-lg font-bold tracking-tight text-gray-900"
+                className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-emerald-600/40 focus-visible:outline-none"
               >
-                MenHealth Digest
+                <BrandLogotype size="md" />
               </Link>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
                 Evidence-aware summaries of trending men&apos;s health content —

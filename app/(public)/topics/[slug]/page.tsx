@@ -1,36 +1,36 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { VideoCard } from "@/components/video/VideoCard";
-import { AdSlot } from "@/components/ads/AdSlot";
-import { Disclaimer } from "@/components/ui/Disclaimer";
-import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
-import { SponsorBlock } from "@/components/monetization/SponsorBlock";
-import { RiskBadge } from "@/components/ui/RiskBadge";
-import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
-import { NewsletterInlineCTA } from "@/components/newsletter/NewsletterInlineCTA";
-import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
-import { NewsletterStickyCTA } from "@/components/newsletter/NewsletterStickyCTA";
-import { JsonLd } from "@/components/seo/JsonLd";
+import { AdSlot } from '@/components/ads/AdSlot';
+import { SponsorBlock } from '@/components/monetization/SponsorBlock';
+import { NewsletterFooterCTA } from '@/components/newsletter/NewsletterFooterCTA';
+import { NewsletterInlineCTA } from '@/components/newsletter/NewsletterInlineCTA';
+import { NewsletterStickyCTA } from '@/components/newsletter/NewsletterStickyCTA';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { RelatedTopics } from '@/components/topic/RelatedTopics';
+import { AffiliateDisclosure } from '@/components/ui/AffiliateDisclosure';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { EvidenceBadge } from '@/components/ui/EvidenceBadge';
+import { RiskBadge } from '@/components/ui/RiskBadge';
+import { VideoCard } from '@/components/video/VideoCard';
+import { db } from '@/lib/db/prisma';
+import { getTopicBySlug, getTopicVideos } from '@/lib/db/queries';
+import {
+  getActiveSponsor,
+  getAffiliateLinksForTopic,
+} from '@/lib/monetization/resolvers';
+import type { FaqEntry } from '@/lib/seo/json-ld';
 import {
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildItemListSchema,
-} from "@/lib/seo/json-ld";
-import { getTopicSeo } from "@/lib/seo/topic-faq";
-import { getTopicContent } from "@/lib/seo/topic-content";
-import type { FaqEntry } from "@/lib/seo/json-ld";
-import Link from "next/link";
-import {
-  getActiveSponsor,
-  getAffiliateLinksForTopic,
-} from "@/lib/monetization/resolvers";
-import { getTopicBySlug, getTopicVideos } from "@/lib/db/queries";
-import { db } from "@/lib/db/prisma";
-import { RelatedTopics } from "@/components/topic/RelatedTopics";
+} from '@/lib/seo/json-ld';
+import { getTopicContent } from '@/lib/seo/topic-content';
+import { getTopicSeo } from '@/lib/seo/topic-faq';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -46,7 +46,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const topic = TOPIC_SEEDS.find((t) => t.slug === slug);
-  if (!topic) return { title: "Topic Not Found" };
+  if (!topic) return { title: 'Topic Not Found' };
 
   const seo = getTopicSeo(slug);
   const description = seo?.intro ?? topic.description;
@@ -60,14 +60,14 @@ export async function generateMetadata({
       title: `${topic.name} — MenHealth Digest`,
       description,
       url: canonical,
-      type: "website",
+      type: 'website',
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: `${topic.name} — MenHealth Digest`,
       description,
     },
-    keywords: [topic.name, "men's health", "health guide", "evidence-based"],
+    keywords: [topic.name, "men's health", 'health guide', 'evidence-based'],
   };
 }
 
@@ -80,7 +80,7 @@ export default async function TopicPage({
 }) {
   const { slug } = await params;
   const { page: pageStr } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
+  const page = Math.max(1, parseInt(pageStr ?? '1', 10));
   const topicSeed = TOPIC_SEEDS.find((t) => t.slug === slug);
   if (!topicSeed) notFound();
 
@@ -101,13 +101,13 @@ export default async function TopicPage({
     ? await db.claim.findMany({
         where: {
           video: {
-            status: "PUBLISHED",
+            status: 'PUBLISHED',
             topics: { some: { topicId: topic.id } },
           },
           slug: { not: null },
         },
         take: 3,
-        orderBy: { riskLevel: "desc" },
+        orderBy: { riskLevel: 'desc' },
         select: { id: true, text: true, evidenceStatus: true, slug: true },
       })
     : [];
@@ -115,9 +115,12 @@ export default async function TopicPage({
   // Evidence overview: aggregate claim verdicts across all videos in this topic
   const topicClaimStatusCounts = topic
     ? await db.claim.groupBy({
-        by: ["evidenceStatus"],
+        by: ['evidenceStatus'],
         where: {
-          video: { status: "PUBLISHED", topics: { some: { topicId: topic.id } } },
+          video: {
+            status: 'PUBLISHED',
+            topics: { some: { topicId: topic.id } },
+          },
         },
         _count: { _all: true },
       })
@@ -125,22 +128,22 @@ export default async function TopicPage({
   const evidenceOverview = {
     claimsAssessed: topicClaimStatusCounts.reduce(
       (sum, c) => sum + c._count._all,
-      0,
+      0
     ),
     supported:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === "SUPPORTED")
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')
         ?._count._all ?? 0,
     mixed:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === "MIXED")?._count
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count
         ._all ?? 0,
     weak:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === "WEAK")?._count
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count
         ._all ?? 0,
     unsupported:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === "UNSUPPORTED")
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'UNSUPPORTED')
         ?._count._all ?? 0,
     notChecked:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === "NOT_CHECKED")
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'NOT_CHECKED')
         ?._count._all ?? 0,
   };
 
@@ -165,7 +168,7 @@ export default async function TopicPage({
 
   // JSON-LD schemas
   const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
+    { name: 'Home', url: APP_URL },
     { name: topicSeed.name, url: `${APP_URL}/topics/${slug}` },
   ]);
 
@@ -176,7 +179,7 @@ export default async function TopicPage({
           publishedVideos.map((v: (typeof publishedVideos)[number]) => ({
             name: v.title,
             url: `${APP_URL}/videos/${v.slug}`,
-          })),
+          }))
         )
       : null;
 
@@ -200,7 +203,7 @@ export default async function TopicPage({
         <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
           <Link href="/" className="hover:underline">
             Home
-          </Link>{" "}
+          </Link>{' '}
           / <span className="text-gray-900">{topicSeed.name}</span>
         </nav>
 
@@ -245,16 +248,22 @@ export default async function TopicPage({
             Evidence overview
           </h2>
           <p className="mb-4 text-sm text-gray-500">
-            How claims about {topicSeed.name.toLowerCase()} across all
-            reviewed videos stack up against the evidence.
+            How claims about {topicSeed.name.toLowerCase()} across all reviewed
+            videos stack up against the evidence.
           </p>
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
             {[
-              { label: "Claims assessed", value: evidenceOverview.claimsAssessed },
-              { label: "Strongly supported", value: evidenceOverview.supported },
-              { label: "Mixed evidence", value: evidenceOverview.mixed },
-              { label: "Weak evidence", value: evidenceOverview.weak },
-              { label: "Unsupported", value: evidenceOverview.unsupported },
+              {
+                label: 'Claims assessed',
+                value: evidenceOverview.claimsAssessed,
+              },
+              {
+                label: 'Strongly supported',
+                value: evidenceOverview.supported,
+              },
+              { label: 'Mixed evidence', value: evidenceOverview.mixed },
+              { label: 'Weak evidence', value: evidenceOverview.weak },
+              { label: 'Unsupported', value: evidenceOverview.unsupported },
             ].map((row) => (
               <div
                 key={row.label}
@@ -341,7 +350,7 @@ export default async function TopicPage({
                   Myth: &ldquo;{item.myth}&rdquo;
                 </p>
                 <p className="mt-1 text-sm text-gray-600">
-                  <span className="font-medium text-emerald-700">Reality:</span>{" "}
+                  <span className="font-medium text-emerald-700">Reality:</span>{' '}
                   {item.reality}
                 </p>
               </div>
@@ -384,12 +393,12 @@ export default async function TopicPage({
                     key={video.id}
                     slug={video.slug}
                     title={video.title}
-                    channelTitle={video.channel?.title ?? ""}
+                    channelTitle={video.channel?.title ?? ''}
                     thumbnailUrl={video.thumbnailUrl}
                     shortSummary={video.summaries[0]?.shortSummary ?? null}
                     trendScore={video.trendScore}
                     topicNames={video.topics.map(
-                      (vt: (typeof video.topics)[number]) => vt.topic.name,
+                      (vt: (typeof video.topics)[number]) => vt.topic.name
                     )}
                     riskLevel={video.riskLevel}
                     durationSeconds={video.durationSeconds ?? undefined}
@@ -409,12 +418,12 @@ export default async function TopicPage({
                 key={video.id}
                 slug={video.slug}
                 title={video.title}
-                channelTitle={video.channel?.title ?? ""}
+                channelTitle={video.channel?.title ?? ''}
                 thumbnailUrl={video.thumbnailUrl}
                 shortSummary={video.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
                 topicNames={video.topics.map(
-                  (vt: (typeof video.topics)[number]) => vt.topic.name,
+                  (vt: (typeof video.topics)[number]) => vt.topic.name
                 )}
                 riskLevel={video.riskLevel}
                 durationSeconds={video.durationSeconds ?? undefined}

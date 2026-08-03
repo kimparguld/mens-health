@@ -1,3 +1,4 @@
+import { BrandLogotype } from '@/components/ui/BrandLogotype';
 import { auth, signOut } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -60,14 +61,14 @@ export default async function AdminLayout({
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className="flex w-56 flex-col border-r bg-white">
-        <div className="flex h-14 items-center border-b px-4">
-          <span className="text-nd font-semibold text-gray-900">MHD Admin</span>
+        <div className="flex h-18 items-center border-b px-4">
+          <BrandLogotype size="md" />
         </div>
         <nav className="flex flex-1 flex-col gap-4 overflow-y-auto p-2">
           {navGroups.map(({ section, items }, i) => (
             <div key={section ?? `group-${i}`} className="flex flex-col gap-1">
               {section && (
-                <span className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <span className="px-3 pt-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
                   {section}
                 </span>
               )}

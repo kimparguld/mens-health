@@ -1,27 +1,27 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { db } from "@/lib/db/prisma";
-import { CREATOR_SEEDS } from "@/lib/youtube/creators";
-import { VideoCard } from "@/components/video/VideoCard";
-import { Disclaimer } from "@/components/ui/Disclaimer";
-import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
-import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { buildBreadcrumbSchema, buildPersonSchema } from "@/lib/seo/json-ld";
+import { NewsletterFooterCTA } from '@/components/newsletter/NewsletterFooterCTA';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { EvidenceBadge } from '@/components/ui/EvidenceBadge';
+import { VideoCard } from '@/components/video/VideoCard';
+import { db } from '@/lib/db/prisma';
+import { buildBreadcrumbSchema, buildPersonSchema } from '@/lib/seo/json-ld';
+import { CREATOR_SEEDS } from '@/lib/youtube/creators';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 function deriveEvidenceLabel(
-  score: number | null | undefined,
+  score: number | null | undefined
 ): string | undefined {
   if (score == null) return undefined;
-  if (score < 0.35) return "WEAK";
-  if (score < 0.6) return "MIXED";
-  if (score < 0.8) return "MODERATE";
-  return "SUPPORTED";
+  if (score < 0.35) return 'WEAK';
+  if (score < 0.6) return 'MIXED';
+  if (score < 0.8) return 'MODERATE';
+  return 'SUPPORTED';
 }
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ slug: string }>;
 
@@ -36,7 +36,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const creator = CREATOR_SEEDS.find((c) => c.slug === slug);
-  if (!creator) return { title: "Creator Not Found" };
+  if (!creator) return { title: 'Creator Not Found' };
 
   const title = `${creator.name} — Men's Health Videos`;
   const description = `${creator.description} Browse ${creator.name}'s top men's health videos, summarised and fact-checked.`;
@@ -46,8 +46,8 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: "profile" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { title, description, url: canonical, type: 'profile' },
+    twitter: { card: 'summary_large_image', title, description },
     keywords: [
       creator.name,
       `${creator.name} videos`,
@@ -70,12 +70,12 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
   const videos = channel
     ? await db.video.findMany({
-        where: { status: "PUBLISHED", channelId: channel.id },
-        orderBy: { trendScore: "desc" },
+        where: { status: 'PUBLISHED', channelId: channel.id },
+        orderBy: { trendScore: 'desc' },
         take: 20,
         include: {
           channel: true,
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          summaries: { take: 1, orderBy: { createdAt: 'desc' } },
           topics: { include: { topic: true } },
         },
       })
@@ -108,13 +108,14 @@ export default async function CreatorPage({ params }: { params: Params }) {
   const videoIds = videos.map((v) => v.id);
 
   // Evidence scorecard: full aggregate counts (not limited like the claims list below)
-  const claimStatusCounts = videoIds.length > 0
-    ? await db.claim.groupBy({
-        by: ["evidenceStatus"],
-        where: { videoId: { in: videoIds } },
-        _count: { _all: true },
-      })
-    : [];
+  const claimStatusCounts =
+    videoIds.length > 0
+      ? await db.claim.groupBy({
+          by: ['evidenceStatus'],
+          where: { videoId: { in: videoIds } },
+          _count: { _all: true },
+        })
+      : [];
   const sourcesCited =
     videoIds.length > 0
       ? await db.evidenceSource.count({
@@ -123,22 +124,25 @@ export default async function CreatorPage({ params }: { params: Params }) {
       : 0;
   const scorecard = {
     videosReviewed: videos.length,
-    claimsAssessed: claimStatusCounts.reduce((sum, c) => sum + c._count._all, 0),
+    claimsAssessed: claimStatusCounts.reduce(
+      (sum, c) => sum + c._count._all,
+      0
+    ),
     supported:
-      claimStatusCounts.find((c) => c.evidenceStatus === "SUPPORTED")?._count
+      claimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')?._count
         ._all ?? 0,
     mixed:
-      claimStatusCounts.find((c) => c.evidenceStatus === "MIXED")?._count
+      claimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count
         ._all ?? 0,
     weak:
-      claimStatusCounts.find((c) => c.evidenceStatus === "WEAK")?._count
-        ._all ?? 0,
+      claimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count._all ??
+      0,
     unsupported:
-      claimStatusCounts.find((c) => c.evidenceStatus === "UNSUPPORTED")
-        ?._count._all ?? 0,
+      claimStatusCounts.find((c) => c.evidenceStatus === 'UNSUPPORTED')?._count
+        ._all ?? 0,
     notChecked:
-      claimStatusCounts.find((c) => c.evidenceStatus === "NOT_CHECKED")
-        ?._count._all ?? 0,
+      claimStatusCounts.find((c) => c.evidenceStatus === 'NOT_CHECKED')?._count
+        ._all ?? 0,
     sourcesCited,
   };
 
@@ -150,7 +154,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
             slug: { not: null },
           },
           take: 6,
-          orderBy: { riskLevel: "desc" },
+          orderBy: { riskLevel: 'desc' },
           select: {
             id: true,
             text: true,
@@ -162,8 +166,8 @@ export default async function CreatorPage({ params }: { params: Params }) {
       : [];
 
   const breadcrumb = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Creators", url: `${APP_URL}/creators` },
+    { name: 'Home', url: APP_URL },
+    { name: 'Creators', url: `${APP_URL}/creators` },
     { name: creator.name, url: `${APP_URL}/creators/${slug}` },
   ]);
 
@@ -172,7 +176,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
     description: creator.description,
     url: `${APP_URL}/creators/${slug}`,
     credentials: creator.credentials,
-    jobTitle: creator.specialty.split(", ")[0],
+    jobTitle: creator.specialty.split(', ')[0],
   });
 
   return (
@@ -181,7 +185,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
       <main>
         {/* Header */}
         <section className="border-b border-gray-100 bg-white py-12">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             <nav className="mb-4 flex items-center gap-2 text-xs text-gray-400">
               <Link href="/" className="hover:text-gray-600">
                 Home
@@ -209,7 +213,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
             {/* Specialty tags */}
             <div className="mt-4 flex flex-wrap gap-2">
-              {creator.specialty.split(", ").map((tag) => (
+              {creator.specialty.split(', ').map((tag) => (
                 <span
                   key={tag}
                   className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
@@ -240,11 +244,11 @@ export default async function CreatorPage({ params }: { params: Params }) {
             {/* Trust score if available */}
             {channel && (
               <p className="mt-3 text-xs text-gray-400">
-                Trust score:{" "}
+                Trust score:{' '}
                 <span className="font-medium text-gray-600">
                   {(channel.trustScore * 100).toFixed(0)}
                   /100
-                </span>{" "}
+                </span>{' '}
                 · {videos.length} videos indexed
               </p>
             )}
@@ -254,28 +258,28 @@ export default async function CreatorPage({ params }: { params: Params }) {
         {/* Evidence scorecard */}
         {scorecard.claimsAssessed > 0 && (
           <section className="border-b border-gray-100 bg-white py-10">
-            <div className="mx-auto max-w-[1120px] px-4">
+            <div className="mx-auto max-w-4xl px-4">
               <h2 className="mb-1 text-lg font-semibold text-gray-900">
                 Evidence Scorecard
               </h2>
               <p className="mb-6 text-sm text-gray-500">
-                A factual summary of claims we&apos;ve checked from{" "}
+                A factual summary of claims we&apos;ve checked from{' '}
                 {creator.name}&apos;s videos — not an overall opinion of the
                 creator.
               </p>
               <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
-                  { label: "Videos reviewed", value: scorecard.videosReviewed },
-                  { label: "Claims assessed", value: scorecard.claimsAssessed },
+                  { label: 'Videos reviewed', value: scorecard.videosReviewed },
+                  { label: 'Claims assessed', value: scorecard.claimsAssessed },
                   {
-                    label: "Strongly supported",
+                    label: 'Strongly supported',
                     value: scorecard.supported,
                   },
-                  { label: "Mixed evidence", value: scorecard.mixed },
-                  { label: "Weak evidence", value: scorecard.weak },
-                  { label: "Unsupported", value: scorecard.unsupported },
-                  { label: "Not yet checked", value: scorecard.notChecked },
-                  { label: "Sources cited", value: scorecard.sourcesCited },
+                  { label: 'Mixed evidence', value: scorecard.mixed },
+                  { label: 'Weak evidence', value: scorecard.weak },
+                  { label: 'Unsupported', value: scorecard.unsupported },
+                  { label: 'Not yet checked', value: scorecard.notChecked },
+                  { label: 'Sources cited', value: scorecard.sourcesCited },
                 ].map((row) => (
                   <div
                     key={row.label}
@@ -294,11 +298,11 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
         {/* Videos */}
         <section className="py-10">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             <h2 className="mb-6 text-lg font-semibold text-gray-900">
               {videos.length > 0
                 ? `${creator.name}'s Top Videos`
-                : "No videos indexed yet"}
+                : 'No videos indexed yet'}
             </h2>
 
             {videos.length === 0 ? (
@@ -322,7 +326,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     key={video.id}
                     slug={video.slug}
                     title={video.title}
-                    channelTitle={video.channel?.title ?? ""}
+                    channelTitle={video.channel?.title ?? ''}
                     thumbnailUrl={video.thumbnailUrl}
                     shortSummary={video.summaries[0]?.shortSummary ?? null}
                     trendScore={video.trendScore}
@@ -340,7 +344,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
         {/* Other creators */}
         <section className="border-t border-gray-100 bg-gray-50 py-10">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             {/* Most common topics */}
             {topTopics.length > 0 && (
               <div className="mb-8">
@@ -354,7 +358,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                       href={`/topics/${t.slug}`}
                       className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-emerald-300 hover:text-emerald-700"
                     >
-                      {t.name}{" "}
+                      {t.name}{' '}
                       <span className="text-gray-400">({t.count})</span>
                     </Link>
                   ))}
@@ -427,7 +431,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
           description="Get the 5-minute Men's Health Digest every Friday — trending videos, summarised claims, evidence notes."
         />
 
-        <div className="mx-auto max-w-[1120px] px-4 pb-10">
+        <div className="mx-auto max-w-4xl px-4 pb-10">
           <Disclaimer />
         </div>
       </main>
