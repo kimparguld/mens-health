@@ -34,6 +34,8 @@ label {
   color: var(--color-gray-600);
 }
 
-button {
+button,
+a {
   cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
