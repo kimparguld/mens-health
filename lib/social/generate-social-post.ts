@@ -201,8 +201,10 @@ export async function generateSocialPost(
   }
 
   // Safety: validate platform constraints.
-  // For X, caption-length violations are intentionally ignored here — the
-  // XAdapter.publish() path truncates the caption to fit 280 chars automatically.
+  // For X, the raw caption-length check is intentionally ignored here — it
+  // doesn't account for the UTM link XAdapter appends, so it under-counts.
+  // XAdapter.validate() re-checks caption + link length correctly during
+  // admin review and again before publish.
   const constraintErrors = validatePlatformConstraints(input.platform, {
     caption: aiOutput.caption,
     hashtags: aiOutput.hashtags,
