@@ -1,26 +1,26 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { VideoCard } from "@/components/video/VideoCard";
-import { Disclaimer } from "@/components/ui/Disclaimer";
-import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { buildBreadcrumbSchema, buildItemListSchema } from "@/lib/seo/json-ld";
-import { getTopicBySlug, getWeeklyRankingVideos } from "@/lib/db/queries";
+import { NewsletterFooterCTA } from '@/components/newsletter/NewsletterFooterCTA';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { VideoCard } from '@/components/video/VideoCard';
+import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
+import { buildBreadcrumbSchema, buildItemListSchema } from '@/lib/seo/json-ld';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 function deriveEvidenceLabel(
-  score: number | null | undefined,
+  score: number | null | undefined
 ): string | undefined {
   if (score == null) return undefined;
-  if (score < 0.35) return "WEAK";
-  if (score < 0.6) return "MIXED";
-  if (score < 0.8) return "MODERATE";
-  return "SUPPORTED";
+  if (score < 0.35) return 'WEAK';
+  if (score < 0.6) return 'MIXED';
+  if (score < 0.8) return 'MODERATE';
+  return 'SUPPORTED';
 }
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ topic: string }>;
 
@@ -35,7 +35,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { topic } = await params;
   const seed = TOPIC_SEEDS.find((t) => t.slug === topic);
-  if (!seed) return { title: "Not Found" };
+  if (!seed) return { title: 'Not Found' };
 
   const title = `Best ${seed.name} Videos This Week`;
   const description = `The top-ranked ${seed.name.toLowerCase()} videos this week — summarised, scored, and checked for evidence quality.`;
@@ -45,8 +45,8 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, type: "website" },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: { title, description, url: canonical, type: 'website' },
+    twitter: { card: 'summary_large_image', title, description },
     keywords: [
       `best ${seed.name.toLowerCase()} videos`,
       `best ${seed.name.toLowerCase()} videos this week`,
@@ -73,8 +73,8 @@ export default async function WeeklyRankingPage({
   const isFallback = false;
 
   const breadcrumb = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Rankings", url: `${APP_URL}/rankings` },
+    { name: 'Home', url: APP_URL },
+    { name: 'Rankings', url: `${APP_URL}/rankings` },
     { name: seed.name, url: `${APP_URL}/rankings/${topic}` },
   ]);
 
@@ -83,14 +83,14 @@ export default async function WeeklyRankingPage({
     displayVideos.map((v) => ({
       name: v.title,
       url: `${APP_URL}/videos/${v.slug}`,
-    })),
+    }))
   );
 
   const now = new Date();
-  const weekLabel = now.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+  const weekLabel = now.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
   });
 
   return (
@@ -100,7 +100,7 @@ export default async function WeeklyRankingPage({
       <main>
         {/* Header */}
         <section className="border-b border-gray-100 bg-white py-12">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             <nav className="mb-4 flex items-center gap-2 text-xs text-gray-400">
               <Link href="/" className="hover:text-gray-600">
                 Home
@@ -124,14 +124,14 @@ export default async function WeeklyRankingPage({
                 : `Top-ranked ${seed.name.toLowerCase()} videos added this week — summarised and scored for evidence quality.`}
             </p>
             <p className="mt-2 text-xs text-gray-400">
-              {isFallback ? "All-time top picks" : `Updated ${weekLabel}`}
+              {isFallback ? 'All-time top picks' : `Updated ${weekLabel}`}
             </p>
           </div>
         </section>
 
         {/* How rankings work */}
         <section className="border-b border-gray-100 bg-gray-50 py-8">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             <details className="group">
               <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-gray-700">
                 <span className="transition-transform group-open:rotate-90">
@@ -142,23 +142,23 @@ export default async function WeeklyRankingPage({
               <div className="mt-3 grid gap-3 pl-5 text-xs text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   {
-                    icon: "📅",
-                    label: "Recency",
-                    desc: "Videos published this week rank higher — fresh content first.",
+                    icon: '📅',
+                    label: 'Recency',
+                    desc: 'Videos published this week rank higher — fresh content first.',
                   },
                   {
-                    icon: "📊",
-                    label: "Engagement",
-                    desc: "Views, likes, and comments relative to channel size.",
+                    icon: '📊',
+                    label: 'Engagement',
+                    desc: 'Views, likes, and comments relative to channel size.',
                   },
                   {
-                    icon: "🎯",
-                    label: "Topic relevance",
+                    icon: '🎯',
+                    label: 'Topic relevance',
                     desc: "How closely the video matches this topic's core questions.",
                   },
                   {
-                    icon: "⚠️",
-                    label: "Risk penalties",
+                    icon: '⚠️',
+                    label: 'Risk penalties',
                     desc: "High-risk or unsubstantiated claims reduce a video's score.",
                   },
                 ].map((item) => (
@@ -179,11 +179,11 @@ export default async function WeeklyRankingPage({
 
         {/* Video list */}
         <section className="py-10">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             {displayVideos.length === 0 ? (
               <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
                 <p className="text-gray-500">
-                  No videos indexed yet for this topic.{" "}
+                  No videos indexed yet for this topic.{' '}
                   <Link href="/" className="text-emerald-600 hover:underline">
                     Browse all topics →
                   </Link>
@@ -203,7 +203,7 @@ export default async function WeeklyRankingPage({
                       <VideoCard
                         slug={video.slug}
                         title={video.title}
-                        channelTitle={video.channel?.title ?? ""}
+                        channelTitle={video.channel?.title ?? ''}
                         thumbnailUrl={video.thumbnailUrl}
                         shortSummary={video.summaries[0]?.shortSummary ?? null}
                         trendScore={video.trendScore}
@@ -224,7 +224,7 @@ export default async function WeeklyRankingPage({
 
         {/* Navigation links */}
         <section className="border-t border-gray-100 bg-gray-50 py-8">
-          <div className="mx-auto flex max-w-[1120px] flex-wrap gap-4 px-4">
+          <div className="mx-auto flex max-w-4xl flex-wrap gap-4 px-4">
             <Link
               href={`/topics/${topic}`}
               className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
@@ -242,7 +242,7 @@ export default async function WeeklyRankingPage({
 
         {/* Cross-links to other weekly rankings */}
         <section className="border-t border-gray-100 bg-gray-50 py-10">
-          <div className="mx-auto max-w-[1120px] px-4">
+          <div className="mx-auto max-w-4xl px-4">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">
               Other weekly rankings
             </h2>
@@ -268,7 +268,7 @@ export default async function WeeklyRankingPage({
           description="Top 5 videos, summarised claims, and evidence notes — every Friday."
         />
 
-        <div className="mx-auto max-w-[1120px] px-4 pb-10">
+        <div className="mx-auto max-w-4xl px-4 pb-10">
           <Disclaimer />
         </div>
       </main>
