@@ -6,7 +6,7 @@ import { CREATOR_SEEDS } from "@/lib/youtube/creators";
 import { VideoCard } from "@/components/video/VideoCard";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
-import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
+import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildBreadcrumbSchema, buildPersonSchema } from "@/lib/seo/json-ld";
 
@@ -422,20 +422,10 @@ export default async function CreatorPage({ params }: { params: Params }) {
         </section>
 
         {/* Newsletter */}
-        <section className="py-12">
-          <div className="mx-auto max-w-xl px-4">
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-              <h2 className="mb-1 text-base font-semibold text-gray-900">
-                Follow the evidence, not the hype
-              </h2>
-              <p className="mb-5 text-sm text-gray-500">
-                Get the 5-minute Men&apos;s Health Digest every Friday —
-                trending videos, summarised claims, evidence notes.
-              </p>
-              <NewsletterSignupForm />
-            </div>
-          </div>
-        </section>
+        <NewsletterFooterCTA
+          headline="Follow the evidence, not the hype"
+          description="Get the 5-minute Men's Health Digest every Friday — trending videos, summarised claims, evidence notes."
+        />
 
         <div className="mx-auto max-w-[1120px] px-4 pb-10">
           <Disclaimer />

@@ -8,7 +8,8 @@ import { AffiliateDisclosure } from "@/components/ui/AffiliateDisclosure";
 import { SponsorBlock } from "@/components/monetization/SponsorBlock";
 import { RiskBadge } from "@/components/ui/RiskBadge";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
-import { NewsletterSignupForm } from "@/components/ui/NewsletterSignupForm";
+import { NewsletterInlineCTA } from "@/components/newsletter/NewsletterInlineCTA";
+import { NewsletterFooterCTA } from "@/components/newsletter/NewsletterFooterCTA";
 import { NewsletterStickyCTA } from "@/components/newsletter/NewsletterStickyCTA";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
@@ -269,6 +270,10 @@ export default async function TopicPage({
         </section>
       )}
 
+      <NewsletterInlineCTA
+        headline={`Get the weekly ${topicSeed.name} digest`}
+      />
+
       <AdSlot slot="between-content" className="mb-10" />
 
       {/* Top Claims */}
@@ -517,17 +522,12 @@ export default async function TopicPage({
       )}
 
       {/* Newsletter CTA */}
-      <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-        <h2 className="text-lg font-bold text-gray-900">
-          Get the weekly digest
-        </h2>
-        <p className="mt-1 text-sm text-gray-600">
-          5 videos summarised · 3 claims checked · 1 practical takeaway
-        </p>
-        <div className="mt-4">
-          <NewsletterSignupForm />
-        </div>
-      </section>
+      <div className="mb-10">
+        <NewsletterFooterCTA
+          headline="Get the weekly digest"
+          description="5 videos summarised · 3 claims checked · 1 practical takeaway"
+        />
+      </div>
 
       <Disclaimer />
       <NewsletterStickyCTA />
