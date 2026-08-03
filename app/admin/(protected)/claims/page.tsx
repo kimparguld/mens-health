@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { db } from "@/lib/db/prisma";
 import { EvidenceBadge } from "@/components/ui/EvidenceBadge";
+import { BacklogAutoReviewButton } from "./BacklogAutoReviewButton";
 
 type SearchParams = Promise<{ status?: string; page?: string }>;
 
@@ -112,6 +113,8 @@ export default async function AdminClaimsPage({
           </Link>
         </div>
       )}
+
+      <BacklogAutoReviewButton />
 
       {/* Status filter tabs */}
       <div className="mb-4 flex flex-wrap gap-2">
