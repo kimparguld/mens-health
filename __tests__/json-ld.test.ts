@@ -92,9 +92,10 @@ describe("buildBreadcrumbSchema", () => {
     const schema = buildBreadcrumbSchema(items) as {
       itemListElement: Array<{ position: number; name: string }>;
     };
-    expect(schema.itemListElement[0].position).toBe(1);
-    expect(schema.itemListElement[1].position).toBe(2);
-    expect(schema.itemListElement[1].name).toBe("Testosterone");
+    const [home, testosterone] = schema.itemListElement;
+    expect(home?.position).toBe(1);
+    expect(testosterone?.position).toBe(2);
+    expect(testosterone?.name).toBe("Testosterone");
   });
 });
 
@@ -112,8 +113,9 @@ describe("buildFaqSchema", () => {
       { question: "Q2", answer: "A2" },
     ]) as { mainEntity: Array<{ "@type": string; name: string }> };
     expect(schema.mainEntity).toHaveLength(2);
-    expect(schema.mainEntity[0]["@type"]).toBe("Question");
-    expect(schema.mainEntity[0].name).toBe("Q1");
+    const [firstQuestion] = schema.mainEntity;
+    expect(firstQuestion?.["@type"]).toBe("Question");
+    expect(firstQuestion?.name).toBe("Q1");
   });
 });
 
