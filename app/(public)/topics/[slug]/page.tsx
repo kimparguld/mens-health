@@ -26,6 +26,7 @@ import {
 } from "@/lib/monetization/resolvers";
 import { getTopicBySlug, getTopicVideos } from "@/lib/db/queries";
 import { db } from "@/lib/db/prisma";
+import { RelatedTopics } from "@/components/topic/RelatedTopics";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
@@ -447,6 +448,8 @@ export default async function TopicPage({
           </div>
         </nav>
       )}
+      <RelatedTopics currentSlug={slug} />
+
       {seo && seo.faq.length > 0 && (
         <section className="mb-12">
           <h2 className="mb-6 text-2xl font-bold text-gray-900">
