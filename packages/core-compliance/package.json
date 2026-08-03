@@ -1,0 +1,18 @@
+{
+  "name": "@menhealth/core-compliance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@prisma/client": "^7.0.0"
+  },
+  "devDependencies": {
+    "@prisma/client": "^7.8.0",
+    "typescript": "^5"
+  }
+}
