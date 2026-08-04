@@ -351,6 +351,52 @@ export default async function VideoPage({ params }: { params: Params }) {
         </>
       )}
 
+      {video.warningSigns.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+            Warning Signs
+          </h2>
+          <ul className="space-y-2">
+            {video.warningSigns.map((w: (typeof video.warningSigns)[number]) => (
+              <li key={w.id} className="flex items-start gap-2">
+                <RiskStamp level={w.severity} />
+                <span className="text-ink-muted/90 text-sm">{w.text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {video.costItems.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+            Costs to Know About
+          </h2>
+          <ul className="space-y-2">
+            {video.costItems.map((c: (typeof video.costItems)[number]) => (
+              <li
+                key={c.id}
+                className={`flex items-center justify-between rounded-lg border px-4 py-2 text-sm ${
+                  c.isHidden
+                    ? 'border-verdict-risky/30 bg-verdict-risky/10'
+                    : 'border-hairline bg-paper'
+                }`}
+              >
+                <span className="text-ink-muted/90">
+                  {c.label}
+                  {c.isHidden && (
+                    <span className="text-verdict-risky ml-2 text-xs font-semibold uppercase">
+                      Hidden fee
+                    </span>
+                  )}
+                </span>
+                <span className="text-ink-muted font-medium">{c.amount}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <AdSlot slot="between-content" className="mb-8" config={adsConfig} />
 
       {/* Claims */}
@@ -492,6 +538,22 @@ export default async function VideoPage({ params }: { params: Params }) {
           defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by Hype Check" width="210" height="50" /></a>`}
         />
       </section>
+
+      {/* Disclosures */}
+      {video.disclosures.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+            Disclosures
+          </h2>
+          <ul className="space-y-1">
+            {video.disclosures.map((d: (typeof video.disclosures)[number]) => (
+              <li key={d.id} className="text-ink-muted/80 text-sm">
+                {d.text}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Affiliate links */}
       {affiliateLinks.length > 0 && (
