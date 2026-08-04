@@ -1,27 +1,34 @@
-import { EvidenceBadge, HowWeRateClaims, NewsletterSignupForm, RiskBadge, VideoCard } from "@menhealth/ui";
+import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
+import { VerdictStamp } from '@/components/ui/VerdictStamp';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  EvidenceBadge,
+  HowWeRateClaims,
+  NewsletterSignupForm,
+  RiskBadge,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Hype Check — Legit, or Just Hype?",
+    absolute: 'Hype Check — Legit, or Just Hype?',
   },
   description:
-    "Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.",
+    'Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.',
   openGraph: {
-    title: "Hype Check — Legit, or Just Hype?",
+    title: 'Hype Check — Legit, or Just Hype?',
     description:
-      "Evidence-based verdicts on trending products, courses, side hustles, and investment apps.",
+      'Evidence-based verdicts on trending products, courses, side hustles, and investment apps.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hype Check',
     description:
-      "Evidence-based verdicts on trending products, courses, and side hustles — without the hype.",
+      'Evidence-based verdicts on trending products, courses, and side hustles — without the hype.',
   },
 };
 
@@ -59,45 +66,51 @@ async function FeaturedInsight() {
   if (!featuredSummary) return null;
 
   return (
-    <section className="bg-slate-50 py-12">
+    <section className="bg-surface py-12">
       <div className="mx-auto max-w-[1120px] px-4">
-        <p className="mb-5 text-sm font-semibold tracking-widest text-indigo-600 uppercase">
+        <p className="text-ink-muted mb-5 text-sm font-semibold tracking-widest uppercase">
           Today&apos;s top insight
         </p>
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="border-hairline bg-paper rounded-md border p-6 sm:p-8">
           {featuredClaim && (
             <div className="mb-4">
-              <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+              <p className="text-ink-muted text-xs font-semibold tracking-wide uppercase">
                 The claim
               </p>
-              <p className="mt-1 text-lg font-semibold text-gray-900">
+              <p className="text-ink mt-1 text-lg font-semibold">
                 &ldquo;{featuredClaim.text}&rdquo;
               </p>
             </div>
           )}
           <div className="mb-5">
-            <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+            <p className="text-ink-muted text-xs font-semibold tracking-wide uppercase">
               Our take
             </p>
-            <p className="mt-1 leading-relaxed text-gray-700">
+            <p className="text-ink mt-1 leading-relaxed">
               {featuredSummary.shortSummary}
             </p>
           </div>
           <div className="mb-5 flex flex-wrap items-center gap-2">
-            {featuredClaim && (
-              <EvidenceBadge status={featuredClaim.evidenceStatus} />
+            {featuredVideo.verdict?.verdict ? (
+              <VerdictStamp verdict={featuredVideo.verdict.verdict} />
+            ) : (
+              <>
+                {featuredClaim && (
+                  <EvidenceBadge status={featuredClaim.evidenceStatus} />
+                )}
+                <RiskBadge level={featuredVideo.riskLevel} />
+              </>
             )}
-            <RiskBadge level={featuredVideo.riskLevel} />
             {featuredWatchMin && (
-              <span className="text-xs text-gray-400">
+              <span className="text-ink-muted text-xs">
                 {featuredWatchMin} min watch
               </span>
             )}
-            <span className="text-xs text-gray-400">~ 2 min read</span>
+            <span className="text-ink-muted text-xs">~ 2 min read</span>
           </div>
           <Link
             href={`/videos/${featuredVideo.slug}`}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+            className="text-ink decoration-hairline hover:decoration-ink inline-flex items-center gap-1 text-sm font-semibold underline underline-offset-4"
           >
             Read the breakdown &rarr;
           </Link>
@@ -117,27 +130,34 @@ async function TrendingVideos() {
   return (
     <section id="trending" className="py-14">
       <div className="mx-auto max-w-[1120px] px-4">
-        <h2 className="mb-6 text-2xl font-bold text-gray-900">
+        <h2 className="font-slab text-ink-muted mb-6 text-2xl font-bold">
           Trending summaries
         </h2>
         {videos.length === 0 ? (
-          <p className="text-gray-500">
+          <p className="text-ink-muted">
             No published summaries yet. Check back soon.
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {videos.map((video, index) => (
-              <VideoCard
+              <HypeVideoCard
                 key={video.id}
                 slug={video.slug}
-                title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                title={
+                  video.editorialTitle ??
+                  video.sourceVideos[0]?.title ??
+                  video.name
+                }
                 channelTitle={video.channel?.title ?? ''}
                 thumbnailUrl={video.thumbnailUrl}
-                shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
+                shortSummary={
+                  video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null
+                }
                 trendScore={video.trendScore}
                 topicNames={video.topics.map((vt) => vt.topic.name)}
                 riskLevel={video.riskLevel}
                 evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
+                verdict={video.verdict?.verdict}
                 durationSeconds={video.durationSeconds ?? undefined}
                 priority={index === 0}
               />
@@ -160,15 +180,15 @@ export default async function HomePage() {
   return (
     <main>
       {/* Hero */}
-      <section className="border-b border-gray-100 bg-white py-16">
+      <section className="border-hairline border-b bg-white py-16">
         <div className="mx-auto max-w-[1120px] px-4">
-          <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+          <h1 className="font-slab text-ink-muted max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
             Trending products and side hustles,{' '}
-            <span className="text-indigo-600">
+            <span className="decoration-ink underline decoration-4 underline-offset-4">
               explained without the hype.
             </span>
           </h1>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-gray-600">
+          <p className="text-ink-muted mt-4 max-w-xl text-lg leading-relaxed">
             We scan trending YouTube videos about products, courses, side
             hustles, and investment apps — then summarise the key claims and
             check them against available evidence.
@@ -176,18 +196,18 @@ export default async function HomePage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/digest"
-              className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+              className="bg-ink-muted rounded-sm px-5 py-2.5 text-sm font-semibold text-white hover:bg-black"
             >
               Get the free digest
             </Link>
             <Link
               href="#trending"
-              className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              className="border-hairline text-ink hover:border-surface rounded-sm border px-5 py-2.5 text-sm font-semibold"
             >
               Explore trending videos
             </Link>
           </div>
-          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
+          <ul className="text-ink-muted mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm">
             <li>✓ Official YouTube embeds</li>
             <li>✓ AI-assisted summaries</li>
             <li>✓ Evidence-aware claim checks</li>
@@ -198,7 +218,7 @@ export default async function HomePage() {
       <Suspense
         fallback={
           <div
-            className="min-h-[420px] bg-slate-50 py-12 lg:min-h-[358px]"
+            className="bg-surface min-h-[420px] py-12 lg:min-h-[358px]"
             aria-hidden
           />
         }
@@ -209,7 +229,7 @@ export default async function HomePage() {
       {/* Topic cards */}
       <section id="topics" className="py-14">
         <div className="mx-auto min-h-[652px] max-w-[1120px] px-4 lg:min-h-[354px]">
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">
+          <h2 className="font-slab text-ink-muted mb-6 text-2xl font-bold">
             Browse by topic
           </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -217,28 +237,26 @@ export default async function HomePage() {
               <Link
                 key={topic.slug}
                 href={`/topics/${topic.slug}`}
-                className="group rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:border-indigo-300 hover:shadow-sm"
+                className="group border-hairline hover:border-ink-muted rounded-md border bg-white p-4 transition-colors"
               >
-                <p className="font-semibold text-gray-900 group-hover:text-indigo-700!">
-                  {topic.name}
-                </p>
-                <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-500">
+                <p className="text-ink-muted font-semibold">{topic.name}</p>
+                <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-600">
                   {topic.description}
                 </p>
-                <p className="mt-3 text-xs font-medium text-indigo-600!">
+                <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-xs font-medium underline underline-offset-2">
                   Explore →
                 </p>
               </Link>
             ))}
           </div>
           {remainingTopics.length > 0 && (
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="text-ink-muted mt-4 text-sm">
               More topics:{' '}
               {remainingTopics.map((t, i) => (
                 <span key={t.slug}>
                   <Link
                     href={`/topics/${t.slug}`}
-                    className="text-indigo-700 hover:text-indigo-500"
+                    className="text-ink decoration-hairline hover:decoration-ink underline"
                   >
                     {t.name}
                   </Link>
@@ -254,12 +272,12 @@ export default async function HomePage() {
         fallback={
           <div className="py-14">
             <div className="mx-auto max-w-[1120px] px-4">
-              <div className="mb-6 h-8 w-48 animate-pulse rounded bg-gray-200" />
+              <div className="bg-hairline/40 mb-6 h-8 w-48 animate-pulse rounded" />
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-64 animate-pulse rounded-xl bg-gray-100"
+                    className="bg-hairline/20 h-64 animate-pulse rounded-md"
                   />
                 ))}
               </div>
@@ -271,16 +289,23 @@ export default async function HomePage() {
       </Suspense>
 
       {/* Newsletter */}
-      <section className="bg-indigo-50 py-16">
+      <section className="bg-surface py-16">
         <div className="mx-auto max-w-lg px-4 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="font-slab text-ink text-2xl font-bold">
             Get the 5-minute Hype Check Digest
           </h2>
-          <p className="mt-2 text-sm text-gray-600">Every week:</p>
-          <ul className="mt-2 space-y-0.5 text-sm text-gray-600">
-            <li>5 trending videos summarised</li>
-            <li>3 claims checked</li>
-            <li>1 practical takeaway</li>
+          <p className="mt-2 text-sm text-white/80">Every week:</p>
+          <ul className="mt-2 space-y-0.5 text-sm text-white/80">
+            <li>
+              <span className="text-ink font-bold">5</span> trending videos
+              summarised
+            </li>
+            <li>
+              <span className="text-ink font-bold">3</span> claims checked
+            </li>
+            <li>
+              <span className="text-ink font-bold">1</span> practical takeaway
+            </li>
             <li>No get-rich-quick nonsense</li>
           </ul>
           <div className="mt-6">

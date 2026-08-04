@@ -1,6 +1,6 @@
-import { useId, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 
-type BrandLogotypeSize = 'sm' | 'md';
+type BrandLogotypeSize = 'sm' | 'md' | 'lg';
 
 interface BrandLogotypeProps {
   className?: string;
@@ -9,22 +9,23 @@ interface BrandLogotypeProps {
 
 const SIZE_STYLES: Record<BrandLogotypeSize, CSSProperties> = {
   sm: {
-    '--mh-logo-mark-size': '2rem',
-    '--mh-logo-wordmark-height': '2rem',
-    '--mh-logo-top-size': '0.58rem',
-    '--mh-logo-bottom-size': '1.06rem',
+    '--mh-logo-mark-size': '1.85rem',
+    '--mh-logo-wordmark-size': '1.05rem',
   } as CSSProperties,
   md: {
-    '--mh-logo-mark-size': '2.45rem',
-    '--mh-logo-wordmark-height': '2.45rem',
-    '--mh-logo-top-size': '0.66rem',
-    '--mh-logo-bottom-size': '1.2rem',
+    '--mh-logo-mark-size': '2.35rem',
+    '--mh-logo-wordmark-size': '1.35rem',
+  } as CSSProperties,
+  lg: {
+    '--mh-logo-mark-size': '3.35rem',
+    '--mh-logo-wordmark-size': '1.85rem',
   } as CSSProperties,
 };
 
-export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProps) {
-  const gradientId = useId();
-
+export function BrandLogotype({
+  className = '',
+  size = 'md',
+}: BrandLogotypeProps) {
   return (
     <span
       className={`mh-logotype ${className}`.trim()}
@@ -32,29 +33,15 @@ export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProp
       aria-label="Hype Check"
     >
       <span className="mh-logotype-mark" aria-hidden="true">
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id={gradientId} x1="6" y1="8" x2="58" y2="60" gradientUnits="userSpaceOnUse">
-              <stop stopColor="#6366f1" />
-              <stop offset="1" stopColor="#4338ca" />
-            </linearGradient>
-          </defs>
-          <rect
-            x="4"
-            y="4"
-            width="56"
-            height="56"
-            rx="16"
-            className="mh-logotype-mark-bg"
-            style={{ fill: `url(#${gradientId})` }}
+        <svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M21 2l3.2 6.6 6.7-3.3-1.6 7.2 7.4 1-5.2 5.4 5.2 5.4-7.4 1 1.6 7.2-6.7-3.3L21 36l-3.2-6.8-6.7 3.3 1.6-7.2-7.4-1 5.2-5.4-5.2-5.4 7.4-1-1.6-7.2 6.7 3.3z"
+            className="mh-logotype-mark-burst"
           />
           <path
-            d="M32 14L44 20V32C44 40 38.4 47.1 32 49.5C25.6 47.1 20 40 20 32V20L32 14Z"
-            className="mh-logotype-mark-shield"
-          />
-          <path
-            d="M23 32L29 38L41 24"
-            className="mh-logotype-mark-wave"
+            d="M14 21l5 5.5L29 14"
+            className="mh-logotype-mark-check"
+            fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -62,8 +49,7 @@ export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProp
       </span>
 
       <span className="mh-logotype-wordmark" aria-hidden="true">
-        <span className="mh-logotype-top">HYPE</span>
-        <span className="mh-logotype-bottom">Check</span>
+        Hype Check
       </span>
     </span>
   );
