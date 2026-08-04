@@ -17,4 +17,10 @@ export const env = {
   YOUTUBE_OAUTH_REDIRECT_URI:
     "https://example.com/api/social/youtube/oauth/callback",
   NEXT_PUBLIC_APP_URL: "https://example.com",
+  ANTHROPIC_API_KEY: "test-anthropic-key",
+  GROQ_API_KEY: "test-groq-key",
+  GROQ_MODEL: "mixtral-8x7b-32768",
+  OPENROUTER_API_KEY: "test-openrouter-key",
+  OPENAI_API_KEY: "test-openai-key",
+  GEMINI_API_KEY: "test-gemini-key",
 } as const;

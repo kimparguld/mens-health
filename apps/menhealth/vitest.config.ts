@@ -26,6 +26,11 @@ export default defineConfig({
         find: "@/lib/db/prisma",
         replacement: resolve(__dirname, "__tests__/__mocks__/prisma.ts"),
       },
+      // Mock aiClient to avoid initializing real API clients in jsdom
+      {
+        find: "@/lib/ai/client",
+        replacement: resolve(__dirname, "__tests__/__mocks__/ai-client.ts"),
+      },
       // next/cache uses Next.js incremental cache context that doesn't exist in Vitest.
       // The stub makes unstable_cache a transparent pass-through.
       {
