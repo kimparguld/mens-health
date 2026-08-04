@@ -35,29 +35,29 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-paper">
       <Suspense fallback={<HeaderShell />}>
         <AuthedHeader />
       </Suspense>
 
       <div className="flex-1">{children}</div>
 
-      <footer className="border-t border-gray-200 bg-gray-50">
+      <footer className="border-t border-hairline bg-surface">
         <div className="mx-auto max-w-280 px-4 py-12">
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {/* Brand */}
             <div className="col-span-2 sm:col-span-1">
               <Link
                 href="/"
-                className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-indigo-600/40 focus-visible:outline-none"
+                className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
               >
                 <BrandLogotype size="md" />
               </Link>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                 Evidence-based verdicts on trending products, courses, and
                 side hustles — without the hype.
               </p>
-              <ul className="mt-4 space-y-1 text-xs text-gray-500">
+              <ul className="mt-4 space-y-1 text-xs text-ink-muted">
                 <li>✓ Educational content only. Not financial advice.</li>
                 <li>✓ We do not host or restream YouTube videos.</li>
                 <li>✓ Affiliate links are clearly disclosed.</li>
@@ -66,35 +66,35 @@ export default async function PublicLayout({
 
             {/* About links */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">About</h3>
-              <ul className="mt-3 space-y-2 text-sm text-gray-500">
+              <h3 className="text-sm font-semibold text-ink">About</h3>
+              <ul className="mt-3 space-y-2 text-sm text-ink-muted">
                 <li>
-                  <Link href="/about" className="hover:text-gray-900">
+                  <Link href="/about" className="hover:text-ink">
                     About Us
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/how-we-rate-evidence"
-                    className="hover:text-gray-900"
+                    className="hover:text-ink"
                   >
                     How We Rate Evidence
                   </Link>
                 </li>
                 <li>
-                  <Link href="/glossary" className="hover:text-gray-900">
+                  <Link href="/glossary" className="hover:text-ink">
                     Glossary
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" className="hover:text-gray-900">
+                  <Link href="/faq" className="hover:text-ink">
                     FAQ
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/editorial-process"
-                    className="hover:text-gray-900"
+                    className="hover:text-ink"
                   >
                     Editorial Process
                   </Link>
@@ -102,7 +102,7 @@ export default async function PublicLayout({
                 <li>
                   <Link
                     href="/disclaimer"
-                    className="hover:text-gray-900"
+                    className="hover:text-ink"
                   >
                     Disclaimer
                   </Link>
@@ -110,18 +110,18 @@ export default async function PublicLayout({
                 <li>
                   <Link
                     href="/affiliate-disclosure"
-                    className="hover:text-gray-900"
+                    className="hover:text-ink"
                   >
                     Affiliate Disclosure
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy" className="hover:text-gray-900">
+                  <Link href="/privacy" className="hover:text-ink">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:text-gray-900">
+                  <Link href="/contact" className="hover:text-ink">
                     Contact
                   </Link>
                 </li>
@@ -130,17 +130,17 @@ export default async function PublicLayout({
 
             {/* Top topics */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">
-                <Link href="/topics" className="hover:text-indigo-700">
+              <h3 className="text-sm font-semibold text-ink">
+                <Link href="/topics" className="hover:text-ink-muted">
                   Top Topics
                 </Link>
               </h3>
-              <ul className="mt-3 space-y-2 text-sm text-gray-500">
+              <ul className="mt-3 space-y-2 text-sm text-ink-muted">
                 {FOOTER_TOPICS.map((topic) => (
                   <li key={topic.slug}>
                     <Link
                       href={`/topics/${topic.slug}`}
-                      className="hover:text-gray-900"
+                      className="hover:text-ink"
                     >
                       {topic.name}
                     </Link>
@@ -149,7 +149,7 @@ export default async function PublicLayout({
                 <li>
                   <Link
                     href="/topics"
-                    className="font-medium text-indigo-700 hover:underline"
+                    className="font-medium text-ink underline decoration-hairline hover:decoration-ink"
                   >
                     View all topics →
                   </Link>
@@ -158,16 +158,16 @@ export default async function PublicLayout({
             </div>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-6 text-xs text-gray-400">
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-6 text-xs text-ink-muted">
             <p>
               © {new Date().getFullYear()} Hype Check. All rights
               reserved.
             </p>
             <div className="flex gap-4">
-              <Link href="/privacy" className="hover:text-gray-600">
+              <Link href="/privacy" className="hover:text-ink">
                 Privacy
               </Link>
-              <Link href="/contact" className="hover:text-gray-600">
+              <Link href="/contact" className="hover:text-ink">
                 Contact
               </Link>
             </div>
