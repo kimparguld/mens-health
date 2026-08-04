@@ -8,7 +8,13 @@ export const {
   factCheckClaim,
   generateEditorialTitle,
   generateTopicFaq,
-} = createAiPipeline(aiClient, { siteName: SITE_NAME });
+} = createAiPipeline(aiClient, {
+  siteName: SITE_NAME,
+  domainDescription:
+    "a platform that reviews trending products, courses, side hustles, and investment apps for hype vs. reality",
+  audienceDescription:
+    "people trying to figure out whether a trending product, course, or money-making opportunity is worth their money",
+});
 
 export type {
   Result,

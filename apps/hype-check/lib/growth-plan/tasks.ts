@@ -166,7 +166,7 @@ export const GROWTH_PLAN_TASKS: SeedTask[] = [
     dayEnd: 14,
     title: "20 claim pages published",
     description:
-      "Publish 20 search-friendly claim pages targeting common men's health questions (e.g. 'Does ashwagandha increase testosterone?').",
+      "Publish 20 search-friendly claim pages targeting common hype/scam questions (e.g. 'Does this trading app really guarantee 40% monthly returns?').",
     adminPath: "/admin/claims",
     priority: "HIGH",
   },
@@ -340,7 +340,7 @@ export const GROWTH_PLAN_TASKS: SeedTask[] = [
     dayEnd: 90,
     title: "Create weekly trend report",
     description:
-      "Publish a weekly trend report (e.g. /weekly) summarising the top trending men's health topics.",
+      "Publish a weekly trend report (e.g. /weekly) summarising the top trending hype/scam topics.",
     adminPath: "/admin/weekly-growth",
     priority: "HIGH",
   },

@@ -39,7 +39,7 @@ export async function generateMetadata({
   if (!seed) return { title: "Not Found" };
 
   return createMetadata({
-    title: `Best ${seed.name} Videos This Week — MenHealth Digest`,
+    title: `Best ${seed.name} Videos This Week — Hype Check`,
     description: `The top trending ${seed.name.toLowerCase()} videos summarised this week. Evidence labels, practical takeaways, and claim checks — no hype.`,
     path: `/weekly/${slug}`,
   });
@@ -326,7 +326,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
         <div className="mt-10">
           <NewsletterInlineCTA
             headline={`Get next week's best ${seed.name.toLowerCase()} videos in your inbox`}
-            description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
+            description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No hype, just evidence."
           />
         </div>
 

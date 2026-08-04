@@ -30,11 +30,11 @@ const APP_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
-    template: "%s — MenHealth Digest",
+    default: "Hype Check — Legit, or Just Hype?",
+    template: "%s — Hype Check",
   },
   description:
-    "Daily summaries of the most important men's health videos, ranked and fact-checked. Fitness, testosterone, sleep, nutrition, longevity — without the hype.",
+    "Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.",
   alternates: {
     canonical: APP_URL,
     types: {
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    siteName: "MenHealth Digest",
+    siteName: "Hype Check",
     type: "website",
     locale: "en_US",
   },

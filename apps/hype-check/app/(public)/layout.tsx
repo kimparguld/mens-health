@@ -11,12 +11,12 @@ type SessionUser = {
 };
 
 const FOOTER_TOPICS = [
-  { slug: 'testosterone', name: 'Testosterone' },
-  { slug: 'sleep', name: 'Sleep' },
-  { slug: 'fitness-over-40', name: 'Fitness Over 40' },
-  { slug: 'nutrition', name: 'Nutrition' },
-  { slug: 'longevity', name: 'Longevity' },
-  { slug: 'supplements', name: 'Supplements' },
+  { slug: 'ai-tools', name: 'AI Tools' },
+  { slug: 'side-hustles', name: 'Side Hustles' },
+  { slug: 'online-courses', name: 'Online Courses' },
+  { slug: 'viral-products', name: 'Viral Products' },
+  { slug: 'investment-apps', name: 'Investment Apps' },
+  { slug: 'giveaways', name: 'Giveaways' },
 ];
 
 async function AuthedHeader() {
@@ -54,11 +54,11 @@ export default async function PublicLayout({
                 <BrandLogotype size="md" />
               </Link>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                Evidence-aware summaries of trending men&apos;s health content —
-                without the hype.
+                Evidence-based verdicts on trending products, courses, and
+                side hustles — without the hype.
               </p>
               <ul className="mt-4 space-y-1 text-xs text-gray-500">
-                <li>✓ Educational content only. Not medical advice.</li>
+                <li>✓ Educational content only. Not financial advice.</li>
                 <li>✓ We do not host or restream YouTube videos.</li>
                 <li>✓ Affiliate links are clearly disclosed.</li>
               </ul>
@@ -160,7 +160,7 @@ export default async function PublicLayout({
 
           <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-6 text-xs text-gray-400">
             <p>
-              © {new Date().getFullYear()} MenHealth Digest. All rights
+              © {new Date().getFullYear()} Hype Check. All rights
               reserved.
             </p>
             <div className="flex gap-4">

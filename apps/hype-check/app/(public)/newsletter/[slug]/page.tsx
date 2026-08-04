@@ -20,7 +20,7 @@ export async function generateMetadata({
   if (!issue) return { title: "Newsletter Issue Not Found" };
 
   return createMetadata({
-    title: `${issue.subject} — MenHealth Digest`,
+    title: `${issue.subject} — Hype Check`,
     description: issue.subject,
     path: `/newsletter/${slug}`,
     type: "article",

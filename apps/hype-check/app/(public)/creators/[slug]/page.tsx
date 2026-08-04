@@ -35,8 +35,8 @@ export async function generateMetadata({
   const creator = CREATOR_SEEDS.find((c) => c.slug === slug);
   if (!creator) return { title: 'Creator Not Found' };
 
-  const title = `${creator.name} — Men's Health Videos`;
-  const description = `${creator.description} Browse ${creator.name}'s top men's health videos, summarised and fact-checked.`;
+  const title = `${creator.name} — Hype Check`;
+  const description = `${creator.description} Browse ${creator.name}'s top videos, summarised and fact-checked.`;
   const canonical = `${APP_URL}/creators/${slug}`;
 
   return {
@@ -49,7 +49,7 @@ export async function generateMetadata({
       creator.name,
       `${creator.name} videos`,
       `${creator.name} YouTube`,
-      "men's health",
+      'legit or scam',
       creator.specialty,
     ],
   };
@@ -398,11 +398,11 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
             {/* Creator disclaimer */}
             <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-              MenHealth Digest does not endorse, represent, or have an
-              affiliation with {creator.name}. This page presents an independent
-              summary of publicly available content. Always evaluate health
-              information critically and consult a qualified healthcare
-              professional for personal medical decisions.
+              Hype Check does not endorse, represent, or have an affiliation
+              with {creator.name}. This page presents an independent summary
+              of publicly available content. Always evaluate claims
+              critically and do your own research before making a purchase
+              or investment decision.
             </div>
 
             <h2 className="mb-4 text-sm font-semibold text-gray-700">
@@ -425,7 +425,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
         {/* Newsletter */}
         <NewsletterFooterCTA
           headline="Follow the evidence, not the hype"
-          description="Get the 5-minute Men's Health Digest every Friday — trending videos, summarised claims, evidence notes."
+          description="Get the 5-minute Hype Check digest every Friday — trending videos, summarised claims, evidence notes."
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">

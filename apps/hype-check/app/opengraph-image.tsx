@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "MenHealth Digest — Evidence-Aware Men's Health Summaries";
+export const alt = "Hype Check — Legit, or Just Hype?";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -39,7 +39,7 @@ export default function Image() {
             maxWidth: 980,
           }}
         >
-          MenHealth Digest
+          Hype Check
         </div>
         <div
           style={{
@@ -50,7 +50,8 @@ export default function Image() {
             maxWidth: 900,
           }}
         >
-          Evidence-aware men&apos;s health summaries — without the hype.
+          Evidence-based verdicts on trending products, courses, and side
+          hustles.
         </div>
         <div
           style={{

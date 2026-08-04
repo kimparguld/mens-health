@@ -24,7 +24,7 @@ export async function GET(
 
   const xml = buildRssFeed(
     {
-      title: `MenHealth Digest — ${seed.name}`,
+      title: `Hype Check — ${seed.name}`,
       description: `Reviews of videos from ${seed.name}.`,
       link: `${appUrl}/creators/${seed.slug}`,
     },

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How MenHealth Digest collects, uses, and protects your data.",
+  description: "How Hype Check collects, uses, and protects your data.",
 };
 
 export default function PrivacyPage() {

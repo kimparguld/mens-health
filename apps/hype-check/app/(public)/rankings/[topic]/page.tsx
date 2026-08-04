@@ -49,7 +49,7 @@ export async function generateMetadata({
       `best ${seed.name.toLowerCase()} videos`,
       `best ${seed.name.toLowerCase()} videos this week`,
       `top ${seed.name.toLowerCase()} youtube videos`,
-      "men's health videos",
+      'legit or scam',
     ],
   };
 }

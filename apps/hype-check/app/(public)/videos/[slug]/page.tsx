@@ -50,9 +50,9 @@ export async function generateMetadata({
     description,
     alternates: { canonical },
     keywords: [
-      "men's health",
-      "health video summary",
-      "evidence-based health",
+      "legit or scam",
+      "video review summary",
+      "evidence-based review",
       video.title,
     ],
     openGraph: {
@@ -324,7 +324,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       <NewsletterInlineCTA
         headline="Enjoying this breakdown? Get one every week."
-        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
+        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No hype, just evidence."
       />
 
       <AdSlot slot="between-content" className="mb-8" config={adsConfig} />
@@ -333,7 +333,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       {video.claims.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 text-xl font-semibold text-gray-900">
-            Health Claims in This Video
+            Claims in This Video
           </h2>
           <div className="space-y-4">
             {video.claims
@@ -456,7 +456,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         </p>
         <img
           src={`${APP_URL}/badge/${video.slug}`}
-          alt="Reviewed by MenHealth Digest"
+          alt="Reviewed by Hype Check"
           width={210}
           height={50}
           className="mb-3"
@@ -465,7 +465,7 @@ export default async function VideoPage({ params }: { params: Params }) {
           readOnly
           rows={2}
           className="w-full rounded border border-gray-200 bg-gray-50 p-2 font-mono text-xs text-gray-600"
-          defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by MenHealth Digest" width="210" height="50" /></a>`}
+          defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by Hype Check" width="210" height="50" /></a>`}
         />
       </section>
 
@@ -508,7 +508,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Disclaimer — required on every video page */}
       <Disclaimer text={DISCLAIMER_TEXT} />
-      <NewsletterStickyCTA label="Free weekly men's health digest" />
+      <NewsletterStickyCTA label="Free weekly Hype Check digest" />
     </main>
   );
 }

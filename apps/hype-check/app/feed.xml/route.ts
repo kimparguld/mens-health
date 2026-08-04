@@ -10,8 +10,9 @@ export async function GET() {
 
   const xml = buildRssFeed(
     {
-      title: "MenHealth Digest — Latest Reviews",
-      description: "Evidence-aware summaries of trending men's health videos.",
+      title: "Hype Check — Latest Verdicts",
+      description:
+        "Evidence-based verdicts on trending products, courses, side hustles, and investment apps.",
       link: appUrl,
     },
     videos.map((v) => toFeedItem(v, appUrl)),

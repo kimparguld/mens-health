@@ -6,15 +6,15 @@ import { buildItemListSchema } from "@menhealth/core-seo";
 import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
-  title: "Weekly Men's Health Video Rankings — MenHealth Digest",
+  title: "Weekly Video Rankings — Hype Check",
   description:
-    "The top-ranked men's health videos by topic this week — scored for evidence quality, trending reach, and practical value.",
+    "The top-ranked videos by topic this week — scored for evidence quality, trending reach, and practical value.",
   path: "/rankings",
 });
 
 export default function RankingsIndexPage() {
   const itemListSchema = buildItemListSchema(
-    "Weekly Men's Health Video Rankings",
+    "Weekly Hype Check Video Rankings",
     TOPIC_SEEDS.map((topic) => ({
       name: topic.name,
       url: createCanonicalUrl(`/rankings/${topic.slug}`),
@@ -28,8 +28,8 @@ export default function RankingsIndexPage() {
         Weekly Rankings
       </h1>
       <p className="mb-8 text-gray-600">
-        Each week we score and rank the top men&apos;s health videos by topic.
-        Choose a topic to see this week&apos;s leaderboard.
+        Each week we score and rank the top videos by topic. Choose a topic
+        to see this week&apos;s leaderboard.
       </p>
       <ul className="grid gap-4 sm:grid-cols-2">
         {TOPIC_SEEDS.map((topic) => (

@@ -355,7 +355,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <tr>
             <td style="padding:16px 32px;background:#fefce8;border-top:1px solid #fef08a;">
               <p style="margin:0;font-size:13px;color:#854d0e;line-height:1.6;">
-                ⚠️ <strong>Health Disclaimer:</strong> ${escapeHtml(brand.healthDisclaimer)}
+                ⚠️ <strong>Disclaimer:</strong> ${escapeHtml(brand.healthDisclaimer)}
               </p>
             </td>
           </tr>

@@ -69,13 +69,13 @@ describe("withNewsletterUtm", () => {
 describe("buildDigestSubject", () => {
   it("returns a title-based subject when no claims exist", () => {
     const subject = buildDigestSubject([makeVideo({ checkedClaims: [] })]);
-    expect(subject).toContain("men's health digest");
+    expect(subject).toContain("hype check digest");
     expect(subject).toContain("How to Build Muscle Over 40");
   });
 
   it("returns a generic subject when no videos are provided", () => {
     expect(buildDigestSubject([])).toBe(
-      "Men's health claims worth understanding this week",
+      "Claims worth understanding this week",
     );
   });
 
@@ -83,7 +83,7 @@ describe("buildDigestSubject", () => {
     const subject = buildDigestSubject([
       makeVideo({ checkedClaims: [makeClaim()] }),
     ]);
-    expect(subject).toBe("Men's health claims worth understanding this week");
+    expect(subject).toBe("Claims worth understanding this week");
   });
 
   it("returns '3 claims' subject for 3 or more claims", () => {
@@ -91,7 +91,7 @@ describe("buildDigestSubject", () => {
       makeVideo({ checkedClaims: [makeClaim(), makeClaim(), makeClaim()] }),
     ];
     expect(buildDigestSubject(videos)).toBe(
-      "3 men's health claims worth understanding this week",
+      "3 claims worth understanding this week",
     );
   });
 
@@ -101,7 +101,7 @@ describe("buildDigestSubject", () => {
       makeVideo({ checkedClaims: [makeClaim()] }),
     ];
     expect(buildDigestSubject(videos)).toBe(
-      "3 men's health claims worth understanding this week",
+      "3 claims worth understanding this week",
     );
   });
 
@@ -120,7 +120,7 @@ describe("buildDigestSubject", () => {
 describe("buildDigestHtml", () => {
   it("includes the newsletter intro paragraph", () => {
     const html = buildDigestHtml([makeVideo()], APP_URL, UNSUB_URL);
-    expect(html).toContain("trending men's health video");
+    expect(html).toContain("trending product");
     expect(html).toContain("three claims worth understanding");
   });
 
@@ -150,10 +150,12 @@ describe("buildDigestHtml", () => {
     expect(html).toContain(UNSUB_URL);
   });
 
-  it("includes the health disclaimer", () => {
+  it("includes the disclaimer", () => {
     const html = buildDigestHtml([makeVideo()], APP_URL, UNSUB_URL);
-    expect(html.toLowerCase()).toContain("health disclaimer");
-    expect(html).toContain("does not constitute medical advice");
+    expect(html.toLowerCase()).toContain("disclaimer");
+    expect(html).toContain(
+      "does not constitute financial, legal, or investment advice",
+    );
   });
 
   it("always renders '3 Claims Checked' heading", () => {
@@ -305,7 +307,7 @@ describe("buildDigestHtml", () => {
 describe("buildDigestText", () => {
   it("includes the newsletter intro paragraph", () => {
     const text = buildDigestText([makeVideo()], APP_URL, UNSUB_URL);
-    expect(text).toContain("trending men's health video");
+    expect(text).toContain("trending product");
   });
 
   it("includes 'TOP VIDEO THIS WEEK' heading", () => {
@@ -332,7 +334,9 @@ describe("buildDigestText", () => {
 
   it("includes the disclaimer", () => {
     const text = buildDigestText([makeVideo()], APP_URL, UNSUB_URL);
-    expect(text).toContain("does not constitute medical advice");
+    expect(text).toContain(
+      "does not constitute financial, legal, or investment advice",
+    );
   });
 
   it("always renders '3 CLAIMS CHECKED' heading", () => {

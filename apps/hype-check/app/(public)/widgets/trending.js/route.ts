@@ -2,7 +2,7 @@ export const revalidate = 3600;
 
 // Vanilla JS, self-injecting widget. Reads its own <script data-topic data-count>
 // attributes via document.currentScript, fetches /api/widgets/trending, and
-// renders a small "Reviewed by MenHealth Digest" list at its own location.
+// renders a small "Reviewed by Hype Check" list at its own location.
 const WIDGET_JS = `(function () {
   var script = document.currentScript;
   if (!script) return;
@@ -17,7 +17,7 @@ const WIDGET_JS = `(function () {
   container.style.borderRadius = "8px";
   container.style.padding = "12px";
   container.innerHTML =
-    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">Reviewed by MenHealth Digest</div>' +
+    '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">Reviewed by Hype Check</div>' +
     '<div data-mhd-list>Loading\\u2026</div>';
   script.parentNode.insertBefore(container, script.nextSibling);
 

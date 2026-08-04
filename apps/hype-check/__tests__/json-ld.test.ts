@@ -158,7 +158,7 @@ describe("buildDefinedTermSchema", () => {
 describe("buildDefinedTermSetSchema", () => {
   it("sets @type to DefinedTermSet and maps terms to hasDefinedTerm", () => {
     const schema = buildDefinedTermSetSchema({
-      name: "Men's Health Glossary",
+      name: "Hype Check Glossary",
       url: "https://example.com/glossary",
       terms: [
         {

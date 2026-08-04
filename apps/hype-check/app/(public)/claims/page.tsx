@@ -9,9 +9,9 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = createMetadata({
-  title: "Health Claims — MenHealth Digest",
+  title: "Claims — Hype Check",
   description:
-    "Browse health claims extracted from men's health videos, each reviewed and rated for evidence quality.",
+    "Browse claims extracted from the videos we review, each reviewed and rated for evidence quality.",
   path: "/claims",
 });
 
@@ -48,10 +48,10 @@ export default async function ClaimsIndexPage() {
     <main className="mx-auto max-w-3xl px-4 py-10">
       <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Health Claims
+        Claims
       </h1>
       <p className="mb-4 text-gray-600">
-        Claims extracted from published men&apos;s health videos, each rated for
+        Claims extracted from published videos we review, each rated for
         evidence quality.
       </p>
 

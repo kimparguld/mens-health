@@ -7,21 +7,21 @@ import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: {
-    absolute: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
+    absolute: "Hype Check — Legit, or Just Hype?",
   },
   description:
-    "Daily summaries of the most important men's health videos, ranked and fact-checked. Fitness, testosterone, sleep, nutrition, longevity — without the hype.",
+    "Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.",
   openGraph: {
-    title: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
+    title: "Hype Check — Legit, or Just Hype?",
     description:
-      "Daily summaries of the most important men's health videos, ranked and fact-checked.",
+      "Evidence-based verdicts on trending products, courses, side hustles, and investment apps.",
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MenHealth Digest',
+    title: 'Hype Check',
     description:
-      "Evidence-aware summaries of trending men's health content — without the hype.",
+      "Evidence-based verdicts on trending products, courses, and side hustles — without the hype.",
   },
 };
 
@@ -36,14 +36,14 @@ function deriveEvidenceLabel(
 }
 
 const FEATURED_TOPIC_SLUGS = [
-  'testosterone',
-  'sleep',
-  'fitness-over-40',
-  'nutrition',
-  'longevity',
-  'supplements',
-  'weight-loss',
-  'muscle-gain',
+  'ai-tools',
+  'side-hustles',
+  'online-courses',
+  'viral-products',
+  'marketplaces',
+  'investment-apps',
+  'giveaways',
+  'travel-hacks',
 ];
 
 async function FeaturedInsight() {
@@ -163,15 +163,15 @@ export default async function HomePage() {
       <section className="border-b border-gray-100 bg-white py-16">
         <div className="mx-auto max-w-[1120px] px-4">
           <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Men&apos;s health trends,{' '}
+            Trending products and side hustles,{' '}
             <span className="text-indigo-600">
               explained without the hype.
             </span>
           </h1>
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-gray-600">
-            We scan trending YouTube videos about fitness, sleep, testosterone,
-            nutrition, longevity, and men&apos;s wellness — then summarise the
-            key claims and check them against available evidence.
+            We scan trending YouTube videos about products, courses, side
+            hustles, and investment apps — then summarise the key claims and
+            check them against available evidence.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
@@ -274,14 +274,14 @@ export default async function HomePage() {
       <section className="bg-indigo-50 py-16">
         <div className="mx-auto max-w-lg px-4 text-center">
           <h2 className="text-2xl font-bold text-gray-900">
-            Get the 5-minute Men&apos;s Health Digest
+            Get the 5-minute Hype Check Digest
           </h2>
           <p className="mt-2 text-sm text-gray-600">Every week:</p>
           <ul className="mt-2 space-y-0.5 text-sm text-gray-600">
             <li>5 trending videos summarised</li>
             <li>3 claims checked</li>
             <li>1 practical takeaway</li>
-            <li>No miracle-cure nonsense</li>
+            <li>No get-rich-quick nonsense</li>
           </ul>
           <div className="mt-6">
             <NewsletterSignupForm />

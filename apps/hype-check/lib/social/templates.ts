@@ -24,7 +24,7 @@ export const SEED_TEMPLATES: TemplateDef[] = [
   {
     name: "Claim Check",
     platform: null,
-    hook: "This men's health claim is trending — here's what it actually says.",
+    hook: "This trending claim is going viral — here's what it actually says.",
     script: [
       "A popular video this week claims that {{claim}}.",
       "",
@@ -43,7 +43,7 @@ export const SEED_TEMPLATES: TemplateDef[] = [
       "Read the full evidence-aware summary at hype-check.net.",
     ].join("\n"),
     caption: [
-      "This men's health claim is trending — here's what it actually says.",
+      "This trending claim is going viral — here's what it actually says.",
       "",
       "{{plainEnglishSummary}}",
       "",
@@ -55,9 +55,9 @@ export const SEED_TEMPLATES: TemplateDef[] = [
       "Read the full summary:",
       "{{utmUrl}}",
       "",
-      "#MensHealth #Fitness #Longevity",
+      "#HypeCheck #Trending #Reviews",
     ].join("\n"),
-    hashtags: ["MensHealth", "Fitness", "Longevity"],
+    hashtags: ["HypeCheck", "Trending", "Reviews"],
   },
   {
     name: "3 Takeaways",
@@ -93,9 +93,9 @@ export const SEED_TEMPLATES: TemplateDef[] = [
       "Read the full summary:",
       "{{utmUrl}}",
       "",
-      "#MensHealth #{{topic}} #Longevity",
+      "#HypeCheck #{{topic}} #Reviews",
     ].join("\n"),
-    hashtags: ["MensHealth", "Longevity"],
+    hashtags: ["HypeCheck", "Reviews"],
   },
   {
     name: "Useful but Incomplete",
@@ -129,14 +129,14 @@ export const SEED_TEMPLATES: TemplateDef[] = [
       "Read the full summary:",
       "{{utmUrl}}",
       "",
-      "#MensHealth #HealthAdvice #Longevity",
+      "#HypeCheck #Reviews #Longevity",
     ].join("\n"),
-    hashtags: ["MensHealth", "HealthAdvice", "Longevity"],
+    hashtags: ["HypeCheck", "Reviews", "Longevity"],
   },
   {
     name: "Weekly Roundup",
     platform: null,
-    hook: "5 men's health claims that were trending this week.",
+    hook: "5 trending claims that went viral this week.",
     script: [
       "This week, the biggest topics were:",
       "",
@@ -153,7 +153,7 @@ export const SEED_TEMPLATES: TemplateDef[] = [
       "Full weekly digest at hype-check.net.",
     ].join("\n"),
     caption: [
-      "5 men's health claims that were trending this week.",
+      "5 trending claims that went viral this week.",
       "",
       "Topics: {{topic1}} | {{topic2}} | {{topic3}}",
       "",
@@ -162,8 +162,8 @@ export const SEED_TEMPLATES: TemplateDef[] = [
       "Read the full weekly digest:",
       "{{utmUrl}}",
       "",
-      "#MensHealth #WeeklyDigest #Longevity",
+      "#HypeCheck #WeeklyDigest #Reviews",
     ].join("\n"),
-    hashtags: ["MensHealth", "WeeklyDigest", "Longevity"],
+    hashtags: ["HypeCheck", "WeeklyDigest", "Reviews"],
   },
 ];

@@ -4,9 +4,9 @@ import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
-  title: "Monthly Reports — MenHealth Digest",
+  title: "Monthly Reports — Hype Check",
   description:
-    "Data-driven monthly reports on men's health video claims: evidence quality, risk levels, and sourcing across everything we've reviewed.",
+    "Data-driven monthly reports on the claims we've checked: evidence quality, risk levels, and sourcing across everything we've reviewed.",
   path: "/reports",
 });
 
@@ -23,8 +23,8 @@ export default async function ReportsIndexPage() {
         Monthly Reports
       </h1>
       <p className="mb-8 text-gray-600">
-        Data-driven summaries of every men&apos;s health video and claim we&apos;ve
-        reviewed, published monthly with a downloadable CSV.
+        Data-driven summaries of every video and claim we&apos;ve reviewed,
+        published monthly with a downloadable CSV.
       </p>
       <ul className="divide-y divide-gray-100">
         {reports.length === 0 && (
