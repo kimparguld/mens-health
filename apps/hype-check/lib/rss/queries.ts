@@ -1,29 +1,33 @@
 import { db } from "@/lib/db/prisma";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/app/generated/prisma";
 import type { FeedVideo } from "@/lib/rss/build-feed";
 
 const FEED_TAKE = 30;
 
 async function queryFeedVideos(
-  where: Prisma.VideoWhereInput,
+  where: Prisma.SubjectWhereInput,
 ): Promise<FeedVideo[]> {
-  const videos = await db.video.findMany({
+  const videos = await db.subject.findMany({
     where: { status: "PUBLISHED", ...where },
     orderBy: [{ publishedAt: "desc" }],
     take: FEED_TAKE,
     include: {
       channel: true,
-      summaries: { take: 1, orderBy: { createdAt: "desc" } },
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+      },
     },
   });
 
   return videos.map((v) => ({
-    title: v.title,
+    title: v.editorialTitle ?? v.sourceVideos[0]?.title ?? v.name,
     slug: v.slug,
-    publishedAt: v.publishedAt,
+    publishedAt: v.publishedAt ?? v.sourceVideos[0]?.publishedAt ?? v.createdAt,
     thumbnailUrl: v.thumbnailUrl,
-    shortSummary: v.summaries[0]?.shortSummary ?? null,
-    channelTitle: v.channel.title,
+    shortSummary: v.sourceVideos[0]?.summaries[0]?.shortSummary ?? null,
+    channelTitle: v.channel?.title ?? "",
     riskLevel: v.riskLevel,
     evidenceScore: v.evidenceScore,
   }));

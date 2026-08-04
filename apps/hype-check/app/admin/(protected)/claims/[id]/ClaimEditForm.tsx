@@ -11,15 +11,16 @@ type EvidenceStatus =
   | "UNSUPPORTED";
 type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
 type ClaimCategory =
-  | "NUTRITION"
-  | "EXERCISE"
-  | "HORMONES"
-  | "MENTAL_HEALTH"
-  | "SUPPLEMENTS"
-  | "MEDICATIONS"
-  | "CANCER"
-  | "LONGEVITY"
-  | "SEXUAL_HEALTH"
+  | "PERFORMANCE"
+  | "INCOME"
+  | "SAFETY"
+  | "PRICING"
+  | "LEGITIMACY"
+  | "REGULATION"
+  | "POPULARITY"
+  | "GUARANTEE"
+  | "ENDORSEMENT"
+  | "SCARCITY"
   | "OTHER";
 
 type Source = {
@@ -40,15 +41,16 @@ const EVIDENCE_OPTIONS: EvidenceStatus[] = [
 ];
 const RISK_OPTIONS: RiskLevel[] = ["LOW", "MEDIUM", "HIGH"];
 const CATEGORY_OPTIONS: ClaimCategory[] = [
-  "NUTRITION",
-  "EXERCISE",
-  "HORMONES",
-  "MENTAL_HEALTH",
-  "SUPPLEMENTS",
-  "MEDICATIONS",
-  "CANCER",
-  "LONGEVITY",
-  "SEXUAL_HEALTH",
+  "PERFORMANCE",
+  "INCOME",
+  "SAFETY",
+  "PRICING",
+  "LEGITIMACY",
+  "REGULATION",
+  "POPULARITY",
+  "GUARANTEE",
+  "ENDORSEMENT",
+  "SCARCITY",
   "OTHER",
 ];
 

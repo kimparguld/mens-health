@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -63,6 +64,17 @@ model VerificationToken {
 
 // ---------------------------------------------------------------------------
 // Core domain
+//
+// Subject is the thing being reviewed (a product/course/side-hustle/investment
+// app/giveaway/etc.) — it's the top-level entity pages are built around, and
+// carries denormalized display/scoring fields (trendScore, riskLevel,
+// evidenceScore, thumbnailUrl, publishedAt, ...) cached from its primary
+// SourceVideo so trending/sorting/card-rendering queries stay simple. A
+// Subject can have more than one SourceVideo (multiple creators covering the
+// same product), but today's ingestion pipeline creates one Subject per
+// SourceVideo — multi-source merging is a future admin workflow, not built
+// here. SourceVideo is the fuller, ingestion-focused record (transcript,
+// disclosure detection, per-video processing status).
 // ---------------------------------------------------------------------------
 
 model Channel {
@@ -75,18 +87,22 @@ model Channel {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  videos               Video[]
+  subjects             Subject[]
+  sourceVideos         SourceVideo[]
   creatorNotifications CreatorNotification[]
 }
 
-model Video {
+model Subject {
   id              String        @id @default(cuid())
-  youtubeVideoId  String        @unique
-  title           String
+  slug            String        @unique
+  name            String
   editorialTitle  String?
+  subjectType     SubjectType
   description     String?
-  channelId       String
-  publishedAt     DateTime
+  websiteUrl      String?
+  channelId       String?
+  youtubeVideoId  String?       @unique
+  publishedAt     DateTime?
   thumbnailUrl    String?
   durationSeconds Int?
   viewCount       Int?
@@ -96,16 +112,48 @@ model Video {
   relevanceScore  Float         @default(0)
   evidenceScore   Float?
   riskLevel       RiskLevel     @default(LOW)
-  status          PublishStatus @default(PENDING)
-  slug            String        @unique
+  status          SubjectStatus @default(DRAFT)
+  slugHistory     String[]      @default([])
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  channel             Channel              @relation(fields: [channelId], references: [id])
+  channel            Channel?             @relation(fields: [channelId], references: [id])
+  sourceVideos       SourceVideo[]
+  claims             Claim[]
+  warningSigns       WarningSign[]
+  costItems          CostItem[]
+  disclosures        Disclosure[]
+  alternativesFrom   Alternative[]        @relation("SubjectAlternatives")
+  alternativesTo     Alternative[]        @relation("AlternativeSubject")
+  verdict            Verdict?
+  verdictHistory     VerdictHistory[]
+  topics             SubjectTopic[]
+  adminReviews       AdminReview[]
+  correctionRequests CorrectionRequest[]
+  submissions        Submission[]
+}
+
+model SourceVideo {
+  id                  String   @id @default(cuid())
+  subjectId           String
+  youtubeVideoId      String   @unique
+  title               String
+  description         String?
+  channelId           String
+  publishedAt         DateTime
+  thumbnailUrl        String?
+  durationSeconds     Int?
+  viewCount           Int?
+  likeCount           Int?
+  commentCount        Int?
+  transcript          String?
+  disclosuresDetected Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  subject             Subject               @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  channel             Channel               @relation(fields: [channelId], references: [id])
   summaries           Summary[]
-  claims              Claim[]
-  topics              VideoTopic[]
-  adminReviews        AdminReview[]
   processingJob       ProcessingJob?
   creatorNotification CreatorNotification?
 }
@@ -120,22 +168,22 @@ model Topic {
   faqJson      Json?
   faqUpdatedAt DateTime?
 
-  videos VideoTopic[]
+  subjects SubjectTopic[]
 }
 
-model VideoTopic {
-  videoId String
-  topicId String
+model SubjectTopic {
+  subjectId String
+  topicId   String
 
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topic   Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
-  @@id([videoId, topicId])
+  @@id([subjectId, topicId])
 }
 
 model Summary {
   id                  String   @id @default(cuid())
-  videoId             String
+  sourceVideoId       String
   shortSummary        String
   longSummary         String
   takeaways           Json
@@ -148,15 +196,16 @@ model Summary {
   reviewerCredentials String?
   createdAt           DateTime @default(now())
 
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  sourceVideo SourceVideo @relation(fields: [sourceVideoId], references: [id], onDelete: Cascade)
 }
 
 model Claim {
   id               String         @id @default(cuid())
-  videoId          String
+  subjectId        String
   slug             String?        @unique
   text             String
-  category         ClaimCategory  @default(OTHER)
+  claimType        ClaimCategory  @default(OTHER)
+  confidence       Float?
   riskLevel        RiskLevel
   evidenceStatus   EvidenceStatus @default(NOT_CHECKED)
   explanation      String?
@@ -164,20 +213,143 @@ model Claim {
   humanConfirmedAt DateTime?
   createdAt        DateTime       @default(now())
 
-  video   Video            @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  sources EvidenceSource[]
+  subject       Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  evidenceItems EvidenceItem[]
 }
 
-model EvidenceSource {
-  id      String  @id @default(cuid())
-  claimId String
-  title   String
-  url     String
-  source  String
-  year    Int?
-  summary String?
+model EvidenceItem {
+  id          String              @id @default(cuid())
+  claimId     String
+  title       String
+  url         String
+  source      String
+  year        Int?
+  summary     String?
+  position    EvidencePosition    @default(UNVERIFIED)
+  reliability EvidenceReliability @default(MEDIUM)
 
   claim Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+}
+
+model WarningSign {
+  id        String    @id @default(cuid())
+  subjectId String
+  text      String
+  severity  RiskLevel @default(MEDIUM)
+  source    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model CostItem {
+  id        String   @id @default(cuid())
+  subjectId String
+  label     String
+  amount    String
+  isHidden  Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model Disclosure {
+  id        String   @id @default(cuid())
+  subjectId String
+  text      String
+  detected  Boolean  @default(false)
+  source    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+/// A subject-to-subject "consider this instead" pointer, e.g. a scam
+/// investment app pointing at a legit, verifiable alternative.
+model Alternative {
+  id            String   @id @default(cuid())
+  subjectId     String
+  alternativeId String
+  note          String?
+  createdAt     DateTime @default(now())
+
+  subject     Subject @relation("SubjectAlternatives", fields: [subjectId], references: [id], onDelete: Cascade)
+  alternative Subject @relation("AlternativeSubject", fields: [alternativeId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, alternativeId])
+}
+
+/// The published, human-facing verdict for a Subject. `internalVerdict` is a
+/// superset used for editorial workflow states (UNVERIFIED/
+/// INSUFFICIENT_EVIDENCE/PENDING_REVIEW) that never render publicly — only
+/// the 5 public VerdictType values are shown to readers. Publishing a SCAM
+/// verdict requires acknowledgedHighRisk + a non-empty note, mirroring the
+/// existing HIGH-risk-claim publish gate.
+model Verdict {
+  id                   String              @id @default(cuid())
+  subjectId            String              @unique
+  verdict              VerdictType
+  internalVerdict      InternalVerdictType @default(PENDING_REVIEW)
+  rationale            String?
+  confidence           Float?
+  acknowledgedHighRisk Boolean             @default(false)
+  acknowledgedBy       String?
+  publishedAt          DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+/// Append-only audit trail of every verdict change — mirrors AdminReview's
+/// audit-trail pattern but scoped specifically to verdict transitions, so a
+/// Subject's full verdict history remains visible even after the current
+/// Verdict row is overwritten.
+model VerdictHistory {
+  id              String              @id @default(cuid())
+  subjectId       String
+  verdict         VerdictType
+  internalVerdict InternalVerdictType
+  rationale       String?
+  changedBy       String?
+  createdAt       DateTime            @default(now())
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+/// A reader-submitted "please review this" request (a URL + optional note),
+/// distinct from the automated discovery pipeline. May or may not resolve to
+/// a Subject once reviewed.
+model Submission {
+  id             String           @id @default(cuid())
+  url            String
+  note           String?
+  submitterEmail String?
+  status         SubmissionStatus @default(PENDING)
+  subjectId      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  subject Subject? @relation(fields: [subjectId], references: [id])
+}
+
+/// A reader-submitted correction/dispute against a published Subject's
+/// claims or verdict.
+model CorrectionRequest {
+  id             String                  @id @default(cuid())
+  subjectId      String
+  message        String
+  requesterEmail String?
+  status         CorrectionRequestStatus @default(OPEN)
+  resolution     String?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 }
 
 // ---------------------------------------------------------------------------
@@ -211,14 +383,14 @@ model NewsletterDigest {
 }
 
 model CreatorNotification {
-  id        String   @id @default(cuid())
-  videoId   String   @unique
-  channelId String
-  email     String
-  sentAt    DateTime @default(now())
+  id            String   @id @default(cuid())
+  sourceVideoId String   @unique
+  channelId     String
+  email         String
+  sentAt        DateTime @default(now())
 
-  video   Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  channel Channel @relation(fields: [channelId], references: [id])
+  sourceVideo SourceVideo @relation(fields: [sourceVideoId], references: [id], onDelete: Cascade)
+  channel     Channel     @relation(fields: [channelId], references: [id])
 }
 
 model MonthlyReport {
@@ -276,43 +448,58 @@ model Sponsor {
 
 model AdminReview {
   id                   String       @id @default(cuid())
-  videoId              String
+  subjectId            String
   action               ReviewAction
   note                 String?
   acknowledgedHighRisk Boolean      @default(false)
   acknowledgedBy       String?
   createdAt            DateTime     @default(now())
 
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 }
 
 model ProcessingJob {
-  id           String    @id @default(cuid())
-  videoId      String    @unique
-  status       JobStatus @default(QUEUED)
-  startedAt    DateTime?
-  completedAt  DateTime?
-  errorMessage String?
-  createdAt    DateTime  @default(now())
+  id            String    @id @default(cuid())
+  sourceVideoId String    @unique
+  status        JobStatus @default(QUEUED)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  errorMessage  String?
+  createdAt     DateTime  @default(now())
 
-  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  sourceVideo SourceVideo @relation(fields: [sourceVideoId], references: [id], onDelete: Cascade)
 }
 
 // ---------------------------------------------------------------------------
 // Enums
 // ---------------------------------------------------------------------------
 
+enum SubjectType {
+  PRODUCT
+  SERVICE
+  APP
+  COURSE
+  SIDE_HUSTLE
+  INVESTMENT
+  GIVEAWAY
+  TRAVEL_HACK
+  JOB_OFFER
+  MARKETPLACE_LISTING
+  VIRAL_CLAIM
+  OTHER
+}
+
+enum SubjectStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
 enum RiskLevel {
   LOW
   MEDIUM
   HIGH
-}
-
-enum PublishStatus {
-  PENDING
-  PROCESSED
-  REJECTED
-  PUBLISHED
 }
 
 enum EvidenceStatus {
@@ -323,17 +510,71 @@ enum EvidenceStatus {
   NOT_CHECKED
 }
 
+/// Hype Check's own claim taxonomy — replaces MenHealth's health-category
+/// enum (NUTRITION/HORMONES/CANCER/...). See lib/ai/claim-risk.ts for the
+/// per-category risk floor.
 enum ClaimCategory {
-  NUTRITION
-  EXERCISE
-  HORMONES
-  MENTAL_HEALTH
-  SUPPLEMENTS
-  MEDICATIONS
-  CANCER
-  LONGEVITY
-  SEXUAL_HEALTH
+  PERFORMANCE
+  INCOME
+  SAFETY
+  PRICING
+  LEGITIMACY
+  REGULATION
+  POPULARITY
+  GUARANTEE
+  ENDORSEMENT
+  SCARCITY
   OTHER
+}
+
+enum EvidencePosition {
+  SUPPORTS
+  CONTRADICTS
+  PARTIAL
+  UNVERIFIED
+  CONTEXT_ONLY
+}
+
+enum EvidenceReliability {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+/// The 5 public-facing verdicts.
+enum VerdictType {
+  LEGIT
+  MISLEADING
+  OVERPRICED
+  RISKY
+  SCAM
+}
+
+/// Superset of VerdictType used internally for editorial workflow states
+/// that never render publicly.
+enum InternalVerdictType {
+  LEGIT
+  MISLEADING
+  OVERPRICED
+  RISKY
+  SCAM
+  UNVERIFIED
+  INSUFFICIENT_EVIDENCE
+  PENDING_REVIEW
+}
+
+enum SubmissionStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum CorrectionRequestStatus {
+  OPEN
+  UNDER_REVIEW
+  ACCEPTED
+  REJECTED
 }
 
 enum ReviewAction {
@@ -342,6 +583,7 @@ enum ReviewAction {
   FLAGGED_HIGH_RISK
   PUBLISHED
   UNPUBLISHED
+  SCAM_VERDICT_ACKNOWLEDGED
 }
 
 enum JobStatus {
@@ -473,11 +715,11 @@ model SocialMetric {
 enum OutreachContactType {
   YOUTUBE_CREATOR
   NEWSLETTER_PUBLISHER
-  FITNESS_BLOGGER
+  FINANCE_BLOGGER
   COACH
   PODCAST_HOST
   SPONSOR_PROSPECT
-  HEALTH_TECH_FOUNDER
+  FINTECH_FOUNDER
 }
 
 enum OutreachStatus {

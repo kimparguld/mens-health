@@ -1,4 +1,4 @@
-import type { Platform } from "@prisma/client";
+import type { Platform } from "@/app/generated/prisma";
 
 /**
  * Template variable placeholders used in hook/script/caption strings.

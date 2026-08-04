@@ -16,18 +16,36 @@ export async function POST(
 
   const { id } = await params;
 
-  const video = await db.video.findUnique({
+  const subject = await db.subject.findUnique({
     where: { id },
-    include: { channel: true },
+    include: {
+      channel: true,
+      sourceVideos: { take: 1, orderBy: { createdAt: "desc" } },
+    },
   });
 
-  if (!video) {
+  if (!subject) {
     return NextResponse.json({ error: "Video not found" }, { status: 404 });
   }
 
+  const sourceVideo = subject.sourceVideos[0];
+  if (!sourceVideo) {
+    return NextResponse.json(
+      { error: "Source video not found" },
+      { status: 404 },
+    );
+  }
+
   const pipelineResult = await generateSummaryAndClaims(
-    video,
-    video.channel.title,
+    {
+      subjectId: subject.id,
+      sourceVideoId: sourceVideo.id,
+      title: sourceVideo.title,
+      description: sourceVideo.description,
+      durationSeconds: sourceVideo.durationSeconds,
+      riskLevel: subject.riskLevel,
+    },
+    subject.channel?.title ?? "",
     { modelUsed: "llama-3.3-70b-versatile" },
   );
 
@@ -39,7 +57,7 @@ export async function POST(
   }
 
   revalidateTag("videos", "max");
-  revalidateTag(`video:${video.slug}`, "max");
+  revalidateTag(`video:${subject.slug}`, "max");
 
   return NextResponse.json({ ok: true });
 }

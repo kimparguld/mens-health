@@ -54,7 +54,7 @@ export async function syncYouTubeVideos(): Promise<{
   for (const topic of TOPIC_SEEDS) {
     try {
       // Upsert topic
-      await db.topic.upsert({
+      const dbTopic = await db.topic.upsert({
         where: { slug: topic.slug },
         create: {
           slug: topic.slug,
@@ -73,7 +73,7 @@ export async function syncYouTubeVideos(): Promise<{
 
       for (const video of videos) {
         const cleanedTitle = cleanTitle(video.title);
-        const existing = await db.video.findUnique({
+        const existing = await db.sourceVideo.findUnique({
           where: { youtubeVideoId: video.videoId },
         });
         if (existing) {
@@ -91,8 +91,16 @@ export async function syncYouTubeVideos(): Promise<{
             },
             cleanedTitle,
           );
-          await db.video.update({
+          await db.sourceVideo.update({
             where: { id: existing.id },
+            data: {
+              viewCount: video.viewCount,
+              likeCount: video.likeCount,
+              commentCount: video.commentCount,
+            },
+          });
+          await db.subject.update({
+            where: { id: existing.subjectId },
             data: {
               viewCount: video.viewCount,
               likeCount: video.likeCount,
@@ -135,12 +143,16 @@ export async function syncYouTubeVideos(): Promise<{
             ? ("HIGH" as const)
             : ("LOW" as const);
 
-        const newVideo = await db.video.create({
+        const subject = await db.subject.create({
           data: {
-            youtubeVideoId: video.videoId,
-            title: cleanedTitle,
-            description: video.description,
+            slug: generateSlug(cleanedTitle, video.videoId),
+            name: cleanedTitle,
+            // No AI classification step exists yet for subject type — every
+            // freshly-ingested subject starts as OTHER until a future
+            // pipeline step (or admin edit) narrows it down.
+            subjectType: "OTHER",
             channelId: channel.id,
+            youtubeVideoId: video.videoId,
             publishedAt: video.publishedAt,
             thumbnailUrl: video.thumbnailUrl,
             durationSeconds: video.durationSeconds,
@@ -150,34 +162,34 @@ export async function syncYouTubeVideos(): Promise<{
             trendScore: scores.trendScore,
             relevanceScore: scores.relevanceScore,
             riskLevel,
-            slug: generateSlug(cleanedTitle, video.videoId),
-            status: "PENDING",
-          },
-        });
-
-        // Link to topic
-        await db.videoTopic.upsert({
-          where: {
-            videoId_topicId: {
-              videoId: newVideo.id,
-              topicId: (await db.topic.findUnique({
-                where: { slug: topic.slug },
-              }))!.id,
+            status: "DRAFT",
+            sourceVideos: {
+              create: {
+                youtubeVideoId: video.videoId,
+                title: cleanedTitle,
+                description: video.description,
+                channelId: channel.id,
+                publishedAt: video.publishedAt,
+                thumbnailUrl: video.thumbnailUrl,
+                durationSeconds: video.durationSeconds,
+                viewCount: video.viewCount,
+                likeCount: video.likeCount,
+                commentCount: video.commentCount,
+              },
+            },
+            topics: {
+              create: { topicId: dbTopic.id },
             },
           },
-          create: {
-            videoId: newVideo.id,
-            topicId: (await db.topic.findUnique({
-              where: { slug: topic.slug },
-            }))!.id,
-          },
-          update: {},
+          include: { sourceVideos: true },
         });
 
-        // Queue for AI processing
+        // Queue for AI processing. Non-null: we just created exactly one
+        // sourceVideo via the nested `create` above.
+        const sourceVideo = subject.sourceVideos[0]!;
         await db.processingJob.upsert({
-          where: { videoId: newVideo.id },
-          create: { videoId: newVideo.id, status: "QUEUED" },
+          where: { sourceVideoId: sourceVideo.id },
+          create: { sourceVideoId: sourceVideo.id, status: "QUEUED" },
           update: {},
         });
 

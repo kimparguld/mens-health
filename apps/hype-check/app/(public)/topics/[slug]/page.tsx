@@ -92,7 +92,7 @@ export default async function TopicPage({
   const topicClaims = topic
     ? await db.claim.findMany({
         where: {
-          video: {
+          subject: {
             status: 'PUBLISHED',
             topics: { some: { topicId: topic.id } },
           },
@@ -104,39 +104,44 @@ export default async function TopicPage({
       })
     : [];
 
-  // Evidence overview: aggregate claim verdicts across all videos in this topic
+  // Evidence overview: aggregate claim verdicts across all videos in this topic.
+  // `_count: true` counts rows per `evidenceStatus` group as a plain number —
+  // the object form (`_count: { _all: true }`) mistypes here because Prisma's
+  // groupBy payload resolves `_count` against the *input* filter shape (not
+  // the count output type) when a select object is used, so `_all` never
+  // actually lands on the result as a required field.
   const topicClaimStatusCounts = topic
     ? await db.claim.groupBy({
         by: ['evidenceStatus'],
         where: {
-          video: {
+          subject: {
             status: 'PUBLISHED',
             topics: { some: { topicId: topic.id } },
           },
         },
-        _count: { _all: true },
+        _count: true,
       })
     : [];
   const evidenceOverview = {
     claimsAssessed: topicClaimStatusCounts.reduce(
-      (sum, c) => sum + c._count._all,
+      (sum, c) => sum + c._count,
       0
     ),
     supported:
       topicClaimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')
-        ?._count._all ?? 0,
+        ?._count ?? 0,
     mixed:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count
-        ._all ?? 0,
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')
+        ?._count ?? 0,
     weak:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count
-        ._all ?? 0,
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')
+        ?._count ?? 0,
     unsupported:
       topicClaimStatusCounts.find((c) => c.evidenceStatus === 'UNSUPPORTED')
-        ?._count._all ?? 0,
+        ?._count ?? 0,
     notChecked:
       topicClaimStatusCounts.find((c) => c.evidenceStatus === 'NOT_CHECKED')
-        ?._count._all ?? 0,
+        ?._count ?? 0,
   };
 
   const [topicResult, featuredResult] = await Promise.all([
@@ -169,7 +174,7 @@ export default async function TopicPage({
       ? buildItemListSchema(
           `${topicSeed.name} Videos`,
           publishedVideos.map((v: (typeof publishedVideos)[number]) => ({
-            name: v.title,
+            name: v.editorialTitle ?? v.sourceVideos[0]?.title ?? v.name,
             url: `${APP_URL}/videos/${v.slug}`,
           }))
         )
@@ -385,10 +390,10 @@ export default async function TopicPage({
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
-                    title={video.title}
+                    title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
                     channelTitle={video.channel?.title ?? ''}
                     thumbnailUrl={video.thumbnailUrl}
-                    shortSummary={video.summaries[0]?.shortSummary ?? null}
+                    shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
                     trendScore={video.trendScore}
                     topicNames={video.topics.map(
                       (vt: (typeof video.topics)[number]) => vt.topic.name
@@ -410,10 +415,10 @@ export default async function TopicPage({
               <VideoCard
                 key={video.id}
                 slug={video.slug}
-                title={video.title}
+                title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
                 channelTitle={video.channel?.title ?? ''}
                 thumbnailUrl={video.thumbnailUrl}
-                shortSummary={video.summaries[0]?.shortSummary ?? null}
+                shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
                 topicNames={video.topics.map(
                   (vt: (typeof video.topics)[number]) => vt.topic.name

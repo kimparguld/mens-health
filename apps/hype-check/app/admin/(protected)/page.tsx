@@ -1,10 +1,10 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/app/generated/prisma";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import AdminBulkActions from "./AdminBulkActions";
 
-type PublishStatus = "PENDING" | "PROCESSED" | "REJECTED" | "PUBLISHED";
+type PublishStatus = "DRAFT" | "REVIEW" | "ARCHIVED" | "PUBLISHED";
 
 type StatusCounts = Record<string, number>;
 
@@ -40,7 +40,7 @@ async function getStats(): Promise<{
     claimsAutoReviewed,
     claimsReviewed,
   ] = await Promise.all([
-    db.video.groupBy({ by: ["status"], _count: { _all: true } }),
+    db.subject.groupBy({ by: ["status"], _count: { _all: true } }),
     db.processingJob.count({
       where: { status: { in: ["QUEUED", "RUNNING"] } },
     }),
@@ -76,12 +76,12 @@ export default async function AdminDashboardPage() {
     [
       {
         label: "Pending",
-        key: "PENDING",
+        key: "DRAFT",
         color: "bg-yellow-100 text-yellow-800",
       },
       {
         label: "Processed",
-        key: "PROCESSED",
+        key: "REVIEW",
         color: "bg-blue-100 text-blue-800",
       },
       {
@@ -89,7 +89,7 @@ export default async function AdminDashboardPage() {
         key: "PUBLISHED",
         color: "bg-green-100 text-green-800",
       },
-      { label: "Rejected", key: "REJECTED", color: "bg-red-100 text-red-800" },
+      { label: "Rejected", key: "ARCHIVED", color: "bg-red-100 text-red-800" },
     ];
 
   return (

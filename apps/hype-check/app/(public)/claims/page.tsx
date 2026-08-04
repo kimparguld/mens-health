@@ -17,7 +17,7 @@ export const metadata: Metadata = createMetadata({
 
 export default async function ClaimsIndexPage() {
   const claims = await db.claim.findMany({
-    where: { video: { status: "PUBLISHED" } },
+    where: { subject: { status: "PUBLISHED" } },
     orderBy: { createdAt: "desc" },
     take: 60,
     select: {
@@ -25,10 +25,16 @@ export default async function ClaimsIndexPage() {
       slug: true,
       text: true,
       evidenceStatus: true,
-      video: {
+      subject: {
         select: {
-          title: true,
+          name: true,
+          editorialTitle: true,
           channel: { select: { title: true } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            select: { title: true },
+          },
         },
       },
     },
@@ -65,6 +71,10 @@ export default async function ClaimsIndexPage() {
         )}
         {claims.map((claim) => {
           const href = `/claims/${claim.slug ?? claim.id}`;
+          const videoTitle =
+            claim.subject.editorialTitle ??
+            claim.subject.sourceVideos[0]?.title ??
+            claim.subject.name;
           return (
             <li key={claim.id} className="py-4">
               <Link href={href} className="group flex items-start gap-3">
@@ -73,7 +83,7 @@ export default async function ClaimsIndexPage() {
                     {claim.text}
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
-                    {claim.video.channel.title} — {claim.video.title}
+                    {claim.subject.channel?.title ?? ""} — {videoTitle}
                   </p>
                 </div>
                 {claim.evidenceStatus && (

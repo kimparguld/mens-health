@@ -1,5 +1,5 @@
 import { db } from '@/lib/db/prisma';
-import type { Platform } from '@prisma/client';
+import type { Platform } from '@/app/generated/prisma';
 import Link from 'next/link';
 
 const PLATFORM_COLORS: Record<Platform, string> = {

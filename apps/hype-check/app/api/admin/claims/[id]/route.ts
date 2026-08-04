@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/app/generated/prisma";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 
@@ -23,15 +23,16 @@ const ClaimUpdateSchema = z.object({
   ]),
   riskLevel: z.enum(["LOW", "MEDIUM", "HIGH"]),
   category: z.enum([
-    "NUTRITION",
-    "EXERCISE",
-    "HORMONES",
-    "MENTAL_HEALTH",
-    "SUPPLEMENTS",
-    "MEDICATIONS",
-    "CANCER",
-    "LONGEVITY",
-    "SEXUAL_HEALTH",
+    "PERFORMANCE",
+    "INCOME",
+    "SAFETY",
+    "PRICING",
+    "LEGITIMACY",
+    "REGULATION",
+    "POPULARITY",
+    "GUARANTEE",
+    "ENDORSEMENT",
+    "SCARCITY",
     "OTHER",
   ]),
   explanation: z.string().max(2000).nullable().optional(),
@@ -60,7 +61,7 @@ export async function PATCH(
 
   const claim = await db.claim.findUnique({
     where: { id },
-    include: { sources: true },
+    include: { evidenceItems: true },
   });
   if (!claim) {
     return Response.json({ error: "Claim not found" }, { status: 404 });
@@ -69,7 +70,7 @@ export async function PATCH(
   const { evidenceStatus, riskLevel, category, explanation, sources } =
     parsed.data;
 
-  const existingIds = new Set(claim.sources.map((s) => s.id));
+  const existingIds = new Set(claim.evidenceItems.map((s) => s.id));
   const submittedIds = new Set(
     sources.filter((s) => s.id).map((s) => s.id as string),
   );
@@ -81,7 +82,7 @@ export async function PATCH(
       data: {
         evidenceStatus,
         riskLevel,
-        category,
+        claimType: category,
         explanation: explanation ?? null,
         // Every manual save is a human touching this claim's verdict —
         // satisfies the auto-publish gate's "real evidence verdict" check
@@ -94,14 +95,14 @@ export async function PATCH(
 
   if (toDelete.length > 0) {
     ops.push(
-      db.evidenceSource.deleteMany({ where: { id: { in: toDelete } } }),
+      db.evidenceItem.deleteMany({ where: { id: { in: toDelete } } }),
     );
   }
 
   for (const s of sources) {
     if (s.id && existingIds.has(s.id)) {
       ops.push(
-        db.evidenceSource.update({
+        db.evidenceItem.update({
           where: { id: s.id },
           data: {
             title: s.title,
@@ -114,7 +115,7 @@ export async function PATCH(
       );
     } else {
       ops.push(
-        db.evidenceSource.create({
+        db.evidenceItem.create({
           data: {
             claimId: id,
             title: s.title,

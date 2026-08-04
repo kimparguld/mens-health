@@ -19,12 +19,16 @@ async function getClaim(slug: string) {
   const claim = await db.claim.findFirst({
     where: { OR: [{ slug }, { id: slug }] },
     include: {
-      sources: true,
-      video: {
+      evidenceItems: true,
+      subject: {
         include: {
           channel: true,
           topics: { include: { topic: true } },
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+          },
         },
       },
     },
@@ -39,7 +43,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const claim = await getClaim(slug);
-  if (!claim || claim.video.status !== "PUBLISHED")
+  if (!claim || claim.subject.status !== "PUBLISHED")
     return { title: "Claim Not Found" };
 
   const canonical = `${APP_URL}/claims/${claim.slug ?? claim.id}`;
@@ -69,11 +73,13 @@ export default async function ClaimPage({ params }: { params: Params }) {
   const { slug } = await params;
   const claim = await getClaim(slug);
 
-  if (!claim || claim.video.status !== "PUBLISHED") notFound();
+  if (!claim || claim.subject.status !== "PUBLISHED") notFound();
 
-  const { video } = claim;
-  const summary = video.summaries[0];
-  const firstTopic = video.topics[0]?.topic;
+  const { subject } = claim;
+  const sourceVideo = subject.sourceVideos[0];
+  const summary = sourceVideo?.summaries[0];
+  const firstTopic = subject.topics[0]?.topic;
+  const displayTitle = subject.editorialTitle ?? sourceVideo?.title ?? subject.name;
 
   const canonicalSlug = claim.slug ?? claim.id;
   const breadcrumb = buildBreadcrumbSchema([
@@ -137,7 +143,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
             <EvidenceBadge status={claim.evidenceStatus} showNotChecked />
             <RiskBadge level={claim.riskLevel} />
             <span className="text-xs text-gray-400 capitalize">
-              {claim.category.replace(/_/g, " ").toLowerCase()}
+              {claim.claimType.replace(/_/g, " ").toLowerCase()}
             </span>
           </div>
 
@@ -164,13 +170,13 @@ export default async function ClaimPage({ params }: { params: Params }) {
           </section>
 
           {/* Sources */}
-          {claim.sources.length > 0 && (
+          {claim.evidenceItems.length > 0 && (
             <section className="mt-8">
               <h2 className="mb-3 text-sm font-semibold tracking-wide text-gray-900 uppercase">
                 Sources reviewed
               </h2>
               <ul className="space-y-3">
-                {claim.sources.map((source) => (
+                {claim.evidenceItems.map((source) => (
                   <li
                     key={source.id}
                     className="rounded-lg border border-gray-100 bg-gray-50 p-4"
@@ -204,13 +210,13 @@ export default async function ClaimPage({ params }: { params: Params }) {
               Extracted from
             </p>
             <Link
-              href={`/videos/${video.slug}`}
+              href={`/videos/${subject.slug}`}
               className="mt-1 block text-base font-semibold text-gray-900 hover:text-indigo-700"
             >
-              {video.title}
+              {displayTitle}
             </Link>
             <p className="mt-0.5 text-sm text-gray-500">
-              {video.channel.title}
+              {subject.channel?.title ?? ""}
             </p>
             {summary && (
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -218,7 +224,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
               </p>
             )}
             <Link
-              href={`/videos/${video.slug}`}
+              href={`/videos/${subject.slug}`}
               className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
             >
               Watch breakdown →

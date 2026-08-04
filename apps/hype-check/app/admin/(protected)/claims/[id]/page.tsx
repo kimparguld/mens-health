@@ -13,8 +13,10 @@ export default async function AdminClaimEditPage({
   const claim = await db.claim.findUnique({
     where: { id },
     include: {
-      video: { select: { id: true, title: true, slug: true } },
-      sources: { orderBy: { year: "desc" } },
+      subject: {
+        select: { id: true, name: true, editorialTitle: true, slug: true },
+      },
+      evidenceItems: { orderBy: { year: "desc" } },
     },
   });
 
@@ -37,10 +39,10 @@ export default async function AdminClaimEditPage({
         </p>
         <p className="mb-3 text-gray-900">{claim.text}</p>
         <Link
-          href={`/admin/videos/${claim.video.id}`}
+          href={`/admin/videos/${claim.subject.id}`}
           className="text-xs text-blue-600 hover:underline"
         >
-          From video: {claim.video.title} →
+          From video: {claim.subject.editorialTitle ?? claim.subject.name} →
         </Link>
         {claim.slug && (
           <Link
@@ -57,9 +59,9 @@ export default async function AdminClaimEditPage({
         claimId={claim.id}
         initialEvidenceStatus={claim.evidenceStatus}
         initialRiskLevel={claim.riskLevel}
-        initialCategory={claim.category}
+        initialCategory={claim.claimType}
         initialExplanation={claim.explanation}
-        initialSources={claim.sources.map((s) => ({
+        initialSources={claim.evidenceItems.map((s) => ({
           id: s.id,
           title: s.title,
           url: s.url,

@@ -19,7 +19,12 @@ type Job = {
   startedAt: Date | null;
   completedAt: Date | null;
   errorMessage: string | null;
-  video: { id: string; title: string | null; youtubeVideoId: string } | null;
+  sourceVideo: {
+    id: string;
+    subjectId: string;
+    title: string | null;
+    youtubeVideoId: string;
+  } | null;
 };
 
 export function JobsTable({
@@ -164,13 +169,13 @@ export function JobsTable({
                       </td>
                     )}
                     <td className="max-w-xs truncate px-4 py-3">
-                      {job.video ? (
+                      {job.sourceVideo ? (
                         <Link
-                          href={`/admin/videos/${job.video.id}`}
+                          href={`/admin/videos/${job.sourceVideo.subjectId}`}
                           className="text-blue-600 hover:underline"
-                          title={job.video.title ?? undefined}
+                          title={job.sourceVideo.title ?? undefined}
                         >
-                          {job.video.title ?? job.video.youtubeVideoId}
+                          {job.sourceVideo.title ?? job.sourceVideo.youtubeVideoId}
                         </Link>
                       ) : (
                         <span className="text-gray-400">Deleted video</span>

@@ -57,15 +57,15 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
   const weekLabel = getWeekLabel();
 
   const topVideo = videos[0] ?? null;
-  const topVideoSummary = topVideo?.summaries[0] ?? null;
+  const topVideoSummary = topVideo?.sourceVideos[0]?.summaries[0] ?? null;
 
   // Fetch checked claims from this week's videos (not NOT_CHECKED)
-  const videoIds = videos.map((v) => v.id);
+  const subjectIds = videos.map((v) => v.id);
   const checkedClaims =
-    videoIds.length > 0
+    subjectIds.length > 0
       ? await db.claim.findMany({
           where: {
-            videoId: { in: videoIds },
+            subjectId: { in: subjectIds },
             evidenceStatus: { not: "NOT_CHECKED" },
             slug: { not: null },
           },
@@ -83,10 +83,10 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
 
   // Most overhyped = highest risk claim that is WEAK or UNSUPPORTED
   const overhypedClaim =
-    (await (videoIds.length > 0
+    (await (subjectIds.length > 0
       ? db.claim.findFirst({
           where: {
-            videoId: { in: videoIds },
+            subjectId: { in: subjectIds },
             evidenceStatus: { in: ["WEAK", "UNSUPPORTED"] },
           },
           orderBy: { riskLevel: "desc" },
@@ -147,8 +147,8 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                 <div className="rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
                   <VideoCard
                     slug={topVideo.slug}
-                    title={topVideo.title}
-                    channelTitle={topVideo.channel.title}
+                    title={topVideo.editorialTitle ?? topVideo.sourceVideos[0]?.title ?? topVideo.name}
+                    channelTitle={topVideo.channel?.title ?? ""}
                     thumbnailUrl={topVideo.thumbnailUrl}
                     shortSummary={topVideoSummary?.shortSummary ?? null}
                     trendScore={topVideo.trendScore}
@@ -237,7 +237,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             </p>
             <ol className="space-y-16">
               {videos.map((video, i) => {
-                const summary = video.summaries[0];
+                const summary = video.sourceVideos[0]?.summaries[0];
                 const topicNames = video.topics.map((vt) => vt.topic.name);
 
                 return (
@@ -247,8 +247,8 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                     </div>
                     <VideoCard
                       slug={video.slug}
-                      title={video.title}
-                      channelTitle={video.channel.title}
+                      title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                      channelTitle={video.channel?.title ?? ""}
                       thumbnailUrl={video.thumbnailUrl}
                       shortSummary={summary?.shortSummary ?? null}
                       trendScore={video.trendScore}

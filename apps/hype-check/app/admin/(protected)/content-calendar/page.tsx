@@ -10,13 +10,17 @@ async function getUpcomingContent() {
         take: 10,
       })
       .catch(() => []),
-    db.video
+    db.subject
       .findMany({
-        where: { status: "PROCESSED" },
+        where: { status: "REVIEW" },
         orderBy: { createdAt: "desc" },
         take: 5,
         include: {
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+          },
         },
       })
       .catch(() => []),
@@ -126,7 +130,7 @@ export default async function ContentCalendarPage() {
                 className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm"
               >
                 <span className="flex-1 truncate font-medium text-gray-900">
-                  {video.title}
+                  {video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
                 </span>
                 <Link
                   href={`/admin/videos/${video.id}`}

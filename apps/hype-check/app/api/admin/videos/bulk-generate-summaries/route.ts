@@ -26,15 +26,18 @@ export async function POST(request: NextRequest) {
 
   const { ids } = parsed.data;
 
-  const videos = await db.video.findMany({
+  const subjects = await db.subject.findMany({
     where: {
       id: { in: ids },
-      summaries: { none: {} },
+      sourceVideos: { none: { summaries: { some: {} } } },
     },
-    include: { channel: true },
+    include: {
+      channel: true,
+      sourceVideos: { take: 1, orderBy: { createdAt: "desc" } },
+    },
   });
 
-  if (videos.length === 0) {
+  if (subjects.length === 0) {
     return Response.json({
       ok: true,
       processed: 0,
@@ -47,16 +50,30 @@ export async function POST(request: NextRequest) {
   let failed = 0;
   const errors: string[] = [];
 
-  for (const video of videos) {
+  for (const subject of subjects) {
+    const sourceVideo = subject.sourceVideos[0];
+    if (!sourceVideo) {
+      failed++;
+      errors.push(`"${subject.name}": no source video found`);
+      continue;
+    }
+
     const pipelineResult = await generateSummaryAndClaims(
-      video,
-      video.channel.title,
+      {
+        subjectId: subject.id,
+        sourceVideoId: sourceVideo.id,
+        title: sourceVideo.title,
+        description: sourceVideo.description,
+        durationSeconds: sourceVideo.durationSeconds,
+        riskLevel: subject.riskLevel,
+      },
+      subject.channel?.title ?? "",
       { modelUsed: "claude-sonnet-4-5" },
     );
 
     if (!pipelineResult.ok) {
       failed++;
-      errors.push(`"${video.title}": ${pipelineResult.error.message}`);
+      errors.push(`"${sourceVideo.title}": ${pipelineResult.error.message}`);
       continue;
     }
 

@@ -2,16 +2,20 @@ import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db/prisma";
 
 // ---------------------------------------------------------------------------
-// Videos
+// Subjects
 // ---------------------------------------------------------------------------
 
 export const getFeaturedVideo = unstable_cache(
   async () =>
-    db.video.findFirst({
+    db.subject.findFirst({
       where: { status: "PUBLISHED" },
       orderBy: { trendScore: "desc" },
       include: {
-        summaries: { take: 1, orderBy: { createdAt: "desc" } },
+        sourceVideos: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+        },
         claims: { take: 1, orderBy: { riskLevel: "desc" } },
         topics: { include: { topic: true } },
       },
@@ -24,7 +28,7 @@ export const getFeaturedVideo = unstable_cache(
 // unstable_cache is created once and its tags are reliably registered.
 const _getTrendingVideosCached = unstable_cache(
   async (excludeId?: string) =>
-    db.video.findMany({
+    db.subject.findMany({
       where: {
         status: "PUBLISHED",
         ...(excludeId ? { id: { not: excludeId } } : {}),
@@ -33,7 +37,11 @@ const _getTrendingVideosCached = unstable_cache(
       take: 13,
       include: {
         channel: true,
-        summaries: { take: 1, orderBy: { createdAt: "desc" } },
+        sourceVideos: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+        },
         topics: { include: { topic: true } },
       },
     }),
@@ -45,16 +53,24 @@ export const getTrendingVideos = (excludeId?: string) =>
 
 const _getVideoBySlugCached = unstable_cache(
   async (slug: string) =>
-    db.video.findUnique({
+    db.subject.findUnique({
       where: { slug, status: "PUBLISHED" },
       include: {
         channel: true,
-        summaries: { take: 1, orderBy: { createdAt: "desc" } },
+        sourceVideos: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+        },
         claims: {
-          include: { sources: true },
+          include: { evidenceItems: true },
           orderBy: { riskLevel: "desc" },
         },
         topics: { include: { topic: true } },
+        warningSigns: true,
+        costItems: true,
+        disclosures: true,
+        verdict: true,
       },
     }),
   ["video"],
@@ -63,25 +79,31 @@ const _getVideoBySlugCached = unstable_cache(
 export const getVideoBySlug = (slug: string) => _getVideoBySlugCached(slug);
 
 /**
- * Fallback: look up a published video by its YouTube video ID.
+ * Fallback: look up a published subject by its YouTube video ID.
  * Used when a slug has changed (e.g. after the clean-video-titles migration)
  * so old social/SEO URLs can redirect to the current canonical slug.
  */
 export async function getPublishedVideoSlugByYouTubeId(
   youtubeVideoId: string,
 ): Promise<string | null> {
-  const video = await db.video.findUnique({
+  const subject = await db.subject.findUnique({
     where: { youtubeVideoId, status: "PUBLISHED" },
     select: { slug: true },
   });
-  return video?.slug ?? null;
+  return subject?.slug ?? null;
 }
 
 const _getVideoBySlugForMetaCached = unstable_cache(
   async (slug: string) =>
-    db.video.findUnique({
+    db.subject.findUnique({
       where: { slug, status: "PUBLISHED" },
-      include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+      include: {
+        sourceVideos: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+        },
+      },
     }),
   ["video-meta"],
   { revalidate: 60, tags: ["videos"] },
@@ -98,22 +120,28 @@ const _getTopicVideosCached = unstable_cache(
       status: "PUBLISHED" as const,
       topics: { some: { topicId } },
     };
-    const [videos, total] = await Promise.all([
-      db.video.findMany({
+    const [subjects, total] = await Promise.all([
+      db.subject.findMany({
         where,
         orderBy: [{ publishedAt: "desc" }, { trendScore: "desc" }],
         skip,
         take: TOPIC_PAGE_SIZE,
         include: {
           channel: true,
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            include: {
+              summaries: { take: 1, orderBy: { createdAt: "desc" } },
+            },
+          },
           topics: { include: { topic: true } },
         },
       }),
-      db.video.count({ where }),
+      db.subject.count({ where }),
     ]);
     return {
-      videos,
+      videos: subjects,
       total,
       page,
       totalPages: Math.ceil(total / TOPIC_PAGE_SIZE),
@@ -131,7 +159,7 @@ const _getWeeklyRankingVideosCached = unstable_cache(
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const videos = await db.video.findMany({
+    const subjects = await db.subject.findMany({
       where: {
         status: "PUBLISHED",
         topics: { some: { topicId } },
@@ -141,13 +169,17 @@ const _getWeeklyRankingVideosCached = unstable_cache(
       take: 10,
       include: {
         channel: true,
-        summaries: { take: 1, orderBy: { createdAt: "desc" } },
+        sourceVideos: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+        },
         topics: { include: { topic: true } },
       },
     });
 
-    if (videos.length === 0) {
-      return db.video.findMany({
+    if (subjects.length === 0) {
+      return db.subject.findMany({
         where: {
           status: "PUBLISHED",
           topics: { some: { topicId } },
@@ -156,13 +188,19 @@ const _getWeeklyRankingVideosCached = unstable_cache(
         take: 10,
         include: {
           channel: true,
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            include: {
+              summaries: { take: 1, orderBy: { createdAt: "desc" } },
+            },
+          },
           topics: { include: { topic: true } },
         },
       });
     }
 
-    return videos;
+    return subjects;
   },
   ["weekly-ranking"],
   { revalidate: 3600, tags: ["videos"] },
@@ -173,7 +211,7 @@ export function getWeeklyRankingVideos(topicId: string) {
 
 const _getRelatedVideosCached = unstable_cache(
   async (topicId: string, excludeVideoId: string) =>
-    db.video.findMany({
+    db.subject.findMany({
       where: {
         status: "PUBLISHED",
         id: { not: excludeVideoId },

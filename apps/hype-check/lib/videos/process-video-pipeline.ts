@@ -1,4 +1,9 @@
-import type { Claim, RiskLevel, Summary } from "@prisma/client";
+import type {
+  Claim,
+  ClaimCategory,
+  RiskLevel,
+  Summary,
+} from "@/app/generated/prisma";
 import { db } from "@/lib/db/prisma";
 import { summarizeVideo } from "@/lib/ai/summarize-video";
 import { extractClaims } from "@/lib/ai/extract-claims";
@@ -17,7 +22,8 @@ export function generateClaimSlug(text: string, id: string): string {
 }
 
 export type PipelineVideoInput = {
-  id: string;
+  subjectId: string;
+  sourceVideoId: string;
   title: string;
   description: string | null;
   durationSeconds: number | null;
@@ -55,7 +61,7 @@ export async function generateSummaryAndClaims(
 
   const summary = await db.summary.create({
     data: {
-      videoId: video.id,
+      sourceVideoId: video.sourceVideoId,
       shortSummary: summaryResult.value.shortSummary,
       longSummary: summaryResult.value.longSummary,
       takeaways: summaryResult.value.takeaways,
@@ -74,7 +80,7 @@ export async function generateSummaryAndClaims(
 
   if (!claimsResult.ok) {
     console.warn(
-      `Claim extraction failed for video ${video.id}: ${claimsResult.error.message}`,
+      `Claim extraction failed for video ${video.sourceVideoId}: ${claimsResult.error.message}`,
     );
     return { ok: true, value: { summary, claims: [] } };
   }
@@ -83,8 +89,12 @@ export async function generateSummaryAndClaims(
   let highestClaimRisk: RiskLevel = "LOW";
 
   for (const extracted of claimsResult.value) {
+    // Safe: extracted.category is validated at runtime against this site's
+    // claimCategories list (see packages/core-ai/src/pipeline.ts) before we
+    // ever get here — TS just can't narrow the literal union automatically.
+    const category = extracted.category as ClaimCategory;
     const deterministicRisk = classifyDeterministicRisk(
-      extracted.category,
+      category,
       extracted.riskLevel,
       extracted.text,
     );
@@ -100,9 +110,9 @@ export async function generateSummaryAndClaims(
 
     const created = await db.claim.create({
       data: {
-        videoId: video.id,
+        subjectId: video.subjectId,
         text: extracted.text,
-        category: extracted.category,
+        claimType: category,
         riskLevel: deterministicRisk,
         evidenceStatus: factCheck?.evidenceStatus ?? "NOT_CHECKED",
         explanation: factCheck?.rationale ?? extracted.explanation ?? null,
@@ -120,8 +130,8 @@ export async function generateSummaryAndClaims(
   }
 
   if (RISK_RANK[highestClaimRisk] > RISK_RANK[video.riskLevel]) {
-    await db.video.update({
-      where: { id: video.id },
+    await db.subject.update({
+      where: { id: video.subjectId },
       data: { riskLevel: highestClaimRisk },
     });
   }

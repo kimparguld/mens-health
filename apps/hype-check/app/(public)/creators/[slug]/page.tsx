@@ -66,13 +66,17 @@ export default async function CreatorPage({ params }: { params: Params }) {
   });
 
   const videos = channel
-    ? await db.video.findMany({
+    ? await db.subject.findMany({
         where: { status: 'PUBLISHED', channelId: channel.id },
         orderBy: { trendScore: 'desc' },
         take: 20,
         include: {
           channel: true,
-          summaries: { take: 1, orderBy: { createdAt: 'desc' } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+            include: { summaries: { take: 1, orderBy: { createdAt: 'desc' } } },
+          },
           topics: { include: { topic: true } },
         },
       })
@@ -102,52 +106,53 @@ export default async function CreatorPage({ params }: { params: Params }) {
     .slice(0, 6);
 
   // Fetch extracted claims from this creator's videos
-  const videoIds = videos.map((v) => v.id);
+  const subjectIds = videos.map((v) => v.id);
 
-  // Evidence scorecard: full aggregate counts (not limited like the claims list below)
+  // Evidence scorecard: full aggregate counts (not limited like the claims list below).
+  // `_count: true` counts the rows in each `evidenceStatus` group as a plain
+  // number — using the object form (`_count: { _all: true }`) mistypes here
+  // because Prisma's groupBy payload resolves `_count` against the *input*
+  // filter shape (not the count output type) when a select object is used,
+  // so `_all` never actually lands on the result as a required field.
   const claimStatusCounts =
-    videoIds.length > 0
+    subjectIds.length > 0
       ? await db.claim.groupBy({
           by: ['evidenceStatus'],
-          where: { videoId: { in: videoIds } },
-          _count: { _all: true },
+          where: { subjectId: { in: subjectIds } },
+          _count: true,
         })
       : [];
   const sourcesCited =
-    videoIds.length > 0
-      ? await db.evidenceSource.count({
-          where: { claim: { videoId: { in: videoIds } } },
+    subjectIds.length > 0
+      ? await db.evidenceItem.count({
+          where: { claim: { subjectId: { in: subjectIds } } },
         })
       : 0;
   const scorecard = {
     videosReviewed: videos.length,
-    claimsAssessed: claimStatusCounts.reduce(
-      (sum, c) => sum + c._count._all,
-      0
-    ),
+    claimsAssessed: claimStatusCounts.reduce((sum, c) => sum + c._count, 0),
     supported:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')?._count
-        ._all ?? 0,
+      claimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')
+        ?._count ?? 0,
     mixed:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count
-        ._all ?? 0,
-    weak:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count._all ??
+      claimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count ??
       0,
+    weak:
+      claimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count ?? 0,
     unsupported:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'UNSUPPORTED')?._count
-        ._all ?? 0,
+      claimStatusCounts.find((c) => c.evidenceStatus === 'UNSUPPORTED')
+        ?._count ?? 0,
     notChecked:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'NOT_CHECKED')?._count
-        ._all ?? 0,
+      claimStatusCounts.find((c) => c.evidenceStatus === 'NOT_CHECKED')
+        ?._count ?? 0,
     sourcesCited,
   };
 
   const claims =
-    videoIds.length > 0
+    subjectIds.length > 0
       ? await db.claim.findMany({
           where: {
-            videoId: { in: videoIds },
+            subjectId: { in: subjectIds },
             slug: { not: null },
           },
           take: 6,
@@ -322,10 +327,12 @@ export default async function CreatorPage({ params }: { params: Params }) {
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
-                    title={video.title}
+                    title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
                     channelTitle={video.channel?.title ?? ''}
                     thumbnailUrl={video.thumbnailUrl}
-                    shortSummary={video.summaries[0]?.shortSummary ?? null}
+                    shortSummary={
+                      video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null
+                    }
                     trendScore={video.trendScore}
                     topicNames={video.topics.map((vt) => vt.topic.name)}
                     riskLevel={video.riskLevel}

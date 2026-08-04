@@ -12,16 +12,16 @@ export async function GET(
 ): Promise<Response> {
   const { slug } = await params;
 
-  const video = await db.video.findUnique({
+  const subject = await db.subject.findUnique({
     where: { slug, status: "PUBLISHED" },
     select: { evidenceScore: true },
   });
 
-  if (!video) {
+  if (!subject) {
     return new Response("Not found", { status: 404 });
   }
 
-  const { label, color } = evidenceLabelAndColor(video.evidenceScore);
+  const { label, color } = evidenceLabelAndColor(subject.evidenceScore);
   const svg = buildBadgeSvg({ siteName: siteConfig.name, evidenceLabel: label, color });
 
   return new Response(svg, {

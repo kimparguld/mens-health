@@ -4,7 +4,7 @@ import { db } from "@/lib/db/prisma";
 
 export default async function AdminTopicsPage() {
   // Count published videos per topic
-  const topicCounts = await db.videoTopic.groupBy({
+  const topicCounts = await db.subjectTopic.groupBy({
     by: ["topicId"],
     _count: { _all: true },
   });

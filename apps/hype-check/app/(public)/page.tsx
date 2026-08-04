@@ -50,7 +50,7 @@ async function FeaturedInsight() {
   const featuredVideo = await getFeaturedVideo();
   if (!featuredVideo) return null;
 
-  const featuredSummary = featuredVideo.summaries[0] ?? null;
+  const featuredSummary = featuredVideo.sourceVideos[0]?.summaries[0] ?? null;
   const featuredClaim = featuredVideo.claims[0] ?? null;
   const featuredWatchMin = featuredVideo.durationSeconds
     ? Math.ceil(featuredVideo.durationSeconds / 60)
@@ -130,10 +130,10 @@ async function TrendingVideos() {
               <VideoCard
                 key={video.id}
                 slug={video.slug}
-                title={video.title}
+                title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
                 channelTitle={video.channel?.title ?? ''}
                 thumbnailUrl={video.thumbnailUrl}
-                shortSummary={video.summaries[0]?.shortSummary ?? null}
+                shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
                 topicNames={video.topics.map((vt) => vt.topic.name)}
                 riskLevel={video.riskLevel}

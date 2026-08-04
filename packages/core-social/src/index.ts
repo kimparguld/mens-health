@@ -19,6 +19,7 @@ export type {
   GenerateSocialPostInput,
   SocialAiClient,
   SocialPostGeneratorConfig,
+  VideoContext,
 } from "./generate-social-post";
 
 export type {

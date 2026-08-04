@@ -5,6 +5,7 @@ import { createAuthConfig } from "@menhealth/core-auth";
 
 export const authConfig: NextAuthConfig = createAuthConfig({
   db,
+  cookiePrefix: "hype-check",
   adminEmailsCsv: env.ADMIN_EMAILS,
   nextAuthSecret: env.NEXTAUTH_SECRET,
   googleClientId: env.AUTH_GOOGLE_ID,

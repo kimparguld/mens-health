@@ -13,7 +13,7 @@ const BulkReviewBodySchema = z.object({
 
 const STATUS_FOR_ACTION = {
   PUBLISHED: "PUBLISHED",
-  REJECTED: "REJECTED",
+  REJECTED: "ARCHIVED",
 } as const;
 
 export async function POST(request: NextRequest) {
@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
   const newStatus = STATUS_FOR_ACTION[action];
 
   if (action === "PUBLISHED") {
-    const withoutSummary = await db.video.count({
-      where: { id: { in: ids }, summaries: { none: {} } },
+    const withoutSummary = await db.subject.count({
+      where: { id: { in: ids }, sourceVideos: { none: { summaries: { some: {} } } } },
     });
     if (withoutSummary > 0) {
       return Response.json(
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // Server-side deny-list for HIGH-risk publish — same rule as the
     // single-video review route: any HIGH-risk video in the batch requires
     // an explicit acknowledgment plus a note, not just a client-side confirm().
-    const highRiskCount = await db.video.count({
+    const highRiskCount = await db.subject.count({
       where: { id: { in: ids }, riskLevel: "HIGH" },
     });
     if (highRiskCount > 0 && (!acknowledgeHighRisk || !note?.trim())) {
@@ -67,27 +67,27 @@ export async function POST(request: NextRequest) {
     action === "PUBLISHED" && acknowledgeHighRisk
       ? new Set(
           (
-            await db.video.findMany({
+            await db.subject.findMany({
               where: { id: { in: ids }, riskLevel: "HIGH" },
               select: { id: true },
             })
-          ).map((v) => v.id),
+          ).map((s) => s.id),
         )
       : new Set<string>();
 
   await db.$transaction([
-    db.video.updateMany({
+    db.subject.updateMany({
       where: { id: { in: ids } },
       data: { status: newStatus },
     }),
-    ...ids.map((videoId) =>
+    ...ids.map((subjectId) =>
       db.adminReview.create({
         data: {
-          videoId,
+          subjectId,
           action,
           note,
-          acknowledgedHighRisk: highRiskIds.has(videoId),
-          acknowledgedBy: highRiskIds.has(videoId)
+          acknowledgedHighRisk: highRiskIds.has(subjectId),
+          acknowledgedBy: highRiskIds.has(subjectId)
             ? session?.user?.email
             : null,
         },

@@ -39,7 +39,7 @@ export async function POST(_request: NextRequest) {
 
   for (const claim of claims) {
     const deterministicRisk = classifyDeterministicRisk(
-      claim.category,
+      claim.claimType,
       claim.riskLevel,
       claim.text,
     );
@@ -57,7 +57,7 @@ export async function POST(_request: NextRequest) {
 
     const factCheckResult = await factCheckClaim({
       text: claim.text,
-      category: claim.category,
+      category: claim.claimType,
     });
 
     if (!factCheckResult.ok) {

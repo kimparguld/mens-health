@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { env } from "@/env";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import type { SocialAccount } from "@prisma/client";
+import type { SocialAccount } from "@/app/generated/prisma";
 
 // Only X is listed as connectable here: it's the only adapter that actually
 // reads the stored OAuth token to auto-publish (via the scheduled cron).

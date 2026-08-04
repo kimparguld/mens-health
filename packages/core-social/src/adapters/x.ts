@@ -1,5 +1,4 @@
 import "server-only";
-import type { PrismaClient } from "@prisma/client";
 import { validatePlatformConstraints } from "../platform-constraints";
 import { getValidAccessToken } from "./refresh-token";
 import type { SocialPost } from "@prisma/client";
@@ -69,8 +68,14 @@ function buildTweetText(post: SocialPost): string {
 export type XAdapterConfig = {
   clientId?: string;
   clientSecret?: string;
-  /** Only required to call publish() — validate()/createDraft() don't need it. */
-  db?: PrismaClient;
+  /**
+   * Only required to call publish() — validate()/createDraft() don't need
+   * it. Prisma's generated types carry generic branding tied to their own
+   * generation, so a `Pick<PrismaClient, ...>` from one site's client isn't
+   * satisfied by another site's — even for identical models.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db?: any;
 };
 
 export class XAdapter implements SocialPublisher {

@@ -3,10 +3,10 @@ import { describe, it, expect } from "vitest";
 // Pure function extracted from the route — mirrors STATUS_FOR_ACTION
 const STATUS_FOR_ACTION = {
   PUBLISHED: "PUBLISHED",
-  UNPUBLISHED: "PROCESSED",
-  REJECTED: "REJECTED",
-  APPROVED: "PROCESSED",
-  FLAGGED_HIGH_RISK: "PROCESSED",
+  UNPUBLISHED: "REVIEW",
+  REJECTED: "ARCHIVED",
+  APPROVED: "REVIEW",
+  FLAGGED_HIGH_RISK: "REVIEW",
 } as const;
 
 type ReviewAction = keyof typeof STATUS_FOR_ACTION;
@@ -20,19 +20,19 @@ describe("resolveStatusForAction", () => {
     expect(resolveStatusForAction("PUBLISHED")).toBe("PUBLISHED");
   });
 
-  it("REJECTED → REJECTED", () => {
-    expect(resolveStatusForAction("REJECTED")).toBe("REJECTED");
+  it("REJECTED → ARCHIVED", () => {
+    expect(resolveStatusForAction("REJECTED")).toBe("ARCHIVED");
   });
 
-  it("APPROVED → PROCESSED (stays in processed, not auto-published)", () => {
-    expect(resolveStatusForAction("APPROVED")).toBe("PROCESSED");
+  it("APPROVED → REVIEW (stays in review, not auto-published)", () => {
+    expect(resolveStatusForAction("APPROVED")).toBe("REVIEW");
   });
 
-  it("FLAGGED_HIGH_RISK → PROCESSED (keeps video in review queue)", () => {
-    expect(resolveStatusForAction("FLAGGED_HIGH_RISK")).toBe("PROCESSED");
+  it("FLAGGED_HIGH_RISK → REVIEW (keeps video in review queue)", () => {
+    expect(resolveStatusForAction("FLAGGED_HIGH_RISK")).toBe("REVIEW");
   });
 
-  it("UNPUBLISHED → PROCESSED (reverts to review queue)", () => {
-    expect(resolveStatusForAction("UNPUBLISHED")).toBe("PROCESSED");
+  it("UNPUBLISHED → REVIEW (reverts to review queue)", () => {
+    expect(resolveStatusForAction("UNPUBLISHED")).toBe("REVIEW");
   });
 });

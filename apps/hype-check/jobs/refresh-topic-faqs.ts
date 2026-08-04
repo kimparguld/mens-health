@@ -15,7 +15,7 @@ export async function refreshTopicFaqs(): Promise<{
   for (const topic of topics) {
     try {
       // Fetch recent published video titles + short summaries for context
-      const videos = await db.video.findMany({
+      const videos = await db.subject.findMany({
         where: {
           status: "PUBLISHED",
           topics: { some: { topicId: topic.id } },
@@ -23,14 +23,20 @@ export async function refreshTopicFaqs(): Promise<{
         orderBy: { trendScore: "desc" },
         take: VIDEO_CONTEXT_LIMIT,
         include: {
-          summaries: { take: 1, orderBy: { createdAt: "desc" } },
+          sourceVideos: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            include: {
+              summaries: { take: 1, orderBy: { createdAt: "desc" } },
+            },
+          },
         },
       });
 
       const videoSummaries = videos
         .map((v) => ({
-          title: v.title,
-          shortSummary: v.summaries[0]?.shortSummary ?? "",
+          title: v.editorialTitle ?? v.sourceVideos[0]?.title ?? v.name,
+          shortSummary: v.sourceVideos[0]?.summaries[0]?.shortSummary ?? "",
         }))
         .filter((v) => v.shortSummary.length > 0);
 
