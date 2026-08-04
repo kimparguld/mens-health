@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 type UtmField = {
   source: string;
@@ -12,34 +12,34 @@ type UtmField = {
 };
 
 const PRESET_SOURCES = [
-  { label: "Google (CPC)", source: "google", medium: "cpc" },
-  { label: "Reddit", source: "reddit", medium: "post" },
-  { label: "Twitter / X", source: "x", medium: "post" },
-  { label: "TikTok", source: "tiktok", medium: "video" },
-  { label: "Newsletter", source: "newsletter", medium: "email" },
-  { label: "YouTube Community", source: "youtube", medium: "community" },
+  { label: 'Google (CPC)', source: 'google', medium: 'cpc' },
+  { label: 'Reddit', source: 'reddit', medium: 'post' },
+  { label: 'Twitter / X', source: 'x', medium: 'post' },
+  { label: 'TikTok', source: 'tiktok', medium: 'video' },
+  { label: 'Newsletter', source: 'newsletter', medium: 'email' },
+  { label: 'YouTube Community', source: 'youtube', medium: 'community' },
 ];
 
 function buildUtmUrl(fields: UtmField): string {
   const base = fields.destinationUrl.trim();
-  if (!base) return "";
-  const url = new URL(base.startsWith("http") ? base : `https://${base}`);
-  if (fields.source) url.searchParams.set("utm_source", fields.source);
-  if (fields.medium) url.searchParams.set("utm_medium", fields.medium);
-  if (fields.campaign) url.searchParams.set("utm_campaign", fields.campaign);
-  if (fields.content) url.searchParams.set("utm_content", fields.content);
-  if (fields.term) url.searchParams.set("utm_term", fields.term);
+  if (!base) return '';
+  const url = new URL(base.startsWith('http') ? base : `https://${base}`);
+  if (fields.source) url.searchParams.set('utm_source', fields.source);
+  if (fields.medium) url.searchParams.set('utm_medium', fields.medium);
+  if (fields.campaign) url.searchParams.set('utm_campaign', fields.campaign);
+  if (fields.content) url.searchParams.set('utm_content', fields.content);
+  if (fields.term) url.searchParams.set('utm_term', fields.term);
   return url.toString();
 }
 
 export default function UtmBuilderPage() {
   const [fields, setFields] = useState<UtmField>({
-    source: "",
-    medium: "",
-    campaign: "",
-    content: "",
-    term: "",
-    destinationUrl: "https://hype-check.net/newsletter",
+    source: '',
+    medium: '',
+    campaign: '',
+    content: '',
+    term: '',
+    destinationUrl: 'https://hype-check.net/newsletter',
   });
   const [copied, setCopied] = useState(false);
 
@@ -78,7 +78,7 @@ export default function UtmBuilderPage() {
             <button
               key={p.label}
               onClick={() => applyPreset(p)}
-              className="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 transition-colors hover:border-indigo-400 hover:text-indigo-800"
+              className="hover:border-ink-muted/40 hover:text-ink-muted/80 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 transition-colors"
             >
               {p.label}
             </button>
@@ -90,34 +90,34 @@ export default function UtmBuilderPage() {
         {(
           [
             {
-              key: "destinationUrl",
-              label: "Destination URL",
-              placeholder: "https://hype-check.net/newsletter",
+              key: 'destinationUrl',
+              label: 'Destination URL',
+              placeholder: 'https://hype-check.net/newsletter',
             },
             {
-              key: "source",
-              label: "utm_source",
-              placeholder: "google, reddit, newsletter…",
+              key: 'source',
+              label: 'utm_source',
+              placeholder: 'google, reddit, newsletter…',
             },
             {
-              key: "medium",
-              label: "utm_medium",
-              placeholder: "cpc, email, post, video…",
+              key: 'medium',
+              label: 'utm_medium',
+              placeholder: 'cpc, email, post, video…',
             },
             {
-              key: "campaign",
-              label: "utm_campaign",
-              placeholder: "mens_health_digest, claim_check…",
+              key: 'campaign',
+              label: 'utm_campaign',
+              placeholder: 'mens_health_digest, claim_check…',
             },
             {
-              key: "content",
-              label: "utm_content (optional)",
-              placeholder: "ad variant or post identifier",
+              key: 'content',
+              label: 'utm_content (optional)',
+              placeholder: 'ad variant or post identifier',
             },
             {
-              key: "term",
-              label: "utm_term (optional)",
-              placeholder: "paid keyword if applicable",
+              key: 'term',
+              label: 'utm_term (optional)',
+              placeholder: 'paid keyword if applicable',
             },
           ] as { key: keyof UtmField; label: string; placeholder: string }[]
         ).map(({ key, label, placeholder }) => (
@@ -130,7 +130,7 @@ export default function UtmBuilderPage() {
               value={fields[key]}
               onChange={set(key)}
               placeholder={placeholder}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+              className="focus:border-ink-muted/50 focus:ring-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:ring-1 focus:outline-none"
             />
           </div>
         ))}
@@ -141,15 +141,15 @@ export default function UtmBuilderPage() {
           <p className="mb-1 text-xs font-semibold text-gray-700">
             Generated UTM URL
           </p>
-          <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3">
-            <code className="min-w-0 flex-1 text-xs break-all text-indigo-900">
+          <div className="border-ink-muted/20 flex items-center gap-2 rounded-lg border bg-indigo-50 p-3">
+            <code className="text-ink-muted/90 min-w-0 flex-1 text-xs break-all">
               {utmUrl}
             </code>
             <button
               onClick={copyUrl}
-              className="flex-shrink-0 rounded bg-indigo-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-800"
+              className="bg-ink-muted/70 hover:bg-ink-muted/80 flex-shrink-0 rounded px-3 py-1.5 text-xs font-semibold text-white"
             >
-              {copied ? "Copied!" : "Copy"}
+              {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
         </div>

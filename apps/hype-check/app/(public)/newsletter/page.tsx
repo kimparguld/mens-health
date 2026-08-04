@@ -1,6 +1,6 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
-import { Disclaimer, NewsletterSignupForm } from '@menhealth/ui';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { Disclaimer, NewsletterSignupForm } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -39,15 +39,15 @@ export default function NewsletterPage() {
     <main className="mx-auto max-w-2xl px-4 py-16">
       {/* Hero */}
       <header className="mb-12 text-center">
-        <p className="mb-2 text-xs font-semibold tracking-widest text-indigo-700 uppercase">
+        <p className="text-ink-muted mb-2 text-xs font-semibold tracking-widest uppercase">
           Free newsletter
         </p>
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900">
           The 5-Minute Hype Check Digest
         </h1>
         <p className="mx-auto mb-8 max-w-md text-lg text-gray-600">
-          Every week: 5 trending picks summarised, 3 claims checked, 1
-          takeaway. No fluff. No fear-mongering. Unsubscribe any time.
+          Every week: 5 trending picks summarised, 3 claims checked, 1 takeaway.
+          No fluff. No fear-mongering. Unsubscribe any time.
         </p>
         <div className="mx-auto">
           <NewsletterSignupForm className="flex-col items-stretch" />
@@ -87,8 +87,8 @@ export default function NewsletterPage() {
         </h2>
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           {/* Issue header */}
-          <div className="border-b border-indigo-100 bg-indigo-50 px-6 py-4">
-            <p className="text-xs font-semibold tracking-widest text-indigo-700 uppercase">
+          <div className="border-ink-muted/10 border-b bg-indigo-50 px-6 py-4">
+            <p className="text-ink-muted text-xs font-semibold tracking-widest uppercase">
               Sample issue · Week of 16 June 2025
             </p>
             <p className="mt-1 text-sm text-gray-600">
@@ -103,7 +103,8 @@ export default function NewsletterPage() {
                 Top Video This Week
               </p>
               <p className="font-semibold text-gray-900">
-                &ldquo;This AI Trading Bot Promises 40% Monthly Returns — Legit?&rdquo;
+                &ldquo;This AI Trading Bot Promises 40% Monthly Returns —
+                Legit?&rdquo;
               </p>
               <p className="mt-1 text-gray-500">
                 Wealth Hacks Daily · 2.4M views
@@ -126,7 +127,7 @@ export default function NewsletterPage() {
                     claim:
                       'Diversified index funds outperform actively picked stocks over time.',
                     badge: 'Claim checked — strong evidence',
-                    color: 'bg-indigo-100 text-indigo-800',
+                    color: 'bg-ink-muted/10 text-ink-muted/80',
                   },
                   {
                     claim:
@@ -160,14 +161,14 @@ export default function NewsletterPage() {
 
             {/* Practical Takeaway */}
             <div className="bg-indigo-50 px-6 py-5">
-              <p className="mb-1 text-[11px] font-semibold tracking-widest text-indigo-600 uppercase">
+              <p className="text-ink-muted/60 mb-1 text-[11px] font-semibold tracking-widest uppercase">
                 Practical Takeaway
               </p>
-              <p className="font-medium text-indigo-900">
+              <p className="text-ink-muted/90 font-medium">
                 Start with a low-cost index fund before paying for any
                 &ldquo;proprietary&rdquo; trading course. The evidence for
-                boring, diversified investing is substantially stronger than
-                for most marketed strategies.
+                boring, diversified investing is substantially stronger than for
+                most marketed strategies.
               </p>
             </div>
 
@@ -193,13 +194,13 @@ export default function NewsletterPage() {
               <div className="flex flex-wrap gap-3 text-sm">
                 <Link
                   href="/topics/investment-apps"
-                  className="text-indigo-700 hover:underline"
+                  className="text-ink-muted hover:underline"
                 >
                   Investment apps hub →
                 </Link>
                 <Link
                   href="/rankings/investment-apps"
-                  className="text-indigo-700 hover:underline"
+                  className="text-ink-muted hover:underline"
                 >
                   Weekly rankings →
                 </Link>
@@ -258,7 +259,7 @@ export default function NewsletterPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-xl border border-gray-200 bg-white px-5 py-4 hover:border-indigo-300 hover:shadow-sm"
+              className="group border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
             >
               <p className="font-semibold text-gray-900">{item.title} →</p>
               <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
@@ -278,10 +279,7 @@ export default function NewsletterPage() {
           advice.
         </p>
         <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-          <Link
-            href="/disclaimer"
-            className="underline hover:text-gray-900"
-          >
+          <Link href="/disclaimer" className="underline hover:text-gray-900">
             Disclaimer
           </Link>
           <Link
@@ -300,13 +298,12 @@ export default function NewsletterPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="rounded-xl border border-indigo-200 bg-indigo-50 px-6 py-8 text-center">
-        <h2 className="mb-2 text-xl font-bold text-indigo-900">
+      <section className="border-hairline bg-ink-muted rounded-xl border px-6 py-8 text-center">
+        <h2 className="mb-2 text-xl font-bold text-white">
           Ready to get the digest?
         </h2>
-        <p className="mb-6 text-sm text-indigo-700">
-          Join readers who want clear, evidence-aware verdicts on trending
-          hype.
+        <p className="mb-6 text-sm text-white/60">
+          Join readers who want clear, evidence-aware verdicts on trending hype.
         </p>
         <div className="mx-auto max-w-sm">
           <NewsletterSignupForm />

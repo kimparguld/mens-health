@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 type Subscriber = {
   id: string;
@@ -25,27 +25,27 @@ export function SubscribersTable({
 
   async function callAction(
     id: string,
-    action: "sync" | "unsubscribe" | "delete",
+    action: 'sync' | 'unsubscribe' | 'delete'
   ) {
     setLoading(`${id}:${action}`);
     setError(null);
     try {
       const res = await fetch(
-        action === "delete"
+        action === 'delete'
           ? `/api/admin/subscribers/${id}`
           : `/api/admin/subscribers/${id}/${action}`,
-        { method: action === "delete" ? "DELETE" : "POST" },
+        { method: action === 'delete' ? 'DELETE' : 'POST' }
       );
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
-        setError(data?.error ?? "Request failed");
+        setError(data?.error ?? 'Request failed');
         return;
       }
       router.refresh();
     } catch {
-      setError("Network error");
+      setError('Network error');
     } finally {
       setLoading(null);
     }
@@ -95,15 +95,15 @@ export function SubscribersTable({
             ) : (
               subscribers.map((sub) => {
                 const statusLabel = sub.unsubscribedAt
-                  ? "Unsubscribed"
+                  ? 'Unsubscribed'
                   : sub.confirmedAt
-                    ? "Active"
-                    : "Unconfirmed";
+                    ? 'Active'
+                    : 'Unconfirmed';
                 const statusColor = sub.unsubscribedAt
-                  ? "bg-red-100 text-red-700"
+                  ? 'bg-red-100 text-red-700'
                   : sub.confirmedAt
-                    ? "bg-green-100 text-green-700"
-                    : "bg-yellow-100 text-yellow-700";
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-yellow-100 text-yellow-700';
                 const notSynced = !sub.unsubscribedAt && !sub.resendContactId;
                 return (
                   <tr key={sub.id} className="hover:bg-gray-50">
@@ -123,12 +123,12 @@ export function SubscribersTable({
                     <td className="px-4 py-3 whitespace-nowrap text-gray-500">
                       {sub.confirmedAt
                         ? new Date(sub.confirmedAt).toLocaleDateString()
-                        : "—"}
+                        : '—'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-500">
                       {sub.unsubscribedAt
                         ? new Date(sub.unsubscribedAt).toLocaleDateString()
-                        : "—"}
+                        : '—'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {notSynced ? (
@@ -145,42 +145,42 @@ export function SubscribersTable({
                       <div className="flex flex-wrap gap-2">
                         {resendConfigured && notSynced && (
                           <button
-                            onClick={() => callAction(sub.id, "sync")}
+                            onClick={() => callAction(sub.id, 'sync')}
                             disabled={loading !== null}
-                            className="text-xs font-medium text-blue-600 hover:underline disabled:opacity-40"
+                            className="text-ink text-xs font-medium hover:underline disabled:opacity-40"
                           >
                             {loading === `${sub.id}:sync`
-                              ? "Syncing…"
-                              : "Sync to Resend"}
+                              ? 'Syncing…'
+                              : 'Sync to Resend'}
                           </button>
                         )}
                         {!sub.unsubscribedAt && (
                           <button
-                            onClick={() => callAction(sub.id, "unsubscribe")}
+                            onClick={() => callAction(sub.id, 'unsubscribe')}
                             disabled={loading !== null}
                             className="text-xs font-medium text-gray-600 hover:underline disabled:opacity-40"
                           >
                             {loading === `${sub.id}:unsubscribe`
-                              ? "Working…"
-                              : "Unsubscribe"}
+                              ? 'Working…'
+                              : 'Unsubscribe'}
                           </button>
                         )}
                         <button
                           onClick={() => {
                             if (
                               confirm(
-                                `Permanently delete ${sub.email}? This also removes them from Resend.`,
+                                `Permanently delete ${sub.email}? This also removes them from Resend.`
                               )
                             ) {
-                              callAction(sub.id, "delete");
+                              callAction(sub.id, 'delete');
                             }
                           }}
                           disabled={loading !== null}
                           className="text-xs font-medium text-red-600 hover:underline disabled:opacity-40"
                         >
                           {loading === `${sub.id}:delete`
-                            ? "Deleting…"
-                            : "Delete"}
+                            ? 'Deleting…'
+                            : 'Delete'}
                         </button>
                       </div>
                     </td>

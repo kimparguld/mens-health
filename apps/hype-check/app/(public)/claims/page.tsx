@@ -1,24 +1,24 @@
-import type { Metadata } from "next";
-import { createMetadata, createCanonicalUrl } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import { EvidenceBadge, Disclaimer, JsonLd } from "@menhealth/ui";
-import { buildItemListSchema } from "@menhealth/core-seo";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
-import Link from "next/link";
+import { db } from '@/lib/db/prisma';
+import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { buildItemListSchema } from '@menhealth/core-seo';
+import { Disclaimer, EvidenceBadge, JsonLd } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = createMetadata({
-  title: "Claims — Hype Check",
+  title: 'Claims — Hype Check',
   description:
-    "Browse claims extracted from the videos we review, each reviewed and rated for evidence quality.",
-  path: "/claims",
+    'Browse claims extracted from the videos we review, each reviewed and rated for evidence quality.',
+  path: '/claims',
 });
 
 export default async function ClaimsIndexPage() {
   const claims = await db.claim.findMany({
-    where: { subject: { status: "PUBLISHED" } },
-    orderBy: { createdAt: "desc" },
+    where: { subject: { status: 'PUBLISHED' } },
+    orderBy: { createdAt: 'desc' },
     take: 60,
     select: {
       id: true,
@@ -32,7 +32,7 @@ export default async function ClaimsIndexPage() {
           channel: { select: { title: true } },
           sourceVideos: {
             take: 1,
-            orderBy: { createdAt: "desc" },
+            orderBy: { createdAt: 'desc' },
             select: { title: true },
           },
         },
@@ -41,13 +41,13 @@ export default async function ClaimsIndexPage() {
   });
 
   const itemListSchema = buildItemListSchema(
-    "Health Claims",
+    'Health Claims',
     claims
       .filter((c) => c.slug != null)
       .map((c) => ({
         name: c.text,
         url: createCanonicalUrl(`/claims/${c.slug}`),
-      })),
+      }))
   );
 
   return (
@@ -79,11 +79,11 @@ export default async function ClaimsIndexPage() {
             <li key={claim.id} className="py-4">
               <Link href={href} className="group flex items-start gap-3">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 group-hover:text-indigo-700">
+                  <p className="group-hover:text-ink-muted text-sm font-medium text-gray-900">
                     {claim.text}
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
-                    {claim.subject.channel?.title ?? ""} — {videoTitle}
+                    {claim.subject.channel?.title ?? ''} — {videoTitle}
                   </p>
                 </div>
                 {claim.evidenceStatus && (

@@ -1,57 +1,57 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 const WEEKLY_SCHEDULE: Array<{
   day: string;
   tasks: Array<{ task: string; link?: string }>;
 }> = [
   {
-    day: "Monday",
+    day: 'Monday',
     tasks: [
       {
-        task: "Check Google Search Console for pages with impressions but low CTR",
+        task: 'Check Google Search Console for pages with impressions but low CTR',
       },
-      { task: "Rewrite 2–3 titles and meta descriptions" },
-      { task: "Pick 5 trending claims to write up this week" },
+      { task: 'Rewrite 2–3 titles and meta descriptions' },
+      { task: 'Pick 5 trending claims to write up this week' },
     ],
   },
   {
-    day: "Tuesday",
+    day: 'Tuesday',
     tasks: [
-      { task: "Publish 2–3 claim pages", link: "/admin/videos" },
+      { task: 'Publish 2–3 claim pages', link: '/admin/videos' },
       {
-        task: "Generate social scripts from claim pages",
-        link: "/admin/social/drafts",
+        task: 'Generate social scripts from claim pages',
+        link: '/admin/social/drafts',
       },
-      { task: "Schedule social posts", link: "/admin/social/calendar" },
+      { task: 'Schedule social posts', link: '/admin/social/calendar' },
     ],
   },
   {
-    day: "Wednesday",
+    day: 'Wednesday',
     tasks: [
-      { task: "Post short-form video (YouTube Shorts / TikTok / Reels)" },
+      { task: 'Post short-form video (YouTube Shorts / TikTok / Reels)' },
       {
-        task: "Participate in Reddit or community post",
-        link: "/admin/social/drafts",
+        task: 'Participate in Reddit or community post',
+        link: '/admin/social/drafts',
       },
     ],
   },
   {
-    day: "Thursday",
+    day: 'Thursday',
     tasks: [
-      { task: "Publish weekly trend page", link: "/weekly" },
-      { task: "Send 5 creator outreach emails", link: "/admin/outreach" },
+      { task: 'Publish weekly trend page', link: '/weekly' },
+      { task: 'Send 5 creator outreach emails', link: '/admin/outreach' },
     ],
   },
   {
-    day: "Friday",
+    day: 'Friday',
     tasks: [
-      { task: "Send weekly newsletter" },
-      { task: "Post weekly roundup short" },
-      { task: "Review analytics — what performed best?" },
+      { task: 'Send weekly newsletter' },
+      { task: 'Post weekly roundup short' },
+      { task: 'Review analytics — what performed best?' },
     ],
   },
   {
-    day: "Sunday",
+    day: 'Sunday',
     tasks: [
       { task: "Review this week's top Search Console pages" },
       { task: "Plan next week's topics based on performance" },
@@ -87,7 +87,7 @@ export default function WeeklyGrowthPage() {
                   {t.link ? (
                     <Link
                       href={t.link}
-                      className="text-indigo-700 underline hover:text-indigo-900"
+                      className="text-ink-muted hover:text-ink-muted/90 underline"
                     >
                       {t.task}
                     </Link>

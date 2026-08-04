@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import type { MonthlyReportStats } from "@/lib/reports/generate-monthly-report";
+import { db } from '@/lib/db/prisma';
+import type { MonthlyReportStats } from '@/lib/reports/generate-monthly-report';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 type Params = Promise<{ slug: string }>;
 
@@ -18,7 +18,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const report = await getReport(slug);
-  if (!report) return { title: "Report Not Found" };
+  if (!report) return { title: 'Report Not Found' };
 
   const stats = report.stats as unknown as MonthlyReportStats;
 
@@ -26,7 +26,7 @@ export async function generateMetadata({
     title: `${stats.periodLabel} Report — Hype Check`,
     description: `${stats.videosPublished} videos reviewed, ${stats.claimsAssessed} claims assessed in ${stats.periodLabel}. Evidence quality, risk levels, and sourcing breakdown.`,
     path: `/reports/${slug}`,
-    type: "article",
+    type: 'article',
   });
 }
 
@@ -42,7 +42,7 @@ export default async function ReportPage({ params }: { params: Params }) {
       <nav className="mb-6 text-sm text-gray-500">
         <Link href="/reports" className="hover:underline">
           Reports
-        </Link>{" "}
+        </Link>{' '}
         / <span className="text-gray-900">{stats.periodLabel}</span>
       </nav>
 
@@ -51,10 +51,9 @@ export default async function ReportPage({ params }: { params: Params }) {
       </h1>
       <p className="mb-6 text-gray-600">
         {stats.videosPublished} videos reviewed, {stats.claimsAssessed} claims
-        assessed. Methodology: every video published on Hype Check in
-        this period, with claims extracted and evidence-checked as described
-        on our{" "}
-        <Link href="/editorial-process" className="text-blue-600 hover:underline">
+        assessed. Methodology: every video published on Hype Check in this
+        period, with claims extracted and evidence-checked as described on our{' '}
+        <Link href="/editorial-process" className="text-ink hover:underline">
           editorial process page
         </Link>
         .
@@ -62,7 +61,7 @@ export default async function ReportPage({ params }: { params: Params }) {
 
       <a
         href={`/reports/${slug}/csv`}
-        className="mb-8 inline-block rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-indigo-300"
+        className="hover:border-ink-muted/30 mb-8 inline-block rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
       >
         Download CSV ↓
       </a>

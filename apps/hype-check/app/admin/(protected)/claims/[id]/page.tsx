@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { db } from "@/lib/db/prisma";
-import { ClaimEditForm } from "./ClaimEditForm";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { ClaimEditForm } from './ClaimEditForm';
 
 export default async function AdminClaimEditPage({
   params,
@@ -16,7 +16,7 @@ export default async function AdminClaimEditPage({
       subject: {
         select: { id: true, name: true, editorialTitle: true, slug: true },
       },
-      evidenceItems: { orderBy: { year: "desc" } },
+      evidenceItems: { orderBy: { year: 'desc' } },
     },
   });
 
@@ -40,7 +40,7 @@ export default async function AdminClaimEditPage({
         <p className="mb-3 text-gray-900">{claim.text}</p>
         <Link
           href={`/admin/videos/${claim.subject.id}`}
-          className="text-xs text-blue-600 hover:underline"
+          className="text-ink text-xs hover:underline"
         >
           From video: {claim.subject.editorialTitle ?? claim.subject.name} →
         </Link>
@@ -48,7 +48,7 @@ export default async function AdminClaimEditPage({
           <Link
             href={`/claims/${claim.slug}`}
             target="_blank"
-            className="ml-4 text-xs text-gray-400 hover:text-blue-600"
+            className="hover:text-ink ml-4 text-xs text-gray-400"
           >
             View live →
           </Link>
@@ -72,7 +72,7 @@ export default async function AdminClaimEditPage({
         autoReviewed={claim.autoReviewed}
         needsConfirmation={
           claim.humanConfirmedAt === null &&
-          claim.evidenceStatus !== "NOT_CHECKED"
+          claim.evidenceStatus !== 'NOT_CHECKED'
         }
       />
     </div>

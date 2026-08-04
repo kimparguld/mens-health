@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import Link from "next/link";
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: "Weekly Trend Pages — Hype Check",
+  title: 'Weekly Trend Pages — Hype Check',
   description:
-    "The top trending videos summarised each week by topic. Evidence labels, claim checks, practical takeaways.",
-  path: "/weekly",
+    'The top trending videos summarised each week by topic. Evidence labels, claim checks, practical takeaways.',
+  path: '/weekly',
 });
 
 export default function WeeklyIndexPage() {
@@ -25,7 +25,7 @@ export default function WeeklyIndexPage() {
           <li key={topic.slug}>
             <Link
               href={`/weekly/${topic.slug}`}
-              className="flex flex-col rounded-xl border border-gray-200 bg-white px-5 py-4 transition-colors hover:border-indigo-300"
+              className="group border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
             >
               <span className="text-base font-semibold text-gray-900">
                 Best {topic.name} videos this week
@@ -33,6 +33,9 @@ export default function WeeklyIndexPage() {
               <span className="mt-1 text-sm text-gray-500">
                 {topic.description}
               </span>
+              <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-xs font-medium underline underline-offset-4">
+                Read more →
+              </p>
             </Link>
           </li>
         ))}

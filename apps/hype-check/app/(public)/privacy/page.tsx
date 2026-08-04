@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How Hype Check collects, uses, and protects your data.",
+  title: 'Privacy Policy',
+  description: 'How Hype Check collects, uses, and protects your data.',
 };
 
 export default function PrivacyPage() {
@@ -93,8 +93,8 @@ export default function PrivacyPage() {
         <p>
           You can unsubscribe from the newsletter at any time using the
           unsubscribe link in any digest email. To request deletion of your
-          account or personal data,{" "}
-          <a href="/contact" className="text-indigo-600 hover:underline">
+          account or personal data,{' '}
+          <a href="/contact" className="text-ink-muted/60 hover:underline">
             contact us
           </a>
           .
@@ -104,8 +104,8 @@ export default function PrivacyPage() {
       <section className="mb-10 space-y-4 leading-relaxed text-gray-700">
         <h2 className="text-xl font-semibold text-gray-900">Contact</h2>
         <p>
-          If you have questions about how we handle your data, please{" "}
-          <a href="/contact" className="text-indigo-600 hover:underline">
+          If you have questions about how we handle your data, please{' '}
+          <a href="/contact" className="text-ink-muted/60 hover:underline">
             get in touch
           </a>
           .

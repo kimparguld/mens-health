@@ -1,8 +1,8 @@
-import { db } from "@/lib/db/prisma";
-import { env } from "@/env";
-import Link from "next/link";
-import { SubscribersTable } from "./SubscribersTable";
-import { BackfillButton } from "./BackfillButton";
+import { env } from '@/env';
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import { BackfillButton } from './BackfillButton';
+import { SubscribersTable } from './SubscribersTable';
 
 const PAGE_SIZE = 50;
 
@@ -12,21 +12,21 @@ export default async function AdminSubscribersPage({
   searchParams: Promise<{ page?: string; filter?: string }>;
 }) {
   const { page: pageStr, filter } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
+  const page = Math.max(1, parseInt(pageStr ?? '1', 10));
   const skip = (page - 1) * PAGE_SIZE;
 
-  const allowedFilters = ["active", "unsubscribed", "unconfirmed"] as const;
+  const allowedFilters = ['active', 'unsubscribed', 'unconfirmed'] as const;
   type Filter = (typeof allowedFilters)[number];
   const safeFilter: Filter = (allowedFilters as readonly string[]).includes(
-    filter ?? "",
+    filter ?? ''
   )
     ? (filter as Filter)
-    : "active";
+    : 'active';
 
   const where =
-    safeFilter === "active"
+    safeFilter === 'active'
       ? { unsubscribedAt: null, confirmedAt: { not: null } }
-      : safeFilter === "unsubscribed"
+      : safeFilter === 'unsubscribed'
         ? { unsubscribedAt: { not: null } }
         : { confirmedAt: null, unsubscribedAt: null };
 
@@ -34,7 +34,7 @@ export default async function AdminSubscribersPage({
     await Promise.all([
       db.newsletterSubscriber.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         skip,
         take: PAGE_SIZE,
       }),
@@ -53,9 +53,9 @@ export default async function AdminSubscribersPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   const filterTabs: Array<{ key: Filter; label: string; count: number }> = [
-    { key: "active", label: "Active", count: totalActive },
-    { key: "unconfirmed", label: "Unconfirmed", count: totalUnconfirmed },
-    { key: "unsubscribed", label: "Unsubscribed", count: totalUnsubscribed },
+    { key: 'active', label: 'Active', count: totalActive },
+    { key: 'unconfirmed', label: 'Unconfirmed', count: totalUnconfirmed },
+    { key: 'unsubscribed', label: 'Unsubscribed', count: totalUnsubscribed },
   ];
 
   return (
@@ -64,7 +64,7 @@ export default async function AdminSubscribersPage({
         <h1 className="text-2xl font-bold text-gray-900">
           Newsletter Subscribers
         </h1>
-        <Link href="/admin" className="text-sm text-blue-600 hover:underline">
+        <Link href="/admin" className="text-ink text-sm hover:underline">
           &larr; Dashboard
         </Link>
       </div>
@@ -97,8 +97,8 @@ export default async function AdminSubscribersPage({
             href={`/admin/subscribers?filter=${key}`}
             className={`rounded-full px-3 py-1 text-sm font-medium transition ${
               safeFilter === key
-                ? "bg-gray-900 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             {label} ({count})

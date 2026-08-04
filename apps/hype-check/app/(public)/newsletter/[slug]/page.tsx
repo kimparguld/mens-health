@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import { NewsletterSignupForm } from "@menhealth/ui";
+import { db } from '@/lib/db/prisma';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { NewsletterSignupForm } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 type Params = Promise<{ slug: string }>;
 
 async function getIssue(slug: string) {
@@ -17,13 +17,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const issue = await getIssue(slug);
-  if (!issue) return { title: "Newsletter Issue Not Found" };
+  if (!issue) return { title: 'Newsletter Issue Not Found' };
 
   return createMetadata({
     title: `${issue.subject} — Hype Check`,
     description: issue.subject,
     path: `/newsletter/${slug}`,
-    type: "article",
+    type: 'article',
   });
 }
 
@@ -42,17 +42,15 @@ export default async function NewsletterIssuePage({
       <nav className="mb-6 text-sm text-gray-500">
         <Link href="/newsletter" className="hover:underline">
           Newsletter
-        </Link>{" "}
-        /{" "}
+        </Link>{' '}
+        /{' '}
         <Link href="/newsletter/archive" className="hover:underline">
           Archive
-        </Link>{" "}
+        </Link>{' '}
         / <span className="text-gray-900">{issue.subject}</span>
       </nav>
 
-      <h1 className="mb-1 text-2xl font-bold text-gray-900">
-        {issue.subject}
-      </h1>
+      <h1 className="mb-1 text-2xl font-bold text-gray-900">{issue.subject}</h1>
       <p className="mb-6 text-sm text-gray-400">
         {issue.sentAt.toLocaleDateString()}
       </p>
@@ -66,7 +64,7 @@ export default async function NewsletterIssuePage({
         />
       </div>
 
-      <div className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-6 text-center">
+      <div className="border-ink-muted/20 mt-8 rounded-xl border bg-indigo-50 p-6 text-center">
         <h2 className="text-lg font-bold text-gray-900">
           Get next week&apos;s issue
         </h2>

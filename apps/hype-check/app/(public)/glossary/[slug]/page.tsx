@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { GLOSSARY_TERMS, getGlossaryTerm } from "@/lib/seo/glossary";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { JsonLd, Disclaimer, RiskBadge } from "@menhealth/ui";
-import { buildBreadcrumbSchema, buildDefinedTermSchema } from "@menhealth/core-seo";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
+import { GLOSSARY_TERMS, getGlossaryTerm } from '@/lib/seo/glossary';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  buildBreadcrumbSchema,
+  buildDefinedTermSchema,
+} from '@menhealth/core-seo';
+import { Disclaimer, JsonLd, RiskBadge } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 
@@ -22,7 +24,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const term = getGlossaryTerm(slug);
-  if (!term) return { title: "Term Not Found" };
+  if (!term) return { title: 'Term Not Found' };
 
   const canonical = `${APP_URL}/glossary/${slug}`;
   const title = `What is ${term.term}? — Hype Check Glossary`;
@@ -35,38 +37,34 @@ export async function generateMetadata({
       title,
       description: term.shortDefinition,
       url: canonical,
-      type: "article",
+      type: 'article',
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description: term.shortDefinition,
     },
   };
 }
 
-export default async function GlossaryTermPage({
-  params,
-}: {
-  params: Params;
-}) {
+export default async function GlossaryTermPage({ params }: { params: Params }) {
   const { slug } = await params;
   const term = getGlossaryTerm(slug);
   if (!term) notFound();
 
   const relatedTopics = TOPIC_SEEDS.filter((t) =>
-    term.relatedTopicSlugs.includes(t.slug),
+    term.relatedTopicSlugs.includes(t.slug)
   );
   const isHighRiskTerm = relatedTopics.some((t) => t.isHighRisk);
 
   const otherTerms = GLOSSARY_TERMS.filter((t) => t.slug !== term.slug).slice(
     0,
-    6,
+    6
   );
 
   const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Glossary", url: `${APP_URL}/glossary` },
+    { name: 'Home', url: APP_URL },
+    { name: 'Glossary', url: `${APP_URL}/glossary` },
     { name: term.term, url: `${APP_URL}/glossary/${slug}` },
   ]);
 
@@ -84,11 +82,11 @@ export default async function GlossaryTermPage({
       <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
         <Link href="/" className="hover:underline">
           Home
-        </Link>{" "}
-        /{" "}
+        </Link>{' '}
+        /{' '}
         <Link href="/glossary" className="hover:underline">
           Glossary
-        </Link>{" "}
+        </Link>{' '}
         / <span className="text-gray-900">{term.term}</span>
       </nav>
 
@@ -114,7 +112,7 @@ export default async function GlossaryTermPage({
               <Link
                 key={topic.slug}
                 href={`/topics/${topic.slug}`}
-                className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+                className="text-ink-muted hover:bg-ink-muted/10 border-ink-muted/20 rounded-full border bg-indigo-50 px-3 py-1.5 text-sm font-medium"
               >
                 {topic.name} →
               </Link>
@@ -132,7 +130,7 @@ export default async function GlossaryTermPage({
             <Link
               key={t.slug}
               href={`/glossary/${t.slug}`}
-              className="rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800 hover:border-indigo-300 hover:text-indigo-700"
+              className="hover:text-ink-muted hover:border-ink-muted/30 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800"
             >
               {t.term}
             </Link>
@@ -140,7 +138,7 @@ export default async function GlossaryTermPage({
         </div>
         <Link
           href="/glossary"
-          className="mt-3 inline-block text-sm font-medium text-indigo-700 hover:underline"
+          className="text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
         >
           Browse the full glossary →
         </Link>

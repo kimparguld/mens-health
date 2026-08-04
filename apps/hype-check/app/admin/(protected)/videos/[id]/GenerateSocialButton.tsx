@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const PLATFORMS = [
-  { value: "YOUTUBE_COMMUNITY", label: "YouTube Community" },
-  { value: "REDDIT", label: "Reddit" },
-  { value: "X", label: "X (Twitter)" },
+  { value: 'YOUTUBE_COMMUNITY', label: 'YouTube Community' },
+  { value: 'REDDIT', label: 'Reddit' },
+  { value: 'X', label: 'X (Twitter)' },
 ] as const;
 
-type Platform = (typeof PLATFORMS)[number]["value"];
+type Platform = (typeof PLATFORMS)[number]['value'];
 
 export default function GenerateSocialButton({ videoId }: { videoId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Set<Platform>>(new Set());
   const [results, setResults] = useState<
-    Record<Platform, "idle" | "loading" | "ok" | string>
-  >({} as Record<Platform, "idle" | "loading" | "ok" | string>);
+    Record<Platform, 'idle' | 'loading' | 'ok' | string>
+  >({} as Record<Platform, 'idle' | 'loading' | 'ok' | string>);
   const [anyLoading, setAnyLoading] = useState(false);
 
   function toggle(p: Platform) {
@@ -36,19 +36,19 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
     if (selected.size === 0) return;
     setAnyLoading(true);
     const promises = Array.from(selected).map(async (platform) => {
-      setResults((r) => ({ ...r, [platform]: "loading" }));
-      const res = await fetch("/api/social/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      setResults((r) => ({ ...r, [platform]: 'loading' }));
+      const res = await fetch('/api/social/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoId, platform }),
       });
       if (res.ok) {
-        setResults((r) => ({ ...r, [platform]: "ok" }));
+        setResults((r) => ({ ...r, [platform]: 'ok' }));
       } else {
         const data = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
-        setResults((r) => ({ ...r, [platform]: data?.error ?? "Error" }));
+        setResults((r) => ({ ...r, [platform]: data?.error ?? 'Error' }));
       }
     });
     await Promise.all(promises);
@@ -95,18 +95,18 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
             <li
               key={platform}
               className={
-                state === "ok"
-                  ? "text-green-700"
-                  : state === "loading"
-                    ? "text-gray-500"
-                    : "text-red-600"
+                state === 'ok'
+                  ? 'text-green-700'
+                  : state === 'loading'
+                    ? 'text-gray-500'
+                    : 'text-red-600'
               }
             >
-              {platform}:{" "}
-              {state === "ok"
-                ? "✓ Draft created"
-                : state === "loading"
-                  ? "Generating…"
+              {platform}:{' '}
+              {state === 'ok'
+                ? '✓ Draft created'
+                : state === 'loading'
+                  ? 'Generating…'
                   : state}
             </li>
           ))}
@@ -117,9 +117,9 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
         <button
           onClick={generate}
           disabled={selected.size === 0 || anyLoading}
-          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="bg-ink-muted/60 hover:bg-ink-muted/70 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {anyLoading ? "Generating…" : "Generate"}
+          {anyLoading ? 'Generating…' : 'Generate'}
         </button>
         <button
           onClick={() => setOpen(false)}

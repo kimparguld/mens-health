@@ -1,6 +1,6 @@
+import { EvidenceBadge, RiskBadge } from '@menhealth/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import { EvidenceBadge, RiskBadge } from '@menhealth/ui';
 import { VerdictStamp, type VerdictType } from './VerdictStamp';
 
 type HypeVideoCardProps = {
@@ -41,10 +41,10 @@ export function HypeVideoCard({
   return (
     <Link
       href={`/videos/${slug}`}
-      className="group flex flex-col overflow-hidden rounded-md border border-hairline bg-surface transition-colors hover:border-ink"
+      className="group border-hairline hover:border-ink flex flex-col overflow-hidden rounded-md border bg-white transition-colors"
     >
       {thumbnailUrl && (
-        <div className="relative aspect-video w-full bg-hairline/40">
+        <div className="bg-hairline/40 relative aspect-video w-full">
           <Image
             src={thumbnailUrl}
             alt={title}
@@ -60,7 +60,7 @@ export function HypeVideoCard({
           {topicNames.slice(0, 2).map((name) => (
             <span
               key={name}
-              className="rounded-full border border-hairline px-2 py-0.5 text-xs font-medium text-ink-muted"
+              className="border-hairline text-ink-muted rounded-full border px-2 py-0.5 text-xs font-medium"
             >
               {name}
             </span>
@@ -74,19 +74,19 @@ export function HypeVideoCard({
               <EvidenceBadge status={evidenceLabel} />
             )}
             {watchTimeMin && (
-              <span className="text-xs text-ink-muted">
+              <span className="text-xs text-gray-500">
                 {watchTimeMin} min watch
               </span>
             )}
           </div>
         )}
-        <h3 className="line-clamp-2 font-slab text-base font-bold text-ink">
+        <h3 className="text-ink line-clamp-2 text-base font-semibold">
           {title}
         </h3>
         {shortSummary && (
-          <p className="line-clamp-2 text-xs text-ink-muted">{shortSummary}</p>
+          <p className="text-ink-muted line-clamp-2 text-xs">{shortSummary}</p>
         )}
-        <p className="mt-auto text-xs text-ink-muted">{channelTitle}</p>
+        <p className="mt-auto text-xs text-gray-500">{channelTitle}</p>
       </div>
     </Link>
   );

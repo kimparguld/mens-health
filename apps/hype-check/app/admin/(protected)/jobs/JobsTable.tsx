@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useTransition } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 
 const JOB_STATUS_COLORS: Record<string, string> = {
-  QUEUED: "bg-yellow-100 text-yellow-800",
-  RUNNING: "bg-blue-100 text-blue-800",
-  COMPLETED: "bg-green-100 text-green-800",
-  FAILED: "bg-red-100 text-red-800",
-  CANCELLED: "bg-gray-100 text-gray-500",
+  QUEUED: 'bg-yellow-100 text-yellow-800',
+  RUNNING: 'bg-blue-100 text-blue-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  FAILED: 'bg-red-100 text-red-800',
+  CANCELLED: 'bg-gray-100 text-gray-500',
 };
 
 type Job = {
@@ -39,7 +39,7 @@ export function JobsTable({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const cancellableJobs = jobs.filter((j) => j.status === "QUEUED");
+  const cancellableJobs = jobs.filter((j) => j.status === 'QUEUED');
   const allCancellableSelected =
     cancellableJobs.length > 0 &&
     cancellableJobs.every((j) => selected.has(j.id));
@@ -69,13 +69,13 @@ export function JobsTable({
     if (ids.length === 0) return;
     setError(null);
     startTransition(async () => {
-      const res = await fetch("/api/admin/jobs/cancel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/admin/jobs/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids }),
       });
       if (!res.ok) {
-        setError("Failed to cancel jobs. Please try again.");
+        setError('Failed to cancel jobs. Please try again.');
         return;
       }
       setSelected(new Set());
@@ -95,7 +95,7 @@ export function JobsTable({
             disabled={selected.size === 0 || isPending}
             className="rounded bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-40"
           >
-            {isPending ? "Cancelling…" : "Cancel selected"}
+            {isPending ? 'Cancelling…' : 'Cancel selected'}
           </button>
           {error && <span className="text-sm text-red-600">{error}</span>}
         </div>
@@ -149,12 +149,12 @@ export function JobsTable({
               </tr>
             ) : (
               jobs.map((job) => {
-                const isQueued = job.status === "QUEUED";
+                const isQueued = job.status === 'QUEUED';
                 const isChecked = selected.has(job.id);
                 return (
                   <tr
                     key={job.id}
-                    className={`hover:bg-gray-50 ${isChecked ? "bg-red-50" : ""}`}
+                    className={`hover:bg-gray-50 ${isChecked ? 'bg-red-50' : ''}`}
                   >
                     {showCancelControls && (
                       <td className="px-4 py-3">
@@ -172,10 +172,11 @@ export function JobsTable({
                       {job.sourceVideo ? (
                         <Link
                           href={`/admin/videos/${job.sourceVideo.subjectId}`}
-                          className="text-blue-600 hover:underline"
+                          className="text-ink hover:underline"
                           title={job.sourceVideo.title ?? undefined}
                         >
-                          {job.sourceVideo.title ?? job.sourceVideo.youtubeVideoId}
+                          {job.sourceVideo.title ??
+                            job.sourceVideo.youtubeVideoId}
                         </Link>
                       ) : (
                         <span className="text-gray-400">Deleted video</span>
@@ -183,7 +184,7 @@ export function JobsTable({
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${JOB_STATUS_COLORS[job.status] ?? "bg-gray-100 text-gray-700"}`}
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${JOB_STATUS_COLORS[job.status] ?? 'bg-gray-100 text-gray-700'}`}
                       >
                         {job.status}
                       </span>
@@ -194,18 +195,18 @@ export function JobsTable({
                     <td className="px-4 py-3 whitespace-nowrap text-gray-500">
                       {job.startedAt
                         ? new Date(job.startedAt).toLocaleString()
-                        : "—"}
+                        : '—'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-gray-500">
                       {job.completedAt
                         ? new Date(job.completedAt).toLocaleString()
-                        : "—"}
+                        : '—'}
                     </td>
                     <td
                       className="max-w-xs truncate px-4 py-3 text-red-600"
                       title={job.errorMessage ?? undefined}
                     >
-                      {job.errorMessage ?? "—"}
+                      {job.errorMessage ?? '—'}
                     </td>
                   </tr>
                 );

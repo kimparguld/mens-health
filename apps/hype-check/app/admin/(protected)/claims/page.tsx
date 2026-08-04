@@ -1,9 +1,9 @@
-import type { Prisma } from "@/app/generated/prisma";
-import Link from "next/link";
-import { db } from "@/lib/db/prisma";
-import { EvidenceBadge } from "@menhealth/ui";
-import { BacklogAutoReviewButton } from "./BacklogAutoReviewButton";
-import { BulkConfirmMediumButton } from "./BulkConfirmMediumButton";
+import type { Prisma } from '@/app/generated/prisma';
+import { db } from '@/lib/db/prisma';
+import { EvidenceBadge } from '@menhealth/ui';
+import Link from 'next/link';
+import { BacklogAutoReviewButton } from './BacklogAutoReviewButton';
+import { BulkConfirmMediumButton } from './BulkConfirmMediumButton';
 
 type SearchParams = Promise<{ status?: string; page?: string }>;
 
@@ -12,11 +12,11 @@ type SearchParams = Promise<{ status?: string; page?: string }>;
 // (MEDIUM-risk) that hasn't been confirmed yet.
 const NEEDS_REVIEW_WHERE: Prisma.ClaimWhereInput = {
   OR: [
-    { evidenceStatus: "NOT_CHECKED" },
+    { evidenceStatus: 'NOT_CHECKED' },
     {
       autoReviewed: false,
       humanConfirmedAt: null,
-      evidenceStatus: { not: "NOT_CHECKED" },
+      evidenceStatus: { not: 'NOT_CHECKED' },
     },
   ],
 };
@@ -26,19 +26,21 @@ const REVIEWED_WHERE: Prisma.ClaimWhereInput = {
 };
 
 const EVIDENCE_STATUS_VALUES = [
-  "NOT_CHECKED",
-  "SUPPORTED",
-  "MIXED",
-  "WEAK",
-  "UNSUPPORTED",
+  'NOT_CHECKED',
+  'SUPPORTED',
+  'MIXED',
+  'WEAK',
+  'UNSUPPORTED',
 ] as const;
 
 function whereForStatus(status: string): Prisma.ClaimWhereInput {
-  if (status === "needs-review") return NEEDS_REVIEW_WHERE;
-  if (status === "auto-reviewed") return AUTO_REVIEWED_WHERE;
-  if (status === "reviewed") return REVIEWED_WHERE;
+  if (status === 'needs-review') return NEEDS_REVIEW_WHERE;
+  if (status === 'auto-reviewed') return AUTO_REVIEWED_WHERE;
+  if (status === 'reviewed') return REVIEWED_WHERE;
   if ((EVIDENCE_STATUS_VALUES as readonly string[]).includes(status)) {
-    return { evidenceStatus: status as (typeof EVIDENCE_STATUS_VALUES)[number] };
+    return {
+      evidenceStatus: status as (typeof EVIDENCE_STATUS_VALUES)[number],
+    };
   }
   return {};
 }
@@ -48,12 +50,12 @@ export default async function AdminClaimsPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const { status = "all", page: pageStr } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
+  const { status = 'all', page: pageStr } = await searchParams;
+  const page = Math.max(1, parseInt(pageStr ?? '1', 10));
   const take = 50;
   const skip = (page - 1) * take;
 
-  const where = status !== "all" ? whereForStatus(status) : {};
+  const where = status !== 'all' ? whereForStatus(status) : {};
 
   const [claims, total, needsReviewCount, autoReviewedCount] =
     await Promise.all([
@@ -61,7 +63,7 @@ export default async function AdminClaimsPage({
         where,
         skip,
         take,
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: 'desc' },
         include: {
           subject: {
             select: {
@@ -81,20 +83,20 @@ export default async function AdminClaimsPage({
   const totalPages = Math.ceil(total / take);
 
   const statusTabs = [
-    { label: "All", value: "all" },
+    { label: 'All', value: 'all' },
     {
       label: `Needs your review (${needsReviewCount})`,
-      value: "needs-review",
+      value: 'needs-review',
     },
     {
       label: `Auto-reviewed, awaiting spot-check (${autoReviewedCount})`,
-      value: "auto-reviewed",
+      value: 'auto-reviewed',
     },
-    { label: "Reviewed", value: "reviewed" },
-    { label: "Supported", value: "SUPPORTED" },
-    { label: "Mixed", value: "MIXED" },
-    { label: "Weak", value: "WEAK" },
-    { label: "Unsupported", value: "UNSUPPORTED" },
+    { label: 'Reviewed', value: 'reviewed' },
+    { label: 'Supported', value: 'SUPPORTED' },
+    { label: 'Mixed', value: 'MIXED' },
+    { label: 'Weak', value: 'WEAK' },
+    { label: 'Unsupported', value: 'UNSUPPORTED' },
   ];
 
   return (
@@ -109,7 +111,7 @@ export default async function AdminClaimsPage({
       {needsReviewCount > 0 && (
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           ⚠️ <strong>{needsReviewCount}</strong> claim
-          {needsReviewCount !== 1 ? "s" : ""} still need your review.{" "}
+          {needsReviewCount !== 1 ? 's' : ''} still need your review.{' '}
           <Link href="/admin/claims?status=needs-review" className="underline">
             Filter to show them →
           </Link>
@@ -127,8 +129,8 @@ export default async function AdminClaimsPage({
             href={`/admin/claims?status=${tab.value}`}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               status === tab.value
-                ? "bg-indigo-600 text-white"
-                : "border border-gray-200 bg-white text-gray-600 hover:border-indigo-300"
+                ? 'bg-ink-muted/60 text-white'
+                : 'hover:border-ink-muted/30 border border-gray-200 bg-white text-gray-600'
             }`}
           >
             {tab.label}
@@ -189,11 +191,11 @@ export default async function AdminClaimsPage({
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        claim.riskLevel === "HIGH"
-                          ? "bg-red-100 text-red-700"
-                          : claim.riskLevel === "MEDIUM"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
+                        claim.riskLevel === 'HIGH'
+                          ? 'bg-red-100 text-red-700'
+                          : claim.riskLevel === 'MEDIUM'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-green-100 text-green-700'
                       }`}
                     >
                       {claim.riskLevel}
@@ -202,7 +204,7 @@ export default async function AdminClaimsPage({
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/videos/${claim.subject.slug}`}
-                      className="line-clamp-1 text-xs text-blue-600 hover:underline"
+                      className="text-ink line-clamp-1 text-xs hover:underline"
                     >
                       {claim.subject.editorialTitle ?? claim.subject.name}
                     </Link>
@@ -211,7 +213,7 @@ export default async function AdminClaimsPage({
                     <div className="flex flex-col gap-1">
                       <Link
                         href={`/admin/claims/${claim.id}`}
-                        className="text-xs font-medium text-indigo-700 hover:underline"
+                        className="text-ink-muted text-xs font-medium hover:underline"
                       >
                         Review →
                       </Link>
@@ -219,7 +221,7 @@ export default async function AdminClaimsPage({
                         <Link
                           href={`/claims/${claim.slug}`}
                           target="_blank"
-                          className="text-xs text-gray-400 hover:text-blue-600"
+                          className="hover:text-ink text-xs text-gray-400"
                         >
                           View live →
                         </Link>

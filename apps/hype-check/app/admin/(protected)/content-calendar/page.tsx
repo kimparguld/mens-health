@@ -1,25 +1,25 @@
-import Link from "next/link";
-import { db } from "@/lib/db/prisma";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
 
 async function getUpcomingContent() {
   const [scheduledPosts, pendingVideos, subscribers] = await Promise.all([
     db.socialPost
       .findMany({
-        where: { status: { in: ["APPROVED", "SCHEDULED"] } },
-        orderBy: { scheduledAt: "asc" },
+        where: { status: { in: ['APPROVED', 'SCHEDULED'] } },
+        orderBy: { scheduledAt: 'asc' },
         take: 10,
       })
       .catch(() => []),
     db.subject
       .findMany({
-        where: { status: "REVIEW" },
-        orderBy: { createdAt: "desc" },
+        where: { status: 'REVIEW' },
+        orderBy: { createdAt: 'desc' },
         take: 5,
         include: {
           sourceVideos: {
             take: 1,
-            orderBy: { createdAt: "desc" },
-            include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+            orderBy: { createdAt: 'desc' },
+            include: { summaries: { take: 1, orderBy: { createdAt: 'desc' } } },
           },
         },
       })
@@ -74,7 +74,7 @@ export default async function ContentCalendarPage() {
           </h2>
           <Link
             href="/admin/social/calendar"
-            className="text-xs text-indigo-700 underline"
+            className="text-ink-muted text-xs underline"
           >
             View social schedule →
           </Link>
@@ -113,7 +113,7 @@ export default async function ContentCalendarPage() {
           </h2>
           <Link
             href="/admin/videos"
-            className="text-xs text-indigo-700 underline"
+            className="text-ink-muted text-xs underline"
           >
             Review queue →
           </Link>
@@ -130,11 +130,13 @@ export default async function ContentCalendarPage() {
                 className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm"
               >
                 <span className="flex-1 truncate font-medium text-gray-900">
-                  {video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                  {video.editorialTitle ??
+                    video.sourceVideos[0]?.title ??
+                    video.name}
                 </span>
                 <Link
                   href={`/admin/videos/${video.id}`}
-                  className="flex-shrink-0 text-xs text-indigo-700 underline"
+                  className="text-ink-muted flex-shrink-0 text-xs underline"
                 >
                   Review
                 </Link>
@@ -145,11 +147,11 @@ export default async function ContentCalendarPage() {
       </section>
 
       {/* Weekly goal reminder */}
-      <section className="rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-5">
-        <h2 className="mb-2 text-sm font-semibold text-indigo-900">
+      <section className="border-ink-muted/20 rounded-xl border bg-indigo-50 px-5 py-5">
+        <h2 className="text-ink-muted/90 mb-2 text-sm font-semibold">
           Weekly publishing goal
         </h2>
-        <ul className="grid grid-cols-2 gap-1 text-sm text-indigo-800">
+        <ul className="text-ink-muted/80 grid grid-cols-2 gap-1 text-sm">
           <li>10 video summaries</li>
           <li>5 claim pages</li>
           <li>2 topic-page updates</li>
@@ -160,14 +162,11 @@ export default async function ContentCalendarPage() {
         <div className="mt-3 flex gap-3 text-xs">
           <Link
             href="/admin/weekly-growth"
-            className="text-indigo-700 underline"
+            className="text-ink-muted underline"
           >
             Weekly workflow →
           </Link>
-          <Link
-            href="/admin/growth-plan"
-            className="text-indigo-700 underline"
-          >
+          <Link href="/admin/growth-plan" className="text-ink-muted underline">
             90-day plan →
           </Link>
         </div>

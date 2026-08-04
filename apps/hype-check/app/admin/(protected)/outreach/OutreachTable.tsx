@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 type OutreachContact = {
   id: string;
@@ -18,61 +18,61 @@ type OutreachContact = {
 };
 
 const CONTACT_TYPES = [
-  { value: "YOUTUBE_CREATOR", label: "YouTube Creator" },
-  { value: "NEWSLETTER_PUBLISHER", label: "Newsletter Publisher" },
-  { value: "FITNESS_BLOGGER", label: "Fitness Blogger" },
-  { value: "COACH", label: "Coach" },
-  { value: "PODCAST_HOST", label: "Podcast Host" },
-  { value: "SPONSOR_PROSPECT", label: "Sponsor Prospect" },
-  { value: "HEALTH_TECH_FOUNDER", label: "Health-Tech Founder" },
+  { value: 'YOUTUBE_CREATOR', label: 'YouTube Creator' },
+  { value: 'NEWSLETTER_PUBLISHER', label: 'Newsletter Publisher' },
+  { value: 'FITNESS_BLOGGER', label: 'Fitness Blogger' },
+  { value: 'COACH', label: 'Coach' },
+  { value: 'PODCAST_HOST', label: 'Podcast Host' },
+  { value: 'SPONSOR_PROSPECT', label: 'Sponsor Prospect' },
+  { value: 'HEALTH_TECH_FOUNDER', label: 'Health-Tech Founder' },
 ];
 
 const STATUSES = [
   {
-    value: "NOT_CONTACTED",
-    label: "Not contacted",
-    color: "bg-gray-100 text-gray-600",
+    value: 'NOT_CONTACTED',
+    label: 'Not contacted',
+    color: 'bg-gray-100 text-gray-600',
   },
   {
-    value: "EMAIL_SENT",
-    label: "Email sent",
-    color: "bg-blue-100 text-blue-700",
+    value: 'EMAIL_SENT',
+    label: 'Email sent',
+    color: 'bg-blue-100 text-blue-700',
   },
   {
-    value: "REPLIED",
-    label: "Replied",
-    color: "bg-indigo-100 text-indigo-700",
+    value: 'REPLIED',
+    label: 'Replied',
+    color: 'bg-ink-muted/10 text-ink-muted',
   },
   {
-    value: "MEETING_BOOKED",
-    label: "Meeting booked",
-    color: "bg-purple-100 text-purple-700",
+    value: 'MEETING_BOOKED',
+    label: 'Meeting booked',
+    color: 'bg-purple-100 text-purple-700',
   },
   {
-    value: "DEAL_IN_PROGRESS",
-    label: "Deal in progress",
-    color: "bg-yellow-100 text-yellow-700",
+    value: 'DEAL_IN_PROGRESS',
+    label: 'Deal in progress',
+    color: 'bg-yellow-100 text-yellow-700',
   },
   {
-    value: "CLOSED_WON",
-    label: "Closed — won",
-    color: "bg-green-100 text-green-800",
+    value: 'CLOSED_WON',
+    label: 'Closed — won',
+    color: 'bg-green-100 text-green-800',
   },
   {
-    value: "CLOSED_LOST",
-    label: "Closed — lost",
-    color: "bg-red-100 text-red-700",
+    value: 'CLOSED_LOST',
+    label: 'Closed — lost',
+    color: 'bg-red-100 text-red-700',
   },
   {
-    value: "FOLLOW_UP_NEEDED",
-    label: "Follow-up needed",
-    color: "bg-orange-100 text-orange-700",
+    value: 'FOLLOW_UP_NEEDED',
+    label: 'Follow-up needed',
+    color: 'bg-orange-100 text-orange-700',
   },
 ];
 
 const TEMPLATES = [
   {
-    name: "Creator summary outreach",
+    name: 'Creator summary outreach',
     body: `Hi [Name],
 
 We created an evidence-aware summary of your video and linked back to your channel.
@@ -85,7 +85,7 @@ Best,
 [Your name]`,
   },
   {
-    name: "Expert quote request",
+    name: 'Expert quote request',
     body: `Hi [Name],
 
 I'm preparing a short evidence-aware summary about [topic].
@@ -98,7 +98,7 @@ Best,
 [Your name]`,
   },
   {
-    name: "Sponsor conversation",
+    name: 'Sponsor conversation',
     body: `Hi [Name],
 
 I run Hype Check, a site/newsletter that reviews trending products, courses, side hustles, and investment apps and gives an evidence-based verdict without the hype.
@@ -113,13 +113,13 @@ Best,
 ];
 
 const BLANK_FORM = {
-  name: "",
-  contactType: "YOUTUBE_CREATOR",
-  email: "",
-  socialUrl: "",
-  relatedContentUrl: "",
-  status: "NOT_CONTACTED",
-  notes: "",
+  name: '',
+  contactType: 'YOUTUBE_CREATOR',
+  email: '',
+  socialUrl: '',
+  relatedContentUrl: '',
+  status: 'NOT_CONTACTED',
+  notes: '',
 };
 
 export function OutreachTable({
@@ -138,16 +138,16 @@ export function OutreachTable({
     return (
       e: React.ChangeEvent<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-      >,
+      >
     ) => setForm((f) => ({ ...f, [key]: e.target.value }));
   }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch("/api/admin/outreach", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/admin/outreach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...form,
         email: form.email || null,
@@ -167,13 +167,13 @@ export function OutreachTable({
 
   async function updateStatus(id: string, status: string) {
     const res = await fetch(`/api/admin/outreach/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     });
     if (res.ok) {
       setContacts((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, status } : c)),
+        prev.map((c) => (c.id === id ? { ...c, status } : c))
       );
     }
   }
@@ -187,9 +187,9 @@ export function OutreachTable({
       <div className="mb-4 flex flex-wrap gap-3">
         <button
           onClick={() => setShowForm(!showForm)}
-          className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800"
+          className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white"
         >
-          {showForm ? "Cancel" : "+ Add contact"}
+          {showForm ? 'Cancel' : '+ Add contact'}
         </button>
         <button
           onClick={() => setShowTemplate(!showTemplate)}
@@ -209,8 +209,8 @@ export function OutreachTable({
                 onClick={() => setTemplateIdx(i)}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   templateIdx === i
-                    ? "bg-indigo-700 text-white"
-                    : "border border-gray-200 text-gray-600 hover:border-indigo-400"
+                    ? 'bg-ink-muted/70 text-white'
+                    : 'hover:border-ink-muted/40 border border-gray-200 text-gray-600'
                 }`}
               >
                 {t.name}
@@ -222,9 +222,9 @@ export function OutreachTable({
           </pre>
           <button
             onClick={() =>
-              navigator.clipboard.writeText(TEMPLATES[templateIdx]?.body || "")
+              navigator.clipboard.writeText(TEMPLATES[templateIdx]?.body || '')
             }
-            className="mt-2 text-xs text-indigo-700 underline"
+            className="text-ink-muted mt-2 text-xs underline"
           >
             Copy template
           </button>
@@ -248,9 +248,9 @@ export function OutreachTable({
               <input
                 type="text"
                 value={form.name}
-                onChange={set("name")}
+                onChange={set('name')}
                 required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -259,8 +259,8 @@ export function OutreachTable({
               </label>
               <select
                 value={form.contactType}
-                onChange={set("contactType")}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                onChange={set('contactType')}
+                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               >
                 {CONTACT_TYPES.map((ct) => (
                   <option key={ct.value} value={ct.value}>
@@ -276,8 +276,8 @@ export function OutreachTable({
               <input
                 type="email"
                 value={form.email}
-                onChange={set("email")}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                onChange={set('email')}
+                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -287,9 +287,9 @@ export function OutreachTable({
               <input
                 type="url"
                 value={form.socialUrl}
-                onChange={set("socialUrl")}
+                onChange={set('socialUrl')}
                 placeholder="https://youtube.com/@..."
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div className="sm:col-span-2">
@@ -299,9 +299,9 @@ export function OutreachTable({
               <input
                 type="url"
                 value={form.relatedContentUrl}
-                onChange={set("relatedContentUrl")}
+                onChange={set('relatedContentUrl')}
                 placeholder="https://hype-check.net/videos/..."
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div className="sm:col-span-2">
@@ -311,8 +311,8 @@ export function OutreachTable({
               <textarea
                 rows={2}
                 value={form.notes}
-                onChange={set("notes")}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                onChange={set('notes')}
+                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
           </div>
@@ -320,9 +320,9 @@ export function OutreachTable({
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800 disabled:opacity-50"
+              className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
-              {saving ? "Saving…" : "Add contact"}
+              {saving ? 'Saving…' : 'Add contact'}
             </button>
             <button
               type="button"
@@ -365,7 +365,7 @@ export function OutreachTable({
                           href={c.socialUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-indigo-600 underline"
+                          className="text-ink-muted/60 text-xs underline"
                         >
                           Profile
                         </a>
@@ -391,10 +391,10 @@ export function OutreachTable({
                     <td className="px-4 py-3 text-xs text-gray-400">
                       {c.nextFollowUpAt
                         ? new Date(c.nextFollowUpAt).toLocaleDateString()
-                        : "—"}
+                        : '—'}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">
-                      <div className="max-w-xs truncate">{c.notes ?? "—"}</div>
+                      <div className="max-w-xs truncate">{c.notes ?? '—'}</div>
                     </td>
                   </tr>
                 );

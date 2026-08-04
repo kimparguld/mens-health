@@ -1,16 +1,22 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { getTopicBySlug, getWeeklyRankingVideos } from "@/lib/db/queries";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { VideoCard, Disclaimer, EvidenceBadge, NewsletterInlineCTA, Breadcrumbs, JsonLd } from "@menhealth/ui";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
-import { buildBreadcrumbSchema } from "@menhealth/core-seo";
-import { db } from "@/lib/db/prisma";
+import { db } from '@/lib/db/prisma';
+import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { buildBreadcrumbSchema } from '@menhealth/core-seo';
+import {
+  Breadcrumbs,
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterInlineCTA,
+  VideoCard,
+} from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 
@@ -20,7 +26,7 @@ function getWeekLabel(): string {
   // ISO week number
   const start = new Date(y, 0, 1);
   const week = Math.ceil(
-    ((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7,
+    ((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7
   );
   return `Week ${week}, ${y}`;
 }
@@ -36,7 +42,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const seed = TOPIC_SEEDS.find((t) => t.slug === slug);
-  if (!seed) return { title: "Not Found" };
+  if (!seed) return { title: 'Not Found' };
 
   return createMetadata({
     title: `Best ${seed.name} Videos This Week — Hype Check`,
@@ -66,11 +72,11 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
       ? await db.claim.findMany({
           where: {
             subjectId: { in: subjectIds },
-            evidenceStatus: { not: "NOT_CHECKED" },
+            evidenceStatus: { not: 'NOT_CHECKED' },
             slug: { not: null },
           },
           take: 3,
-          orderBy: { riskLevel: "desc" },
+          orderBy: { riskLevel: 'desc' },
           select: {
             id: true,
             text: true,
@@ -87,16 +93,16 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
       ? db.claim.findFirst({
           where: {
             subjectId: { in: subjectIds },
-            evidenceStatus: { in: ["WEAK", "UNSUPPORTED"] },
+            evidenceStatus: { in: ['WEAK', 'UNSUPPORTED'] },
           },
-          orderBy: { riskLevel: "desc" },
+          orderBy: { riskLevel: 'desc' },
           select: { text: true, evidenceStatus: true, slug: true },
         })
       : null)) ?? null;
 
   const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Weekly trends", url: `${APP_URL}/weekly` },
+    { name: 'Home', url: APP_URL },
+    { name: 'Weekly trends', url: `${APP_URL}/weekly` },
     { name: seed.name, url: `${APP_URL}/weekly/${slug}` },
   ]);
 
@@ -106,13 +112,13 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
       <main className="mx-auto max-w-4xl px-4 py-10">
         <Breadcrumbs
           items={[
-            { label: "Weekly trends", href: "/weekly" },
+            { label: 'Weekly trends', href: '/weekly' },
             { label: seed.name },
           ]}
         />
 
         <header className="mb-12">
-          <p className="mb-1 text-xs font-semibold tracking-wide text-indigo-700 uppercase">
+          <p className="text-ink-muted mb-1 text-xs font-semibold tracking-wide uppercase">
             {weekLabel}
           </p>
           <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
@@ -131,7 +137,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             </p>
             <Link
               href={`/topics/${slug}`}
-              className="mt-3 inline-block text-sm font-semibold text-indigo-600 hover:underline"
+              className="text-ink-muted/60 mt-3 inline-block text-sm font-semibold hover:underline"
             >
               Browse all {seed.name} videos →
             </Link>
@@ -141,21 +147,25 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* Top Video This Week */}
             {topVideo && (
               <section className="mb-12">
-                <p className="mb-3 text-xs font-semibold tracking-wide text-indigo-700 uppercase">
+                <p className="text-ink-muted mb-3 text-xs font-semibold tracking-wide uppercase">
                   Top Video This Week
                 </p>
                 <div className="rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
                   <VideoCard
                     slug={topVideo.slug}
-                    title={topVideo.editorialTitle ?? topVideo.sourceVideos[0]?.title ?? topVideo.name}
-                    channelTitle={topVideo.channel?.title ?? ""}
+                    title={
+                      topVideo.editorialTitle ??
+                      topVideo.sourceVideos[0]?.title ??
+                      topVideo.name
+                    }
+                    channelTitle={topVideo.channel?.title ?? ''}
                     thumbnailUrl={topVideo.thumbnailUrl}
                     shortSummary={topVideoSummary?.shortSummary ?? null}
                     trendScore={topVideo.trendScore}
                     topicNames={topVideo.topics.map((vt) => vt.topic.name)}
                     riskLevel={topVideo.riskLevel}
                     evidenceLabel={
-                      topVideo.evidenceScore != null ? "SUPPORTED" : undefined
+                      topVideo.evidenceScore != null ? 'SUPPORTED' : undefined
                     }
                     durationSeconds={topVideo.durationSeconds ?? undefined}
                     customSizes="100vw"
@@ -165,11 +175,11 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                 {topVideoSummary?.takeaways &&
                   Array.isArray(topVideoSummary.takeaways) &&
                   (topVideoSummary.takeaways as string[]).length > 0 && (
-                    <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-4">
-                      <p className="mb-2 text-xs font-semibold tracking-wide text-indigo-700 uppercase">
+                    <div className="border-ink-muted/20 mt-4 rounded-xl border bg-indigo-50 px-5 py-4">
+                      <p className="text-ink-muted mb-2 text-xs font-semibold tracking-wide uppercase">
                         Practical Takeaway
                       </p>
-                      <p className="text-sm text-indigo-800">
+                      <p className="text-ink-muted/80 text-sm">
                         {(topVideoSummary.takeaways as string[])[0]}
                       </p>
                     </div>
@@ -180,9 +190,9 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* 3 Claims Checked */}
             {checkedClaims.length > 0 && (
               <section className="mb-12">
-                <p className="mb-3 text-xs font-semibold tracking-wide text-indigo-700 uppercase">
+                <p className="text-ink-muted mb-3 text-xs font-semibold tracking-wide uppercase">
                   {checkedClaims.length} Claim
-                  {checkedClaims.length !== 1 ? "s" : ""} Checked This Week
+                  {checkedClaims.length !== 1 ? 's' : ''} Checked This Week
                 </p>
                 <ul className="space-y-3">
                   {checkedClaims.map((claim) => (
@@ -197,7 +207,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       {claim.slug && (
                         <Link
                           href={`/claims/${claim.slug}`}
-                          className="text-xs font-medium text-indigo-700 hover:underline"
+                          className="text-ink-muted text-xs font-medium hover:underline"
                         >
                           See evidence →
                         </Link>
@@ -242,13 +252,17 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
 
                 return (
                   <li key={video.id} className="relative">
-                    <div className="absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white bg-indigo-700 text-lg font-bold text-white">
+                    <div className="bg-ink-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
                       {i + 1}
                     </div>
                     <VideoCard
                       slug={video.slug}
-                      title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
-                      channelTitle={video.channel?.title ?? ""}
+                      title={
+                        video.editorialTitle ??
+                        video.sourceVideos[0]?.title ??
+                        video.name
+                      }
+                      channelTitle={video.channel?.title ?? ''}
                       thumbnailUrl={video.thumbnailUrl}
                       shortSummary={summary?.shortSummary ?? null}
                       trendScore={video.trendScore}
@@ -256,8 +270,8 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       riskLevel={video.riskLevel}
                       evidenceLabel={
                         video.evidenceScore != null
-                          ? "SUPPORTED"
-                          : "NOT_CHECKED"
+                          ? 'SUPPORTED'
+                          : 'NOT_CHECKED'
                       }
                       durationSeconds={video.durationSeconds ?? undefined}
                       customSizes="100vw"
@@ -272,7 +286,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       )}
                     <Link
                       href={`/videos/${video.slug}`}
-                      className="mt-2 ml-3 inline-block text-sm font-medium text-indigo-700 hover:underline"
+                      className="text-ink-muted mt-2 ml-3 inline-block text-sm font-medium hover:underline"
                     >
                       Read full summary →
                     </Link>
@@ -291,7 +305,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             <li>
               <Link
                 href={`/topics/${slug}`}
-                className="font-medium text-indigo-700 hover:underline"
+                className="text-ink-muted font-medium hover:underline"
               >
                 {seed.name} topic hub →
               </Link>
@@ -299,7 +313,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             <li>
               <Link
                 href={`/rankings/${slug}`}
-                className="font-medium text-indigo-700 hover:underline"
+                className="text-ink-muted font-medium hover:underline"
               >
                 {seed.name} rankings →
               </Link>
@@ -339,7 +353,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
               <Link
                 key={t.slug}
                 href={`/weekly/${t.slug}`}
-                className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-colors hover:border-indigo-300 hover:text-indigo-800"
+                className="hover:border-ink-muted/30 hover:text-ink-muted/80 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-colors"
               >
                 {t.name}
               </Link>

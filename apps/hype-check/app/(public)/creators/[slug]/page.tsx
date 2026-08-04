@@ -1,8 +1,14 @@
-import { NewsletterFooterCTA, JsonLd, Disclaimer, EvidenceBadge, VideoCard } from "@menhealth/ui";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { db } from '@/lib/db/prisma';
-import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
+import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
+import {
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterFooterCTA,
+  VideoCard,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -17,8 +23,7 @@ function deriveEvidenceLabel(
   return 'SUPPORTED';
 }
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 
@@ -132,11 +137,10 @@ export default async function CreatorPage({ params }: { params: Params }) {
     videosReviewed: videos.length,
     claimsAssessed: claimStatusCounts.reduce((sum, c) => sum + c._count, 0),
     supported:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')
-        ?._count ?? 0,
-    mixed:
-      claimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count ??
+      claimStatusCounts.find((c) => c.evidenceStatus === 'SUPPORTED')?._count ??
       0,
+    mixed:
+      claimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')?._count ?? 0,
     weak:
       claimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count ?? 0,
     unsupported:
@@ -198,7 +202,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
               <span className="text-gray-600">{creator.name}</span>
             </nav>
 
-            <p className="mb-2 text-xs font-semibold tracking-widest text-indigo-600 uppercase">
+            <p className="text-ink-muted/60 mb-2 text-xs font-semibold tracking-widest uppercase">
               Creator profile
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -316,7 +320,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 </p>
                 <Link
                   href="/"
-                  className="mt-4 inline-block text-sm font-semibold text-indigo-600 hover:underline"
+                  className="text-ink-muted/60 mt-4 inline-block text-sm font-semibold hover:underline"
                 >
                   Browse all videos →
                 </Link>
@@ -327,7 +331,11 @@ export default async function CreatorPage({ params }: { params: Params }) {
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
-                    title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                    title={
+                      video.editorialTitle ??
+                      video.sourceVideos[0]?.title ??
+                      video.name
+                    }
                     channelTitle={video.channel?.title ?? ''}
                     thumbnailUrl={video.thumbnailUrl}
                     shortSummary={
@@ -360,7 +368,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     <Link
                       key={t.slug}
                       href={`/topics/${t.slug}`}
-                      className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+                      className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700"
                     >
                       {t.name}{' '}
                       <span className="text-gray-400">({t.count})</span>
@@ -392,7 +400,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                       {claim.slug && (
                         <Link
                           href={`/claims/${claim.slug}`}
-                          className="text-xs text-indigo-700 hover:underline"
+                          className="text-ink-muted text-xs hover:underline"
                         >
                           See evidence →
                         </Link>
@@ -406,10 +414,10 @@ export default async function CreatorPage({ params }: { params: Params }) {
             {/* Creator disclaimer */}
             <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
               Hype Check does not endorse, represent, or have an affiliation
-              with {creator.name}. This page presents an independent summary
-              of publicly available content. Always evaluate claims
-              critically and do your own research before making a purchase
-              or investment decision.
+              with {creator.name}. This page presents an independent summary of
+              publicly available content. Always evaluate claims critically and
+              do your own research before making a purchase or investment
+              decision.
             </div>
 
             <h2 className="mb-4 text-sm font-semibold text-gray-700">
@@ -420,7 +428,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 <Link
                   key={c.slug}
                   href={`/creators/${c.slug}`}
-                  className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+                  className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700"
                 >
                   {c.name}
                 </Link>
