@@ -7,6 +7,9 @@ import GenerateWarningsButton from './GenerateWarningsButton';
 import ReviewActions from './ReviewActions';
 import ReviewerForm from './ReviewerForm';
 import VerdictPanel from './VerdictPanel';
+import { WarningSignsEditor } from './WarningSignsEditor';
+import { CostItemsEditor } from './CostItemsEditor';
+import { DisclosuresEditor } from './DisclosuresEditor';
 
 const riskColors: Record<string, string> = {
   LOW: 'bg-green-100 text-green-700',
@@ -225,24 +228,29 @@ export default async function AdminVideoDetailPage({
               Warning signs, costs &amp; disclosures
             </h2>
             {subject.warningSigns.length === 0 &&
-            subject.costItems.length === 0 &&
-            subject.disclosures.length === 0 ? (
-              <div>
-                <p className="mb-3 text-sm text-gray-500">
-                  Nothing generated yet for this video.
-                </p>
-                <GenerateWarningsButton videoId={subject.id} />
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">
-                {subject.warningSigns.length} warning sign
-                {subject.warningSigns.length === 1 ? '' : 's'},{' '}
-                {subject.costItems.length} cost item
-                {subject.costItems.length === 1 ? '' : 's'},{' '}
-                {subject.disclosures.length} disclosure
-                {subject.disclosures.length === 1 ? '' : 's'} generated.
-              </p>
-            )}
+              subject.costItems.length === 0 &&
+              subject.disclosures.length === 0 && (
+                <div className="mb-4">
+                  <p className="mb-3 text-sm text-gray-500">
+                    Nothing generated yet for this video.
+                  </p>
+                  <GenerateWarningsButton videoId={subject.id} />
+                </div>
+              )}
+            <div className="space-y-6">
+              <WarningSignsEditor
+                subjectId={subject.id}
+                initialItems={subject.warningSigns}
+              />
+              <CostItemsEditor
+                subjectId={subject.id}
+                initialItems={subject.costItems}
+              />
+              <DisclosuresEditor
+                subjectId={subject.id}
+                initialItems={subject.disclosures}
+              />
+            </div>
           </section>
         </div>
 
