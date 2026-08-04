@@ -51,19 +51,25 @@ async function getGrowthMetrics() {
     db.marketingCampaign.count({ where: { isActive: true } }),
     db.socialPost.count(),
     db.socialPost.count({ where: { status: "PUBLISHED" } }),
-    db.video.count({ where: { status: "PUBLISHED" } }),
-    db.video.findMany({
+    db.subject.count({ where: { status: "PUBLISHED" } }),
+    db.subject.findMany({
       where: { status: "PUBLISHED" },
       orderBy: { trendScore: "desc" },
       take: 5,
-      select: { title: true, slug: true, trendScore: true, publishedAt: true },
+      select: {
+        name: true,
+        editorialTitle: true,
+        slug: true,
+        trendScore: true,
+        publishedAt: true,
+      },
     }),
     db.claim.count({
-      where: { video: { status: "PUBLISHED" }, slug: { not: null } },
+      where: { subject: { status: "PUBLISHED" }, slug: { not: null } },
     }),
     db.topic.count(),
     db.claim.count({ where: { evidenceStatus: "NOT_CHECKED" } }),
-    db.video.count({
+    db.subject.count({
       where: {
         status: "PUBLISHED",
       },
@@ -301,7 +307,7 @@ export default async function GrowthAnalyticsPage() {
                   #{i + 1}
                 </span>
                 <span className="flex-1 font-medium text-gray-900">
-                  {v.title}
+                  {v.editorialTitle ?? v.name}
                 </span>
                 <span className="text-xs text-gray-400">
                   Score: {(v.trendScore * 100).toFixed(0)}

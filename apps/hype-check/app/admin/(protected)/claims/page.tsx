@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/app/generated/prisma";
 import Link from "next/link";
 import { db } from "@/lib/db/prisma";
 import { EvidenceBadge } from "@menhealth/ui";
@@ -63,9 +63,10 @@ export default async function AdminClaimsPage({
         take,
         orderBy: { createdAt: "desc" },
         include: {
-          video: {
+          subject: {
             select: {
-              title: true,
+              name: true,
+              editorialTitle: true,
               slug: true,
               status: true,
             },
@@ -200,10 +201,10 @@ export default async function AdminClaimsPage({
                   </td>
                   <td className="px-4 py-3">
                     <Link
-                      href={`/admin/videos/${claim.video.slug}`}
+                      href={`/admin/videos/${claim.subject.slug}`}
                       className="line-clamp-1 text-xs text-blue-600 hover:underline"
                     >
-                      {claim.video.title}
+                      {claim.subject.editorialTitle ?? claim.subject.name}
                     </Link>
                   </td>
                   <td className="px-4 py-3">

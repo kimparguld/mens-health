@@ -40,10 +40,12 @@ export async function generateMetadata({
 
   if (!video) return { title: "Video Not Found" };
 
+  const sourceVideo = video.sourceVideos[0];
   const description =
-    video.summaries[0]?.shortSummary ?? video.description ?? "";
+    sourceVideo?.summaries[0]?.shortSummary ?? video.description ?? "";
   const canonical = `${APP_URL}/videos/${slug}`;
-  const displayTitle = video.editorialTitle ?? video.title;
+  const displayTitle = video.editorialTitle ?? sourceVideo?.title ?? video.name;
+  const publishedAt = video.publishedAt ?? sourceVideo?.publishedAt ?? video.createdAt;
 
   return {
     title: displayTitle,
@@ -53,14 +55,14 @@ export async function generateMetadata({
       "legit or scam",
       "video review summary",
       "evidence-based review",
-      video.title,
+      displayTitle,
     ],
     openGraph: {
       title: displayTitle,
       description,
       url: canonical,
       type: "article",
-      publishedTime: new Date(video.publishedAt).toISOString(),
+      publishedTime: new Date(publishedAt).toISOString(),
       modifiedTime: new Date(video.updatedAt).toISOString(),
       images: video.thumbnailUrl ? [{ url: video.thumbnailUrl }] : [],
     },
@@ -100,7 +102,10 @@ export default async function VideoPage({ params }: { params: Params }) {
     notFound();
   }
 
-  const summary = video.summaries[0];
+  const sourceVideo = video.sourceVideos[0];
+  const summary = sourceVideo?.summaries[0];
+  const youtubeVideoId = video.youtubeVideoId ?? sourceVideo?.youtubeVideoId ?? "";
+  const publishedAt = video.publishedAt ?? sourceVideo?.publishedAt ?? video.createdAt;
   const takeaways: string[] = Array.isArray(summary?.takeaways)
     ? (summary.takeaways as string[])
     : [];
@@ -119,19 +124,19 @@ export default async function VideoPage({ params }: { params: Params }) {
     getRelatedVideos(firstTopic?.id, video.id),
   ]);
 
+  const displayTitle = video.editorialTitle ?? sourceVideo?.title ?? video.name;
+
   const videoSchema = buildVideoObjectSchema({
-    title: video.title,
+    title: displayTitle,
     description: summary?.shortSummary ?? video.description ?? "",
     thumbnailUrl: video.thumbnailUrl,
-    publishedAt: video.publishedAt,
-    channelTitle: video.channel.title,
-    youtubeVideoId: video.youtubeVideoId,
+    publishedAt,
+    channelTitle: video.channel?.title ?? "",
+    youtubeVideoId,
     appUrl: APP_URL,
     slug: video.slug,
     durationSeconds: video.durationSeconds,
   });
-
-  const displayTitle = video.editorialTitle ?? video.title;
 
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Home", url: APP_URL },
@@ -145,7 +150,7 @@ export default async function VideoPage({ params }: { params: Params }) {
     headline: displayTitle,
     description: summary?.shortSummary ?? video.description ?? "",
     imageUrl: video.thumbnailUrl,
-    publishedAt: video.publishedAt,
+    publishedAt,
     updatedAt: video.updatedAt,
     authorName: summary?.reviewerName ?? undefined,
     url: `${APP_URL}/videos/${video.slug}`,
@@ -199,26 +204,28 @@ export default async function VideoPage({ params }: { params: Params }) {
       <h1 className="mb-2 text-3xl leading-tight font-bold text-gray-900">
         {displayTitle}
       </h1>
-      {video.editorialTitle && video.editorialTitle !== video.title && (
-        <p className="mb-2 text-sm text-gray-400">
-          Originally titled: &ldquo;{video.title}&rdquo;
-        </p>
-      )}
+      {video.editorialTitle &&
+        sourceVideo?.title &&
+        video.editorialTitle !== sourceVideo.title && (
+          <p className="mb-2 text-sm text-gray-400">
+            Originally titled: &ldquo;{sourceVideo.title}&rdquo;
+          </p>
+        )}
 
       {/* Meta */}
       <p className="mb-1 text-sm text-gray-500">
         Channel:{" "}
         <a
-          href={`https://www.youtube.com/channel/${video.channel.youtubeId}`}
+          href={`https://www.youtube.com/channel/${video.channel?.youtubeId ?? ""}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
         >
-          {video.channel.title}
+          {video.channel?.title ?? ""}
         </a>
         {" · "}
         <a
-          href={`https://www.youtube.com/watch?v=${video.youtubeVideoId}`}
+          href={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
@@ -233,17 +240,17 @@ export default async function VideoPage({ params }: { params: Params }) {
         </p>
       )}
       <p className="mb-6 text-xs text-gray-400">
-        Published {new Date(video.publishedAt).toLocaleDateString()}
+        Published {new Date(publishedAt).toLocaleDateString()}
         {new Date(video.updatedAt).getTime() !==
-          new Date(video.publishedAt).getTime() &&
+          new Date(publishedAt).getTime() &&
           ` · Updated ${new Date(video.updatedAt).toLocaleDateString()}`}
       </p>
 
       {/* Official YouTube embed */}
       <div className="mb-8">
         <YouTubePlayer
-          videoId={video.youtubeVideoId}
-          title={video.title}
+          videoId={youtubeVideoId}
+          title={displayTitle}
           thumbnailUrl={video.thumbnailUrl}
         />
       </div>
@@ -432,10 +439,10 @@ export default async function VideoPage({ params }: { params: Params }) {
                   href={`/videos/${rv.slug}`}
                   className="text-sm font-medium text-blue-600 hover:underline"
                 >
-                  {rv.title}
+                  {rv.editorialTitle ?? rv.name}
                 </Link>
                 <span className="ml-2 text-xs text-gray-400">
-                  {rv.channel.title}
+                  {rv.channel?.title ?? ""}
                 </span>
               </li>
             ))}

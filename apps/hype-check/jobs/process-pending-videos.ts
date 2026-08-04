@@ -1,4 +1,4 @@
-import type { RiskLevel } from "@prisma/client";
+import type { RiskLevel } from "@/app/generated/prisma";
 import { db } from "@/lib/db/prisma";
 import { generateSummaryAndClaims } from "@/lib/videos/process-video-pipeline";
 import { generateEditorialTitle } from "@/lib/ai/generate-editorial-title";
@@ -32,7 +32,7 @@ const BATCH_SIZE = 5;
 const STALE_RUNNING_THRESHOLD_MS = 20 * 60 * 1000; // 20 minutes
 
 export async function processPendingVideos(options?: {
-  videoIds?: string[];
+  sourceVideoIds?: string[];
 }): Promise<{
   processed: number;
   failed: number;
@@ -51,10 +51,14 @@ export async function processPendingVideos(options?: {
   const jobs = await db.processingJob.findMany({
     where: {
       status: "QUEUED",
-      ...(options?.videoIds ? { videoId: { in: options.videoIds } } : {}),
+      ...(options?.sourceVideoIds
+        ? { sourceVideoId: { in: options.sourceVideoIds } }
+        : {}),
     },
-    take: options?.videoIds ? options.videoIds.length : BATCH_SIZE,
-    include: { video: true },
+    take: options?.sourceVideoIds
+      ? options.sourceVideoIds.length
+      : BATCH_SIZE,
+    include: { sourceVideo: { include: { subject: true } } },
   });
 
   for (const job of jobs) {
@@ -64,14 +68,22 @@ export async function processPendingVideos(options?: {
         data: { status: "RUNNING", startedAt: new Date() },
       });
 
-      const { video } = job;
+      const { sourceVideo } = job;
+      const { subject } = sourceVideo;
 
       const channel = await db.channel.findUnique({
-        where: { id: video.channelId },
+        where: { id: sourceVideo.channelId },
       });
 
       const pipelineResult = await generateSummaryAndClaims(
-        video,
+        {
+          subjectId: subject.id,
+          sourceVideoId: sourceVideo.id,
+          title: sourceVideo.title,
+          description: sourceVideo.description,
+          durationSeconds: sourceVideo.durationSeconds,
+          riskLevel: subject.riskLevel,
+        },
         channel?.title ?? "",
         { modelUsed: "claude-sonnet-4-5" },
       );
@@ -84,55 +96,55 @@ export async function processPendingVideos(options?: {
 
       // --- Generate an SEO-friendly editorial title (raw YouTube title is kept as-is) ---
       const editorialTitleResult = await generateEditorialTitle({
-        title: video.title,
+        title: sourceVideo.title,
         shortSummary: pipelineResult.value.summary.shortSummary,
         channelTitle: channel?.title ?? "",
       });
       if (editorialTitleResult.ok) {
-        await db.video.update({
-          where: { id: video.id },
+        await db.subject.update({
+          where: { id: subject.id },
           data: { editorialTitle: editorialTitleResult.value },
         });
       } else {
         console.warn(
-          `Editorial title generation failed for video ${video.id}: ${editorialTitleResult.error.message}`,
+          `Editorial title generation failed for video ${sourceVideo.id}: ${editorialTitleResult.error.message}`,
         );
       }
 
-      // Re-fetch the video to get the latest riskLevel (may have been escalated by the pipeline)
-      const latestVideo = await db.video.findUnique({
-        where: { id: video.id },
+      // Re-fetch the subject to get the latest riskLevel (may have been escalated by the pipeline)
+      const latestSubject = await db.subject.findUnique({
+        where: { id: subject.id },
         select: { riskLevel: true },
       });
 
       const finalStatus = isEligibleForAutoPublish(
-        { riskLevel: latestVideo?.riskLevel ?? video.riskLevel },
+        { riskLevel: latestSubject?.riskLevel ?? subject.riskLevel },
         claims,
       )
         ? "PUBLISHED"
-        : "PROCESSED";
+        : "REVIEW";
 
       const evidenceScore = deriveEvidenceScore(claims);
 
-      await db.video.update({
-        where: { id: video.id },
+      await db.subject.update({
+        where: { id: subject.id },
         data: { status: finalStatus, evidenceScore },
       });
 
       if (finalStatus === "PUBLISHED") {
         await db.adminReview.create({
           data: {
-            videoId: video.id,
+            subjectId: subject.id,
             action: "PUBLISHED",
-            note: `Auto-published: risk level ${latestVideo?.riskLevel ?? video.riskLevel}, all claims evidence-checked`,
+            note: `Auto-published: risk level ${latestSubject?.riskLevel ?? subject.riskLevel}, all claims evidence-checked`,
           },
         });
         await submitUrlsToIndexNow(
-          [`${env.NEXT_PUBLIC_APP_URL}/videos/${video.slug}`],
+          [`${env.NEXT_PUBLIC_APP_URL}/videos/${subject.slug}`],
           env.NEXT_PUBLIC_APP_URL,
           INDEXNOW_KEY,
         );
-        await notifyCreatorIfApplicable(video.id);
+        await notifyCreatorIfApplicable(subject.id);
       }
 
       await db.processingJob.update({

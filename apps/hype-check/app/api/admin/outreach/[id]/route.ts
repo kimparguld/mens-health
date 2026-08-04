@@ -9,11 +9,11 @@ const PatchSchema = z.object({
     .enum([
       "YOUTUBE_CREATOR",
       "NEWSLETTER_PUBLISHER",
-      "FITNESS_BLOGGER",
+      "FINANCE_BLOGGER",
       "COACH",
       "PODCAST_HOST",
       "SPONSOR_PROSPECT",
-      "HEALTH_TECH_FOUNDER",
+      "FINTECH_FOUNDER",
     ])
     .optional(),
   email: z.string().email().optional().nullable(),

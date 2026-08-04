@@ -5,6 +5,7 @@ import ReviewActions from "./ReviewActions";
 import GenerateSocialButton from "./GenerateSocialButton";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 import ReviewerForm from "./ReviewerForm";
+import VerdictPanel from "./VerdictPanel";
 
 const riskColors: Record<string, string> = {
   LOW: "bg-green-100 text-green-700",
@@ -27,20 +28,28 @@ export default async function AdminVideoDetailPage({
 }) {
   const { id } = await params;
 
-  const video = await db.video.findUnique({
+  const subject = await db.subject.findUnique({
     where: { id },
     include: {
       channel: true,
-      summaries: { orderBy: { createdAt: "desc" }, take: 1 },
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        include: { summaries: { orderBy: { createdAt: "desc" }, take: 1 } },
+      },
       claims: { orderBy: { riskLevel: "desc" } },
       adminReviews: { orderBy: { createdAt: "desc" }, take: 5 },
       topics: { include: { topic: true } },
+      verdict: true,
+      verdictHistory: { orderBy: { createdAt: "desc" }, take: 5 },
     },
   });
 
-  if (!video) notFound();
+  if (!subject) notFound();
 
-  const summary = video.summaries[0];
+  const sourceVideo = subject.sourceVideos[0];
+  const summary = sourceVideo?.summaries[0];
+  const title = subject.editorialTitle ?? sourceVideo?.title ?? subject.name;
   const takeaways = summary ? (summary.takeaways as string[]) : [];
   const warnings = summary ? ((summary.warnings as string[] | null) ?? []) : [];
   const redFlags = summary ? ((summary.redFlags as string[] | null) ?? []) : [];
@@ -55,18 +64,18 @@ export default async function AdminVideoDetailPage({
           >
             &larr; Back to queue
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{video.title}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            {video.channel.title} &bull;{" "}
-            {video.publishedAt.toLocaleDateString()} &bull;{" "}
+            {subject.channel?.title ?? "Unknown creator"} &bull;{" "}
+            {subject.publishedAt?.toLocaleDateString() ?? "—"} &bull;{" "}
             <span
-              className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[video.riskLevel] ?? ""}`}
+              className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[subject.riskLevel] ?? ""}`}
             >
-              {video.riskLevel} risk
+              {subject.riskLevel} risk
             </span>{" "}
             &bull;{" "}
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
-              {video.status}
+              {subject.status}
             </span>
           </p>
         </div>
@@ -74,13 +83,13 @@ export default async function AdminVideoDetailPage({
         {/* Review action buttons */}
         <div className="flex flex-col items-end gap-2">
           <ReviewActions
-            videoId={video.id}
-            currentStatus={video.status}
+            videoId={subject.id}
+            currentStatus={subject.status}
             hasSummary={!!summary}
-            riskLevel={video.riskLevel}
+            riskLevel={subject.riskLevel}
           />
-          {video.status === "PUBLISHED" && (
-            <GenerateSocialButton videoId={video.id} />
+          {subject.status === "PUBLISHED" && (
+            <GenerateSocialButton videoId={subject.id} />
           )}
         </div>
       </div>
@@ -89,17 +98,19 @@ export default async function AdminVideoDetailPage({
         {/* Main content — left 2 cols */}
         <div className="col-span-2 space-y-6">
           {/* YouTube embed */}
-          <div className="overflow-hidden rounded-lg border bg-black">
-            <div className="relative aspect-video">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${video.youtubeVideoId}`}
-                title={video.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full"
-              />
+          {sourceVideo && (
+            <div className="overflow-hidden rounded-lg border bg-black">
+              <div className="relative aspect-video">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${sourceVideo.youtubeVideoId}`}
+                  title={title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 h-full w-full"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* AI Summary */}
           {summary ? (
@@ -150,7 +161,7 @@ export default async function AdminVideoDetailPage({
               )}
 
               <ReviewerForm
-                videoId={video.id}
+                videoId={subject.id}
                 initialName={summary.reviewerName}
                 initialCredentials={summary.reviewerCredentials}
               />
@@ -160,18 +171,18 @@ export default async function AdminVideoDetailPage({
               <p className="mb-3 text-sm text-gray-500">
                 No AI summary generated yet.
               </p>
-              <GenerateSummaryButton videoId={video.id} />
+              <GenerateSummaryButton videoId={subject.id} />
             </div>
           )}
 
           {/* Claims */}
-          {video.claims.length > 0 && (
+          {subject.claims.length > 0 && (
             <section className="rounded-lg border bg-white p-5">
               <h2 className="mb-4 font-semibold text-gray-900">
-                Extracted claims ({video.claims.length})
+                Extracted claims ({subject.claims.length})
               </h2>
               <div className="space-y-3">
-                {video.claims.map((claim: (typeof video.claims)[number]) => (
+                {subject.claims.map((claim: (typeof subject.claims)[number]) => (
                   <div key={claim.id} className="rounded border p-3 text-sm">
                     <div className="mb-1 flex items-center gap-2">
                       <span
@@ -180,7 +191,7 @@ export default async function AdminVideoDetailPage({
                         {claim.riskLevel}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {claim.category}
+                        {claim.claimType}
                       </span>
                       <span
                         className={`ml-auto text-xs font-medium ${evidenceColors[claim.evidenceStatus] ?? ""}`}
@@ -203,15 +214,21 @@ export default async function AdminVideoDetailPage({
 
         {/* Sidebar — right col */}
         <div className="space-y-6">
+          <VerdictPanel
+            subjectId={subject.id}
+            currentVerdict={subject.verdict}
+            history={subject.verdictHistory}
+          />
+
           {/* Topics */}
-          {video.topics.length > 0 && (
+          {subject.topics.length > 0 && (
             <div className="rounded-lg border bg-white p-4">
               <h3 className="mb-2 text-sm font-semibold text-gray-700">
                 Topics
               </h3>
               <div className="flex flex-wrap gap-1.5">
-                {video.topics.map(
-                  ({ topic }: (typeof video.topics)[number]) => (
+                {subject.topics.map(
+                  ({ topic }: (typeof subject.topics)[number]) => (
                     <span
                       key={topic.id}
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -234,32 +251,32 @@ export default async function AdminVideoDetailPage({
             <dl className="space-y-1">
               <div className="flex justify-between text-gray-600">
                 <dt>Views</dt>
-                <dd>{video.viewCount?.toLocaleString() ?? "—"}</dd>
+                <dd>{subject.viewCount?.toLocaleString() ?? "—"}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Likes</dt>
-                <dd>{video.likeCount?.toLocaleString() ?? "—"}</dd>
+                <dd>{subject.likeCount?.toLocaleString() ?? "—"}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Trend score</dt>
-                <dd>{video.trendScore.toFixed(2)}</dd>
+                <dd>{subject.trendScore.toFixed(2)}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Relevance score</dt>
-                <dd>{video.relevanceScore.toFixed(2)}</dd>
+                <dd>{subject.relevanceScore.toFixed(2)}</dd>
               </div>
             </dl>
           </div>
 
           {/* Review history */}
-          {video.adminReviews.length > 0 && (
+          {subject.adminReviews.length > 0 && (
             <div className="rounded-lg border bg-white p-4 text-sm">
               <h3 className="mb-3 font-semibold text-gray-700">
                 Review history
               </h3>
               <ol className="space-y-2">
-                {video.adminReviews.map(
-                  (review: (typeof video.adminReviews)[number]) => (
+                {subject.adminReviews.map(
+                  (review: (typeof subject.adminReviews)[number]) => (
                     <li key={review.id} className="text-gray-600">
                       <span className="font-medium text-gray-800">
                         {review.action}
@@ -280,14 +297,16 @@ export default async function AdminVideoDetailPage({
           )}
 
           {/* YouTube link */}
-          <a
-            href={`https://www.youtube.com/watch?v=${video.youtubeVideoId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block rounded-lg border bg-white p-4 text-sm text-blue-600 hover:underline"
-          >
-            Open on YouTube &rarr;
-          </a>
+          {sourceVideo && (
+            <a
+              href={`https://www.youtube.com/watch?v=${sourceVideo.youtubeVideoId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block rounded-lg border bg-white p-4 text-sm text-blue-600 hover:underline"
+            >
+              Open on YouTube &rarr;
+            </a>
+          )}
         </div>
       </div>
     </div>

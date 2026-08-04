@@ -1,4 +1,4 @@
-import type { GrowthPhase, GrowthTaskPriority } from "@prisma/client";
+import type { GrowthPhase, GrowthTaskPriority } from "@/app/generated/prisma";
 
 export type SeedTask = {
   uniqueKey: string;

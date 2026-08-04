@@ -10,13 +10,13 @@ export async function POST(_request: NextRequest) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Sweep all PROCESSED videos with a summary through the same auto-publish
+  // Sweep all REVIEW subjects with a summary through the same auto-publish
   // gate the daily cron uses — catches LOW-risk videos and, once every claim
   // has a real evidence verdict, clean MEDIUM-risk videos too. HIGH risk is
   // never eligible, enforced inside the gate itself.
   const [candidates, pendingLowRiskCount] = await Promise.all([
-    db.video.findMany({
-      where: { status: "PROCESSED", summaries: { some: {} } },
+    db.subject.findMany({
+      where: { status: "REVIEW", sourceVideos: { some: { summaries: { some: {} } } } },
       select: {
         id: true,
         riskLevel: true,
@@ -25,17 +25,17 @@ export async function POST(_request: NextRequest) {
         },
       },
     }),
-    db.video.count({ where: { status: "PENDING", riskLevel: "LOW" } }),
+    db.subject.count({ where: { status: "DRAFT", riskLevel: "LOW" } }),
   ]);
 
-  const eligible = candidates.filter((video) =>
-    isEligibleForAutoPublish(video, video.claims),
+  const eligible = candidates.filter((subject) =>
+    isEligibleForAutoPublish(subject, subject.claims),
   );
 
   if (eligible.length === 0) {
     const hint =
       pendingLowRiskCount > 0
-        ? ` (${pendingLowRiskCount} low-risk video(s) are still PENDING — run "Generate summaries" first to process them)`
+        ? ` (${pendingLowRiskCount} low-risk video(s) are still DRAFT — run "Generate summaries" first to process them)`
         : "";
     return Response.json({
       ok: true,
@@ -44,19 +44,19 @@ export async function POST(_request: NextRequest) {
     });
   }
 
-  const ids = eligible.map((v) => v.id);
+  const ids = eligible.map((s) => s.id);
 
   await db.$transaction([
-    db.video.updateMany({
+    db.subject.updateMany({
       where: { id: { in: ids } },
       data: { status: "PUBLISHED" },
     }),
-    ...eligible.map((video) =>
+    ...eligible.map((subject) =>
       db.adminReview.create({
         data: {
-          videoId: video.id,
+          subjectId: subject.id,
           action: "PUBLISHED",
-          note: `Auto-published: risk level ${video.riskLevel}, all claims evidence-checked`,
+          note: `Auto-published: risk level ${subject.riskLevel}, all claims evidence-checked`,
         },
       }),
     ),

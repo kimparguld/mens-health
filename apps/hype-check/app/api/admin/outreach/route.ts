@@ -8,11 +8,11 @@ const ContactSchema = z.object({
   contactType: z.enum([
     "YOUTUBE_CREATOR",
     "NEWSLETTER_PUBLISHER",
-    "FITNESS_BLOGGER",
+    "FINANCE_BLOGGER",
     "COACH",
     "PODCAST_HOST",
     "SPONSOR_PROSPECT",
-    "HEALTH_TECH_FOUNDER",
+    "FINTECH_FOUNDER",
   ]),
   email: z.string().email().optional().nullable(),
   socialUrl: z.string().url().optional().nullable(),

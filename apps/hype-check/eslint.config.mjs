@@ -22,6 +22,9 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
+    // Prisma's generated client — lives under app/ (not node_modules) since
+    // it was isolated to its own output path, so it needs an explicit ignore.
+    'app/generated/**',
   ]),
 ]);
 

@@ -1,12 +1,20 @@
 import { unstable_cache } from "next/cache";
-import type { PrismaClient, AffiliateLink, Sponsor } from "@prisma/client";
+import type { AffiliateLink, Sponsor } from "@prisma/client";
 
 /**
  * Binds these resolvers to the site's own Prisma client once, so callers
  * keep calling `getActiveSponsor()`/`getAffiliateLinksForTopic(slug)`
  * exactly as before (see apps/menhealth/lib/monetization/resolvers.ts).
  */
-export function createMonetizationResolvers(db: PrismaClient) {
+export function createMonetizationResolvers(
+  // Prisma's generated types carry generic branding tied to their own
+  // generation, so a `Pick<PrismaClient, ...>` from one site's generated
+  // client isn't satisfied by another site's — even for identical models.
+  // `any` here is intentional; the explicit Promise<Sponsor | null> /
+  // Promise<AffiliateLink[]> return types below keep callers fully typed.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+) {
   /**
    * Returns the single active sponsor whose date window covers now.
    * Returns null if none is configured or all are outside their window.

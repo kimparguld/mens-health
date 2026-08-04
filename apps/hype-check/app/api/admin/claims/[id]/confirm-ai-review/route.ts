@@ -30,7 +30,7 @@ export async function POST(
 
   await db.adminReview.create({
     data: {
-      videoId: claim.videoId,
+      subjectId: claim.subjectId,
       action: "APPROVED",
       note: `Confirmed AI fact-check suggestion for claim: "${claim.text.slice(0, 100)}"`,
     },

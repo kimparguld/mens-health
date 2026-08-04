@@ -29,21 +29,31 @@ export async function PATCH(
     );
   }
 
-  const summary = await db.summary.findFirst({
-    where: { videoId: id },
-    orderBy: { createdAt: "desc" },
+  const subject = await db.subject.findUnique({
+    where: { id },
+    select: {
+      slug: true,
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        select: {
+          summaries: {
+            take: 1,
+            orderBy: { createdAt: "desc" },
+            select: { id: true },
+          },
+        },
+      },
+    },
   });
+
+  const summary = subject?.sourceVideos[0]?.summaries[0];
   if (!summary) {
     return Response.json(
       { error: "No summary found for this video" },
       { status: 404 },
     );
   }
-
-  const video = await db.video.findUnique({
-    where: { id },
-    select: { slug: true },
-  });
 
   await db.summary.update({
     where: { id: summary.id },
@@ -55,7 +65,7 @@ export async function PATCH(
   });
 
   revalidateTag("videos", "max");
-  if (video?.slug) revalidateTag(`video:${video.slug}`, "max");
+  if (subject?.slug) revalidateTag(`video:${subject.slug}`, "max");
 
   return Response.json({ ok: true });
 }

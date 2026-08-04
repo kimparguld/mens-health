@@ -52,7 +52,7 @@ export async function computeMonthlyReportStats(
   periodStart: Date,
   periodEnd: Date,
 ): Promise<MonthlyReportStats> {
-  const videos = await db.video.findMany({
+  const videos = await db.subject.findMany({
     where: {
       status: "PUBLISHED",
       publishedAt: { gte: periodStart, lt: periodEnd },
@@ -60,7 +60,7 @@ export async function computeMonthlyReportStats(
     include: {
       channel: true,
       topics: { include: { topic: true } },
-      claims: { include: { sources: true } },
+      claims: { include: { evidenceItems: true } },
     },
   });
 
@@ -121,8 +121,8 @@ export async function computeMonthlyReportStats(
   const categoryCounts = new Map<string, number>();
   for (const claim of allClaims) {
     categoryCounts.set(
-      claim.category,
-      (categoryCounts.get(claim.category) ?? 0) + 1,
+      claim.claimType,
+      (categoryCounts.get(claim.claimType) ?? 0) + 1,
     );
   }
   const claimCategoryBreakdown = [...categoryCounts.entries()]
@@ -135,14 +135,14 @@ export async function computeMonthlyReportStats(
     { claimsAssessed: number; totalSources: number }
   >();
   for (const video of videos) {
-    if (video.claims.length === 0) continue;
+    if (video.claims.length === 0 || !video.channel) continue;
     const entry = creatorClaimStats.get(video.channel.title) ?? {
       claimsAssessed: 0,
       totalSources: 0,
     };
     entry.claimsAssessed += video.claims.length;
     entry.totalSources += video.claims.reduce(
-      (sum, c) => sum + c.sources.length,
+      (sum, c) => sum + c.evidenceItems.length,
       0,
     );
     creatorClaimStats.set(video.channel.title, entry);

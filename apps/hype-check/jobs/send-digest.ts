@@ -22,13 +22,17 @@ export interface SendDigestResult {
 export async function sendWeeklyDigest(): Promise<SendDigestResult> {
   const since = new Date(Date.now() - LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
 
-  const videos = await db.video.findMany({
+  const videos = await db.subject.findMany({
     where: {
       status: "PUBLISHED",
       publishedAt: { gte: since },
     },
     include: {
-      summaries: { take: 1, orderBy: { createdAt: "desc" } },
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+      },
       channel: true,
       claims: {
         where: {
@@ -52,28 +56,32 @@ export async function sendWeeklyDigest(): Promise<SendDigestResult> {
     };
   }
 
-  const digestVideos: DigestVideo[] = videos.map((v) => ({
-    title: v.title,
-    slug: v.slug,
-    channelTitle: v.channel.title,
-    thumbnailUrl: v.thumbnailUrl,
-    shortSummary: v.summaries[0]?.shortSummary ?? null,
-    trendScore: v.trendScore,
-    // Only claims with an explicit evidence verdict are included.
-    checkedClaims: v.claims.map((c) => ({
-      claim: c.text,
-      verdict:
-        c.evidenceStatus.charAt(0) + c.evidenceStatus.slice(1).toLowerCase(),
-      summary: c.explanation ?? c.text,
-      slug: c.slug ?? c.id,
-    })),
-    practicalTakeaway:
-      v.summaries[0]?.takeaways &&
-      Array.isArray(v.summaries[0].takeaways) &&
-      (v.summaries[0].takeaways as string[]).length > 0
-        ? (v.summaries[0].takeaways as string[])[0]
-        : null,
-  }));
+  const digestVideos: DigestVideo[] = videos.map((v) => {
+    const sourceVideo = v.sourceVideos[0];
+    const summary = sourceVideo?.summaries[0];
+    return {
+      title: v.editorialTitle ?? sourceVideo?.title ?? v.name,
+      slug: v.slug,
+      channelTitle: v.channel?.title ?? "",
+      thumbnailUrl: v.thumbnailUrl,
+      shortSummary: summary?.shortSummary ?? null,
+      trendScore: v.trendScore,
+      // Only claims with an explicit evidence verdict are included.
+      checkedClaims: v.claims.map((c) => ({
+        claim: c.text,
+        verdict:
+          c.evidenceStatus.charAt(0) + c.evidenceStatus.slice(1).toLowerCase(),
+        summary: c.explanation ?? c.text,
+        slug: c.slug ?? c.id,
+      })),
+      practicalTakeaway:
+        summary?.takeaways &&
+        Array.isArray(summary.takeaways) &&
+        (summary.takeaways as string[]).length > 0
+          ? (summary.takeaways as string[])[0]
+          : null,
+    };
+  });
 
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const fromEmail =

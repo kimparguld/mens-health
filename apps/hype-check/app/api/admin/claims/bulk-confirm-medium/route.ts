@@ -30,7 +30,7 @@ export async function POST(_request: NextRequest) {
       humanConfirmedAt: null,
       evidenceStatus: { not: "NOT_CHECKED" },
     },
-    select: { id: true, videoId: true, text: true, riskLevel: true },
+    select: { id: true, subjectId: true, text: true, riskLevel: true },
   });
 
   if (pending.length === 0) {
@@ -45,7 +45,7 @@ export async function POST(_request: NextRequest) {
     }),
     db.adminReview.createMany({
       data: pending.map((claim) => ({
-        videoId: claim.videoId,
+        subjectId: claim.subjectId,
         action: "APPROVED" as const,
         note: `Bulk-confirmed AI fact-check suggestion (${claim.riskLevel} risk) for claim: "${claim.text.slice(0, 100)}"`,
       })),

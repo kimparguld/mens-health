@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/app/generated/prisma";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
@@ -23,10 +23,10 @@ const ReviewBodySchema = z.object({
 
 const STATUS_FOR_ACTION = {
   PUBLISHED: "PUBLISHED",
-  UNPUBLISHED: "PROCESSED",
-  REJECTED: "REJECTED",
-  APPROVED: "PROCESSED",
-  FLAGGED_HIGH_RISK: "PROCESSED",
+  UNPUBLISHED: "REVIEW",
+  REJECTED: "ARCHIVED",
+  APPROVED: "REVIEW",
+  FLAGGED_HIGH_RISK: "REVIEW",
 } as const;
 
 export async function POST(
@@ -51,15 +51,23 @@ export async function POST(
 
   const { action, note, acknowledgeHighRisk } = parsed.data;
 
-  const video = await db.video.findUnique({
+  const subject = await db.subject.findUnique({
     where: { id },
-    include: { _count: { select: { summaries: true } } },
+    include: {
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+      },
+    },
   });
-  if (!video) {
+  if (!subject) {
     return Response.json({ error: "Video not found" }, { status: 404 });
   }
 
-  if (action === "PUBLISHED" && video._count.summaries === 0) {
+  const hasSummary = (subject.sourceVideos[0]?.summaries.length ?? 0) > 0;
+
+  if (action === "PUBLISHED" && !hasSummary) {
     return Response.json(
       {
         error:
@@ -75,7 +83,7 @@ export async function POST(
   // that's actually enforced.
   if (
     action === "PUBLISHED" &&
-    video.riskLevel === "HIGH" &&
+    subject.riskLevel === "HIGH" &&
     (!acknowledgeHighRisk || !note?.trim())
   ) {
     return Response.json(
@@ -90,14 +98,14 @@ export async function POST(
   const newStatus = STATUS_FOR_ACTION[action];
   const isHighRiskAck =
     action === "PUBLISHED" &&
-    video.riskLevel === "HIGH" &&
+    subject.riskLevel === "HIGH" &&
     acknowledgeHighRisk === true;
 
   const ops: Prisma.PrismaPromise<unknown>[] = [
-    db.video.update({ where: { id }, data: { status: newStatus } }),
+    db.subject.update({ where: { id }, data: { status: newStatus } }),
     db.adminReview.create({
       data: {
-        videoId: id,
+        subjectId: id,
         action,
         note,
         acknowledgedHighRisk: isHighRiskAck,
@@ -111,7 +119,7 @@ export async function POST(
   if (action === "PUBLISHED") {
     ops.push(
       db.claim.updateMany({
-        where: { videoId: id, evidenceStatus: "NOT_CHECKED" },
+        where: { subjectId: id, evidenceStatus: "NOT_CHECKED" },
         data: { evidenceStatus: "MIXED" },
       }),
     );
@@ -120,15 +128,15 @@ export async function POST(
   await db.$transaction(ops);
 
   revalidateTag("videos", "max");
-  if (video.slug) revalidateTag(`video:${video.slug}`, "max");
+  if (subject.slug) revalidateTag(`video:${subject.slug}`, "max");
 
   if (action === "PUBLISHED") {
     await submitUrlsToIndexNow(
-      [`${env.NEXT_PUBLIC_APP_URL}/videos/${video.slug}`],
+      [`${env.NEXT_PUBLIC_APP_URL}/videos/${subject.slug}`],
       env.NEXT_PUBLIC_APP_URL,
       INDEXNOW_KEY,
     );
-    await notifyCreatorIfApplicable(video.id);
+    await notifyCreatorIfApplicable(subject.id);
   }
 
   return Response.json({ ok: true, status: newStatus });

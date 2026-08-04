@@ -1,4 +1,4 @@
-import type { Claim, RiskLevel, Summary } from "@prisma/client";
+import type { Claim, ClaimCategory, RiskLevel, Summary } from "@prisma/client";
 import { db } from "@/lib/db/prisma";
 import { summarizeVideo } from "@/lib/ai/summarize-video";
 import { extractClaims } from "@/lib/ai/extract-claims";
@@ -83,8 +83,13 @@ export async function generateSummaryAndClaims(
   let highestClaimRisk: RiskLevel = "LOW";
 
   for (const extracted of claimsResult.value) {
+    // Safe: extracted.category is validated at runtime against this site's
+    // own claimCategories list inside createAiPipeline before ever reaching
+    // here — the cast just narrows the AI package's generic `string` back to
+    // this app's own Prisma enum.
+    const category = extracted.category as ClaimCategory;
     const deterministicRisk = classifyDeterministicRisk(
-      extracted.category,
+      category,
       extracted.riskLevel,
       extracted.text,
     );
@@ -102,7 +107,7 @@ export async function generateSummaryAndClaims(
       data: {
         videoId: video.id,
         text: extracted.text,
-        category: extracted.category,
+        category,
         riskLevel: deterministicRisk,
         evidenceStatus: factCheck?.evidenceStatus ?? "NOT_CHECKED",
         explanation: factCheck?.rationale ?? extracted.explanation ?? null,

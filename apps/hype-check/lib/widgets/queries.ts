@@ -23,7 +23,7 @@ export async function getTrendingWidgetVideos(
   count: number,
 ): Promise<WidgetVideo[]> {
   const take = Math.min(Math.max(1, count), MAX_COUNT);
-  const videos = await db.video.findMany({
+  const videos = await db.subject.findMany({
     where: {
       status: "PUBLISHED",
       ...(topicSlug
@@ -36,11 +36,11 @@ export async function getTrendingWidgetVideos(
   });
 
   return videos.map((v) => ({
-    title: v.title,
+    title: v.editorialTitle ?? v.name,
     slug: v.slug,
     thumbnailUrl: v.thumbnailUrl,
     evidenceLabel: evidenceLabel(v.evidenceScore),
     riskLevel: v.riskLevel,
-    channelTitle: v.channel.title,
+    channelTitle: v.channel?.title ?? "",
   }));
 }

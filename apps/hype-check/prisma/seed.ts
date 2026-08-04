@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/app/generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { SEED_TEMPLATES } from "../lib/social/templates";
 import { GROWTH_PLAN_TASKS } from "../lib/growth-plan/tasks";

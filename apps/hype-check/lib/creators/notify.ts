@@ -16,34 +16,42 @@ function evidenceLabel(evidenceScore: number | null): string {
  * and haven't already notified them for this exact video. Best-effort: a
  * failed send never throws, so it can't block a publish job.
  */
-export async function notifyCreatorIfApplicable(videoId: string): Promise<void> {
-  const video = await db.video.findUnique({
-    where: { id: videoId },
-    include: { channel: true },
+export async function notifyCreatorIfApplicable(
+  subjectId: string,
+): Promise<void> {
+  const subject = await db.subject.findUnique({
+    where: { id: subjectId },
+    include: {
+      channel: true,
+      sourceVideos: { take: 1, orderBy: { createdAt: "desc" } },
+    },
   });
-  if (!video || video.status !== "PUBLISHED") return;
+  const sourceVideo = subject?.sourceVideos[0];
+  if (!subject || !subject.channel || !sourceVideo) return;
+  if (subject.status !== "PUBLISHED") return;
 
   const seed = CREATOR_SEEDS.find(
-    (c) => c.youtubeChannelId === video.channel.youtubeId,
+    (c) => c.youtubeChannelId === subject.channel!.youtubeId,
   );
   if (!seed?.contactEmail) return;
 
   const alreadyNotified = await db.creatorNotification.findUnique({
-    where: { videoId: video.id },
+    where: { sourceVideoId: sourceVideo.id },
   });
   if (alreadyNotified) return;
 
   const appUrl = env.NEXT_PUBLIC_APP_URL;
-  const reviewUrl = `${appUrl}/videos/${video.slug}`;
+  const reviewUrl = `${appUrl}/videos/${subject.slug}`;
   const fromEmail =
     env.RESEND_FROM_EMAIL ?? `digest@${new URL(appUrl).hostname}`;
+  const title = subject.editorialTitle ?? sourceVideo.title;
 
-  const subject = "Your video was featured on Hype Check";
+  const subjectLine = "Your video was featured on Hype Check";
   const html = `<p>Hi ${seed.name},</p>
-<p>We included your video "${video.title}" in a Hype Check review.</p>
+<p>We included your video "${title}" in a Hype Check review.</p>
 <ul>
-  <li>Evidence rating: ${evidenceLabel(video.evidenceScore)}</li>
-  <li>Risk rating: ${video.riskLevel}</li>
+  <li>Evidence rating: ${evidenceLabel(subject.evidenceScore)}</li>
+  <li>Risk rating: ${subject.riskLevel}</li>
 </ul>
 <p>You can view the full analysis here: <a href="${reviewUrl}">${reviewUrl}</a></p>
 <p>If we misunderstood a claim or missed a source, just reply to this email with a correction — we review and update pages when creators flag something.</p>
@@ -53,7 +61,7 @@ export async function notifyCreatorIfApplicable(videoId: string): Promise<void> 
     const { error } = await resend.emails.send({
       from: fromEmail,
       to: [seed.contactEmail],
-      subject,
+      subject: subjectLine,
       html,
     });
     if (error) {
@@ -62,8 +70,8 @@ export async function notifyCreatorIfApplicable(videoId: string): Promise<void> 
     }
     await db.creatorNotification.create({
       data: {
-        videoId: video.id,
-        channelId: video.channelId,
+        sourceVideoId: sourceVideo.id,
+        channelId: subject.channel.id,
         email: seed.contactEmail,
       },
     });

@@ -1,12 +1,21 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import type { NextAuthConfig } from "next-auth";
-import type { PrismaClient } from "@prisma/client";
 import Google from "next-auth/providers/google";
 import Resend from "next-auth/providers/resend";
 import { buildAdminEmailSet, createSharedCallbacks } from "./callbacks";
 
 export type AuthConfigOptions = {
-  db: PrismaClient;
+  /**
+   * Prisma's generated client types carry generic branding tied to their
+   * own generation, so even structurally-identical schemas across sites
+   * produce mutually-incompatible `PrismaClient` types — there's no shared
+   * type here that stays satisfied for every site. `any` at this one
+   * boundary is intentional: PrismaAdapter only needs the Auth.js delegates
+   * (user/account/session/verificationToken) at runtime, which every site's
+   * client has regardless of its own schema.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
   adminEmailsCsv: string;
   nextAuthSecret: string;
   googleClientId?: string;
@@ -14,6 +23,14 @@ export type AuthConfigOptions = {
   resendApiKey?: string;
   /** e.g. "MenHealth Digest <no-reply@menhealth-digest.com>" — site-specific. */
   authFromEmail: string;
+  /**
+   * Namespaces the session cookie per site, e.g. "hype-check". Every site in
+   * this monorepo runs on `localhost` in dev, and cookies are scoped by host
+   * only (not port) — without a distinct name, sites share Auth.js's default
+   * cookie name and can decrypt each other's session tokens with the wrong
+   * secret, producing "no matching decryption secret" errors.
+   */
+  cookiePrefix: string;
   /** Defaults to "/admin/login" for both, matching the original config. */
   signInPage?: string;
   errorPage?: string;
@@ -31,6 +48,9 @@ export function createAuthConfig(opts: AuthConfigOptions): NextAuthConfig {
     adapter: PrismaAdapter(opts.db),
     session: { strategy: "jwt" },
     secret: opts.nextAuthSecret,
+    cookies: {
+      sessionToken: { name: `${opts.cookiePrefix}.session-token` },
+    },
     providers: [
       Google({
         clientId: opts.googleClientId ?? "",

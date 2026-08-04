@@ -10,15 +10,26 @@ export async function POST(_request: NextRequest) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Find all videos that are missing a summary
-  const videosWithoutSummaries = await db.video.findMany({
+  // Find all subjects that are missing a summary and resolve each to its
+  // primary source video (ProcessingJob is keyed by sourceVideoId).
+  const subjectsWithoutSummaries = await db.subject.findMany({
     where: {
-      summaries: { none: {} },
+      sourceVideos: { none: { summaries: { some: {} } } },
     },
-    select: { id: true },
+    select: {
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        select: { id: true },
+      },
+    },
   });
 
-  if (videosWithoutSummaries.length === 0) {
+  const sourceVideoIds = subjectsWithoutSummaries
+    .map((subject) => subject.sourceVideos[0]?.id)
+    .filter((id): id is string => Boolean(id));
+
+  if (sourceVideoIds.length === 0) {
     return Response.json({
       ok: true,
       queued: 0,
@@ -28,10 +39,10 @@ export async function POST(_request: NextRequest) {
 
   // Upsert processing jobs — reset any failed/completed jobs to QUEUED
   // so they are picked up by the processor below.
-  for (const { id: videoId } of videosWithoutSummaries) {
+  for (const sourceVideoId of sourceVideoIds) {
     await db.processingJob.upsert({
-      where: { videoId },
-      create: { videoId, status: "QUEUED" },
+      where: { sourceVideoId },
+      create: { sourceVideoId, status: "QUEUED" },
       update: {
         status: "QUEUED",
         startedAt: null,
@@ -46,11 +57,11 @@ export async function POST(_request: NextRequest) {
 
   revalidateTag("videos", "max");
 
-  const remaining = videosWithoutSummaries.length - processed - failed;
+  const remaining = sourceVideoIds.length - processed - failed;
 
   return Response.json({
     ok: true,
-    queued: videosWithoutSummaries.length,
+    queued: sourceVideoIds.length,
     processed,
     failed,
     message:

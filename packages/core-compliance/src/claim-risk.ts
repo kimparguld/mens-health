@@ -1,4 +1,4 @@
-import type { ClaimCategory, RiskLevel } from "@prisma/client";
+import type { RiskLevel } from "@prisma/client";
 
 const RISK_RANK: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
 
@@ -8,15 +8,19 @@ function maxRisk(...levels: RiskLevel[]): RiskLevel {
   );
 }
 
-export type ClaimRiskConfig = {
+export type ClaimRiskConfig<TCategory extends string> = {
   /**
    * Category floor: the LLM's own riskLevel suggestion can never classify a
    * claim in one of these categories below its floor — only at or above it.
    * A site fills in every ClaimCategory value from its own high-risk list
    * (AGENTS.md-style: TRT/hormones, medications, supplements, cancer, mental
    * health, ED, or whatever this site's own regulated categories are).
+   *
+   * Generic over the category type rather than importing Prisma's
+   * `ClaimCategory` directly — each site defines its own category enum in
+   * its own schema.prisma, and those enums are not the same across sites.
    */
-  categoryRiskFloor: Record<ClaimCategory, RiskLevel>;
+  categoryRiskFloor: Record<TCategory, RiskLevel>;
   /**
    * Safety net for claims the LLM miscategorizes (e.g. a TRT claim tagged
    * OTHER). Escalates risk to HIGH when any pattern matches; never
@@ -31,7 +35,9 @@ export type ClaimRiskConfig = {
  * `classifyDeterministicRisk(category, llmSuggestedRisk, text)` exactly as
  * before (see apps/menhealth/lib/ai/claim-risk.ts).
  */
-export function createClaimRiskClassifier(config: ClaimRiskConfig) {
+export function createClaimRiskClassifier<TCategory extends string>(
+  config: ClaimRiskConfig<TCategory>,
+) {
   function matchesHighRiskPattern(text: string): boolean {
     return config.highRiskTextPatterns.some((pattern) => pattern.test(text));
   }
@@ -41,7 +47,7 @@ export function createClaimRiskClassifier(config: ClaimRiskConfig) {
   // the LLM can push risk up but never down from what the category/keywords
   // warrant.
   function classifyDeterministicRisk(
-    category: ClaimCategory,
+    category: TCategory,
     llmSuggestedRisk: RiskLevel,
     text: string,
   ): RiskLevel {

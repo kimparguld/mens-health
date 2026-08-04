@@ -37,7 +37,14 @@ export default async function AdminJobsPage({
       skip,
       take: PAGE_SIZE,
       include: {
-        video: { select: { id: true, title: true, youtubeVideoId: true } },
+        sourceVideo: {
+          select: {
+            id: true,
+            subjectId: true,
+            title: true,
+            youtubeVideoId: true,
+          },
+        },
       },
     }),
     db.processingJob.count({ where }),

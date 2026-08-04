@@ -10,7 +10,7 @@ const BASE_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let videos: { slug: string; updatedAt: Date; topics: { topic: { slug: string } }[]; channelId: string }[] = [];
+  let videos: { slug: string; updatedAt: Date; topics: { topic: { slug: string } }[]; channelId: string | null }[] = [];
   let claims: { slug: string | null; id: string; createdAt: Date }[] = [];
   let newsletterIssues: { slug: string | null; sentAt: Date }[] = [];
   let monthlyReports: { slug: string; periodStart: Date }[] = [];
@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const [videoRows, claimRows, channels, newsletterRows, reportRows] =
       await Promise.all([
-        db.video.findMany({
+        db.subject.findMany({
           where: { status: 'PUBLISHED' },
           select: {
             slug: true,
@@ -28,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           },
         }),
         db.claim.findMany({
-          where: { video: { status: 'PUBLISHED' } },
+          where: { subject: { status: 'PUBLISHED' } },
           select: { slug: true, id: true, createdAt: true },
         }),
         db.channel.findMany({ select: { id: true, youtubeId: true } }),
@@ -60,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         latestUpdateByTopicSlug.set(topic.slug, video.updatedAt);
       }
     }
+    if (!video.channelId) continue;
     const current = latestUpdateByChannelId.get(video.channelId);
     if (!current || video.updatedAt > current) {
       latestUpdateByChannelId.set(video.channelId, video.updatedAt);

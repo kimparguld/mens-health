@@ -8,6 +8,7 @@ import type { NextAuthConfig } from "next-auth";
 import { createEdgeAuthConfig } from "@menhealth/core-auth";
 
 export const edgeAuthConfig: NextAuthConfig = createEdgeAuthConfig({
+  cookiePrefix: "menhealth",
   adminEmailsCsv: process.env.ADMIN_EMAILS ?? "",
   nextAuthSecret: process.env.NEXTAUTH_SECRET,
   googleClientId: process.env.AUTH_GOOGLE_ID,

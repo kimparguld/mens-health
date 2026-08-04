@@ -4,31 +4,35 @@ import { classifyDeterministicRisk } from "@/lib/ai/claim-risk";
 describe("classifyDeterministicRisk", () => {
   it("floors risk to HIGH for high-risk categories regardless of LLM suggestion", () => {
     expect(
-      classifyDeterministicRisk("HORMONES", "LOW", "TRT can help you feel better"),
+      classifyDeterministicRisk(
+        "SAFETY",
+        "LOW",
+        "This supplement is completely safe with no side effects",
+      ),
     ).toBe("HIGH");
     expect(
-      classifyDeterministicRisk("MEDICATIONS", "LOW", "Take this daily"),
+      classifyDeterministicRisk("LEGITIMACY", "LOW", "This is a real, registered company"),
     ).toBe("HIGH");
-    expect(classifyDeterministicRisk("CANCER", "MEDIUM", "May help")).toBe(
+    expect(classifyDeterministicRisk("REGULATION", "MEDIUM", "SEC-approved investment")).toBe(
       "HIGH",
     );
   });
 
   it("never de-escalates below the category floor", () => {
     expect(
-      classifyDeterministicRisk("SUPPLEMENTS", "LOW", "Vitamin D helps sleep"),
+      classifyDeterministicRisk("GUARANTEE", "LOW", "Guaranteed 40% monthly returns"),
     ).toBe("HIGH");
   });
 
   it("respects the LLM's own risk suggestion when it's above the category floor", () => {
     expect(
-      classifyDeterministicRisk("NUTRITION", "MEDIUM", "Eat more protein"),
+      classifyDeterministicRisk("PERFORMANCE", "MEDIUM", "This product is twice as fast"),
     ).toBe("MEDIUM");
   });
 
   it("keeps low-risk categories at LOW when nothing escalates them", () => {
     expect(
-      classifyDeterministicRisk("EXERCISE", "LOW", "Walk 30 minutes a day"),
+      classifyDeterministicRisk("POPULARITY", "LOW", "Thousands of happy customers"),
     ).toBe("LOW");
   });
 

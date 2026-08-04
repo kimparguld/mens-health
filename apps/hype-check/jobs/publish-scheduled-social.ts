@@ -1,7 +1,7 @@
 import { db } from "@/lib/db/prisma";
 import { XAdapter } from "@/lib/social/adapters/x";
 import type { SocialPublisher } from "@/lib/social/adapters/publisher";
-import type { Platform } from "@prisma/client";
+import type { Platform } from "@/app/generated/prisma";
 import { env } from "@/env";
 
 /**

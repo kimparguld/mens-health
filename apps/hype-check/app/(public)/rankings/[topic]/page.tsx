@@ -79,7 +79,7 @@ export default async function WeeklyRankingPage({
   const listSchema = buildItemListSchema(
     `Best ${seed.name} Videos This Week`,
     displayVideos.map((v) => ({
-      name: v.title,
+      name: v.editorialTitle ?? v.sourceVideos[0]?.title ?? v.name,
       url: `${APP_URL}/videos/${v.slug}`,
     }))
   );
@@ -200,10 +200,10 @@ export default async function WeeklyRankingPage({
                     <div className="min-w-0 flex-1">
                       <VideoCard
                         slug={video.slug}
-                        title={video.title}
+                        title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
                         channelTitle={video.channel?.title ?? ''}
                         thumbnailUrl={video.thumbnailUrl}
-                        shortSummary={video.summaries[0]?.shortSummary ?? null}
+                        shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
                         trendScore={video.trendScore}
                         topicNames={video.topics.map((vt) => vt.topic.name)}
                         riskLevel={video.riskLevel}

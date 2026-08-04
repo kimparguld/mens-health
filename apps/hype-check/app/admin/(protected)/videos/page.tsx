@@ -13,10 +13,14 @@ type SortDir = "asc" | "desc";
 function buildOrderBy(
   sort: SortField,
   dir: SortDir,
-): NonNullable<Parameters<typeof db.video.findMany>[0]>["orderBy"] {
+): NonNullable<Parameters<typeof db.subject.findMany>[0]>["orderBy"] {
   if (sort === "risk") return { riskLevel: dir };
   if (sort === "claims") return { claims: { _count: dir } };
-  if (sort === "summary") return { summaries: { _count: dir } };
+  // Summary now lives two relation hops away (Subject -> SourceVideo ->
+  // Summary), which Prisma's relation-count orderBy doesn't support directly.
+  // evidenceScore is set in the same pipeline step that creates the summary,
+  // so null/non-null is a reliable proxy for "has a summary yet".
+  if (sort === "summary") return { evidenceScore: dir };
   return { updatedAt: dir };
 }
 
@@ -35,7 +39,7 @@ export default async function AdminVideoQueuePage({
 }) {
   const {
     page: pageStr,
-    status = "PENDING",
+    status = "DRAFT",
     q = "",
     noSummary,
     sort: sortParam,
@@ -61,19 +65,19 @@ export default async function AdminVideoQueuePage({
   const skip = take !== undefined ? (page - 1) * take : 0;
 
   const allowedStatuses = [
-    "PROCESSED",
-    "PENDING",
+    "REVIEW",
+    "DRAFT",
     "PUBLISHED",
-    "REJECTED",
+    "ARCHIVED",
   ] as const;
   type VideoStatus = (typeof allowedStatuses)[number];
   const safeStatus: VideoStatus = (
     allowedStatuses as readonly string[]
   ).includes(status)
     ? (status as VideoStatus)
-    : "PENDING";
+    : "DRAFT";
 
-  const searchableStatuses: VideoStatus[] = ["PENDING", "PUBLISHED"];
+  const searchableStatuses: VideoStatus[] = ["DRAFT", "PUBLISHED"];
   const showSearch = searchableStatuses.includes(safeStatus);
   const safeQ = showSearch ? q.trim() : "";
   const showNoSummaryFilter = showSearch;
@@ -82,13 +86,20 @@ export default async function AdminVideoQueuePage({
   const where = {
     status: safeStatus,
     ...(safeQ
-      ? { title: { contains: safeQ, mode: "insensitive" as const } }
+      ? {
+          OR: [
+            { editorialTitle: { contains: safeQ, mode: "insensitive" as const } },
+            { name: { contains: safeQ, mode: "insensitive" as const } },
+          ],
+        }
       : {}),
-    ...(filterNoSummary ? { summaries: { none: {} } } : {}),
+    ...(filterNoSummary
+      ? { sourceVideos: { none: { summaries: { some: {} } } } }
+      : {}),
   };
 
-  const [videos, total] = await Promise.all([
-    db.video.findMany({
+  const [subjects, total] = await Promise.all([
+    db.subject.findMany({
       where,
       orderBy: buildOrderBy(sortField, sortDir),
       skip,
@@ -96,19 +107,36 @@ export default async function AdminVideoQueuePage({
       // take omitted means no limit ("all")
       include: {
         channel: true,
-        _count: { select: { claims: true, summaries: true } },
+        sourceVideos: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          include: { _count: { select: { summaries: true } } },
+        },
+        _count: { select: { claims: true } },
       },
     }),
-    db.video.count({ where }),
+    db.subject.count({ where }),
   ]);
+
+  const videos = subjects.map((s) => ({
+    id: s.id,
+    title: s.editorialTitle ?? s.sourceVideos[0]?.title ?? s.name,
+    riskLevel: s.riskLevel,
+    updatedAt: s.updatedAt,
+    channel: { title: s.channel?.title ?? "" },
+    _count: {
+      claims: s._count.claims,
+      summaries: s.sourceVideos[0]?._count.summaries ?? 0,
+    },
+  }));
 
   const totalPages = take !== undefined ? Math.ceil(total / take) : 1;
 
   const statusTabs: Array<{ label: string; value: string }> = [
-    { label: "Pending", value: "PENDING" },
+    { label: "Pending", value: "DRAFT" },
     { label: "Published", value: "PUBLISHED" },
-    { label: "Rejected", value: "REJECTED" },
-    { label: "Processed", value: "PROCESSED" },
+    { label: "Rejected", value: "ARCHIVED" },
+    { label: "Processed", value: "REVIEW" },
   ];
 
   function pageHref(p: number) {
@@ -200,17 +228,17 @@ export default async function AdminVideoQueuePage({
         <BulkPublishTable
           videos={videos}
           showBulkActions={
-            safeStatus === "PENDING" ||
-            safeStatus === "PROCESSED" ||
+            safeStatus === "DRAFT" ||
+            safeStatus === "REVIEW" ||
             safeStatus === "PUBLISHED"
           }
           showPublishAction={
-            safeStatus === "PENDING" || safeStatus === "PROCESSED"
+            safeStatus === "DRAFT" || safeStatus === "REVIEW"
           }
           showSummaryColumn={
-            safeStatus === "PENDING" ||
+            safeStatus === "DRAFT" ||
             safeStatus === "PUBLISHED" ||
-            safeStatus === "PROCESSED"
+            safeStatus === "REVIEW"
           }
           sortField={sortField}
           sortDir={sortDir}

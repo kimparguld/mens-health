@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type PublishStatus = "PENDING" | "PROCESSED" | "PUBLISHED" | "REJECTED";
+type PublishStatus = "DRAFT" | "REVIEW" | "PUBLISHED" | "ARCHIVED";
 
 const ACTIONS = [
   {
