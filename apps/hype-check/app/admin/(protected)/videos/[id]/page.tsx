@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import GenerateSocialButton from './GenerateSocialButton';
 import GenerateSummaryButton from './GenerateSummaryButton';
+import GenerateWarningsButton from './GenerateWarningsButton';
 import ReviewActions from './ReviewActions';
 import ReviewerForm from './ReviewerForm';
 import VerdictPanel from './VerdictPanel';
@@ -38,6 +39,9 @@ export default async function AdminVideoDetailPage({
         include: { summaries: { orderBy: { createdAt: 'desc' }, take: 1 } },
       },
       claims: { orderBy: { riskLevel: 'desc' } },
+      warningSigns: true,
+      costItems: true,
+      disclosures: true,
       adminReviews: { orderBy: { createdAt: 'desc' }, take: 5 },
       topics: { include: { topic: true } },
       verdict: true,
@@ -214,6 +218,32 @@ export default async function AdminVideoDetailPage({
               </div>
             </section>
           )}
+
+          {/* Warning signs, costs & disclosures */}
+          <section className="rounded-lg border bg-white p-5">
+            <h2 className="mb-4 font-semibold text-gray-900">
+              Warning signs, costs &amp; disclosures
+            </h2>
+            {subject.warningSigns.length === 0 &&
+            subject.costItems.length === 0 &&
+            subject.disclosures.length === 0 ? (
+              <div>
+                <p className="mb-3 text-sm text-gray-500">
+                  Nothing generated yet for this video.
+                </p>
+                <GenerateWarningsButton videoId={subject.id} />
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600">
+                {subject.warningSigns.length} warning sign
+                {subject.warningSigns.length === 1 ? '' : 's'},{' '}
+                {subject.costItems.length} cost item
+                {subject.costItems.length === 1 ? '' : 's'},{' '}
+                {subject.disclosures.length} disclosure
+                {subject.disclosures.length === 1 ? '' : 's'} generated.
+              </p>
+            )}
+          </section>
         </div>
 
         {/* Sidebar — right col */}
