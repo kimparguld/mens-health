@@ -1,6 +1,10 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
 import { extractWarningsCostsDisclosures } from "@/lib/ai/extract-warnings-costs-disclosures";
+import {
+  highestRiskLevel,
+  RISK_RANK,
+} from "@/lib/videos/process-video-pipeline";
 import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -83,6 +87,20 @@ export async function POST(
         detected: d.detected,
         source: AI_EXTRACTION_SOURCE,
       })),
+    });
+  }
+
+  // A HIGH-severity warning sign found by this backfill must escalate the
+  // subject's risk level exactly like the main pipeline does — this is what
+  // keeps the video behind the admin-approval gate (isEligibleForAutoPublish)
+  // instead of silently remaining eligible for auto-publish.
+  const highestWarningSeverity = highestRiskLevel(
+    warningSigns.map((w) => w.severity),
+  );
+  if (RISK_RANK[highestWarningSeverity] > RISK_RANK[subject.riskLevel]) {
+    await db.subject.update({
+      where: { id: subject.id },
+      data: { riskLevel: highestWarningSeverity },
     });
   }
 

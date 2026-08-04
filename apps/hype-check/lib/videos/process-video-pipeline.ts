@@ -44,7 +44,7 @@ export type GenerateSummaryAndClaimsResult = {
   disclosures: DisclosureOutput[];
 };
 
-const RISK_RANK: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
+export const RISK_RANK: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
 const AI_EXTRACTION_SOURCE = "ai-extraction";
 
 export function highestRiskLevel(levels: RiskLevel[]): RiskLevel {
@@ -99,58 +99,15 @@ export async function generateSummaryAndClaims(
     console.warn(
       `Claim extraction failed for video ${video.sourceVideoId}: ${claimsResult.error.message}`,
     );
-    return { ok: true, value: { summary, claims: [], warningSigns: [], costItems: [], disclosures: [] } };
-  }
-
-  const claims: Claim[] = [];
-  let highestClaimRisk: RiskLevel = "LOW";
-
-  for (const extracted of claimsResult.value) {
-    // Safe: extracted.category is validated at runtime against this site's
-    // claimCategories list (see packages/core-ai/src/pipeline.ts) before we
-    // ever get here — TS just can't narrow the literal union automatically.
-    const category = extracted.category as ClaimCategory;
-    const deterministicRisk = classifyDeterministicRisk(
-      category,
-      extracted.riskLevel,
-      extracted.text,
-    );
-
-    if (RISK_RANK[deterministicRisk] > RISK_RANK[highestClaimRisk]) {
-      highestClaimRisk = deterministicRisk;
-    }
-
-    // HIGH claims never get an automated verdict — discarded by
-    // construction, not by a UI hint that could later be relaxed.
-    const factCheck =
-      deterministicRisk === "HIGH" ? undefined : extracted.factCheck;
-
-    const created = await db.claim.create({
-      data: {
-        subjectId: video.subjectId,
-        text: extracted.text,
-        claimType: category,
-        riskLevel: deterministicRisk,
-        evidenceStatus: factCheck?.evidenceStatus ?? "NOT_CHECKED",
-        explanation: factCheck?.rationale ?? extracted.explanation ?? null,
-        // Only LOW-risk claims with an actual AI verdict are auto-reviewed;
-        // MEDIUM claims get the verdict pre-filled but still need a human
-        // one-click confirm, and HIGH claims never get a verdict at all.
-        autoReviewed: deterministicRisk === "LOW" && factCheck != null,
-      },
-    });
-    const withSlug = await db.claim.update({
-      where: { id: created.id },
-      data: { slug: generateClaimSlug(extracted.text, created.id) },
-    });
-    claims.push(withSlug);
   }
 
   // Warning signs, cost items, and disclosures — same AI-extraction +
-  // human-review pattern as claims above. A HIGH-severity warning sign
-  // escalates the subject's risk level exactly like a HIGH claim does,
-  // which keeps it behind the same admin-approval gate
-  // (isEligibleForAutoPublish) rather than needing separate gating logic.
+  // human-review pattern as claims below. Runs unconditionally (i.e. even
+  // when claim extraction above failed) because a HIGH-severity warning
+  // sign must still escalate the subject's risk level exactly like a HIGH
+  // claim does, which keeps it behind the same admin-approval gate
+  // (isEligibleForAutoPublish) rather than needing separate gating logic —
+  // a claim-extraction failure must never silently skip this.
   let warningSigns: WarningSignOutput[] = [];
   let costItems: CostItemOutput[] = [];
   let disclosures: DisclosureOutput[] = [];
@@ -204,6 +161,53 @@ export async function generateSummaryAndClaims(
   const highestWarningSeverity = highestRiskLevel(
     warningSigns.map((w) => w.severity),
   );
+
+  const claims: Claim[] = [];
+  let highestClaimRisk: RiskLevel = "LOW";
+
+  if (claimsResult.ok) {
+    for (const extracted of claimsResult.value) {
+      // Safe: extracted.category is validated at runtime against this site's
+      // claimCategories list (see packages/core-ai/src/pipeline.ts) before we
+      // ever get here — TS just can't narrow the literal union automatically.
+      const category = extracted.category as ClaimCategory;
+      const deterministicRisk = classifyDeterministicRisk(
+        category,
+        extracted.riskLevel,
+        extracted.text,
+      );
+
+      if (RISK_RANK[deterministicRisk] > RISK_RANK[highestClaimRisk]) {
+        highestClaimRisk = deterministicRisk;
+      }
+
+      // HIGH claims never get an automated verdict — discarded by
+      // construction, not by a UI hint that could later be relaxed.
+      const factCheck =
+        deterministicRisk === "HIGH" ? undefined : extracted.factCheck;
+
+      const created = await db.claim.create({
+        data: {
+          subjectId: video.subjectId,
+          text: extracted.text,
+          claimType: category,
+          riskLevel: deterministicRisk,
+          evidenceStatus: factCheck?.evidenceStatus ?? "NOT_CHECKED",
+          explanation: factCheck?.rationale ?? extracted.explanation ?? null,
+          // Only LOW-risk claims with an actual AI verdict are auto-reviewed;
+          // MEDIUM claims get the verdict pre-filled but still need a human
+          // one-click confirm, and HIGH claims never get a verdict at all.
+          autoReviewed: deterministicRisk === "LOW" && factCheck != null,
+        },
+      });
+      const withSlug = await db.claim.update({
+        where: { id: created.id },
+        data: { slug: generateClaimSlug(extracted.text, created.id) },
+      });
+      claims.push(withSlug);
+    }
+  }
+
   const highestOverallRisk = highestRiskLevel([
     highestClaimRisk,
     highestWarningSeverity,
