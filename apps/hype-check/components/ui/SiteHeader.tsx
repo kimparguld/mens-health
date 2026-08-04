@@ -174,7 +174,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           <button
             type="button"
             onClick={openDrawer}
-            className="text-ink-muted hover:bg-surface hover:text-ink flex items-center justify-center rounded-md p-2 md:hidden"
+            className="hover:bg-surface hover:text-ink flex items-center justify-center rounded-md p-2 text-white md:hidden"
             aria-label="Open menu"
           >
             <HamburgerIcon />
@@ -212,9 +212,9 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               <Link
                 href="/"
                 onClick={closeDrawer}
-                className="focus-visible:ring-ink/40 rounded-md focus-visible:ring-2 focus-visible:outline-none"
+                className="focus-visible:ring-ink/40 flex rounded-md focus-visible:ring-2 focus-visible:outline-none"
               >
-                <BrandLogotype size="sm" />
+                <BrandLogotype size="md" />
               </Link>
               <button
                 type="button"
@@ -229,18 +229,18 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             <div className="border-hairline mx-6 border-t" />
 
             {/* Nav links */}
-            <nav className="flex flex-1 flex-col overflow-y-auto px-4 py-4">
+            <nav className="flex flex-1 flex-col overflow-y-auto bg-white px-4 py-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={closeDrawer}
-                  className="group text-ink hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
+                  className="group text-ink-muted hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
                 >
                   {link.label}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="text-hairline group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                    className="text-ink-muted group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -261,12 +261,12 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 <Link
                   href="/account"
                   onClick={closeDrawer}
-                  className="group text-ink hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
+                  className="group text-ink-muted/80 hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
                 >
                   {user.name ?? user.email ?? 'Account'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="text-hairline group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                    className="text-ink-muted/80 group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

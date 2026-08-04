@@ -1,7 +1,7 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import { RiskStamp } from '@/components/ui/RiskStamp';
+import Image from 'next/image';
+import Link from 'next/link';
 import { VerdictStamp, type VerdictType } from './VerdictStamp';
 
 type HypeVideoCardProps = {
@@ -42,7 +42,7 @@ export function HypeVideoCard({
   return (
     <Link
       href={`/videos/${slug}`}
-      className="group border-hairline hover:border-ink flex flex-col overflow-hidden rounded-md border bg-white transition-colors"
+      className="group border-hairline flex flex-col overflow-hidden rounded-md border bg-white shadow-sm transition-shadow hover:shadow-xl"
     >
       {thumbnailUrl && (
         <div className="bg-hairline/40 relative aspect-video w-full">

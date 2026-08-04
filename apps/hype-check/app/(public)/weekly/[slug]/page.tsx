@@ -1,3 +1,5 @@
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
 import { db } from '@/lib/db/prisma';
 import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
 import { createMetadata } from '@/lib/seo/site-metadata';
@@ -9,9 +11,7 @@ import {
   Disclaimer,
   JsonLd,
   NewsletterInlineCTA,
-  VideoCard,
 } from '@menhealth/ui';
-import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -151,7 +151,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                   Top Video This Week
                 </p>
                 <div className="rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
-                  <VideoCard
+                  <HypeVideoCard
                     slug={topVideo.slug}
                     title={
                       topVideo.editorialTitle ??
@@ -255,7 +255,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                     <div className="bg-ink-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
                       {i + 1}
                     </div>
-                    <VideoCard
+                    <HypeVideoCard
                       slug={video.slug}
                       title={
                         video.editorialTitle ??
@@ -361,7 +361,10 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
           </div>
         </nav>
 
-        <Disclaimer text={DISCLAIMER_TEXT} className="mt-10" />
+        <Disclaimer
+          text={DISCLAIMER_TEXT}
+          className="mt-10 border-gray-200 bg-white text-gray-500"
+        />
       </main>
     </>
   );

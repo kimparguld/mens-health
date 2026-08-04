@@ -1,3 +1,4 @@
+import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
 import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
@@ -5,12 +6,7 @@ import {
   buildBreadcrumbSchema,
   buildItemListSchema,
 } from '@menhealth/core-seo';
-import {
-  Disclaimer,
-  JsonLd,
-  NewsletterFooterCTA,
-  VideoCard,
-} from '@menhealth/ui';
+import { Disclaimer, JsonLd, NewsletterFooterCTA } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -205,7 +201,7 @@ export default async function WeeklyRankingPage({
                       {index + 1}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <VideoCard
+                      <HypeVideoCard
                         slug={video.slug}
                         title={
                           video.editorialTitle ??
@@ -281,7 +277,10 @@ export default async function WeeklyRankingPage({
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">
-          <Disclaimer text={DISCLAIMER_TEXT} />
+          <Disclaimer
+            text={DISCLAIMER_TEXT}
+            className="border-gray-200 bg-white text-gray-500"
+          />
         </div>
       </main>
     </>

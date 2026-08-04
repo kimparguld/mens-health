@@ -1,14 +1,10 @@
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
 import { db } from '@/lib/db/prisma';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
 import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
-import {
-  Disclaimer,
-  JsonLd,
-  NewsletterFooterCTA,
-  VideoCard,
-} from '@menhealth/ui';
-import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { Disclaimer, JsonLd, NewsletterFooterCTA } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -328,7 +324,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {videos.map((video, index) => (
-                  <VideoCard
+                  <HypeVideoCard
                     key={video.id}
                     slug={video.slug}
                     title={
@@ -444,7 +440,10 @@ export default async function CreatorPage({ params }: { params: Params }) {
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">
-          <Disclaimer text={DISCLAIMER_TEXT} />
+          <Disclaimer
+            text={DISCLAIMER_TEXT}
+            className="border-gray-200 bg-white text-gray-500"
+          />
         </div>
       </main>
     </>

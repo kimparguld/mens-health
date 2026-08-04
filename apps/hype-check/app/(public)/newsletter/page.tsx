@@ -310,7 +310,10 @@ export default function NewsletterPage() {
         </div>
       </section>
 
-      <Disclaimer text={DISCLAIMER_TEXT} className="mt-10" />
+      <Disclaimer
+        text={DISCLAIMER_TEXT}
+        className="mt-10 border-gray-200 bg-white text-gray-500"
+      />
     </main>
   );
 }
