@@ -3,8 +3,8 @@
 :root {
   --paper: #f5f1e8;
   --surface: #fbf9f4;
-  --ink: #14110f;
-  --ink-muted: #6b6459;
+  --ink: #a95923;
+  --ink-muted: #180b02;
   --hairline: #d9d2c3;
   --brand-red: #c1272d;
   --verdict-legit: #1e7a46;
@@ -16,9 +16,9 @@
 
 @theme inline {
   --color-paper: var(--paper);
-  --color-surface: var(--surface);
+  --color-surface: var(--color-gray-900);
   --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
+  --color-ink-muted: var(--color-gray-900);
   --color-hairline: var(--hairline);
   --color-brand-red: var(--brand-red);
   --color-verdict-legit: var(--verdict-legit);
@@ -30,11 +30,11 @@
   --font-slab: var(--font-slab);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --paper: #14110f;
     --surface: #1c1815;
-    --ink: #f5f1e8;
+    --ink: #4f39f6;
     --ink-muted: #b5aea0;
     --hairline: #3a342c;
     --brand-red: #e2555a;
@@ -44,11 +44,11 @@
     --verdict-risky: #e0684c;
     --verdict-scam: #e2555a;
   }
-}
+} */
 
 body {
   background: var(--paper);
-  color: var(--ink);
+  color: var(--ink-muted);
   font-family:
     var(--font-sans),
     system-ui,
@@ -58,7 +58,7 @@ body {
 
 input,
 textarea {
-  color: var(--color-gray-600);
+  color: var(--ink-muted);
 }
 
 button,
@@ -103,7 +103,7 @@ a {
 }
 
 .mh-logotype-mark-check {
-  stroke: var(--paper);
+  stroke: var(--color-white);
   stroke-width: 3.4;
 }
 
