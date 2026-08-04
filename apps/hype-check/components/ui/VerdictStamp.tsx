@@ -13,16 +13,22 @@ const VERDICT_STYLES: Record<VerdictType, string> = {
   SCAM: 'border-verdict-scam text-verdict-scam -rotate-2',
 };
 
+const SIZE_STYLES: Record<'sm' | 'lg', string> = {
+  sm: 'px-2.5 py-0.5 text-xs',
+  lg: 'px-4 py-1.5 text-base',
+};
+
 interface VerdictStampProps {
   verdict: VerdictType | null | undefined;
+  size?: 'sm' | 'lg';
 }
 
-export function VerdictStamp({ verdict }: VerdictStampProps) {
+export function VerdictStamp({ verdict, size = 'sm' }: VerdictStampProps) {
   if (!verdict) return null;
 
   return (
     <span
-      className={`inline-block rounded-sm border-[2.5px] px-2.5 py-0.5 font-slab text-xs font-black tracking-widest uppercase ${VERDICT_STYLES[verdict]}`}
+      className={`inline-block rounded-sm border-[2.5px] font-slab font-black tracking-widest uppercase ${SIZE_STYLES[size]} ${VERDICT_STYLES[verdict]}`}
     >
       {verdict}
     </span>

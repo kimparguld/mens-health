@@ -5,7 +5,8 @@ import {
   buildBreadcrumbSchema,
   buildDefinedTermSchema,
 } from '@menhealth/core-seo';
-import { Disclaimer, JsonLd, RiskBadge } from '@menhealth/ui';
+import { Disclaimer, JsonLd } from '@menhealth/ui';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -92,7 +93,7 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
 
       <header className="mb-8">
         <div className="mb-2 flex items-center gap-2">
-          {isHighRiskTerm && <RiskBadge level="HIGH" />}
+          {isHighRiskTerm && <RiskStamp level="HIGH" />}
         </div>
         <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
           {term.term}

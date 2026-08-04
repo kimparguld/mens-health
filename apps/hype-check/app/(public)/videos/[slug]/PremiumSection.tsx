@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { premium } from "@/lib/flags/feature-flags";
-import { PremiumGate, EvidenceBadge, RiskBadge } from "@menhealth/ui";
+import { PremiumGate } from "@menhealth/ui";
+import { EvidenceStamp } from "@/components/ui/EvidenceStamp";
+import { RiskStamp } from "@/components/ui/RiskStamp";
 type Claim = {
   id: string;
   text: string;
@@ -18,10 +20,10 @@ export async function PremiumSection({ claims }: { claims: Claim[] }) {
     <PremiumGate isPremium={isPremium} premiumEnabled={premium?.isEnabled() ?? false}>
       <div className="space-y-4">
         {claims.map((claim) => (
-          <div key={claim.id} className="rounded-lg border border-gray-200 p-4">
+          <div key={claim.id} className="rounded-lg border border-hairline p-4">
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <RiskBadge level={claim.riskLevel as "LOW" | "MEDIUM" | "HIGH"} />
-              <EvidenceBadge
+              <RiskStamp level={claim.riskLevel as "LOW" | "MEDIUM" | "HIGH"} />
+              <EvidenceStamp
                 status={
                   claim.evidenceStatus as
                     | "SUPPORTED"
@@ -32,9 +34,9 @@ export async function PremiumSection({ claims }: { claims: Claim[] }) {
                 }
               />
             </div>
-            <p className="text-sm font-medium text-gray-900">{claim.text}</p>
+            <p className="text-sm font-medium text-ink-muted">{claim.text}</p>
             {claim.explanation && (
-              <p className="mt-1 text-xs text-gray-500">{claim.explanation}</p>
+              <p className="mt-1 text-xs text-ink-muted/60">{claim.explanation}</p>
             )}
           </div>
         ))}

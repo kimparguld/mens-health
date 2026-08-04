@@ -32,4 +32,14 @@ describe("VerdictStamp", () => {
       unmount();
     }
   });
+
+  it("applies larger text size when size='lg' is passed", () => {
+    render(<VerdictStamp verdict="LEGIT" size="lg" />);
+    expect(screen.getByText("LEGIT")).toHaveClass("text-base");
+  });
+
+  it("defaults to the small text size when size is omitted", () => {
+    render(<VerdictStamp verdict="LEGIT" />);
+    expect(screen.getByText("LEGIT")).toHaveClass("text-xs");
+  });
 });

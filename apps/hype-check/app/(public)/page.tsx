@@ -1,12 +1,12 @@
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import { VerdictStamp } from '@/components/ui/VerdictStamp';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import {
-  EvidenceBadge,
   HowWeRateClaims,
   NewsletterSignupForm,
-  RiskBadge,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -96,9 +96,9 @@ async function FeaturedInsight() {
             ) : (
               <>
                 {featuredClaim && (
-                  <EvidenceBadge status={featuredClaim.evidenceStatus} />
+                  <EvidenceStamp status={featuredClaim.evidenceStatus} />
                 )}
-                <RiskBadge level={featuredVideo.riskLevel} />
+                <RiskStamp level={featuredVideo.riskLevel} />
               </>
             )}
             {featuredWatchMin && (
