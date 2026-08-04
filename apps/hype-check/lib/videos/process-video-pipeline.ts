@@ -45,6 +45,7 @@ export type GenerateSummaryAndClaimsResult = {
 };
 
 const RISK_RANK: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
+const AI_EXTRACTION_SOURCE = "ai-extraction";
 
 export function highestRiskLevel(levels: RiskLevel[]): RiskLevel {
   return levels.reduce<RiskLevel>(
@@ -98,7 +99,7 @@ export async function generateSummaryAndClaims(
     console.warn(
       `Claim extraction failed for video ${video.sourceVideoId}: ${claimsResult.error.message}`,
     );
-    return { ok: true, value: { summary, claims: [] } };
+    return { ok: true, value: { summary, claims: [], warningSigns: [], costItems: [], disclosures: [] } };
   }
 
   const claims: Claim[] = [];
@@ -169,7 +170,7 @@ export async function generateSummaryAndClaims(
           subjectId: video.subjectId,
           text: w.text,
           severity: w.severity,
-          source: "ai-extraction",
+          source: AI_EXTRACTION_SOURCE,
         })),
       });
     }
@@ -190,7 +191,7 @@ export async function generateSummaryAndClaims(
           subjectId: video.subjectId,
           text: d.text,
           detected: d.detected,
-          source: "ai-extraction",
+          source: AI_EXTRACTION_SOURCE,
         })),
       });
     }
