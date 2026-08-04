@@ -69,9 +69,6 @@ const _getVideoBySlugCached = unstable_cache(
           orderBy: { riskLevel: "desc" },
         },
         topics: { include: { topic: true } },
-        // Fetched for future use — no admin UI or job writes to these tables yet,
-        // so they're always empty. Don't build page sections around them until
-        // there's a way to populate them.
         warningSigns: true,
         costItems: true,
         disclosures: true,
