@@ -5,6 +5,8 @@ import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+const AI_EXTRACTION_SOURCE = "ai-extraction";
+
 export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -58,7 +60,7 @@ export async function POST(
         subjectId: subject.id,
         text: w.text,
         severity: w.severity,
-        source: "ai-extraction",
+        source: AI_EXTRACTION_SOURCE,
       })),
     });
   }
@@ -79,7 +81,7 @@ export async function POST(
         subjectId: subject.id,
         text: d.text,
         detected: d.detected,
-        source: "ai-extraction",
+        source: AI_EXTRACTION_SOURCE,
       })),
     });
   }
