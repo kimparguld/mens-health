@@ -540,20 +540,51 @@ export default async function VideoPage({ params }: { params: Params }) {
       </section>
 
       {/* Disclosures */}
-      {video.disclosures.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-lg font-semibold">
-            Disclosures
-          </h2>
-          <ul className="space-y-1">
-            {video.disclosures.map((d: (typeof video.disclosures)[number]) => (
-              <li key={d.id} className="text-ink-muted/80 text-sm">
-                {d.text}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {(() => {
+        const disclosedItems = video.disclosures.filter(
+          (d: (typeof video.disclosures)[number]) => d.detected,
+        );
+        const undisclosedItems = video.disclosures.filter(
+          (d: (typeof video.disclosures)[number]) => !d.detected,
+        );
+
+        return (
+          <>
+            {disclosedItems.length > 0 && (
+              <section className="mb-8">
+                <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+                  Disclosures
+                </h2>
+                <ul className="space-y-1">
+                  {disclosedItems.map((d) => (
+                    <li key={d.id} className="text-ink-muted/80 text-sm">
+                      {d.text}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {undisclosedItems.length > 0 && (
+              <section className="mb-8">
+                <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+                  Possible Undisclosed Sponsorship
+                </h2>
+                <ul className="space-y-2">
+                  {undisclosedItems.map((d) => (
+                    <li
+                      key={d.id}
+                      className="border-verdict-risky/30 bg-verdict-risky/10 text-ink-muted/90 rounded-lg border px-4 py-3 text-sm"
+                    >
+                      {d.text}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </>
+        );
+      })()}
 
       {/* Affiliate links */}
       {affiliateLinks.length > 0 && (
