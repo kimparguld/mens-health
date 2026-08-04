@@ -1,5 +1,5 @@
 import "server-only";
-import type { Platform, PrismaClient } from "@prisma/client";
+import type { Platform } from "@prisma/client";
 import { z } from "zod";
 
 const RefreshResponse = z.object({
@@ -27,7 +27,11 @@ type RefreshConfig = {
  * Server-only — never call from client components.
  */
 export async function getValidAccessToken(
-  db: PrismaClient,
+  // Prisma's generated types carry generic branding tied to their own
+  // generation, so a `Pick<PrismaClient, ...>` from one site's client isn't
+  // satisfied by another site's — even for identical models.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
   platform: Platform,
   config: RefreshConfig,
 ): Promise<string> {

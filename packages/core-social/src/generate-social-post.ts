@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { PrismaClient, Platform, RiskLevel } from "@prisma/client";
+import type { Platform, RiskLevel } from "@prisma/client";
 import { buildUtmUrl } from "./utm";
 import {
   validatePlatformConstraints,
@@ -21,7 +21,7 @@ export type GenerateSocialPostInput = {
   templateId?: string;
 };
 
-type VideoContext = {
+export type VideoContext = {
   title: string;
   slug: string;
   shortSummary: string;
@@ -48,11 +48,30 @@ export type SocialAiClient = {
 };
 
 export type SocialPostGeneratorConfig = {
-  db: PrismaClient;
+  /**
+   * Prisma's generated types carry generic branding tied to their own
+   * generation, so a `Pick<PrismaClient, ...>` from one site's generated
+   * client isn't satisfied by another site's — even for identical models.
+   * `any` here is intentional; this package only ever calls
+   * `db.socialPost.create(...)` with a fixed, internally-controlled shape.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
+  /**
+   * Site-supplied content lookup — each site's own DB schema differs (e.g.
+   * menhealth's Video vs. hype-check's Subject), so this package never
+   * queries the DB for source content directly. Return null if the source
+   * doesn't exist or isn't published.
+   */
+  fetchContext: (sourceId: string) => Promise<VideoContext | null>;
   aiClient: SocialAiClient;
   /** Whether the AI client is actually configured — same guard as the old GROQ_API_KEY check. */
   aiConfigured: boolean;
   siteName: string;
+  /** What kind of content this is, substituted into the prompt in place of the old hardcoded "men's health video summary", e.g. "product/course review". */
+  contentTypeLabel: string;
+  /** Appended to every caption, substituted into the prompt in place of the old hardcoded "Educational only. Not medical advice.". */
+  disclaimerLine: string;
   /** This site's own canonical URL, used to build the UTM link. */
   baseUrl: string;
   /** Site-specific forbidden caption/script phrasing, on top of core-compliance's engine. */
@@ -80,35 +99,6 @@ function riskLabel(level: RiskLevel): string {
  * apps/menhealth/lib/social/generate-social-post.ts).
  */
 export function createSocialPostGenerator(config: SocialPostGeneratorConfig) {
-  async function fetchVideoContext(
-    videoId: string,
-  ): Promise<VideoContext | null> {
-    const video = await config.db.video.findUnique({
-      where: { id: videoId },
-      include: {
-        summaries: { take: 1, orderBy: { createdAt: "desc" } },
-        topics: { include: { topic: true } },
-        claims: { take: 5, orderBy: { riskLevel: "desc" } },
-      },
-    });
-
-    if (!video || video.status !== "PUBLISHED") return null;
-
-    const summary = video.summaries[0];
-    const takeaways = summary ? (summary.takeaways as string[]) : [];
-
-    return {
-      title: video.title,
-      slug: video.slug,
-      shortSummary: summary?.shortSummary ?? video.title,
-      takeaways,
-      riskLevel: video.riskLevel,
-      evidenceScore: video.evidenceScore,
-      topicNames: video.topics.map((vt) => vt.topic.name),
-      claimTexts: video.claims.map((c) => c.text),
-    };
-  }
-
   function buildPrompt(
     ctx: VideoContext,
     platform: Platform,
@@ -117,7 +107,7 @@ export function createSocialPostGenerator(config: SocialPostGeneratorConfig) {
     const constraints = PLATFORM_CONSTRAINTS[platform];
     return `You are the social content writer for ${config.siteName}.
 
-Generate a social media post for the following men's health video summary.
+Generate a social media post for the following ${config.contentTypeLabel}.
 
 Platform: ${platform}
 Video title: ${ctx.title}
@@ -136,15 +126,13 @@ Platform limits (HARD — do not exceed):
 - Script: ${constraints.maxScriptWords} words max
 
 Rules:
-- Do NOT write fear-based copy ("fix your testosterone", "this cures", "doctors don't want you to know").
-- Do NOT imply the reader has a medical condition.
-- Do NOT present content as medical advice.
-- End caption with: "Educational only. Not medical advice."
+- Do NOT write fear-based or manipulative copy — no unsubstantiated guarantees, no implying the reader is at risk, no fake urgency.
+- End caption with: "${config.disclaimerLine}"
 - Include the UTM link in the caption.
 - Include evidence label and risk level in the caption.
 - Keep hook under ${constraints.maxHookChars} characters.
 - For text-only platforms (X, REDDIT), set "script" to an empty string "".
-- Set requiresReview to true if the content involves TRT, medications, supplements, cancer, mental health, or ED.
+- Set requiresReview to true if the content involves any of: ${config.highRiskKeywords.slice(0, 6).join(", ")}.
 
 Respond ONLY with a JSON object:
 {
@@ -163,7 +151,7 @@ Respond ONLY with a JSON object:
   async function generateSocialPost(
     input: GenerateSocialPostInput,
   ): Promise<Result<{ postId: string }>> {
-    const ctx = await fetchVideoContext(input.videoId);
+    const ctx = await config.fetchContext(input.videoId);
     if (!ctx) {
       return {
         ok: false,

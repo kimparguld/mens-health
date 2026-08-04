@@ -1,7 +1,8 @@
-// Pure SVG builder for the embeddable "Reviewed by MenHealth Digest" badge.
+// Pure SVG builder for the embeddable "Reviewed by <site>" badge.
 // No I/O — easily unit-tested.
 
 export type BadgeInput = {
+  siteName: string;
   evidenceLabel: string;
   color: string;
 };
@@ -24,15 +25,16 @@ function escapeXml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function buildBadgeSvg({ evidenceLabel, color }: BadgeInput): string {
+export function buildBadgeSvg({ siteName, evidenceLabel, color }: BadgeInput): string {
+  const name = escapeXml(siteName);
   const label = escapeXml(evidenceLabel);
   const width = 210;
   const height = 50;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Reviewed by MenHealth Digest — ${label}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="Reviewed by ${name} — ${label}">
   <rect width="${width}" height="${height}" rx="8" fill="#111827" />
   <rect x="0" y="${height - 6}" width="${width}" height="6" rx="0" fill="${color}" />
-  <text x="12" y="20" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff">Reviewed by MenHealth Digest</text>
+  <text x="12" y="20" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff">Reviewed by ${name}</text>
   <text x="12" y="36" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="${color}">${label}</text>
 </svg>`;
 }

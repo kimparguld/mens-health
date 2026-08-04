@@ -7,6 +7,35 @@ export type { Result } from "./result";
 export type AiPipelineOptions = {
   /** Substituted into every prompt in place of the old hardcoded "MenHealth Digest". */
   siteName: string;
+  /**
+   * One-clause description of what this site is, substituted into every
+   * prompt in place of the old hardcoded "a men's health content curation
+   * platform" / "a men's health video review site". E.g. "a men's health
+   * content curation platform" or "a platform that reviews trending
+   * products, courses, and money-making claims for hype vs. reality".
+   */
+  domainDescription: string;
+  /**
+   * One-clause description of who FAQ content is written for, substituted
+   * into generateTopicFaq's prompt in place of the old hardcoded "men aged
+   * 30–55 who are health-conscious but not medical professionals".
+   */
+  audienceDescription: string;
+  /**
+   * This site's own claim-category taxonomy (matching its Prisma
+   * `ClaimCategory` enum), substituted for the old hardcoded
+   * NUTRITION/HORMONES/CANCER/... list. extractClaims validates the AI's
+   * output against exactly these values.
+   */
+  claimCategories: readonly [string, ...string[]];
+  /** E.g. "health claims" or "claims about scams, pricing, and legitimacy" — substituted into extractClaims' prompt. */
+  claimTypeLabel: string;
+  /**
+   * The HIGH/MEDIUM/LOW risk-level guide bullets substituted into
+   * extractClaims' prompt, e.g.:
+   * "- HIGH: Claims about medications, TRT, hormones...\n- MEDIUM: ...\n- LOW: ..."
+   */
+  riskLevelGuide: string;
 };
 
 // --- summarizeVideo ---------------------------------------------------------
@@ -59,39 +88,22 @@ const FactCheckSchema = z.object({
     .describe("Brief rationale for the evidence status"),
 });
 
-const ClaimSchema = z.object({
-  text: z.string().min(1).describe("The health claim extracted from the video"),
-  category: z.enum([
-    "NUTRITION",
-    "EXERCISE",
-    "HORMONES",
-    "MENTAL_HEALTH",
-    "SUPPLEMENTS",
-    "MEDICATIONS",
-    "CANCER",
-    "LONGEVITY",
-    "SEXUAL_HEALTH",
-    "OTHER",
-  ]),
-  riskLevel: z.enum(["LOW", "MEDIUM", "HIGH"]),
-  explanation: z
-    .string()
-    .optional()
-    .describe("Brief explanation of why this claim matters or is notable"),
-  // Deliberately no "sources"/citations field: the AI provider chain actually
-  // reached at runtime (Groq/OpenRouter/OpenAI/Gemini fallback) has no real
-  // web-search grounding, so any AI-authored citation would be fabricated.
-  // Real sources stay human-added via the claim edit form.
-  factCheck: FactCheckSchema.optional().describe(
-    "A preliminary fact-check verdict, used to auto-review low-risk claims and pre-fill medium-risk review",
-  ),
-});
-
-const ClaimsOutputSchema = z.object({
-  claims: z.array(ClaimSchema).max(10),
-});
-
-export type ExtractedClaim = z.infer<typeof ClaimSchema>;
+/**
+ * `category` is validated at runtime against each site's own
+ * `claimCategories` list (see AiPipelineOptions) rather than a hardcoded
+ * enum — sites don't share a claim taxonomy (e.g. menhealth's
+ * NUTRITION/HORMONES/... vs. hype-check's PERFORMANCE/INCOME/...). Typed as
+ * `string` here since the literal union isn't known until a site supplies
+ * it; callers narrow to their own Prisma `ClaimCategory` type at the point
+ * they persist it, since the runtime value is already validated by then.
+ */
+export type ExtractedClaim = {
+  text: string;
+  category: string;
+  riskLevel: "LOW" | "MEDIUM" | "HIGH";
+  explanation?: string;
+  factCheck?: FactCheckResult;
+};
 
 export type ClaimExtractionInput = {
   title: string;
@@ -146,31 +158,57 @@ export type FaqGenerationInput = {
 };
 
 /**
- * Binds the 5 AI content-generation functions to this site's AI client and
- * brand name, so callers keep calling `summarizeVideo(input)` etc. exactly
- * as before (see apps/menhealth/lib/ai/pipeline.ts).
- *
- * Note: prompt wording below still references men's-health domain examples
- * (TRT, hormones, testosterone, "men aged 30–55") the same way
- * lib/seo/topic-content.ts and lib/seo/glossary.ts do — a new site in a
- * different topic vertical should review and adjust this wording, not just
- * the siteName.
+ * Binds the 5 AI content-generation functions to this site's AI client,
+ * brand name, domain/audience description, and claim taxonomy, so callers
+ * keep calling `summarizeVideo(input)` etc. exactly as before (see
+ * apps/menhealth/lib/ai/pipeline.ts). A new site in a different topic
+ * vertical still needs its own Prisma `ClaimCategory` enum and admin claim
+ * editor to match whatever `claimCategories` it passes here — this package
+ * only handles the AI-facing side of that taxonomy.
  */
 export function createAiPipeline(client: AiClient, options: AiPipelineOptions) {
-  const { siteName } = options;
+  const {
+    siteName,
+    domainDescription,
+    audienceDescription,
+    claimCategories,
+    claimTypeLabel,
+    riskLevelGuide,
+  } = options;
+
+  const ClaimSchema = z.object({
+    text: z.string().min(1).describe(`The ${claimTypeLabel} extracted from the video`),
+    category: z.enum(claimCategories),
+    riskLevel: z.enum(["LOW", "MEDIUM", "HIGH"]),
+    explanation: z
+      .string()
+      .optional()
+      .describe("Brief explanation of why this claim matters or is notable"),
+    // Deliberately no "sources"/citations field: the AI provider chain actually
+    // reached at runtime (Groq/OpenRouter/OpenAI/Gemini fallback) has no real
+    // web-search grounding, so any AI-authored citation would be fabricated.
+    // Real sources stay human-added via the claim edit form.
+    factCheck: FactCheckSchema.optional().describe(
+      "A preliminary fact-check verdict, used to auto-review low-risk claims and pre-fill medium-risk review",
+    ),
+  });
+
+  const ClaimsOutputSchema = z.object({
+    claims: z.array(ClaimSchema).max(10),
+  });
 
   async function summarizeVideo(
     input: SummaryInput,
   ): Promise<Result<SummaryOutput>> {
-    const prompt = `You are an editorial analyst for ${siteName}, a men's health content curation platform.
+    const prompt = `You are an editorial analyst for ${siteName}, ${domainDescription}.
 
 Analyze the following YouTube video metadata and produce a structured editorial summary.
 
 IMPORTANT RULES:
-- Do not present any content as medical advice.
+- Do not present any content as professional advice.
 - Be skeptical of extraordinary claims.
 - Use neutral, evidence-aware language.
-- If the video makes high-risk health claims (TRT, medications, supplements for conditions), note this in redFlags.
+- If the video makes high-risk ${claimTypeLabel}, note this in redFlags.
 
 Video metadata:
 Title: ${input.title}
@@ -236,19 +274,17 @@ Respond ONLY with the JSON object. No markdown, no explanation.`;
   async function extractClaims(
     input: ClaimExtractionInput,
   ): Promise<Result<ExtractedClaim[]>> {
-    const prompt = `You are a health claims analyst for ${siteName}.
+    const prompt = `You are a ${claimTypeLabel} analyst for ${siteName}.
 
-Extract factual health claims from the following video content. Focus on claims that are:
-- Specific and verifiable (e.g. "X increases testosterone by Y%")
-- Health-relevant (not general lifestyle advice)
+Extract factual ${claimTypeLabel} from the following video content. Focus on claims that are:
+- Specific and verifiable (e.g. "X increases returns by Y%")
+- Relevant to this site's subject matter (not general commentary)
 - Either well-supported or potentially misleading
 
 Risk level guide:
-- HIGH: Claims about medications, TRT, hormones, sexual health, mental health treatment, cancer, supplements as cures
-- MEDIUM: Diet claims, specific supplement dosages, training frequency claims with quantified outcomes
-- LOW: General lifestyle advice, widely accepted recommendations
+${riskLevelGuide}
 
-For each claim, also provide a preliminary fact-check verdict ("factCheck") based on general medical/scientific consensus you're aware of — evidenceStatus (SUPPORTED/MIXED/WEAK/UNSUPPORTED) plus a one-sentence rationale. Omit "factCheck" entirely if you're not confident enough to give a verdict. Do not include citations or source URLs — state only the verdict and rationale.
+For each claim, also provide a preliminary fact-check verdict ("factCheck") based on general consensus you're aware of — evidenceStatus (SUPPORTED/MIXED/WEAK/UNSUPPORTED) plus a one-sentence rationale. Omit "factCheck" entirely if you're not confident enough to give a verdict. Do not include citations or source URLs — state only the verdict and rationale.
 
 Video content:
 Title: ${input.title}
@@ -260,7 +296,7 @@ Respond with a JSON object:
   "claims": [
     {
       "text": "string",
-      "category": "NUTRITION|EXERCISE|HORMONES|MENTAL_HEALTH|SUPPLEMENTS|MEDICATIONS|CANCER|LONGEVITY|SEXUAL_HEALTH|OTHER",
+      "category": "${claimCategories.join("|")}",
       "riskLevel": "LOW|MEDIUM|HIGH",
       "explanation": "string (optional)",
       "factCheck": {
@@ -271,7 +307,7 @@ Respond with a JSON object:
   ]
 }
 
-Extract 0–10 claims. If there are no notable health claims, return an empty array.
+Extract 0–10 claims. If there are no notable claims, return an empty array.
 Respond ONLY with the JSON object.`;
 
     try {
@@ -324,9 +360,9 @@ Respond ONLY with the JSON object.`;
   async function factCheckClaim(
     input: FactCheckClaimInput,
   ): Promise<Result<FactCheckResult>> {
-    const prompt = `You are a health claims fact-checker for ${siteName}.
+    const prompt = `You are a ${claimTypeLabel} fact-checker for ${siteName}.
 
-Evaluate the following health claim against general medical/scientific consensus and give a fact-check verdict.
+Evaluate the following claim against general consensus and give a fact-check verdict.
 
 Claim: ${input.text}
 Category: ${input.category}
@@ -384,7 +420,7 @@ Respond ONLY with the JSON object.`;
   async function generateEditorialTitle(
     input: EditorialTitleInput,
   ): Promise<Result<string>> {
-    const prompt = `You are an SEO editor for ${siteName}, a men's health video review site.
+    const prompt = `You are an SEO editor for ${siteName}, ${domainDescription}.
 
 The video below was reviewed. Its raw YouTube title is often clickbait or doesn't match how people actually search. Write a clear, editorial title for our review page that:
 - Describes what the video claims or covers, in plain search-friendly language
@@ -452,7 +488,7 @@ Respond ONLY with the JSON object. No markdown, no explanation.`;
             .join("\n")
         : "No videos available yet.";
 
-    const prompt = `You are an editorial analyst for ${siteName}, a men's health content curation platform.
+    const prompt = `You are an editorial analyst for ${siteName}, ${domainDescription}.
 
 Generate an SEO-optimised intro paragraph and 3–5 Frequently Asked Questions for the topic: "${input.topicName}".
 
@@ -462,7 +498,7 @@ Recent published videos on this topic:
 ${videoContext}
 
 RULES:
-- Write for men aged 30–55 who are health-conscious but not medical professionals.
+- Write for ${audienceDescription}.
 - Do NOT present content as medical advice. Use neutral, evidence-aware language.
 - Questions must be things people actually search for.
 - Answers must be factual, concise (2–4 sentences), and reference established evidence where possible.

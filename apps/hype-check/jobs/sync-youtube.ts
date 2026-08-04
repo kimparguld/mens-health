@@ -1,0 +1,205 @@
+import { db } from "@/lib/db/prisma";
+import { searchAndEnrichVideos } from "@/lib/youtube/client";
+import { scoreVideo, detectsClickbait } from "@/lib/youtube/scoring";
+import { TOPIC_SEEDS } from "@/lib/youtube/topics";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function cleanTitle(raw: string): string {
+  return (
+    raw
+      // Decode numeric HTML entities (&#39; &#x27; etc.)
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) =>
+        String.fromCharCode(parseInt(hex, 16)),
+      )
+      .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+      // Decode common named HTML entities
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, '"')
+      .replace(/&apos;/gi, "'")
+      .replace(/&lt;/gi, "<")
+      .replace(/&gt;/gi, ">")
+      // Strip leading Markdown heading markers (# Title, ## Title, etc.)
+      .replace(/^#{1,6}\s+/, "")
+      .trim()
+  );
+}
+
+function generateSlug(title: string, videoId: string): string {
+  const base = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .slice(0, 60)
+    .replace(/-+$/, "");
+  return `${base}-${videoId}`;
+}
+
+// ---------------------------------------------------------------------------
+// Main sync function
+// ---------------------------------------------------------------------------
+
+export async function syncYouTubeVideos(): Promise<{
+  processed: number;
+  skipped: number;
+  errors: number;
+}> {
+  let processed = 0;
+  let skipped = 0;
+  let errors = 0;
+
+  for (const topic of TOPIC_SEEDS) {
+    try {
+      // Upsert topic
+      const dbTopic = await db.topic.upsert({
+        where: { slug: topic.slug },
+        create: {
+          slug: topic.slug,
+          name: topic.name,
+          description: topic.description,
+          isHighRisk: topic.isHighRisk,
+        },
+        update: {
+          name: topic.name,
+          description: topic.description,
+          isHighRisk: topic.isHighRisk,
+        },
+      });
+
+      const videos = await searchAndEnrichVideos(topic.query, 20);
+
+      for (const video of videos) {
+        const cleanedTitle = cleanTitle(video.title);
+        const existing = await db.sourceVideo.findUnique({
+          where: { youtubeVideoId: video.videoId },
+        });
+        if (existing) {
+          // Update view count and scores for existing videos
+          const scores = scoreVideo(
+            {
+              viewCount: video.viewCount,
+              likeCount: video.likeCount,
+              commentCount: video.commentCount,
+              publishedAt: video.publishedAt,
+              channelTrustScore: 0.5,
+              titleRelevance: 0.7,
+              topicMatch: 0.8,
+              containsHighRiskClaims: topic.isHighRisk,
+            },
+            cleanedTitle,
+          );
+          await db.sourceVideo.update({
+            where: { id: existing.id },
+            data: {
+              viewCount: video.viewCount,
+              likeCount: video.likeCount,
+              commentCount: video.commentCount,
+            },
+          });
+          await db.subject.update({
+            where: { id: existing.subjectId },
+            data: {
+              viewCount: video.viewCount,
+              likeCount: video.likeCount,
+              commentCount: video.commentCount,
+              trendScore: scores.trendScore,
+              relevanceScore: scores.relevanceScore,
+            },
+          });
+          skipped++;
+          continue;
+        }
+
+        // Upsert channel
+        const channel = await db.channel.upsert({
+          where: { youtubeId: video.channelId },
+          create: {
+            youtubeId: video.channelId,
+            title: video.channelTitle,
+          },
+          update: { title: video.channelTitle },
+        });
+
+        const scores = scoreVideo(
+          {
+            viewCount: video.viewCount,
+            likeCount: video.likeCount,
+            commentCount: video.commentCount,
+            publishedAt: video.publishedAt,
+            channelTrustScore: channel.trustScore,
+            titleRelevance: 0.7,
+            topicMatch: 0.8,
+            containsHighRiskClaims: topic.isHighRisk,
+          },
+          cleanedTitle,
+        );
+
+        const isClickbait = detectsClickbait(cleanedTitle);
+        const riskLevel =
+          topic.isHighRisk || isClickbait
+            ? ("HIGH" as const)
+            : ("LOW" as const);
+
+        const subject = await db.subject.create({
+          data: {
+            slug: generateSlug(cleanedTitle, video.videoId),
+            name: cleanedTitle,
+            // No AI classification step exists yet for subject type — every
+            // freshly-ingested subject starts as OTHER until a future
+            // pipeline step (or admin edit) narrows it down.
+            subjectType: "OTHER",
+            channelId: channel.id,
+            youtubeVideoId: video.videoId,
+            publishedAt: video.publishedAt,
+            thumbnailUrl: video.thumbnailUrl,
+            durationSeconds: video.durationSeconds,
+            viewCount: video.viewCount,
+            likeCount: video.likeCount,
+            commentCount: video.commentCount,
+            trendScore: scores.trendScore,
+            relevanceScore: scores.relevanceScore,
+            riskLevel,
+            status: "DRAFT",
+            sourceVideos: {
+              create: {
+                youtubeVideoId: video.videoId,
+                title: cleanedTitle,
+                description: video.description,
+                channelId: channel.id,
+                publishedAt: video.publishedAt,
+                thumbnailUrl: video.thumbnailUrl,
+                durationSeconds: video.durationSeconds,
+                viewCount: video.viewCount,
+                likeCount: video.likeCount,
+                commentCount: video.commentCount,
+              },
+            },
+            topics: {
+              create: { topicId: dbTopic.id },
+            },
+          },
+          include: { sourceVideos: true },
+        });
+
+        // Queue for AI processing. Non-null: we just created exactly one
+        // sourceVideo via the nested `create` above.
+        const sourceVideo = subject.sourceVideos[0]!;
+        await db.processingJob.upsert({
+          where: { sourceVideoId: sourceVideo.id },
+          create: { sourceVideoId: sourceVideo.id, status: "QUEUED" },
+          update: {},
+        });
+
+        processed++;
+      }
+    } catch (error) {
+      console.error(`Error syncing topic "${topic.slug}":`, error);
+      errors++;
+    }
+  }
+
+  return { processed, skipped, errors };
+}

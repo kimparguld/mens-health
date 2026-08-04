@@ -152,7 +152,7 @@ describe("buildDigestHtml", () => {
 
   it("includes the health disclaimer", () => {
     const html = buildDigestHtml([makeVideo()], APP_URL, UNSUB_URL);
-    expect(html.toLowerCase()).toContain("health disclaimer");
+    expect(html.toLowerCase()).toContain("disclaimer");
     expect(html).toContain("does not constitute medical advice");
   });
 
