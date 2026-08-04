@@ -783,8 +783,10 @@ Replace every remaining occurrence of these raw classes in the file with their t
 | `text-gray-500` | `text-ink-muted/60` |
 | `text-gray-400` | `text-ink-muted/50` |
 | `border-gray-200` | `border-hairline` |
-| `bg-gray-50` | `bg-surface` |
+| `bg-gray-50` | `bg-paper` |
 | `text-amber-500` | `text-verdict-risky` |
+
+(`bg-paper`, not `bg-surface` — same `--color-surface` token bug noted under Task 4. The embeddable-badge `<textarea>` uses `bg-gray-50` with `text-gray-600` today; keep it on a token pairing that stays legible, e.g. `bg-paper` with `text-ink-muted/60` — not `text-ink-muted/70` on `bg-surface`, which resolves to identical colors and renders invisible text.)
 
 This covers: the "Summary" / "Key Takeaways" / "What to Be Careful About" headings and body text, the claims card border/text, the "Topics" / "Key terms" / "Related reviews" headings, the embeddable-badge section, and the affiliate links section. The `⚠` warning icon (`text-amber-500` → `text-verdict-risky`) is the one non-heading, non-border replacement in this pass.
 
