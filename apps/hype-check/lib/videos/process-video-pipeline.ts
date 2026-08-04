@@ -9,6 +9,12 @@ import { summarizeVideo } from "@/lib/ai/summarize-video";
 import { extractClaims } from "@/lib/ai/extract-claims";
 import { classifyDeterministicRisk } from "@/lib/ai/claim-risk";
 import type { Result } from "@/lib/ai/summarize-video";
+import { extractWarningsCostsDisclosures } from "@/lib/ai/extract-warnings-costs-disclosures";
+import type {
+  WarningSignOutput,
+  CostItemOutput,
+  DisclosureOutput,
+} from "@/lib/ai/extract-warnings-costs-disclosures";
 
 export function generateClaimSlug(text: string, id: string): string {
   const base = text
@@ -33,9 +39,19 @@ export type PipelineVideoInput = {
 export type GenerateSummaryAndClaimsResult = {
   summary: Summary;
   claims: Claim[];
+  warningSigns: WarningSignOutput[];
+  costItems: CostItemOutput[];
+  disclosures: DisclosureOutput[];
 };
 
 const RISK_RANK: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
+
+export function highestRiskLevel(levels: RiskLevel[]): RiskLevel {
+  return levels.reduce<RiskLevel>(
+    (max, level) => (RISK_RANK[level] > RISK_RANK[max] ? level : max),
+    "LOW",
+  );
+}
 
 // Generates the AI summary and extracted claims for a video, persists both,
 // and escalates the video's riskLevel to match the highest deterministic
@@ -129,12 +145,78 @@ export async function generateSummaryAndClaims(
     claims.push(withSlug);
   }
 
-  if (RISK_RANK[highestClaimRisk] > RISK_RANK[video.riskLevel]) {
+  // Warning signs, cost items, and disclosures — same AI-extraction +
+  // human-review pattern as claims above. A HIGH-severity warning sign
+  // escalates the subject's risk level exactly like a HIGH claim does,
+  // which keeps it behind the same admin-approval gate
+  // (isEligibleForAutoPublish) rather than needing separate gating logic.
+  let warningSigns: WarningSignOutput[] = [];
+  let costItems: CostItemOutput[] = [];
+  let disclosures: DisclosureOutput[] = [];
+
+  const extractionResult = await extractWarningsCostsDisclosures({
+    title: video.title,
+    description: video.description ?? "",
+    shortSummary: summary.shortSummary,
+  });
+
+  if (extractionResult.ok) {
+    ({ warningSigns, costItems, disclosures } = extractionResult.value);
+
+    if (warningSigns.length > 0) {
+      await db.warningSign.createMany({
+        data: warningSigns.map((w) => ({
+          subjectId: video.subjectId,
+          text: w.text,
+          severity: w.severity,
+          source: "ai-extraction",
+        })),
+      });
+    }
+    if (costItems.length > 0) {
+      await db.costItem.createMany({
+        data: costItems.map((c) => ({
+          subjectId: video.subjectId,
+          label: c.label,
+          amount: c.amount,
+          isHidden: c.isHidden,
+          notes: c.notes ?? null,
+        })),
+      });
+    }
+    if (disclosures.length > 0) {
+      await db.disclosure.createMany({
+        data: disclosures.map((d) => ({
+          subjectId: video.subjectId,
+          text: d.text,
+          detected: d.detected,
+          source: "ai-extraction",
+        })),
+      });
+    }
+  } else {
+    console.warn(
+      `Warning/cost/disclosure extraction failed for video ${video.sourceVideoId}: ${extractionResult.error.message}`,
+    );
+  }
+
+  const highestWarningSeverity = highestRiskLevel(
+    warningSigns.map((w) => w.severity),
+  );
+  const highestOverallRisk = highestRiskLevel([
+    highestClaimRisk,
+    highestWarningSeverity,
+  ]);
+
+  if (RISK_RANK[highestOverallRisk] > RISK_RANK[video.riskLevel]) {
     await db.subject.update({
       where: { id: video.subjectId },
-      data: { riskLevel: highestClaimRisk },
+      data: { riskLevel: highestOverallRisk },
     });
   }
 
-  return { ok: true, value: { summary, claims } };
+  return {
+    ok: true,
+    value: { summary, claims, warningSigns, costItems, disclosures },
+  };
 }
