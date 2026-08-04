@@ -3,9 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import GenerateSocialButton from './GenerateSocialButton';
 import GenerateSummaryButton from './GenerateSummaryButton';
+import GenerateWarningsButton from './GenerateWarningsButton';
 import ReviewActions from './ReviewActions';
 import ReviewerForm from './ReviewerForm';
 import VerdictPanel from './VerdictPanel';
+import { WarningSignsEditor } from './WarningSignsEditor';
+import { CostItemsEditor } from './CostItemsEditor';
+import { DisclosuresEditor } from './DisclosuresEditor';
 
 const riskColors: Record<string, string> = {
   LOW: 'bg-green-100 text-green-700',
@@ -38,6 +42,9 @@ export default async function AdminVideoDetailPage({
         include: { summaries: { orderBy: { createdAt: 'desc' }, take: 1 } },
       },
       claims: { orderBy: { riskLevel: 'desc' } },
+      warningSigns: true,
+      costItems: true,
+      disclosures: true,
       adminReviews: { orderBy: { createdAt: 'desc' }, take: 5 },
       topics: { include: { topic: true } },
       verdict: true,
@@ -214,6 +221,37 @@ export default async function AdminVideoDetailPage({
               </div>
             </section>
           )}
+
+          {/* Warning signs, costs & disclosures */}
+          <section className="rounded-lg border bg-white p-5">
+            <h2 className="mb-4 font-semibold text-gray-900">
+              Warning signs, costs &amp; disclosures
+            </h2>
+            {subject.warningSigns.length === 0 &&
+              subject.costItems.length === 0 &&
+              subject.disclosures.length === 0 && (
+                <div className="mb-4">
+                  <p className="mb-3 text-sm text-gray-500">
+                    Nothing generated yet for this video.
+                  </p>
+                  <GenerateWarningsButton videoId={subject.id} />
+                </div>
+              )}
+            <div className="space-y-6">
+              <WarningSignsEditor
+                subjectId={subject.id}
+                initialItems={subject.warningSigns}
+              />
+              <CostItemsEditor
+                subjectId={subject.id}
+                initialItems={subject.costItems}
+              />
+              <DisclosuresEditor
+                subjectId={subject.id}
+                initialItems={subject.disclosures}
+              />
+            </div>
+          </section>
         </div>
 
         {/* Sidebar — right col */}
