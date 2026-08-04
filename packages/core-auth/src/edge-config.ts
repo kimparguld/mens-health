@@ -9,6 +9,8 @@ export type EdgeAuthConfigOptions = {
   googleClientSecret?: string;
   signInPage?: string;
   errorPage?: string;
+  /** See AuthConfigOptions.cookiePrefix in node-config.ts — must match it. */
+  cookiePrefix: string;
 };
 
 /**
@@ -27,6 +29,9 @@ export function createEdgeAuthConfig(
   return {
     session: { strategy: "jwt" },
     secret: opts.nextAuthSecret,
+    cookies: {
+      sessionToken: { name: `${opts.cookiePrefix}.session-token` },
+    },
     providers: [
       Google({
         clientId: opts.googleClientId ?? "",

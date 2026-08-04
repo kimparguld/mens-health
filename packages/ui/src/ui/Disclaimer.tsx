@@ -3,10 +3,11 @@
 import { Suspense, useState } from 'react';
 
 type Props = {
+  text: string;
   className?: string;
 };
 
-function _Disclaimer({ className }: Props) {
+function _Disclaimer({ text, className }: Props) {
   const [visible, setVisible] = useState<boolean>(true);
   return (
     visible && (
@@ -14,11 +15,7 @@ function _Disclaimer({ className }: Props) {
         className={`rounded-lg border border-amber-200 bg-amber-50 px-4 flex py-3 text-sm text-amber-900${className ? ` ${className}` : ''}`}
         role="alert"
       >
-        <p>
-          <strong>Educational content only.</strong> This page summarizes publicly available video content for
-          informational purposes. It is not medical advice. Always speak with a licensed healthcare professional before
-          making any medical decisions.
-        </p>
+        <p>{text}</p>
         <button
           onClick={() => setVisible(false)}
           aria-label="Dismiss disclaimer"
@@ -31,10 +28,10 @@ function _Disclaimer({ className }: Props) {
   );
 }
 
-export function Disclaimer({ className }: Props) {
+export function Disclaimer({ text, className }: Props) {
   return (
     <Suspense fallback={null}>
-      <_Disclaimer className={className} />
+      <_Disclaimer text={text} className={className} />
     </Suspense>
   );
 }

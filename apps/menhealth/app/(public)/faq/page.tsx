@@ -5,6 +5,7 @@ import { getAllTopicSeo } from "@/lib/seo/topic-faq";
 import { JsonLd, Disclaimer } from "@menhealth/ui";
 import { buildBreadcrumbSchema, buildFaqSchema } from "@menhealth/core-seo";
 import type { FaqEntry } from "@menhealth/core-seo";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
@@ -108,7 +109,7 @@ export default function FaqPage() {
         </section>
       ))}
 
-      <Disclaimer />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
     </main>
   );
 }

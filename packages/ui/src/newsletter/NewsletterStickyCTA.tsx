@@ -8,7 +8,11 @@ import { NewsletterSignupForm } from "../ui/NewsletterSignupForm";
 const SCROLL_DEPTH_THRESHOLD = 0.4;
 const DISMISS_STORAGE_KEY = "newsletter-sticky-dismissed";
 
-export function NewsletterStickyCTA() {
+type Props = {
+  label: string;
+};
+
+export function NewsletterStickyCTA({ label }: Props) {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(
     () =>
@@ -47,7 +51,7 @@ export function NewsletterStickyCTA() {
       <div className="mx-auto flex max-w-md items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold text-emerald-900">
-            Free weekly men&apos;s health digest
+            {label}
           </p>
           <div className="mt-1">
             <NewsletterSignupForm compact />

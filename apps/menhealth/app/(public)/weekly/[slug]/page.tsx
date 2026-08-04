@@ -5,6 +5,7 @@ import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { getTopicBySlug, getWeeklyRankingVideos } from "@/lib/db/queries";
 import { createMetadata } from "@/lib/seo/site-metadata";
 import { VideoCard, Disclaimer, EvidenceBadge, NewsletterInlineCTA, Breadcrumbs, JsonLd } from "@menhealth/ui";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { buildBreadcrumbSchema } from "@menhealth/core-seo";
 import { db } from "@/lib/db/prisma";
 
@@ -325,6 +326,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
         <div className="mt-10">
           <NewsletterInlineCTA
             headline={`Get next week's best ${seed.name.toLowerCase()} videos in your inbox`}
+            description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
           />
         </div>
 
@@ -345,7 +347,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
           </div>
         </nav>
 
-        <Disclaimer className="mt-10" />
+        <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} className="mt-10" />
       </main>
     </>
   );

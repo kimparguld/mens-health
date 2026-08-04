@@ -4,6 +4,7 @@ import { GLOSSARY_TERMS } from "@/lib/seo/glossary";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { JsonLd, Disclaimer } from "@menhealth/ui";
 import { buildBreadcrumbSchema, buildDefinedTermSetSchema } from "@menhealth/core-seo";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
@@ -100,7 +101,7 @@ export default function GlossaryPage() {
         </div>
       </section>
 
-      <Disclaimer />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
     </main>
   );
 }

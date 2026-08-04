@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { YouTubePlayer, AdSlot, Disclaimer, AffiliateDisclosure, SponsorBlock, EvidenceBadge, RiskBadge, NewsletterInlineCTA, NewsletterFooterCTA, NewsletterStickyCTA, JsonLd } from "@menhealth/ui";
 import { PremiumSection } from "./PremiumSection";
 import { adsConfig } from "@/lib/ads-config";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import {
   buildVideoObjectSchema,
   buildBreadcrumbSchema,
@@ -321,7 +322,10 @@ export default async function VideoPage({ params }: { params: Params }) {
         </>
       )}
 
-      <NewsletterInlineCTA headline="Enjoying this breakdown? Get one every week." />
+      <NewsletterInlineCTA
+        headline="Enjoying this breakdown? Get one every week."
+        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
+      />
 
       <AdSlot slot="between-content" className="mb-8" config={adsConfig} />
 
@@ -503,8 +507,8 @@ export default async function VideoPage({ params }: { params: Params }) {
       </div>
 
       {/* Disclaimer — required on every video page */}
-      <Disclaimer />
-      <NewsletterStickyCTA />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
+      <NewsletterStickyCTA label="Free weekly men's health digest" />
     </main>
   );
 }

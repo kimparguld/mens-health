@@ -5,6 +5,7 @@ import { GLOSSARY_TERMS, getGlossaryTerm } from "@/lib/seo/glossary";
 import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import { JsonLd, Disclaimer, RiskBadge } from "@menhealth/ui";
 import { buildBreadcrumbSchema, buildDefinedTermSchema } from "@menhealth/core-seo";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
 
@@ -145,7 +146,7 @@ export default async function GlossaryTermPage({
         </Link>
       </section>
 
-      <Disclaimer />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
     </main>
   );
 }

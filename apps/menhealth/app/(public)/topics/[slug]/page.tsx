@@ -1,4 +1,5 @@
 import { AdSlot, SponsorBlock, NewsletterFooterCTA, NewsletterInlineCTA, NewsletterStickyCTA, JsonLd, AffiliateDisclosure, Disclaimer, EvidenceBadge, RiskBadge, VideoCard } from "@menhealth/ui";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { adsConfig } from '@/lib/ads-config';
 import { RelatedTopics } from '@/components/topic/RelatedTopics';
 import { db } from '@/lib/db/prisma';
@@ -272,6 +273,7 @@ export default async function TopicPage({
 
       <NewsletterInlineCTA
         headline={`Get the weekly ${topicSeed.name} digest`}
+        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
       />
 
       <AdSlot slot="between-content" className="mb-10" config={adsConfig} />
@@ -529,8 +531,8 @@ export default async function TopicPage({
         />
       </div>
 
-      <Disclaimer />
-      <NewsletterStickyCTA />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
+      <NewsletterStickyCTA label="Free weekly men's health digest" />
     </main>
   );
 }

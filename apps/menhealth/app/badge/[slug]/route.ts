@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/prisma";
+import { siteConfig } from "@/site.config";
 import { buildBadgeSvg, evidenceLabelAndColor } from "@menhealth/core-seo";
 
 export const revalidate = 3600;
@@ -21,7 +22,7 @@ export async function GET(
   }
 
   const { label, color } = evidenceLabelAndColor(video.evidenceScore);
-  const svg = buildBadgeSvg({ evidenceLabel: label, color });
+  const svg = buildBadgeSvg({ siteName: siteConfig.name, evidenceLabel: label, color });
 
   return new Response(svg, {
     headers: {

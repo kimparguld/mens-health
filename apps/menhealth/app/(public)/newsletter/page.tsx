@@ -1,5 +1,6 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
 import { Disclaimer, NewsletterSignupForm } from '@menhealth/ui';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -308,7 +309,7 @@ export default function NewsletterPage() {
         </div>
       </section>
 
-      <Disclaimer className="mt-10" />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} className="mt-10" />
     </main>
   );
 }
