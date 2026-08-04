@@ -1,4 +1,5 @@
 import { NewsletterFooterCTA, JsonLd, Disclaimer, VideoCard } from "@menhealth/ui";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
 import { buildBreadcrumbSchema, buildItemListSchema } from '@menhealth/core-seo';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
@@ -266,7 +267,7 @@ export default async function WeeklyRankingPage({
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">
-          <Disclaimer />
+          <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
         </div>
       </main>
     </>

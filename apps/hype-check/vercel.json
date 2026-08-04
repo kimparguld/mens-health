@@ -1,0 +1,32 @@
+{
+  "crons": [
+    {
+      "path": "/api/youtube/sync",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/ai/process-video",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/seo/refresh-faqs",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/newsletter/send-digest",
+      "schedule": "0 10 * * 4"
+    },
+    {
+      "path": "/api/cron/deactivate-sponsors",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/publish-scheduled-social",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/generate-monthly-report",
+      "schedule": "0 9 1 * *"
+    }
+  ]
+}

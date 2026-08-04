@@ -3,6 +3,7 @@ import { createMetadata, createCanonicalUrl } from "@/lib/seo/site-metadata";
 import { db } from "@/lib/db/prisma";
 import { EvidenceBadge, Disclaimer, JsonLd } from "@menhealth/ui";
 import { buildItemListSchema } from "@menhealth/core-seo";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +55,7 @@ export default async function ClaimsIndexPage() {
         evidence quality.
       </p>
 
-      <Disclaimer />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
 
       <ul className="mt-8 divide-y divide-gray-100">
         {claims.length === 0 && (

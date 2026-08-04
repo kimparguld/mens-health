@@ -4,6 +4,7 @@ import Link from "next/link";
 import { db } from "@/lib/db/prisma";
 import { AdSlot, EvidenceBadge, RiskBadge, Disclaimer, NewsletterFooterCTA, JsonLd } from "@menhealth/ui";
 import { adsConfig } from "@/lib/ads-config";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { buildBreadcrumbSchema } from "@menhealth/core-seo";
 
 export const dynamic = "force-dynamic";
@@ -236,7 +237,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
         </div>
 
         <div className="mt-10">
-          <Disclaimer />
+          <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
         </div>
       </main>
     </>

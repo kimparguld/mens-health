@@ -1,4 +1,5 @@
 import { NewsletterFooterCTA, JsonLd, Disclaimer, EvidenceBadge, VideoCard } from "@menhealth/ui";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { db } from '@/lib/db/prisma';
 import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
@@ -428,7 +429,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">
-          <Disclaimer />
+          <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
         </div>
       </main>
     </>
