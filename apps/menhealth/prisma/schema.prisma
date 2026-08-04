@@ -123,6 +123,20 @@ model Topic {
   videos VideoTopic[]
 }
 
+model TopicSuggestion {
+  id                  String           @id @default(cuid())
+  slug                String           @unique
+  name                String
+  query               String
+  description         String
+  suggestedIsHighRisk Boolean          @default(false)
+  popularityScore     Int
+  evidence            Json
+  status              SuggestionStatus @default(PENDING)
+  createdAt           DateTime         @default(now())
+  reviewedAt          DateTime?
+}
+
 model VideoTopic {
   videoId String
   topicId String
@@ -306,6 +320,12 @@ enum RiskLevel {
   LOW
   MEDIUM
   HIGH
+}
+
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum PublishStatus {
