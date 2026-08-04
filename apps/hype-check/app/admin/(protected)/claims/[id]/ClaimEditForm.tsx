@@ -1,27 +1,23 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 type EvidenceStatus =
-  | "NOT_CHECKED"
-  | "SUPPORTED"
-  | "MIXED"
-  | "WEAK"
-  | "UNSUPPORTED";
-type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
+  'NOT_CHECKED' | 'SUPPORTED' | 'MIXED' | 'WEAK' | 'UNSUPPORTED';
+type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 type ClaimCategory =
-  | "PERFORMANCE"
-  | "INCOME"
-  | "SAFETY"
-  | "PRICING"
-  | "LEGITIMACY"
-  | "REGULATION"
-  | "POPULARITY"
-  | "GUARANTEE"
-  | "ENDORSEMENT"
-  | "SCARCITY"
-  | "OTHER";
+  | 'PERFORMANCE'
+  | 'INCOME'
+  | 'SAFETY'
+  | 'PRICING'
+  | 'LEGITIMACY'
+  | 'REGULATION'
+  | 'POPULARITY'
+  | 'GUARANTEE'
+  | 'ENDORSEMENT'
+  | 'SCARCITY'
+  | 'OTHER';
 
 type Source = {
   id?: string;
@@ -33,29 +29,29 @@ type Source = {
 };
 
 const EVIDENCE_OPTIONS: EvidenceStatus[] = [
-  "NOT_CHECKED",
-  "SUPPORTED",
-  "MIXED",
-  "WEAK",
-  "UNSUPPORTED",
+  'NOT_CHECKED',
+  'SUPPORTED',
+  'MIXED',
+  'WEAK',
+  'UNSUPPORTED',
 ];
-const RISK_OPTIONS: RiskLevel[] = ["LOW", "MEDIUM", "HIGH"];
+const RISK_OPTIONS: RiskLevel[] = ['LOW', 'MEDIUM', 'HIGH'];
 const CATEGORY_OPTIONS: ClaimCategory[] = [
-  "PERFORMANCE",
-  "INCOME",
-  "SAFETY",
-  "PRICING",
-  "LEGITIMACY",
-  "REGULATION",
-  "POPULARITY",
-  "GUARANTEE",
-  "ENDORSEMENT",
-  "SCARCITY",
-  "OTHER",
+  'PERFORMANCE',
+  'INCOME',
+  'SAFETY',
+  'PRICING',
+  'LEGITIMACY',
+  'REGULATION',
+  'POPULARITY',
+  'GUARANTEE',
+  'ENDORSEMENT',
+  'SCARCITY',
+  'OTHER',
 ];
 
 function emptySource(): Source {
-  return { title: "", url: "", source: "", year: null, summary: null };
+  return { title: '', url: '', source: '', year: null, summary: null };
 }
 
 export function ClaimEditForm({
@@ -81,7 +77,7 @@ export function ClaimEditForm({
   const [evidenceStatus, setEvidenceStatus] = useState(initialEvidenceStatus);
   const [riskLevel, setRiskLevel] = useState(initialRiskLevel);
   const [category, setCategory] = useState(initialCategory);
-  const [explanation, setExplanation] = useState(initialExplanation ?? "");
+  const [explanation, setExplanation] = useState(initialExplanation ?? '');
   const [sources, setSources] = useState<Source[]>(initialSources);
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -95,19 +91,19 @@ export function ClaimEditForm({
     try {
       const res = await fetch(
         `/api/admin/claims/${claimId}/confirm-ai-review`,
-        { method: "POST" },
+        { method: 'POST' }
       );
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
-        setError(data?.error ?? "Failed to confirm");
+        setError(data?.error ?? 'Failed to confirm');
         return;
       }
       setConfirmed(true);
       router.refresh();
     } catch {
-      setError("Network error");
+      setError('Network error');
     } finally {
       setConfirming(false);
     }
@@ -115,7 +111,7 @@ export function ClaimEditForm({
 
   function updateSource(index: number, patch: Partial<Source>) {
     setSources((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, ...patch } : s)),
+      prev.map((s, i) => (i === index ? { ...s, ...patch } : s))
     );
   }
 
@@ -129,8 +125,8 @@ export function ClaimEditForm({
     setSaved(false);
     try {
       const res = await fetch(`/api/admin/claims/${claimId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           evidenceStatus,
           riskLevel,
@@ -149,13 +145,13 @@ export function ClaimEditForm({
         const data = (await res.json().catch(() => null)) as {
           error?: string;
         } | null;
-        setError(data?.error ?? "Failed to save");
+        setError(data?.error ?? 'Failed to save');
         return;
       }
       setSaved(true);
       router.refresh();
     } catch {
-      setError("Network error");
+      setError('Network error');
     } finally {
       setSaving(false);
     }
@@ -167,15 +163,15 @@ export function ClaimEditForm({
         <div className="flex items-center justify-between gap-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           <p>
             {autoReviewed
-              ? "AI-reviewed verdict — auto-applied for this low-risk claim. Spot-check and confirm, or edit below."
-              : "AI-suggested verdict — not yet confirmed by a human. Confirm as-is, or edit below."}
+              ? 'AI-reviewed verdict — auto-applied for this low-risk claim. Spot-check and confirm, or edit below.'
+              : 'AI-suggested verdict — not yet confirmed by a human. Confirm as-is, or edit below.'}
           </p>
           <button
             onClick={handleConfirmAsIs}
             disabled={confirming}
             className="shrink-0 rounded-md border border-blue-400 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 disabled:opacity-50"
           >
-            {confirming ? "Confirming…" : "Confirm as-is"}
+            {confirming ? 'Confirming…' : 'Confirm as-is'}
           </button>
         </div>
       )}
@@ -196,14 +192,12 @@ export function ClaimEditForm({
             </label>
             <select
               value={category}
-              onChange={(e) =>
-                setCategory(e.target.value as ClaimCategory)
-              }
+              onChange={(e) => setCategory(e.target.value as ClaimCategory)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
             >
               {CATEGORY_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
-                  {opt.replace("_", " ")}
+                  {opt.replace('_', ' ')}
                 </option>
               ))}
             </select>
@@ -221,7 +215,7 @@ export function ClaimEditForm({
             >
               {EVIDENCE_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
-                  {opt.replace("_", " ")}
+                  {opt.replace('_', ' ')}
                 </option>
               ))}
             </select>
@@ -284,9 +278,7 @@ export function ClaimEditForm({
                     type="text"
                     placeholder="Title"
                     value={s.title}
-                    onChange={(e) =>
-                      updateSource(i, { title: e.target.value })
-                    }
+                    onChange={(e) => updateSource(i, { title: e.target.value })}
                     className="rounded border border-gray-300 px-2 py-1.5 text-sm"
                   />
                   <input
@@ -310,7 +302,7 @@ export function ClaimEditForm({
                   <input
                     type="number"
                     placeholder="Year"
-                    value={s.year ?? ""}
+                    value={s.year ?? ''}
                     onChange={(e) =>
                       updateSource(i, {
                         year: e.target.value ? Number(e.target.value) : null,
@@ -321,7 +313,7 @@ export function ClaimEditForm({
                   <input
                     type="text"
                     placeholder="One-line summary (optional)"
-                    value={s.summary ?? ""}
+                    value={s.summary ?? ''}
                     onChange={(e) =>
                       updateSource(i, { summary: e.target.value || null })
                     }
@@ -354,9 +346,9 @@ export function ClaimEditForm({
       <button
         onClick={handleSave}
         disabled={saving}
-        className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800 disabled:opacity-40"
+        className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
       >
-        {saving ? "Saving…" : "Save review"}
+        {saving ? 'Saving…' : 'Save review'}
       </button>
     </div>
   );

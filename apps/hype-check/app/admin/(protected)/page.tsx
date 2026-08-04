@@ -1,10 +1,10 @@
-import type { Prisma } from "@/app/generated/prisma";
-import Link from "next/link";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import AdminBulkActions from "./AdminBulkActions";
+import type { Prisma } from '@/app/generated/prisma';
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import AdminBulkActions from './AdminBulkActions';
 
-type PublishStatus = "DRAFT" | "REVIEW" | "ARCHIVED" | "PUBLISHED";
+type PublishStatus = 'DRAFT' | 'REVIEW' | 'ARCHIVED' | 'PUBLISHED';
 
 type StatusCounts = Record<string, number>;
 
@@ -14,11 +14,11 @@ type StatusCounts = Record<string, number>;
 // tab split so the two views agree on what "needs review" means.
 const NEEDS_REVIEW_WHERE: Prisma.ClaimWhereInput = {
   OR: [
-    { evidenceStatus: "NOT_CHECKED" },
+    { evidenceStatus: 'NOT_CHECKED' },
     {
       autoReviewed: false,
       humanConfirmedAt: null,
-      evidenceStatus: { not: "NOT_CHECKED" },
+      evidenceStatus: { not: 'NOT_CHECKED' },
     },
   ],
 };
@@ -40,9 +40,9 @@ async function getStats(): Promise<{
     claimsAutoReviewed,
     claimsReviewed,
   ] = await Promise.all([
-    db.subject.groupBy({ by: ["status"], _count: { _all: true } }),
+    db.subject.groupBy({ by: ['status'], _count: { _all: true } }),
     db.processingJob.count({
-      where: { status: { in: ["QUEUED", "RUNNING"] } },
+      where: { status: { in: ['QUEUED', 'RUNNING'] } },
     }),
     db.newsletterSubscriber.count({ where: { unsubscribedAt: null } }),
     db.claim.count({ where: NEEDS_REVIEW_WHERE }),
@@ -75,21 +75,21 @@ export default async function AdminDashboardPage() {
   const statuses: Array<{ label: string; key: PublishStatus; color: string }> =
     [
       {
-        label: "Pending",
-        key: "DRAFT",
-        color: "bg-yellow-100 text-yellow-800",
+        label: 'Pending',
+        key: 'DRAFT',
+        color: 'bg-yellow-100 text-yellow-800',
       },
       {
-        label: "Processed",
-        key: "REVIEW",
-        color: "bg-blue-100 text-blue-800",
+        label: 'Processed',
+        key: 'REVIEW',
+        color: 'bg-blue-100 text-blue-800',
       },
       {
-        label: "Published",
-        key: "PUBLISHED",
-        color: "bg-green-100 text-green-800",
+        label: 'Published',
+        key: 'PUBLISHED',
+        color: 'bg-green-100 text-green-800',
       },
-      { label: "Rejected", key: "ARCHIVED", color: "bg-red-100 text-red-800" },
+      { label: 'Rejected', key: 'ARCHIVED', color: 'bg-red-100 text-red-800' },
     ];
 
   return (
@@ -141,7 +141,7 @@ export default async function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/claims?status=reviewed"
-          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-indigo-300 hover:shadow-md"
+          className="hover:border-ink-muted/30 rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">
             Claims reviewed by a human

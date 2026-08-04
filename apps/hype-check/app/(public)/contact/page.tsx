@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Get in touch with Hype Check.",
+  title: 'Contact',
+  description: 'Get in touch with Hype Check.',
 };
 
 export default function ContactPage() {
@@ -22,10 +22,10 @@ export default function ContactPage() {
             General enquiries
           </h2>
           <p className="text-sm text-gray-600">
-            For anything not listed below, email us at{" "}
+            For anything not listed below, email us at{' '}
             <a
               href="mailto:hello@hype-check.net"
-              className="text-indigo-600 hover:underline"
+              className="text-ink-muted/60 hover:underline"
             >
               hello@hype-check.net
             </a>
@@ -38,13 +38,13 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600">
             Found a factual error in a summary or an incorrect evidence rating?
-            Email{" "}
+            Email{' '}
             <a
               href="mailto:corrections@hype-check.net"
-              className="text-indigo-600 hover:underline"
+              className="text-ink-muted/60 hover:underline"
             >
               corrections@hype-check.net
-            </a>{" "}
+            </a>{' '}
             with the video title and a description of the issue. We aim to
             respond within 3 business days.
           </p>
@@ -56,10 +56,10 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600">
             For advertising, sponsorship, or affiliate programme enquiries,
-            email{" "}
+            email{' '}
             <a
               href="mailto:partnerships@hype-check.net"
-              className="text-indigo-600 hover:underline"
+              className="text-ink-muted/60 hover:underline"
             >
               partnerships@hype-check.net
             </a>
@@ -74,10 +74,10 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600">
             To request deletion of your personal data or exercise any other data
-            rights, email{" "}
+            rights, email{' '}
             <a
               href="mailto:privacy@hype-check.net"
-              className="text-indigo-600 hover:underline"
+              className="text-ink-muted/60 hover:underline"
             >
               privacy@hype-check.net
             </a>

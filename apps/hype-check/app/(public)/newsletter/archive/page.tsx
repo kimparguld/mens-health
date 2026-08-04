@@ -1,19 +1,19 @@
-import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import Link from "next/link";
+import { db } from '@/lib/db/prisma';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: "Newsletter Archive — Hype Check",
+  title: 'Newsletter Archive — Hype Check',
   description:
-    "Past issues of the Hype Check weekly newsletter — trending products, claims checked, and practical takeaways.",
-  path: "/newsletter/archive",
+    'Past issues of the Hype Check weekly newsletter — trending products, claims checked, and practical takeaways.',
+  path: '/newsletter/archive',
 });
 
 export default async function NewsletterArchivePage() {
   const issues = await db.newsletterDigest.findMany({
     where: { slug: { not: null } },
-    orderBy: { sentAt: "desc" },
+    orderBy: { sentAt: 'desc' },
     take: 100,
     select: { slug: true, subject: true, sentAt: true },
   });
@@ -36,7 +36,7 @@ export default async function NewsletterArchivePage() {
           <li key={issue.slug} className="py-4">
             <Link
               href={`/newsletter/${issue.slug}`}
-              className="text-sm font-medium text-blue-600 hover:underline"
+              className="text-ink text-sm font-medium hover:underline"
             >
               {issue.subject}
             </Link>

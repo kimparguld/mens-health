@@ -68,10 +68,10 @@ async function FeaturedInsight() {
   return (
     <section className="bg-surface py-12">
       <div className="mx-auto max-w-[1120px] px-4">
-        <p className="text-ink-muted mb-5 text-sm font-semibold tracking-widest uppercase">
+        <p className="mb-5 text-sm font-semibold tracking-widest text-white/80 uppercase">
           Today&apos;s top insight
         </p>
-        <div className="border-hairline bg-paper rounded-md border p-6 sm:p-8">
+        <div className="border-hairline rounded-md border bg-white p-6 sm:p-8">
           {featuredClaim && (
             <div className="mb-4">
               <p className="text-ink-muted text-xs font-semibold tracking-wide uppercase">
@@ -83,10 +83,10 @@ async function FeaturedInsight() {
             </div>
           )}
           <div className="mb-5">
-            <p className="text-ink-muted text-xs font-semibold tracking-wide uppercase">
+            <p className="text-xs font-semibold tracking-wide text-black uppercase">
               Our take
             </p>
-            <p className="text-ink mt-1 leading-relaxed">
+            <p className="text-ink-muted mt-1 leading-relaxed">
               {featuredSummary.shortSummary}
             </p>
           </div>

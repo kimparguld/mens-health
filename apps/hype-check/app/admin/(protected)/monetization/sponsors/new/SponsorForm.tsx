@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface SponsorFormData {
   name: string;
@@ -31,12 +31,12 @@ interface SponsorFormProps {
 export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<SponsorFormData>({
-    name: defaultValues?.name ?? "",
-    copyText: defaultValues?.copyText ?? "",
-    ctaText: defaultValues?.ctaText ?? "",
-    ctaUrl: defaultValues?.ctaUrl ?? "",
-    startDate: defaultValues?.startDate ?? "",
-    endDate: defaultValues?.endDate ?? "",
+    name: defaultValues?.name ?? '',
+    copyText: defaultValues?.copyText ?? '',
+    ctaText: defaultValues?.ctaText ?? '',
+    ctaUrl: defaultValues?.ctaUrl ?? '',
+    startDate: defaultValues?.startDate ?? '',
+    endDate: defaultValues?.endDate ?? '',
     isActive: defaultValues?.isActive ?? true,
   });
   const [saving, setSaving] = useState(false);
@@ -63,28 +63,28 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
 
     try {
       const res = await fetch(
-        sponsorId ? `/api/admin/sponsors/${sponsorId}` : "/api/admin/sponsors",
+        sponsorId ? `/api/admin/sponsors/${sponsorId}` : '/api/admin/sponsors',
         {
-          method: sponsorId ? "PATCH" : "POST",
-          headers: { "Content-Type": "application/json" },
+          method: sponsorId ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-        },
+        }
       );
 
       if (!res.ok) {
         const data: { error?: unknown } = await res.json();
         setError(
-          typeof data.error === "string"
+          typeof data.error === 'string'
             ? data.error
-            : "Failed to save. Check all fields and try again.",
+            : 'Failed to save. Check all fields and try again.'
         );
         return;
       }
 
-      router.push("/admin/monetization");
+      router.push('/admin/monetization');
       router.refresh();
     } catch {
-      setError("Network error. Please try again.");
+      setError('Network error. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -99,7 +99,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
         <input
           required
           value={form.name}
-          onChange={(e) => set("name", e.target.value)}
+          onChange={(e) => set('name', e.target.value)}
           placeholder="e.g. Athletic Greens"
           className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
@@ -113,7 +113,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           required
           rows={3}
           value={form.copyText}
-          onChange={(e) => set("copyText", e.target.value)}
+          onChange={(e) => set('copyText', e.target.value)}
           placeholder="Short promotional message shown on site"
           className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
@@ -127,7 +127,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           <input
             required
             value={form.ctaText}
-            onChange={(e) => set("ctaText", e.target.value)}
+            onChange={(e) => set('ctaText', e.target.value)}
             placeholder="e.g. Try it free"
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
@@ -140,7 +140,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
             required
             type="url"
             value={form.ctaUrl}
-            onChange={(e) => set("ctaUrl", e.target.value)}
+            onChange={(e) => set('ctaUrl', e.target.value)}
             placeholder="https://..."
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
@@ -155,7 +155,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           <input
             type="date"
             value={form.startDate}
-            onChange={(e) => set("startDate", e.target.value)}
+            onChange={(e) => set('startDate', e.target.value)}
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
@@ -166,7 +166,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           <input
             type="date"
             value={form.endDate}
-            onChange={(e) => set("endDate", e.target.value)}
+            onChange={(e) => set('endDate', e.target.value)}
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
@@ -177,8 +177,8 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           type="checkbox"
           id="isActive"
           checked={form.isActive}
-          onChange={(e) => set("isActive", e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600"
+          onChange={(e) => set('isActive', e.target.checked)}
+          className="text-ink h-4 w-4 rounded border-gray-300"
         />
         <label htmlFor="isActive" className="text-sm text-gray-700">
           Active (visible on site immediately)
@@ -195,7 +195,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           disabled={saving}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {saving ? "Saving…" : sponsorId ? "Update sponsor" : "Create sponsor"}
+          {saving ? 'Saving…' : sponsorId ? 'Update sponsor' : 'Create sponsor'}
         </button>
         <a
           href="/admin/monetization"

@@ -1,24 +1,24 @@
-import { db } from "@/lib/db/prisma";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import ReviewActions from "./ReviewActions";
-import GenerateSocialButton from "./GenerateSocialButton";
-import GenerateSummaryButton from "./GenerateSummaryButton";
-import ReviewerForm from "./ReviewerForm";
-import VerdictPanel from "./VerdictPanel";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import GenerateSocialButton from './GenerateSocialButton';
+import GenerateSummaryButton from './GenerateSummaryButton';
+import ReviewActions from './ReviewActions';
+import ReviewerForm from './ReviewerForm';
+import VerdictPanel from './VerdictPanel';
 
 const riskColors: Record<string, string> = {
-  LOW: "bg-green-100 text-green-700",
-  MEDIUM: "bg-yellow-100 text-yellow-700",
-  HIGH: "bg-red-100 text-red-700",
+  LOW: 'bg-green-100 text-green-700',
+  MEDIUM: 'bg-yellow-100 text-yellow-700',
+  HIGH: 'bg-red-100 text-red-700',
 };
 
 const evidenceColors: Record<string, string> = {
-  SUPPORTED: "text-green-700",
-  MIXED: "text-yellow-700",
-  WEAK: "text-orange-600",
-  UNSUPPORTED: "text-red-700",
-  NOT_CHECKED: "text-gray-500",
+  SUPPORTED: 'text-green-700',
+  MIXED: 'text-yellow-700',
+  WEAK: 'text-orange-600',
+  UNSUPPORTED: 'text-red-700',
+  NOT_CHECKED: 'text-gray-500',
 };
 
 export default async function AdminVideoDetailPage({
@@ -34,14 +34,14 @@ export default async function AdminVideoDetailPage({
       channel: true,
       sourceVideos: {
         take: 1,
-        orderBy: { createdAt: "desc" },
-        include: { summaries: { orderBy: { createdAt: "desc" }, take: 1 } },
+        orderBy: { createdAt: 'desc' },
+        include: { summaries: { orderBy: { createdAt: 'desc' }, take: 1 } },
       },
-      claims: { orderBy: { riskLevel: "desc" } },
-      adminReviews: { orderBy: { createdAt: "desc" }, take: 5 },
+      claims: { orderBy: { riskLevel: 'desc' } },
+      adminReviews: { orderBy: { createdAt: 'desc' }, take: 5 },
       topics: { include: { topic: true } },
       verdict: true,
-      verdictHistory: { orderBy: { createdAt: "desc" }, take: 5 },
+      verdictHistory: { orderBy: { createdAt: 'desc' }, take: 5 },
     },
   });
 
@@ -60,20 +60,20 @@ export default async function AdminVideoDetailPage({
         <div>
           <Link
             href="/admin/videos"
-            className="mb-2 inline-block text-sm text-blue-600 hover:underline"
+            className="text-ink mb-2 inline-block text-sm hover:underline"
           >
             &larr; Back to queue
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            {subject.channel?.title ?? "Unknown creator"} &bull;{" "}
-            {subject.publishedAt?.toLocaleDateString() ?? "—"} &bull;{" "}
+            {subject.channel?.title ?? 'Unknown creator'} &bull;{' '}
+            {subject.publishedAt?.toLocaleDateString() ?? '—'} &bull;{' '}
             <span
-              className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[subject.riskLevel] ?? ""}`}
+              className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[subject.riskLevel] ?? ''}`}
             >
               {subject.riskLevel} risk
-            </span>{" "}
-            &bull;{" "}
+            </span>{' '}
+            &bull;{' '}
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
               {subject.status}
             </span>
@@ -88,7 +88,7 @@ export default async function AdminVideoDetailPage({
             hasSummary={!!summary}
             riskLevel={subject.riskLevel}
           />
-          {subject.status === "PUBLISHED" && (
+          {subject.status === 'PUBLISHED' && (
             <GenerateSocialButton videoId={subject.id} />
           )}
         </div>
@@ -182,31 +182,35 @@ export default async function AdminVideoDetailPage({
                 Extracted claims ({subject.claims.length})
               </h2>
               <div className="space-y-3">
-                {subject.claims.map((claim: (typeof subject.claims)[number]) => (
-                  <div key={claim.id} className="rounded border p-3 text-sm">
-                    <div className="mb-1 flex items-center gap-2">
-                      <span
-                        className={`rounded px-1.5 py-0.5 text-xs font-medium ${riskColors[claim.riskLevel] ?? ""}`}
-                      >
-                        {claim.riskLevel}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {claim.claimType}
-                      </span>
-                      <span
-                        className={`ml-auto text-xs font-medium ${evidenceColors[claim.evidenceStatus] ?? ""}`}
-                      >
-                        {claim.evidenceStatus === "NOT_CHECKED"
-                          ? "Not checked"
-                          : claim.evidenceStatus}
-                      </span>
+                {subject.claims.map(
+                  (claim: (typeof subject.claims)[number]) => (
+                    <div key={claim.id} className="rounded border p-3 text-sm">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-xs font-medium ${riskColors[claim.riskLevel] ?? ''}`}
+                        >
+                          {claim.riskLevel}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {claim.claimType}
+                        </span>
+                        <span
+                          className={`ml-auto text-xs font-medium ${evidenceColors[claim.evidenceStatus] ?? ''}`}
+                        >
+                          {claim.evidenceStatus === 'NOT_CHECKED'
+                            ? 'Not checked'
+                            : claim.evidenceStatus}
+                        </span>
+                      </div>
+                      <p className="text-gray-800">{claim.text}</p>
+                      {claim.explanation && (
+                        <p className="mt-1 text-gray-500">
+                          {claim.explanation}
+                        </p>
+                      )}
                     </div>
-                    <p className="text-gray-800">{claim.text}</p>
-                    {claim.explanation && (
-                      <p className="mt-1 text-gray-500">{claim.explanation}</p>
-                    )}
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </section>
           )}
@@ -233,13 +237,13 @@ export default async function AdminVideoDetailPage({
                       key={topic.id}
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         topic.isHighRisk
-                          ? "bg-red-100 text-red-700"
-                          : "bg-gray-100 text-gray-700"
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-gray-100 text-gray-700'
                       }`}
                     >
                       {topic.name}
                     </span>
-                  ),
+                  )
                 )}
               </div>
             </div>
@@ -251,11 +255,11 @@ export default async function AdminVideoDetailPage({
             <dl className="space-y-1">
               <div className="flex justify-between text-gray-600">
                 <dt>Views</dt>
-                <dd>{subject.viewCount?.toLocaleString() ?? "—"}</dd>
+                <dd>{subject.viewCount?.toLocaleString() ?? '—'}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Likes</dt>
-                <dd>{subject.likeCount?.toLocaleString() ?? "—"}</dd>
+                <dd>{subject.likeCount?.toLocaleString() ?? '—'}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Trend score</dt>
@@ -290,7 +294,7 @@ export default async function AdminVideoDetailPage({
                         {review.createdAt.toLocaleDateString()}
                       </span>
                     </li>
-                  ),
+                  )
                 )}
               </ol>
             </div>
@@ -302,7 +306,7 @@ export default async function AdminVideoDetailPage({
               href={`https://www.youtube.com/watch?v=${sourceVideo.youtubeVideoId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block rounded-lg border bg-white p-4 text-sm text-blue-600 hover:underline"
+              className="text-ink block rounded-lg border bg-white p-4 text-sm hover:underline"
             >
               Open on YouTube &rarr;
             </a>

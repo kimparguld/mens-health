@@ -1,43 +1,45 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { GLOSSARY_TERMS } from "@/lib/seo/glossary";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { JsonLd, Disclaimer } from "@menhealth/ui";
-import { buildBreadcrumbSchema, buildDefinedTermSetSchema } from "@menhealth/core-seo";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
+import { GLOSSARY_TERMS } from '@/lib/seo/glossary';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  buildBreadcrumbSchema,
+  buildDefinedTermSetSchema,
+} from '@menhealth/core-seo';
+import { Disclaimer, JsonLd } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = {
-  title: "Hype Check Glossary — Key Terms Explained",
+  title: 'Hype Check Glossary — Key Terms Explained',
   description:
-    "Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps — evidence score, risk level, guaranteed returns, and more.",
+    'Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps — evidence score, risk level, guaranteed returns, and more.',
   alternates: { canonical: `${APP_URL}/glossary` },
   openGraph: {
-    title: "Hype Check Glossary — Key Terms Explained",
+    title: 'Hype Check Glossary — Key Terms Explained',
     description:
-      "Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps.",
+      'Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps.',
     url: `${APP_URL}/glossary`,
-    type: "website",
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Hype Check Glossary — Key Terms Explained",
+    card: 'summary_large_image',
+    title: 'Hype Check Glossary — Key Terms Explained',
   },
 };
 
 export default function GlossaryPage() {
   const sortedTerms = [...GLOSSARY_TERMS].sort((a, b) =>
-    a.term.localeCompare(b.term),
+    a.term.localeCompare(b.term)
   );
 
   const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Glossary", url: `${APP_URL}/glossary` },
+    { name: 'Home', url: APP_URL },
+    { name: 'Glossary', url: `${APP_URL}/glossary` },
   ]);
 
   const definedTermSetSchema = buildDefinedTermSetSchema({
-    name: "Hype Check Glossary",
+    name: 'Hype Check Glossary',
     url: `${APP_URL}/glossary`,
     terms: sortedTerms.map((t) => ({
       name: t.term,
@@ -53,7 +55,7 @@ export default function GlossaryPage() {
       <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
         <Link href="/" className="hover:underline">
           Home
-        </Link>{" "}
+        </Link>{' '}
         / <span className="text-gray-900">Glossary</span>
       </nav>
 
@@ -62,10 +64,9 @@ export default function GlossaryPage() {
           Hype Check Glossary
         </h1>
         <p className="mt-3 text-lg leading-relaxed text-gray-600">
-          Plain-English definitions for the evidence, risk, and marketing
-          terms that come up again and again across the videos we review —
-          so you can follow a video summary without Googling every other
-          word.
+          Plain-English definitions for the evidence, risk, and marketing terms
+          that come up again and again across the videos we review — so you can
+          follow a video summary without Googling every other word.
         </p>
       </header>
 
@@ -74,12 +75,10 @@ export default function GlossaryPage() {
           <Link
             key={term.slug}
             href={`/glossary/${term.slug}`}
-            className="rounded-xl border border-gray-200 bg-white px-5 py-4 transition hover:border-indigo-300 hover:shadow-sm"
+            className="hover:border-ink-muted/30 rounded-xl border border-gray-200 bg-white px-5 py-4 transition hover:shadow-sm"
           >
             <h2 className="font-semibold text-gray-900">{term.term}</h2>
-            <p className="mt-1 text-sm text-gray-600">
-              {term.shortDefinition}
-            </p>
+            <p className="mt-1 text-sm text-gray-600">{term.shortDefinition}</p>
           </Link>
         ))}
       </section>
@@ -93,7 +92,7 @@ export default function GlossaryPage() {
             <Link
               key={topic.slug}
               href={`/topics/${topic.slug}`}
-              className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+              className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
             >
               {topic.name}
             </Link>

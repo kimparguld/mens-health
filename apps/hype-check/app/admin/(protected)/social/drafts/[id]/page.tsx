@@ -1,22 +1,22 @@
-import { db } from "@/lib/db/prisma";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import DraftActions from "./DraftActions";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import DraftActions from './DraftActions';
 
 const RISK_COLORS: Record<string, string> = {
-  HIGH: "bg-red-100 text-red-800",
-  MEDIUM: "bg-amber-100 text-amber-800",
-  LOW: "bg-green-100 text-green-800",
+  HIGH: 'bg-red-100 text-red-800',
+  MEDIUM: 'bg-amber-100 text-amber-800',
+  LOW: 'bg-green-100 text-green-800',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-700",
-  PENDING_REVIEW: "bg-yellow-100 text-yellow-800",
-  APPROVED: "bg-blue-100 text-blue-800",
-  SCHEDULED: "bg-indigo-100 text-indigo-800",
-  PUBLISHED: "bg-green-100 text-green-800",
-  REJECTED: "bg-red-100 text-red-800",
-  FAILED: "bg-red-200 text-red-900",
+  DRAFT: 'bg-gray-100 text-gray-700',
+  PENDING_REVIEW: 'bg-yellow-100 text-yellow-800',
+  APPROVED: 'bg-blue-100 text-blue-800',
+  SCHEDULED: 'bg-ink-muted/10 text-ink-muted/80',
+  PUBLISHED: 'bg-green-100 text-green-800',
+  REJECTED: 'bg-red-100 text-red-800',
+  FAILED: 'bg-red-200 text-red-900',
 };
 
 export default async function SocialDraftDetailPage({
@@ -27,7 +27,7 @@ export default async function SocialDraftDetailPage({
   const { id } = await params;
   const post = await db.socialPost.findUnique({
     where: { id },
-    include: { attempts: { orderBy: { attemptedAt: "desc" }, take: 5 } },
+    include: { attempts: { orderBy: { attemptedAt: 'desc' }, take: 5 } },
   });
 
   if (!post) notFound();
@@ -42,17 +42,17 @@ export default async function SocialDraftDetailPage({
           ← Drafts
         </Link>
         <span
-          className={`rounded px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[post.status] ?? "bg-gray-100 text-gray-700"}`}
+          className={`rounded px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[post.status] ?? 'bg-gray-100 text-gray-700'}`}
         >
           {post.status}
         </span>
         <span
-          className={`rounded px-2 py-0.5 text-xs font-medium ${RISK_COLORS[post.riskLevel] ?? ""}`}
+          className={`rounded px-2 py-0.5 text-xs font-medium ${RISK_COLORS[post.riskLevel] ?? ''}`}
         >
           {post.riskLevel} risk
         </span>
         <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
-          {post.platform.replace("_", " ")}
+          {post.platform.replace('_', ' ')}
         </span>
       </div>
 
@@ -92,7 +92,7 @@ export default async function SocialDraftDetailPage({
             href={post.utmUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm break-all text-blue-600 hover:underline"
+            className="text-ink text-sm break-all hover:underline"
           >
             {post.utmUrl}
           </a>
@@ -106,8 +106,8 @@ export default async function SocialDraftDetailPage({
             <p className="text-sm text-gray-900">
               {new Date(post.scheduledAt)
                 .toISOString()
-                .replace("T", " ")
-                .replace(/\..+$/, "")}{" "}
+                .replace('T', ' ')
+                .replace(/\..+$/, '')}{' '}
               UTC
             </p>
           </section>
@@ -122,7 +122,7 @@ export default async function SocialDraftDetailPage({
               href={post.platformUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline"
+              className="text-ink text-sm hover:underline"
             >
               {post.platformUrl}
             </a>
@@ -153,11 +153,11 @@ export default async function SocialDraftDetailPage({
                   <span
                     className={`mr-2 inline-block rounded px-2 py-0.5 text-xs font-medium ${
                       attempt.success
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {attempt.success ? "OK" : "FAILED"}
+                    {attempt.success ? 'OK' : 'FAILED'}
                   </span>
                   <span className="text-gray-600">
                     {new Date(attempt.attemptedAt).toLocaleString()}

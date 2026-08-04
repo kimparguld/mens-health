@@ -1,5 +1,5 @@
-import { db } from "@/lib/db/prisma";
-import Link from "next/link";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
 
 async function getGrowthMetrics() {
   const sevenDaysAgo = new Date();
@@ -27,34 +27,34 @@ async function getGrowthMetrics() {
       where: { unsubscribedAt: null, createdAt: { gte: sevenDaysAgo } },
     }),
     db.newsletterSubscriber.groupBy({
-      by: ["sourcePage"],
+      by: ['sourcePage'],
       where: { sourcePage: { not: null } },
       _count: { _all: true },
-      orderBy: { _count: { sourcePage: "desc" } },
+      orderBy: { _count: { sourcePage: 'desc' } },
       take: 5,
     }),
     db.newsletterSubscriber.groupBy({
-      by: ["utmSource"],
+      by: ['utmSource'],
       where: { utmSource: { not: null } },
       _count: { _all: true },
-      orderBy: { _count: { utmSource: "desc" } },
+      orderBy: { _count: { utmSource: 'desc' } },
       take: 5,
     }),
     db.newsletterSubscriber.groupBy({
-      by: ["utmCampaign"],
+      by: ['utmCampaign'],
       where: { utmCampaign: { not: null } },
       _count: { _all: true },
-      orderBy: { _count: { utmCampaign: "desc" } },
+      orderBy: { _count: { utmCampaign: 'desc' } },
       take: 5,
     }),
     db.outreachContact.count(),
     db.marketingCampaign.count({ where: { isActive: true } }),
     db.socialPost.count(),
-    db.socialPost.count({ where: { status: "PUBLISHED" } }),
-    db.subject.count({ where: { status: "PUBLISHED" } }),
+    db.socialPost.count({ where: { status: 'PUBLISHED' } }),
+    db.subject.count({ where: { status: 'PUBLISHED' } }),
     db.subject.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { trendScore: "desc" },
+      where: { status: 'PUBLISHED' },
+      orderBy: { trendScore: 'desc' },
       take: 5,
       select: {
         name: true,
@@ -65,13 +65,13 @@ async function getGrowthMetrics() {
       },
     }),
     db.claim.count({
-      where: { subject: { status: "PUBLISHED" }, slug: { not: null } },
+      where: { subject: { status: 'PUBLISHED' }, slug: { not: null } },
     }),
     db.topic.count(),
-    db.claim.count({ where: { evidenceStatus: "NOT_CHECKED" } }),
+    db.claim.count({ where: { evidenceStatus: 'NOT_CHECKED' } }),
     db.subject.count({
       where: {
-        status: "PUBLISHED",
+        status: 'PUBLISHED',
       },
     }),
   ]);
@@ -100,40 +100,40 @@ export default async function GrowthAnalyticsPage() {
 
   const cards = [
     {
-      label: "Newsletter subscribers",
+      label: 'Newsletter subscribers',
       value: metrics.totalSubscribers,
       sub: `+${metrics.newSubscribersThisWeek} this week`,
-      href: "/admin/subscribers",
+      href: '/admin/subscribers',
     },
     {
-      label: "Active campaigns",
+      label: 'Active campaigns',
       value: metrics.activeCampaigns,
-      sub: "Paid and organic",
-      href: "/admin/marketing/campaigns",
+      sub: 'Paid and organic',
+      href: '/admin/marketing/campaigns',
     },
     {
-      label: "Outreach contacts",
+      label: 'Outreach contacts',
       value: metrics.totalContacts,
-      sub: "Creator and sponsor pipeline",
-      href: "/admin/outreach",
+      sub: 'Creator and sponsor pipeline',
+      href: '/admin/outreach',
     },
     {
-      label: "Published videos",
+      label: 'Published videos',
       value: metrics.publishedVideos,
-      sub: "Live on site",
-      href: "/admin/videos?status=PUBLISHED",
+      sub: 'Live on site',
+      href: '/admin/videos?status=PUBLISHED',
     },
     {
-      label: "Published claim pages",
+      label: 'Published claim pages',
       value: metrics.publishedClaimsCount,
-      sub: "With slugs",
-      href: "/admin/claims",
+      sub: 'With slugs',
+      href: '/admin/claims',
     },
     {
-      label: "Topic hubs",
+      label: 'Topic hubs',
       value: metrics.publishedTopicsCount,
-      sub: "Configured",
-      href: "/admin/topics",
+      sub: 'Configured',
+      href: '/admin/topics',
     },
   ];
 
@@ -153,7 +153,7 @@ export default async function GrowthAnalyticsPage() {
           <Link
             key={c.label}
             href={c.href}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-4 transition-colors hover:border-indigo-300"
+            className="hover:border-ink-muted/30 rounded-xl border border-gray-200 bg-white px-4 py-4 transition-colors"
           >
             <p className="text-xs text-gray-500">{c.label}</p>
             <p className="mt-1 text-2xl font-bold text-gray-900">{c.value}</p>
@@ -177,7 +177,7 @@ export default async function GrowthAnalyticsPage() {
                   className="underline"
                 >
                   {metrics.notCheckedClaimsCount} claim
-                  {metrics.notCheckedClaimsCount !== 1 ? "s" : ""} with
+                  {metrics.notCheckedClaimsCount !== 1 ? 's' : ''} with
                   NOT_CHECKED evidence status
                 </Link>
               </li>
@@ -189,7 +189,7 @@ export default async function GrowthAnalyticsPage() {
                   className="underline"
                 >
                   {metrics.videosWithoutSocialDraft} published video
-                  {metrics.videosWithoutSocialDraft !== 1 ? "s" : ""} without a
+                  {metrics.videosWithoutSocialDraft !== 1 ? 's' : ''} without a
                   social draft
                 </Link>
               </li>
@@ -216,7 +216,7 @@ export default async function GrowthAnalyticsPage() {
                 {metrics.topSignupSources.map((row) => (
                   <tr key={row.sourcePage} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      {row.sourcePage ?? "(unknown)"}
+                      {row.sourcePage ?? '(unknown)'}
                     </td>
                     <td className="px-4 py-3 text-gray-600">
                       {row._count._all}
@@ -247,7 +247,7 @@ export default async function GrowthAnalyticsPage() {
                 {metrics.topUtmSources.map((row) => (
                   <tr key={row.utmSource} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      {row.utmSource ?? "(none)"}
+                      {row.utmSource ?? '(none)'}
                     </td>
                     <td className="px-4 py-3 text-gray-600">
                       {row._count._all}
@@ -278,7 +278,7 @@ export default async function GrowthAnalyticsPage() {
                 {metrics.topUtmCampaigns.map((row) => (
                   <tr key={row.utmCampaign} className="hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900">
-                      {row.utmCampaign ?? "(none)"}
+                      {row.utmCampaign ?? '(none)'}
                     </td>
                     <td className="px-4 py-3 text-gray-600">
                       {row._count._all}
@@ -315,7 +315,7 @@ export default async function GrowthAnalyticsPage() {
                 <Link
                   href={`/videos/${v.slug}`}
                   target="_blank"
-                  className="text-xs text-blue-600 hover:underline"
+                  className="text-ink text-xs hover:underline"
                 >
                   View →
                 </Link>
@@ -335,7 +335,7 @@ export default async function GrowthAnalyticsPage() {
           the API for automatic updates.
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {["Impressions", "Clicks", "CTR", "Avg. position"].map((label) => (
+          {['Impressions', 'Clicks', 'CTR', 'Avg. position'].map((label) => (
             <div
               key={label}
               className="rounded-lg border border-gray-200 bg-white px-3 py-3 text-center"
@@ -346,7 +346,7 @@ export default async function GrowthAnalyticsPage() {
           ))}
         </div>
         <p className="mt-3 text-xs text-gray-400">
-          Connect Google Search Console at{" "}
+          Connect Google Search Console at{' '}
           <a
             href="https://search.google.com/search-console"
             target="_blank"
@@ -354,27 +354,27 @@ export default async function GrowthAnalyticsPage() {
             className="underline"
           >
             search.google.com
-          </a>{" "}
+          </a>{' '}
           to see organic search performance.
         </p>
       </section>
 
       {/* Growth loop reminder */}
-      <section className="rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-5">
-        <h2 className="mb-2 text-sm font-semibold text-indigo-900">
+      <section className="border-ink-muted/20 rounded-xl border bg-indigo-50 px-5 py-5">
+        <h2 className="text-ink-muted/90 mb-2 text-sm font-semibold">
           Traffic loop
         </h2>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-indigo-800">
+        <div className="text-ink-muted/80 flex flex-wrap items-center gap-2 text-xs">
           {[
-            "SEO claim pages",
-            "Social posts",
-            "Newsletter signup",
-            "Weekly digest",
-            "Return visitors",
-            "Revenue",
+            'SEO claim pages',
+            'Social posts',
+            'Newsletter signup',
+            'Weekly digest',
+            'Return visitors',
+            'Revenue',
           ].map((step, i, arr) => (
             <span key={step} className="flex items-center gap-2">
-              <span className="rounded-full bg-indigo-100 px-2 py-0.5 font-medium">
+              <span className="bg-ink-muted/10 rounded-full px-2 py-0.5 font-medium">
                 {step}
               </span>
               {i < arr.length - 1 && <span>→</span>}
@@ -382,15 +382,12 @@ export default async function GrowthAnalyticsPage() {
           ))}
         </div>
         <div className="mt-3 flex gap-3 text-xs">
-          <Link
-            href="/admin/growth-plan"
-            className="text-indigo-700 underline"
-          >
+          <Link href="/admin/growth-plan" className="text-ink-muted underline">
             90-day plan →
           </Link>
           <Link
             href="/admin/weekly-growth"
-            className="text-indigo-700 underline"
+            className="text-ink-muted underline"
           >
             Weekly workflow →
           </Link>

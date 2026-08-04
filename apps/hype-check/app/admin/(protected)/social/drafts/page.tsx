@@ -1,36 +1,36 @@
-import { db } from "@/lib/db/prisma";
-import Link from "next/link";
-import { ClearAllButton } from "./ClearAllButton";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import { ClearAllButton } from './ClearAllButton';
 
 const PAGE_SIZE = 25;
 
 const RISK_COLORS: Record<string, string> = {
-  HIGH: "bg-red-100 text-red-800",
-  MEDIUM: "bg-amber-100 text-amber-800",
-  LOW: "bg-green-100 text-green-800",
+  HIGH: 'bg-red-100 text-red-800',
+  MEDIUM: 'bg-amber-100 text-amber-800',
+  LOW: 'bg-green-100 text-green-800',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-700",
-  PENDING_REVIEW: "bg-yellow-100 text-yellow-800",
-  APPROVED: "bg-blue-100 text-blue-800",
-  SCHEDULED: "bg-indigo-100 text-indigo-800",
-  PUBLISHED: "bg-green-100 text-green-800",
-  REJECTED: "bg-red-100 text-red-800",
-  FAILED: "bg-red-200 text-red-900",
+  DRAFT: 'bg-gray-100 text-gray-700',
+  PENDING_REVIEW: 'bg-yellow-100 text-yellow-800',
+  APPROVED: 'bg-blue-100 text-blue-800',
+  SCHEDULED: 'bg-ink-muted/10 text-ink-muted/80',
+  PUBLISHED: 'bg-green-100 text-green-800',
+  REJECTED: 'bg-red-100 text-red-800',
+  FAILED: 'bg-red-200 text-red-900',
 };
 
 const ALL_STATUSES = [
-  "PENDING_REVIEW",
-  "DRAFT",
-  "APPROVED",
-  "SCHEDULED",
-  "PUBLISHED",
-  "REJECTED",
-  "FAILED",
+  'PENDING_REVIEW',
+  'DRAFT',
+  'APPROVED',
+  'SCHEDULED',
+  'PUBLISHED',
+  'REJECTED',
+  'FAILED',
 ] as const;
 
-const ALL_PLATFORMS = ["YOUTUBE_COMMUNITY", "TIKTOK", "REDDIT", "X"] as const;
+const ALL_PLATFORMS = ['YOUTUBE_COMMUNITY', 'TIKTOK', 'REDDIT', 'X'] as const;
 
 type PostStatus = (typeof ALL_STATUSES)[number];
 type Platform = (typeof ALL_PLATFORMS)[number];
@@ -47,21 +47,21 @@ export default async function SocialDraftsPage({
 }) {
   const { status, platform, risk, page: pageStr } = await searchParams;
 
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
+  const page = Math.max(1, parseInt(pageStr ?? '1', 10));
   const skip = (page - 1) * PAGE_SIZE;
 
-  const safeStatus = (ALL_STATUSES as readonly string[]).includes(status ?? "")
+  const safeStatus = (ALL_STATUSES as readonly string[]).includes(status ?? '')
     ? (status as PostStatus)
     : undefined;
 
   const safePlatform = (ALL_PLATFORMS as readonly string[]).includes(
-    platform ?? "",
+    platform ?? ''
   )
     ? (platform as Platform)
     : undefined;
 
-  const safeRisk = ["HIGH", "MEDIUM", "LOW"].includes(risk ?? "")
-    ? (risk as "HIGH" | "MEDIUM" | "LOW")
+  const safeRisk = ['HIGH', 'MEDIUM', 'LOW'].includes(risk ?? '')
+    ? (risk as 'HIGH' | 'MEDIUM' | 'LOW')
     : undefined;
 
   const where = {
@@ -73,13 +73,13 @@ export default async function SocialDraftsPage({
   const [posts, total, scheduledCount, publishedCount] = await Promise.all([
     db.socialPost.findMany({
       where,
-      orderBy: [{ requiresReview: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ requiresReview: 'desc' }, { createdAt: 'desc' }],
       skip,
       take: PAGE_SIZE,
     }),
     db.socialPost.count({ where }),
-    db.socialPost.count({ where: { status: "SCHEDULED" } }),
-    db.socialPost.count({ where: { status: "PUBLISHED" } }),
+    db.socialPost.count({ where: { status: 'SCHEDULED' } }),
+    db.socialPost.count({ where: { status: 'PUBLISHED' } }),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -120,17 +120,17 @@ export default async function SocialDraftsPage({
           <div className="flex flex-wrap gap-1">
             <Link
               href="/admin/social/drafts"
-              className={`rounded px-2 py-1 text-xs font-medium ${!safeStatus ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`rounded px-2 py-1 text-xs font-medium ${!safeStatus ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               All
             </Link>
             {ALL_STATUSES.map((s) => (
               <Link
                 key={s}
-                href={filterHref("status", s)}
-                className={`rounded px-2 py-1 text-xs font-medium ${safeStatus === s ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                href={filterHref('status', s)}
+                className={`rounded px-2 py-1 text-xs font-medium ${safeStatus === s ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
-                {s.replace("_", " ")}
+                {s.replace('_', ' ')}
               </Link>
             ))}
           </div>
@@ -144,10 +144,10 @@ export default async function SocialDraftsPage({
             {ALL_PLATFORMS.map((p) => (
               <Link
                 key={p}
-                href={filterHref("platform", p)}
-                className={`rounded px-2 py-1 text-xs font-medium ${safePlatform === p ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                href={filterHref('platform', p)}
+                className={`rounded px-2 py-1 text-xs font-medium ${safePlatform === p ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
-                {p.replace("_", " ")}
+                {p.replace('_', ' ')}
               </Link>
             ))}
           </div>
@@ -158,11 +158,11 @@ export default async function SocialDraftsPage({
             Risk
           </p>
           <div className="flex flex-wrap gap-1">
-            {(["HIGH", "MEDIUM", "LOW"] as const).map((r) => (
+            {(['HIGH', 'MEDIUM', 'LOW'] as const).map((r) => (
               <Link
                 key={r}
-                href={filterHref("risk", r)}
-                className={`rounded px-2 py-1 text-xs font-medium ${safeRisk === r ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                href={filterHref('risk', r)}
+                className={`rounded px-2 py-1 text-xs font-medium ${safeRisk === r ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 {r}
               </Link>
@@ -204,7 +204,7 @@ export default async function SocialDraftsPage({
                   <td className="max-w-xs px-4 py-3">
                     <Link
                       href={`/admin/social/drafts/${post.id}`}
-                      className="font-medium text-gray-900 hover:text-blue-600"
+                      className="hover:text-ink font-medium text-gray-900"
                     >
                       <span className="line-clamp-2">{post.hook}</span>
                     </Link>
@@ -215,18 +215,18 @@ export default async function SocialDraftsPage({
                     )}
                   </td>
                   <td className="px-4 py-3 text-gray-600">
-                    {post.platform.replace("_", " ")}
+                    {post.platform.replace('_', ' ')}
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`rounded px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[post.status] ?? "bg-gray-100 text-gray-700"}`}
+                      className={`rounded px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[post.status] ?? 'bg-gray-100 text-gray-700'}`}
                     >
-                      {post.status.replace("_", " ")}
+                      {post.status.replace('_', ' ')}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`rounded px-2 py-0.5 text-xs font-medium ${RISK_COLORS[post.riskLevel] ?? ""}`}
+                      className={`rounded px-2 py-0.5 text-xs font-medium ${RISK_COLORS[post.riskLevel] ?? ''}`}
                     >
                       {post.riskLevel}
                     </span>

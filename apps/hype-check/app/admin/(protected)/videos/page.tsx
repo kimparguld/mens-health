@@ -1,26 +1,26 @@
-import { db } from "@/lib/db/prisma";
-import Link from "next/link";
-import BulkPublishTable from "./BulkPublishTable";
-import NoSummaryCheckbox from "./NoSummaryCheckbox";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import BulkPublishTable from './BulkPublishTable';
+import NoSummaryCheckbox from './NoSummaryCheckbox';
 
-const ALLOWED_PAGE_SIZES = ["25", "50", "100", "all"] as const;
+const ALLOWED_PAGE_SIZES = ['25', '50', '100', 'all'] as const;
 type PageSizeOption = (typeof ALLOWED_PAGE_SIZES)[number];
 
-const ALLOWED_SORT_FIELDS = ["risk", "claims", "summary", "updated"] as const;
+const ALLOWED_SORT_FIELDS = ['risk', 'claims', 'summary', 'updated'] as const;
 type SortField = (typeof ALLOWED_SORT_FIELDS)[number];
-type SortDir = "asc" | "desc";
+type SortDir = 'asc' | 'desc';
 
 function buildOrderBy(
   sort: SortField,
-  dir: SortDir,
-): NonNullable<Parameters<typeof db.subject.findMany>[0]>["orderBy"] {
-  if (sort === "risk") return { riskLevel: dir };
-  if (sort === "claims") return { claims: { _count: dir } };
+  dir: SortDir
+): NonNullable<Parameters<typeof db.subject.findMany>[0]>['orderBy'] {
+  if (sort === 'risk') return { riskLevel: dir };
+  if (sort === 'claims') return { claims: { _count: dir } };
   // Summary now lives two relation hops away (Subject -> SourceVideo ->
   // Summary), which Prisma's relation-count orderBy doesn't support directly.
   // evidenceScore is set in the same pipeline step that creates the summary,
   // so null/non-null is a reliable proxy for "has a summary yet".
-  if (sort === "summary") return { evidenceScore: dir };
+  if (sort === 'summary') return { evidenceScore: dir };
   return { updatedAt: dir };
 }
 
@@ -39,8 +39,8 @@ export default async function AdminVideoQueuePage({
 }) {
   const {
     page: pageStr,
-    status = "DRAFT",
-    q = "",
+    status = 'DRAFT',
+    q = '',
     noSummary,
     sort: sortParam,
     dir: dirParam,
@@ -49,47 +49,44 @@ export default async function AdminVideoQueuePage({
 
   const pageSize: PageSizeOption = (
     ALLOWED_PAGE_SIZES as readonly string[]
-  ).includes(pageSizeParam ?? "")
+  ).includes(pageSizeParam ?? '')
     ? (pageSizeParam as PageSizeOption)
-    : "25";
-  const take = pageSize === "all" ? undefined : parseInt(pageSize, 10);
+    : '25';
+  const take = pageSize === 'all' ? undefined : parseInt(pageSize, 10);
 
   const sortField: SortField = (
     ALLOWED_SORT_FIELDS as readonly string[]
-  ).includes(sortParam ?? "")
+  ).includes(sortParam ?? '')
     ? (sortParam as SortField)
-    : "updated";
-  const sortDir: SortDir = dirParam === "asc" ? "asc" : "desc";
+    : 'updated';
+  const sortDir: SortDir = dirParam === 'asc' ? 'asc' : 'desc';
   const page =
-    pageSize === "all" ? 1 : Math.max(1, parseInt(pageStr ?? "1", 10));
+    pageSize === 'all' ? 1 : Math.max(1, parseInt(pageStr ?? '1', 10));
   const skip = take !== undefined ? (page - 1) * take : 0;
 
-  const allowedStatuses = [
-    "REVIEW",
-    "DRAFT",
-    "PUBLISHED",
-    "ARCHIVED",
-  ] as const;
+  const allowedStatuses = ['REVIEW', 'DRAFT', 'PUBLISHED', 'ARCHIVED'] as const;
   type VideoStatus = (typeof allowedStatuses)[number];
   const safeStatus: VideoStatus = (
     allowedStatuses as readonly string[]
   ).includes(status)
     ? (status as VideoStatus)
-    : "DRAFT";
+    : 'DRAFT';
 
-  const searchableStatuses: VideoStatus[] = ["DRAFT", "PUBLISHED"];
+  const searchableStatuses: VideoStatus[] = ['DRAFT', 'PUBLISHED'];
   const showSearch = searchableStatuses.includes(safeStatus);
-  const safeQ = showSearch ? q.trim() : "";
+  const safeQ = showSearch ? q.trim() : '';
   const showNoSummaryFilter = showSearch;
-  const filterNoSummary = showNoSummaryFilter && noSummary === "true";
+  const filterNoSummary = showNoSummaryFilter && noSummary === 'true';
 
   const where = {
     status: safeStatus,
     ...(safeQ
       ? {
           OR: [
-            { editorialTitle: { contains: safeQ, mode: "insensitive" as const } },
-            { name: { contains: safeQ, mode: "insensitive" as const } },
+            {
+              editorialTitle: { contains: safeQ, mode: 'insensitive' as const },
+            },
+            { name: { contains: safeQ, mode: 'insensitive' as const } },
           ],
         }
       : {}),
@@ -109,7 +106,7 @@ export default async function AdminVideoQueuePage({
         channel: true,
         sourceVideos: {
           take: 1,
-          orderBy: { createdAt: "desc" },
+          orderBy: { createdAt: 'desc' },
           include: { _count: { select: { summaries: true } } },
         },
         _count: { select: { claims: true } },
@@ -123,7 +120,7 @@ export default async function AdminVideoQueuePage({
     title: s.editorialTitle ?? s.sourceVideos[0]?.title ?? s.name,
     riskLevel: s.riskLevel,
     updatedAt: s.updatedAt,
-    channel: { title: s.channel?.title ?? "" },
+    channel: { title: s.channel?.title ?? '' },
     _count: {
       claims: s._count.claims,
       summaries: s.sourceVideos[0]?._count.summaries ?? 0,
@@ -133,36 +130,36 @@ export default async function AdminVideoQueuePage({
   const totalPages = take !== undefined ? Math.ceil(total / take) : 1;
 
   const statusTabs: Array<{ label: string; value: string }> = [
-    { label: "Pending", value: "DRAFT" },
-    { label: "Published", value: "PUBLISHED" },
-    { label: "Rejected", value: "ARCHIVED" },
-    { label: "Processed", value: "REVIEW" },
+    { label: 'Pending', value: 'DRAFT' },
+    { label: 'Published', value: 'PUBLISHED' },
+    { label: 'Rejected', value: 'ARCHIVED' },
+    { label: 'Processed', value: 'REVIEW' },
   ];
 
   function pageHref(p: number) {
     const params = new URLSearchParams({ status: safeStatus, page: String(p) });
-    if (safeQ) params.set("q", safeQ);
-    if (filterNoSummary) params.set("noSummary", "true");
-    if (sortField !== "updated") params.set("sort", sortField);
-    if (sortDir !== "desc") params.set("dir", sortDir);
-    if (pageSize !== "25") params.set("pageSize", pageSize);
+    if (safeQ) params.set('q', safeQ);
+    if (filterNoSummary) params.set('noSummary', 'true');
+    if (sortField !== 'updated') params.set('sort', sortField);
+    if (sortDir !== 'desc') params.set('dir', sortDir);
+    if (pageSize !== '25') params.set('pageSize', pageSize);
     return `/admin/videos?${params.toString()}`;
   }
 
   function pageSizeHref(size: PageSizeOption) {
     const params = new URLSearchParams({ status: safeStatus });
-    if (safeQ) params.set("q", safeQ);
-    if (filterNoSummary) params.set("noSummary", "true");
-    if (sortField !== "updated") params.set("sort", sortField);
-    if (sortDir !== "desc") params.set("dir", sortDir);
-    if (size !== "25") params.set("pageSize", size);
+    if (safeQ) params.set('q', safeQ);
+    if (filterNoSummary) params.set('noSummary', 'true');
+    if (sortField !== 'updated') params.set('sort', sortField);
+    if (sortDir !== 'desc') params.set('dir', sortDir);
+    if (size !== '25') params.set('pageSize', size);
     return `/admin/videos?${params.toString()}`;
   }
 
   const baseQuery: Record<string, string> = { status: safeStatus };
   if (safeQ) baseQuery.q = safeQ;
-  if (filterNoSummary) baseQuery.noSummary = "true";
-  if (pageSize !== "25") baseQuery.pageSize = pageSize;
+  if (filterNoSummary) baseQuery.noSummary = 'true';
+  if (pageSize !== '25') baseQuery.pageSize = pageSize;
 
   return (
     <div>
@@ -176,8 +173,8 @@ export default async function AdminVideoQueuePage({
             href={`/admin/videos?status=${value}`}
             className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
               safeStatus === value
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? 'text-ink border-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
             {label}
@@ -222,23 +219,21 @@ export default async function AdminVideoQueuePage({
         <p className="text-sm text-gray-500">
           {safeQ
             ? `No videos matching "${safeQ}".`
-            : "No videos in this queue."}
+            : 'No videos in this queue.'}
         </p>
       ) : (
         <BulkPublishTable
           videos={videos}
           showBulkActions={
-            safeStatus === "DRAFT" ||
-            safeStatus === "REVIEW" ||
-            safeStatus === "PUBLISHED"
+            safeStatus === 'DRAFT' ||
+            safeStatus === 'REVIEW' ||
+            safeStatus === 'PUBLISHED'
           }
-          showPublishAction={
-            safeStatus === "DRAFT" || safeStatus === "REVIEW"
-          }
+          showPublishAction={safeStatus === 'DRAFT' || safeStatus === 'REVIEW'}
           showSummaryColumn={
-            safeStatus === "DRAFT" ||
-            safeStatus === "PUBLISHED" ||
-            safeStatus === "REVIEW"
+            safeStatus === 'DRAFT' ||
+            safeStatus === 'PUBLISHED' ||
+            safeStatus === 'REVIEW'
           }
           sortField={sortField}
           sortDir={sortDir}
@@ -252,7 +247,7 @@ export default async function AdminVideoQueuePage({
           <div className="flex items-center gap-2">
             <span>Show:</span>
             {ALLOWED_PAGE_SIZES.map((size) => {
-              if (parseInt(size) > total || (size === "all" && total < 25)) {
+              if (parseInt(size) > total || (size === 'all' && total < 25)) {
                 return null;
               }
               return (
@@ -261,8 +256,8 @@ export default async function AdminVideoQueuePage({
                   href={pageSizeHref(size)}
                   className={`rounded border px-2 py-0.5 capitalize ${
                     pageSize === size
-                      ? "border-blue-600 bg-blue-50 text-blue-600"
-                      : "hover:bg-gray-50"
+                      ? 'text-ink border-blue-600 bg-blue-50'
+                      : 'hover:bg-gray-50'
                   }`}
                 >
                   {size}

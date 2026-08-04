@@ -1,14 +1,14 @@
-import Link from "next/link";
-import { db } from "@/lib/db/prisma";
-import { GrowthPlanBoard } from "@/components/growth-plan/GrowthPlanBoard";
-import type { GrowthTask } from "@/components/growth-plan/GrowthPlanBoard";
+import type { GrowthTask } from '@/components/growth-plan/GrowthPlanBoard';
+import { GrowthPlanBoard } from '@/components/growth-plan/GrowthPlanBoard';
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
 
 async function getData() {
   const [tasks, startDateSetting] = await Promise.all([
     db.growthPlanTask.findMany({
-      orderBy: [{ phase: "asc" }, { sortOrder: "asc" }],
+      orderBy: [{ phase: 'asc' }, { sortOrder: 'asc' }],
     }),
-    db.setting.findUnique({ where: { key: "growthPlanStartDate" } }),
+    db.setting.findUnique({ where: { key: 'growthPlanStartDate' } }),
   ]);
   return { tasks, startDate: startDateSetting?.value ?? null };
 }
@@ -44,7 +44,7 @@ export default async function GrowthPlanPage() {
             Track your 90-day traffic foundation. Each phase builds on the last.
           </p>
         </div>
-        <div className="flex gap-3 text-sm text-indigo-700">
+        <div className="text-ink-muted flex gap-3 text-sm">
           <Link href="/admin/content-calendar" className="hover:underline">
             Calendar
           </Link>
@@ -61,10 +61,10 @@ export default async function GrowthPlanPage() {
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
           <p className="font-semibold text-amber-900">No tasks found.</p>
           <p className="mt-1 text-sm text-amber-700">
-            Run{" "}
+            Run{' '}
             <code className="rounded bg-amber-100 px-1 font-mono">
               pnpm seed
-            </code>{" "}
+            </code>{' '}
             to seed the growth plan tasks.
           </p>
         </div>

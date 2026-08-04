@@ -1,11 +1,11 @@
-import Link from "next/link";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { db } from "@/lib/db/prisma";
+import { db } from '@/lib/db/prisma';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import Link from 'next/link';
 
 export default async function AdminTopicsPage() {
   // Count published videos per topic
   const topicCounts = await db.subjectTopic.groupBy({
-    by: ["topicId"],
+    by: ['topicId'],
     _count: { _all: true },
   });
 
@@ -72,7 +72,7 @@ export default async function AdminTopicsPage() {
                   <td className="px-4 py-3 text-gray-600">{count}</td>
                   <td className="px-4 py-3">
                     {record?.faqIntro ? (
-                      <span className="text-xs text-indigo-600">✓ Yes</span>
+                      <span className="text-ink-muted/60 text-xs">✓ Yes</span>
                     ) : (
                       <span className="text-xs text-gray-400">—</span>
                     )}
@@ -81,7 +81,7 @@ export default async function AdminTopicsPage() {
                     <Link
                       href={`/topics/${t.slug}`}
                       target="_blank"
-                      className="text-xs text-blue-600 hover:underline"
+                      className="text-ink text-xs hover:underline"
                     >
                       View hub →
                     </Link>
@@ -94,7 +94,7 @@ export default async function AdminTopicsPage() {
       </div>
 
       <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
-        <strong>Note:</strong> Topic hubs are configured in{" "}
+        <strong>Note:</strong> Topic hubs are configured in{' '}
         <code className="rounded bg-amber-100 px-1 font-mono text-xs">
           lib/youtube/topics.ts
         </code>

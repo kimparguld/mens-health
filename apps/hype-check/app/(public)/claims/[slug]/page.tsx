@@ -1,16 +1,22 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { db } from "@/lib/db/prisma";
-import { AdSlot, EvidenceBadge, RiskBadge, Disclaimer, NewsletterFooterCTA, JsonLd } from "@menhealth/ui";
-import { adsConfig } from "@/lib/ads-config";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
-import { buildBreadcrumbSchema } from "@menhealth/core-seo";
+import { adsConfig } from '@/lib/ads-config';
+import { db } from '@/lib/db/prisma';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { buildBreadcrumbSchema } from '@menhealth/core-seo';
+import {
+  AdSlot,
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterFooterCTA,
+  RiskBadge,
+} from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 
@@ -26,8 +32,8 @@ async function getClaim(slug: string) {
           topics: { include: { topic: true } },
           sourceVideos: {
             take: 1,
-            orderBy: { createdAt: "desc" },
-            include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+            orderBy: { createdAt: 'desc' },
+            include: { summaries: { take: 1, orderBy: { createdAt: 'desc' } } },
           },
         },
       },
@@ -43,8 +49,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const claim = await getClaim(slug);
-  if (!claim || claim.subject.status !== "PUBLISHED")
-    return { title: "Claim Not Found" };
+  if (!claim || claim.subject.status !== 'PUBLISHED')
+    return { title: 'Claim Not Found' };
 
   const canonical = `${APP_URL}/claims/${claim.slug ?? claim.id}`;
   const description =
@@ -59,10 +65,10 @@ export async function generateMetadata({
       title: `${claim.text} — Evidence Review`,
       description,
       url: canonical,
-      type: "article",
+      type: 'article',
     },
     twitter: {
-      card: "summary",
+      card: 'summary',
       title: `${claim.text} — Evidence Review`,
       description,
     },
@@ -73,18 +79,19 @@ export default async function ClaimPage({ params }: { params: Params }) {
   const { slug } = await params;
   const claim = await getClaim(slug);
 
-  if (!claim || claim.subject.status !== "PUBLISHED") notFound();
+  if (!claim || claim.subject.status !== 'PUBLISHED') notFound();
 
   const { subject } = claim;
   const sourceVideo = subject.sourceVideos[0];
   const summary = sourceVideo?.summaries[0];
   const firstTopic = subject.topics[0]?.topic;
-  const displayTitle = subject.editorialTitle ?? sourceVideo?.title ?? subject.name;
+  const displayTitle =
+    subject.editorialTitle ?? sourceVideo?.title ?? subject.name;
 
   const canonicalSlug = claim.slug ?? claim.id;
   const breadcrumb = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Claims", url: `${APP_URL}/claims` },
+    { name: 'Home', url: APP_URL },
+    { name: 'Claims', url: `${APP_URL}/claims` },
     {
       name: claim.text.slice(0, 60),
       url: `${APP_URL}/claims/${canonicalSlug}`,
@@ -93,17 +100,17 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
   const EVIDENCE_EXPLANATION: Record<string, string> = {
     SUPPORTED:
-      "Multiple well-designed studies consistently support this claim.",
+      'Multiple well-designed studies consistently support this claim.',
     MIXED:
-      "Some evidence supports this, but findings are inconsistent or limited in scope.",
-    WEAK: "Limited or low-quality evidence — treat with caution.",
-    UNSUPPORTED: "Available evidence does not support this claim.",
-    NOT_CHECKED: "This claim has not yet been reviewed against the literature.",
+      'Some evidence supports this, but findings are inconsistent or limited in scope.',
+    WEAK: 'Limited or low-quality evidence — treat with caution.',
+    UNSUPPORTED: 'Available evidence does not support this claim.',
+    NOT_CHECKED: 'This claim has not yet been reviewed against the literature.',
   };
 
   const evidenceNote =
     EVIDENCE_EXPLANATION[claim.evidenceStatus] ??
-    EVIDENCE_EXPLANATION["NOT_CHECKED"];
+    EVIDENCE_EXPLANATION['NOT_CHECKED'];
 
   return (
     <>
@@ -131,7 +138,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
         {/* Claim heading */}
         <article>
-          <p className="mb-3 text-xs font-semibold tracking-widest text-indigo-600 uppercase">
+          <p className="text-ink-muted/60 mb-3 text-xs font-semibold tracking-widest uppercase">
             Claim
           </p>
           <h1 className="text-2xl leading-snug font-bold text-gray-900 sm:text-3xl">
@@ -143,12 +150,12 @@ export default async function ClaimPage({ params }: { params: Params }) {
             <EvidenceBadge status={claim.evidenceStatus} showNotChecked />
             <RiskBadge level={claim.riskLevel} />
             <span className="text-xs text-gray-400 capitalize">
-              {claim.claimType.replace(/_/g, " ").toLowerCase()}
+              {claim.claimType.replace(/_/g, ' ').toLowerCase()}
             </span>
           </div>
 
           {/* Not-checked notice */}
-          {claim.evidenceStatus === "NOT_CHECKED" && (
+          {claim.evidenceStatus === 'NOT_CHECKED' && (
             <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               This claim has been extracted from the video but has not yet been
               fully reviewed against published evidence. Treat with appropriate
@@ -185,13 +192,13 @@ export default async function ClaimPage({ params }: { params: Params }) {
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-gray-900 hover:text-indigo-700"
+                      className="hover:text-ink-muted font-medium text-gray-900"
                     >
                       {source.title}
                     </a>
                     <p className="mt-0.5 text-xs text-gray-500">
                       {source.source}
-                      {source.year ? `, ${source.year}` : ""}
+                      {source.year ? `, ${source.year}` : ''}
                     </p>
                     {source.summary && (
                       <p className="mt-1 text-sm text-gray-600">
@@ -211,12 +218,12 @@ export default async function ClaimPage({ params }: { params: Params }) {
             </p>
             <Link
               href={`/videos/${subject.slug}`}
-              className="mt-1 block text-base font-semibold text-gray-900 hover:text-indigo-700"
+              className="hover:text-ink-muted mt-1 block text-base font-semibold text-gray-900"
             >
               {displayTitle}
             </Link>
             <p className="mt-0.5 text-sm text-gray-500">
-              {subject.channel?.title ?? ""}
+              {subject.channel?.title ?? ''}
             </p>
             {summary && (
               <p className="mt-3 text-sm leading-relaxed text-gray-600">
@@ -225,7 +232,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
             )}
             <Link
               href={`/videos/${subject.slug}`}
-              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+              className="hover:text-ink-muted text-ink-muted/60 mt-4 inline-flex items-center gap-1 text-sm font-semibold"
             >
               Watch breakdown →
             </Link>

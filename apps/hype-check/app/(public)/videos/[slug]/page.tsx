@@ -1,32 +1,41 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { Suspense } from "react";
-import { YouTubePlayer, AdSlot, Disclaimer, AffiliateDisclosure, SponsorBlock, EvidenceBadge, RiskBadge, NewsletterInlineCTA, NewsletterFooterCTA, NewsletterStickyCTA, JsonLd } from "@menhealth/ui";
-import { PremiumSection } from "./PremiumSection";
-import { adsConfig } from "@/lib/ads-config";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
+import { adsConfig } from '@/lib/ads-config';
 import {
-  buildVideoObjectSchema,
-  buildBreadcrumbSchema,
-  buildArticleSchema,
-} from "@menhealth/core-seo";
+  getPublishedVideoSlugByYouTubeId,
+  getRelatedVideos,
+  getVideoBySlug,
+  getVideoBySlugForMeta,
+} from '@/lib/db/queries';
 import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
-} from "@/lib/monetization/resolvers";
-import { redirect } from "next/navigation";
+} from '@/lib/monetization/resolvers';
+import { getGlossaryTermsForTopics } from '@/lib/seo/glossary';
+import { DISCLAIMER_TEXT, SITE_NAME } from '@/lib/site-brand';
 import {
-  getVideoBySlug,
-  getVideoBySlugForMeta,
-  getPublishedVideoSlugByYouTubeId,
-  getRelatedVideos,
-} from "@/lib/db/queries";
-import { getGlossaryTermsForTopics } from "@/lib/seo/glossary";
-import { SITE_NAME } from "@/lib/site-brand";
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+  buildVideoObjectSchema,
+} from '@menhealth/core-seo';
+import {
+  AdSlot,
+  AffiliateDisclosure,
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterInlineCTA,
+  NewsletterSignupForm,
+  NewsletterStickyCTA,
+  RiskBadge,
+  SponsorBlock,
+  YouTubePlayer,
+} from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { Suspense } from 'react';
+import { PremiumSection } from './PremiumSection';
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 
@@ -38,36 +47,37 @@ export async function generateMetadata({
   const { slug } = await params;
   const video = await getVideoBySlugForMeta(slug);
 
-  if (!video) return { title: "Video Not Found" };
+  if (!video) return { title: 'Video Not Found' };
 
   const sourceVideo = video.sourceVideos[0];
   const description =
-    sourceVideo?.summaries[0]?.shortSummary ?? video.description ?? "";
+    sourceVideo?.summaries[0]?.shortSummary ?? video.description ?? '';
   const canonical = `${APP_URL}/videos/${slug}`;
   const displayTitle = video.editorialTitle ?? sourceVideo?.title ?? video.name;
-  const publishedAt = video.publishedAt ?? sourceVideo?.publishedAt ?? video.createdAt;
+  const publishedAt =
+    video.publishedAt ?? sourceVideo?.publishedAt ?? video.createdAt;
 
   return {
     title: displayTitle,
     description,
     alternates: { canonical },
     keywords: [
-      "legit or scam",
-      "video review summary",
-      "evidence-based review",
+      'legit or scam',
+      'video review summary',
+      'evidence-based review',
       displayTitle,
     ],
     openGraph: {
       title: displayTitle,
       description,
       url: canonical,
-      type: "article",
+      type: 'article',
       publishedTime: new Date(publishedAt).toISOString(),
       modifiedTime: new Date(video.updatedAt).toISOString(),
       images: video.thumbnailUrl ? [{ url: video.thumbnailUrl }] : [],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: displayTitle,
       description,
       images: video.thumbnailUrl ? [video.thumbnailUrl] : [],
@@ -104,8 +114,10 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const sourceVideo = video.sourceVideos[0];
   const summary = sourceVideo?.summaries[0];
-  const youtubeVideoId = video.youtubeVideoId ?? sourceVideo?.youtubeVideoId ?? "";
-  const publishedAt = video.publishedAt ?? sourceVideo?.publishedAt ?? video.createdAt;
+  const youtubeVideoId =
+    video.youtubeVideoId ?? sourceVideo?.youtubeVideoId ?? '';
+  const publishedAt =
+    video.publishedAt ?? sourceVideo?.publishedAt ?? video.createdAt;
   const takeaways: string[] = Array.isArray(summary?.takeaways)
     ? (summary.takeaways as string[])
     : [];
@@ -115,7 +127,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const firstTopic = video.topics[0]?.topic;
   const glossaryTerms = getGlossaryTermsForTopics(
-    video.topics.map((vt: (typeof video.topics)[number]) => vt.topic.slug),
+    video.topics.map((vt: (typeof video.topics)[number]) => vt.topic.slug)
   );
 
   const [sponsor, affiliateLinks, relatedVideos] = await Promise.all([
@@ -128,10 +140,10 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const videoSchema = buildVideoObjectSchema({
     title: displayTitle,
-    description: summary?.shortSummary ?? video.description ?? "",
+    description: summary?.shortSummary ?? video.description ?? '',
     thumbnailUrl: video.thumbnailUrl,
     publishedAt,
-    channelTitle: video.channel?.title ?? "",
+    channelTitle: video.channel?.title ?? '',
     youtubeVideoId,
     appUrl: APP_URL,
     slug: video.slug,
@@ -139,7 +151,7 @@ export default async function VideoPage({ params }: { params: Params }) {
   });
 
   const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
+    { name: 'Home', url: APP_URL },
     ...(firstTopic
       ? [{ name: firstTopic.name, url: `${APP_URL}/topics/${firstTopic.slug}` }]
       : []),
@@ -148,7 +160,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const articleSchema = buildArticleSchema({
     headline: displayTitle,
-    description: summary?.shortSummary ?? video.description ?? "",
+    description: summary?.shortSummary ?? video.description ?? '',
     imageUrl: video.thumbnailUrl,
     publishedAt,
     updatedAt: video.updatedAt,
@@ -167,8 +179,8 @@ export default async function VideoPage({ params }: { params: Params }) {
       <nav className="mb-6 text-sm text-gray-500">
         <Link href="/" className="hover:underline">
           Home
-        </Link>{" "}
-        /{" "}
+        </Link>{' '}
+        /{' '}
         {video.topics[0] && (
           <>
             <Link
@@ -176,8 +188,8 @@ export default async function VideoPage({ params }: { params: Params }) {
               className="hover:underline"
             >
               {video.topics[0].topic.name}
-            </Link>{" "}
-            /{" "}
+            </Link>{' '}
+            /{' '}
           </>
         )}
         <span className="text-gray-900">{displayTitle}</span>
@@ -189,13 +201,13 @@ export default async function VideoPage({ params }: { params: Params }) {
           <Link
             key={vt.topicId}
             href={`/topics/${vt.topic.slug}`}
-            className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800 hover:bg-indigo-200"
+            className="bg-ink-muted/10 hover:bg-ink-muted/20 text-ink-muted/80 rounded-full px-2.5 py-0.5 text-xs font-medium"
           >
             {vt.topic.name}
           </Link>
         ))}
         <EvidenceBadge
-          status={video.claims[0]?.evidenceStatus ?? "NOT_CHECKED"}
+          status={video.claims[0]?.evidenceStatus ?? 'NOT_CHECKED'}
         />
         <RiskBadge level={video.riskLevel} />
       </div>
@@ -214,21 +226,21 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Meta */}
       <p className="mb-1 text-sm text-gray-500">
-        Channel:{" "}
+        Channel:{' '}
         <a
-          href={`https://www.youtube.com/channel/${video.channel?.youtubeId ?? ""}`}
+          href={`https://www.youtube.com/channel/${video.channel?.youtubeId ?? ''}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
+          className="text-ink hover:underline"
         >
-          {video.channel?.title ?? ""}
+          {video.channel?.title ?? ''}
         </a>
-        {" · "}
+        {' · '}
         <a
           href={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
+          className="text-ink hover:underline"
         >
           Watch on YouTube ↗
         </a>
@@ -236,7 +248,9 @@ export default async function VideoPage({ params }: { params: Params }) {
       {summary?.reviewerName && (
         <p className="mb-1 text-sm text-gray-500">
           Reviewed by {summary.reviewerName}
-          {summary.reviewerCredentials ? `, ${summary.reviewerCredentials}` : ""}
+          {summary.reviewerCredentials
+            ? `, ${summary.reviewerCredentials}`
+            : ''}
         </p>
       )}
       <p className="mb-6 text-xs text-gray-400">
@@ -271,7 +285,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       {summary && (
         <div className="mb-8 space-y-3">
           {summary.targetAudience && (
-            <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+            <div className="border-ink-muted/20 text-ink-muted/90 rounded-lg border bg-indigo-50 px-4 py-3 text-sm">
               <span className="font-semibold">Best for: </span>
               {summary.targetAudience}
             </div>
@@ -303,7 +317,7 @@ export default async function VideoPage({ params }: { params: Params }) {
               <ul className="space-y-2">
                 {takeaways.map((item, index) => (
                   <li key={index} className="flex gap-2 text-gray-700">
-                    <span className="mt-0.5 text-indigo-500">✓</span>
+                    <span className="text-ink-muted/50 mt-0.5">✓</span>
                     {item}
                   </li>
                 ))}
@@ -349,7 +363,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                 <Link
                   key={claim.id}
                   href={`/claims/${claim.slug ?? claim.id}`}
-                  className="block rounded-lg border border-gray-200 p-4 transition-colors hover:border-indigo-300"
+                  className="hover:border-ink-muted/30 block rounded-lg border border-gray-200 p-4 transition-colors"
                 >
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <RiskBadge level={claim.riskLevel} />
@@ -363,7 +377,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                       {claim.explanation}
                     </p>
                   )}
-                  <p className="mt-2 text-xs font-medium text-indigo-600">
+                  <p className="text-ink-muted/60 mt-2 text-xs font-medium">
                     View evidence review →
                   </p>
                 </Link>
@@ -389,14 +403,14 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Topics */}
       {video.topics.length > 0 && (
-        <section className="mb-8">
+        <section className="mt-8 mb-8">
           <h2 className="mb-3 text-xl font-semibold text-gray-900">Topics</h2>
           <div className="flex flex-wrap gap-2">
             {video.topics.map((vt: (typeof video.topics)[number]) => (
               <Link
                 key={vt.topicId}
                 href={`/topics/${vt.topic.slug}`}
-                className="rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-800 hover:bg-indigo-200"
+                className="bg-ink-muted/10 hover:bg-ink-muted/20 text-ink-muted/80 rounded-full px-3 py-1 text-sm font-medium"
               >
                 {vt.topic.name}
               </Link>
@@ -416,7 +430,7 @@ export default async function VideoPage({ params }: { params: Params }) {
               <Link
                 key={term.slug}
                 href={`/glossary/${term.slug}`}
-                className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+                className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
                 title={term.shortDefinition}
               >
                 {term.term}
@@ -437,12 +451,12 @@ export default async function VideoPage({ params }: { params: Params }) {
               <li key={rv.id}>
                 <Link
                   href={`/videos/${rv.slug}`}
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="text-ink text-sm font-medium hover:underline"
                 >
                   {rv.editorialTitle ?? rv.name}
                 </Link>
                 <span className="ml-2 text-xs text-gray-400">
-                  {rv.channel?.title ?? ""}
+                  {rv.channel?.title ?? ''}
                 </span>
               </li>
             ))}
@@ -489,7 +503,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="text-ink text-sm font-medium hover:underline"
                 >
                   {link.label}
                 </a>
@@ -506,12 +520,25 @@ export default async function VideoPage({ params }: { params: Params }) {
       )}
 
       {/* Newsletter CTA */}
-      <div className="mb-8">
-        <NewsletterFooterCTA
-          headline="Get the weekly digest"
-          description="5 videos summarised · 3 claims checked · 1 practical takeaway"
-        />
-      </div>
+
+      <section className="border-hairline bg-ink-muted mb-8 rounded-xl border px-6 py-8 text-center">
+        <div className="mx-auto max-w-xl px-4 text-center">
+          <p className="text-ink mb-1 text-xs font-semibold tracking-wide uppercase">
+            Free newsletter
+          </p>
+          <h2 className="mb-2 text-2xl font-bold text-white">
+            Get the weekly digest
+          </h2>
+          <p className="mb-6 text-sm text-white/60">
+            Join readers who want clear, evidence-aware verdicts on trending
+            hype.
+          </p>
+          <NewsletterSignupForm />
+          <p className="mt-3 text-xs text-white/40">
+            Unsubscribe any time. No spam.
+          </p>
+        </div>
+      </section>
 
       {/* Disclaimer — required on every video page */}
       <Disclaimer text={DISCLAIMER_TEXT} />

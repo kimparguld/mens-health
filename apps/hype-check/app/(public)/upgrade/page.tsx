@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 const FEATURES = [
-  "Ad-free browsing across all topics",
-  "Early access to AI-generated digests",
-  "Deep-dive evidence summaries for every claim",
-  "Weekly premium newsletter with curated picks",
-  "Bookmark & track videos in your personal feed",
+  'Ad-free browsing across all topics',
+  'Early access to AI-generated digests',
+  'Deep-dive evidence summaries for every claim',
+  'Weekly premium newsletter with curated picks',
+  'Bookmark & track videos in your personal feed',
 ];
 
 export default function UpgradePage() {
@@ -18,15 +18,15 @@ export default function UpgradePage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const res = await fetch('/api/stripe/checkout', { method: 'POST' });
       const data: { url?: string; error?: string } = await res.json();
       if (!res.ok || !data.url) {
-        setError(data.error ?? "Something went wrong. Please try again.");
+        setError(data.error ?? 'Something went wrong. Please try again.');
         return;
       }
       window.location.href = data.url;
     } catch {
-      setError("Network error. Please try again.");
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -53,7 +53,7 @@ export default function UpgradePage() {
               key={feature}
               className="flex items-start gap-3 text-sm text-gray-700"
             >
-              <span className="mt-0.5 flex-shrink-0 text-blue-600">✓</span>
+              <span className="text-ink mt-0.5 flex-shrink-0">✓</span>
               {feature}
             </li>
           ))}
@@ -75,7 +75,7 @@ export default function UpgradePage() {
           disabled={loading}
           className="w-full rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? "Redirecting…" : "Start premium — $9/mo"}
+          {loading ? 'Redirecting…' : 'Start premium — $9/mo'}
         </button>
 
         <p className="mt-4 text-center text-xs text-gray-400">

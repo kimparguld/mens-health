@@ -1,28 +1,39 @@
-import { AdSlot, SponsorBlock, NewsletterFooterCTA, NewsletterInlineCTA, NewsletterStickyCTA, JsonLd, AffiliateDisclosure, Disclaimer, EvidenceBadge, RiskBadge, VideoCard } from "@menhealth/ui";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
-import { adsConfig } from '@/lib/ads-config';
 import { RelatedTopics } from '@/components/topic/RelatedTopics';
+import { adsConfig } from '@/lib/ads-config';
 import { db } from '@/lib/db/prisma';
 import { getTopicBySlug, getTopicVideos } from '@/lib/db/queries';
 import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from '@/lib/monetization/resolvers';
+import { getTopicContent } from '@/lib/seo/topic-content';
+import { getTopicSeo } from '@/lib/seo/topic-faq';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { FaqEntry } from '@menhealth/core-seo';
 import {
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildItemListSchema,
 } from '@menhealth/core-seo';
-import { getTopicContent } from '@/lib/seo/topic-content';
-import { getTopicSeo } from '@/lib/seo/topic-faq';
-import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  AdSlot,
+  AffiliateDisclosure,
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterFooterCTA,
+  NewsletterInlineCTA,
+  NewsletterStickyCTA,
+  RiskBadge,
+  SponsorBlock,
+  VideoCard,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 type SearchParams = Promise<{ page?: string }>;
@@ -59,7 +70,12 @@ export async function generateMetadata({
       title: `${topic.name} — Hype Check`,
       description,
     },
-    keywords: [topic.name, 'legit or scam', 'evidence-based review', 'is it worth it'],
+    keywords: [
+      topic.name,
+      'legit or scam',
+      'evidence-based review',
+      'is it worth it',
+    ],
   };
 }
 
@@ -134,8 +150,8 @@ export default async function TopicPage({
       topicClaimStatusCounts.find((c) => c.evidenceStatus === 'MIXED')
         ?._count ?? 0,
     weak:
-      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')
-        ?._count ?? 0,
+      topicClaimStatusCounts.find((c) => c.evidenceStatus === 'WEAK')?._count ??
+      0,
     unsupported:
       topicClaimStatusCounts.find((c) => c.evidenceStatus === 'UNSUPPORTED')
         ?._count ?? 0,
@@ -221,14 +237,14 @@ export default async function TopicPage({
 
       {/* Beginner Guide */}
       {staticContent?.beginnerGuide && (
-        <section className="mb-10 rounded-xl border border-indigo-200 bg-indigo-50 px-6 py-6">
+        <section className="border-ink-muted/20 mb-10 rounded-xl border bg-indigo-50 px-6 py-6">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
             {staticContent.beginnerGuide.heading}
           </h2>
           <ol className="space-y-2">
             {staticContent.beginnerGuide.steps.map((step, i) => (
               <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
+                <span className="bg-ink-muted/60 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white">
                   {i + 1}
                 </span>
                 {step}
@@ -307,7 +323,7 @@ export default async function TopicPage({
                     {claim.slug && (
                       <Link
                         href={`/claims/${claim.slug}`}
-                        className="text-xs font-medium text-indigo-700 hover:underline"
+                        className="text-ink-muted text-xs font-medium hover:underline"
                       >
                         See evidence →
                       </Link>
@@ -328,7 +344,7 @@ export default async function TopicPage({
           </ul>
           <Link
             href={`/rankings/${slug}`}
-            className="mt-3 inline-block text-sm font-medium text-indigo-700 hover:underline"
+            className="text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
           >
             See top-ranked videos for {topicSeed.name} →
           </Link>
@@ -348,7 +364,7 @@ export default async function TopicPage({
                   Myth: &ldquo;{item.myth}&rdquo;
                 </p>
                 <p className="mt-1 text-sm text-gray-600">
-                  <span className="font-medium text-indigo-700">Reality:</span>{' '}
+                  <span className="text-ink-muted font-medium">Reality:</span>{' '}
                   {item.reality}
                 </p>
               </div>
@@ -366,7 +382,7 @@ export default async function TopicPage({
           <ul className="space-y-2">
             {staticContent.takeaways.map((takeaway, i) => (
               <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="mt-0.5 text-indigo-600">✓</span>
+                <span className="text-ink-muted/60 mt-0.5">✓</span>
                 {takeaway}
               </li>
             ))}
@@ -390,10 +406,16 @@ export default async function TopicPage({
                   <VideoCard
                     key={video.id}
                     slug={video.slug}
-                    title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                    title={
+                      video.editorialTitle ??
+                      video.sourceVideos[0]?.title ??
+                      video.name
+                    }
                     channelTitle={video.channel?.title ?? ''}
                     thumbnailUrl={video.thumbnailUrl}
-                    shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
+                    shortSummary={
+                      video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null
+                    }
                     trendScore={video.trendScore}
                     topicNames={video.topics.map(
                       (vt: (typeof video.topics)[number]) => vt.topic.name
@@ -415,10 +437,16 @@ export default async function TopicPage({
               <VideoCard
                 key={video.id}
                 slug={video.slug}
-                title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                title={
+                  video.editorialTitle ??
+                  video.sourceVideos[0]?.title ??
+                  video.name
+                }
                 channelTitle={video.channel?.title ?? ''}
                 thumbnailUrl={video.thumbnailUrl}
-                shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
+                shortSummary={
+                  video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null
+                }
                 trendScore={video.trendScore}
                 topicNames={video.topics.map(
                   (vt: (typeof video.topics)[number]) => vt.topic.name
@@ -470,7 +498,7 @@ export default async function TopicPage({
           <div className="divide-y rounded-xl border bg-white">
             {seo.faq.map((item, i) => (
               <details key={i} className="group px-5 py-4">
-                <summary className="cursor-pointer list-none text-base font-medium text-gray-900 group-open:text-indigo-700">
+                <summary className="group-open:text-ink-muted cursor-pointer list-none text-base font-medium text-gray-900">
                   <span className="mr-2 inline-block transition-transform group-open:rotate-90">
                     ›
                   </span>
@@ -512,7 +540,7 @@ export default async function TopicPage({
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="text-ink text-sm font-medium hover:underline"
                 >
                   {link.label}
                 </a>

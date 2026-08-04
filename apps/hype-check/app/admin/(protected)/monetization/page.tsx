@@ -1,10 +1,9 @@
-import { db } from "@/lib/db/prisma";
-
+import { db } from '@/lib/db/prisma';
 
 export default async function MonetizationPage() {
   const [affiliateLinks, sponsors] = await Promise.all([
-    db.affiliateLink.findMany({ orderBy: { createdAt: "desc" } }),
-    db.sponsor.findMany({ orderBy: { createdAt: "desc" } }),
+    db.affiliateLink.findMany({ orderBy: { createdAt: 'desc' } }),
+    db.sponsor.findMany({ orderBy: { createdAt: 'desc' } }),
   ]);
 
   return (
@@ -54,7 +53,7 @@ export default async function MonetizationPage() {
                         href={s.ctaUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-ink hover:underline"
                       >
                         {s.ctaText}
                       </a>
@@ -63,21 +62,21 @@ export default async function MonetizationPage() {
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                           s.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-500"
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-500'
                         }`}
                       >
-                        {s.isActive ? "Active" : "Inactive"}
+                        {s.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500">
                       {s.endDate
-                        ? s.endDate.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
+                        ? s.endDate.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
                           })
-                        : "—"}
+                        : '—'}
                     </td>
                   </tr>
                 ))}
@@ -137,26 +136,26 @@ export default async function MonetizationPage() {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-ink hover:underline"
                       >
                         {link.label}
                       </a>
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {link.topicSlug ?? "—"}
+                      {link.topicSlug ?? '—'}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
-                      {link.commission ?? "—"}
+                      {link.commission ?? '—'}
                     </td>
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                           link.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-500"
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-500'
                         }`}
                       >
-                        {link.isActive ? "Active" : "Inactive"}
+                        {link.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
                   </tr>

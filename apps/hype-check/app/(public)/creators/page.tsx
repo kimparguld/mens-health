@@ -1,24 +1,24 @@
-import type { Metadata } from "next";
-import { createMetadata, createCanonicalUrl } from "@/lib/seo/site-metadata";
-import { CREATOR_SEEDS } from "@/lib/youtube/creators";
-import { JsonLd } from "@menhealth/ui";
-import { buildItemListSchema } from "@menhealth/core-seo";
-import Link from "next/link";
+import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
+import { CREATOR_SEEDS } from '@/lib/youtube/creators';
+import { buildItemListSchema } from '@menhealth/core-seo';
+import { JsonLd } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: "Video Creators — Hype Check",
+  title: 'Video Creators — Hype Check',
   description:
     "Browse the top YouTube creators we track across trending products, courses, side hustles, and investment apps. Each creator's videos are summarised, scored, and checked for evidence quality.",
-  path: "/creators",
+  path: '/creators',
 });
 
 export default function CreatorsIndexPage() {
   const itemListSchema = buildItemListSchema(
-    "Hype Check Video Creators",
+    'Hype Check Video Creators',
     CREATOR_SEEDS.map((creator) => ({
       name: creator.name,
       url: createCanonicalUrl(`/creators/${creator.slug}`),
-    })),
+    }))
   );
 
   return (
@@ -36,13 +36,13 @@ export default function CreatorsIndexPage() {
           <li key={creator.slug}>
             <Link
               href={`/creators/${creator.slug}`}
-              className="flex flex-col rounded-xl border border-gray-200 bg-white px-5 py-4 transition-colors hover:border-indigo-300"
+              className="border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white px-5 py-4 transition-all"
             >
               <span className="text-base font-semibold text-gray-900">
                 {creator.name}
               </span>
               {creator.credentials && (
-                <span className="mt-0.5 text-xs font-medium text-indigo-700">
+                <span className="text-ink mt-0.5 text-xs font-medium">
                   {creator.credentials}
                 </span>
               )}

@@ -1,8 +1,16 @@
-import { NewsletterFooterCTA, JsonLd, Disclaimer, VideoCard } from "@menhealth/ui";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
-import { buildBreadcrumbSchema, buildItemListSchema } from '@menhealth/core-seo';
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+} from '@menhealth/core-seo';
+import {
+  Disclaimer,
+  JsonLd,
+  NewsletterFooterCTA,
+  VideoCard,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -17,8 +25,7 @@ function deriveEvidenceLabel(
   return 'SUPPORTED';
 }
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ topic: string }>;
 
@@ -110,7 +117,7 @@ export default async function WeeklyRankingPage({
               <span>/</span>
               <span className="text-gray-600">This Week</span>
             </nav>
-            <p className="mb-2 text-xs font-semibold tracking-widest text-indigo-600 uppercase">
+            <p className="text-ink-muted/60 mb-2 text-xs font-semibold tracking-widest uppercase">
               Weekly ranking
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -182,7 +189,7 @@ export default async function WeeklyRankingPage({
               <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
                 <p className="text-gray-500">
                   No videos indexed yet for this topic.{' '}
-                  <Link href="/" className="text-indigo-600 hover:underline">
+                  <Link href="/" className="text-ink-muted/60 hover:underline">
                     Browse all topics →
                   </Link>
                 </p>
@@ -194,16 +201,23 @@ export default async function WeeklyRankingPage({
                     key={video.id}
                     className="relative flex items-start gap-4"
                   >
-                    <div className="absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white bg-indigo-700 text-lg font-bold text-white">
+                    <div className="bg-ink-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
                       {index + 1}
                     </div>
                     <div className="min-w-0 flex-1">
                       <VideoCard
                         slug={video.slug}
-                        title={video.editorialTitle ?? video.sourceVideos[0]?.title ?? video.name}
+                        title={
+                          video.editorialTitle ??
+                          video.sourceVideos[0]?.title ??
+                          video.name
+                        }
                         channelTitle={video.channel?.title ?? ''}
                         thumbnailUrl={video.thumbnailUrl}
-                        shortSummary={video.sourceVideos[0]?.summaries[0]?.shortSummary ?? null}
+                        shortSummary={
+                          video.sourceVideos[0]?.summaries[0]?.shortSummary ??
+                          null
+                        }
                         trendScore={video.trendScore}
                         topicNames={video.topics.map((vt) => vt.topic.name)}
                         riskLevel={video.riskLevel}
@@ -225,13 +239,13 @@ export default async function WeeklyRankingPage({
           <div className="mx-auto flex max-w-4xl flex-wrap gap-4 px-4">
             <Link
               href={`/topics/${topic}`}
-              className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+              className="text-ink-muted hover:bg-ink-muted/10 border-ink-muted/20 rounded-lg border bg-indigo-50 px-4 py-2 text-sm font-medium"
             >
               ← {seed.name} topic hub
             </Link>
             <Link
               href={`/weekly/${topic}`}
-              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-indigo-300"
+              className="hover:border-ink-muted/30 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
             >
               Weekly {seed.name} picks →
             </Link>
@@ -251,7 +265,7 @@ export default async function WeeklyRankingPage({
                   <Link
                     key={t.slug}
                     href={`/rankings/${t.slug}`}
-                    className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-700"
+                    className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700"
                   >
                     {t.name}
                   </Link>
