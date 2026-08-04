@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Disclaimer } from "@menhealth/ui";
+import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 export const metadata: Metadata = {
   title: "Medical Disclaimer",
   description:
@@ -83,7 +84,7 @@ export default function MedicalDisclaimerPage() {
         </p>
       </section>
 
-      <Disclaimer />
+      <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
     </main>
   );
 }

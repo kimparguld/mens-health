@@ -1,0 +1,20 @@
+// Vitest stub for @/env.
+// Provides the shape expected by adapters without requiring real env vars.
+export const env = {
+  DATABASE_URL: "postgresql://test",
+  NEXTAUTH_SECRET: "test-secret-32-chars-long-padding",
+  ADMIN_EMAILS: "admin@test.com",
+  YOUTUBE_API_KEY: "yt-test-key",
+  CRON_SECRET: "test-cron-secret-32-chars-padding",
+  X_CLIENT_ID: "x-client-id",
+  X_CLIENT_SECRET: "x-client-secret",
+  X_REDIRECT_URI: "https://example.com/api/social/x/oauth/callback",
+  REDDIT_CLIENT_ID: "reddit-client-id",
+  REDDIT_CLIENT_SECRET: "reddit-client-secret",
+  REDDIT_REDIRECT_URI: "https://example.com/api/social/reddit/oauth/callback",
+  YOUTUBE_OAUTH_CLIENT_ID: "yt-oauth-client-id",
+  YOUTUBE_OAUTH_CLIENT_SECRET: "yt-oauth-client-secret",
+  YOUTUBE_OAUTH_REDIRECT_URI:
+    "https://example.com/api/social/youtube/oauth/callback",
+  NEXT_PUBLIC_APP_URL: "https://example.com",
+} as const;

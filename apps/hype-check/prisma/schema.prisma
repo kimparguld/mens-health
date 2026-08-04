@@ -1,0 +1,577 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js required tables
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  isAdmin       Boolean   @default(false)
+  isPremium     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Core domain
+// ---------------------------------------------------------------------------
+
+model Channel {
+  id           String   @id @default(cuid())
+  youtubeId    String   @unique
+  title        String
+  description  String?
+  thumbnailUrl String?
+  trustScore   Float    @default(0.5)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  videos               Video[]
+  creatorNotifications CreatorNotification[]
+}
+
+model Video {
+  id              String        @id @default(cuid())
+  youtubeVideoId  String        @unique
+  title           String
+  editorialTitle  String?
+  description     String?
+  channelId       String
+  publishedAt     DateTime
+  thumbnailUrl    String?
+  durationSeconds Int?
+  viewCount       Int?
+  likeCount       Int?
+  commentCount    Int?
+  trendScore      Float         @default(0)
+  relevanceScore  Float         @default(0)
+  evidenceScore   Float?
+  riskLevel       RiskLevel     @default(LOW)
+  status          PublishStatus @default(PENDING)
+  slug            String        @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  channel             Channel              @relation(fields: [channelId], references: [id])
+  summaries           Summary[]
+  claims              Claim[]
+  topics              VideoTopic[]
+  adminReviews        AdminReview[]
+  processingJob       ProcessingJob?
+  creatorNotification CreatorNotification?
+}
+
+model Topic {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  name         String
+  description  String?
+  isHighRisk   Boolean   @default(false)
+  faqIntro     String?
+  faqJson      Json?
+  faqUpdatedAt DateTime?
+
+  videos VideoTopic[]
+}
+
+model VideoTopic {
+  videoId String
+  topicId String
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, topicId])
+}
+
+model Summary {
+  id                  String   @id @default(cuid())
+  videoId             String
+  shortSummary        String
+  longSummary         String
+  takeaways           Json
+  warnings            Json?
+  targetAudience      String?
+  redFlags            Json?
+  modelUsed           String?
+  reviewedByHuman     Boolean  @default(false)
+  reviewerName        String?
+  reviewerCredentials String?
+  createdAt           DateTime @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+model Claim {
+  id               String         @id @default(cuid())
+  videoId          String
+  slug             String?        @unique
+  text             String
+  category         ClaimCategory  @default(OTHER)
+  riskLevel        RiskLevel
+  evidenceStatus   EvidenceStatus @default(NOT_CHECKED)
+  explanation      String?
+  autoReviewed     Boolean        @default(false)
+  humanConfirmedAt DateTime?
+  createdAt        DateTime       @default(now())
+
+  video   Video            @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  sources EvidenceSource[]
+}
+
+model EvidenceSource {
+  id      String  @id @default(cuid())
+  claimId String
+  title   String
+  url     String
+  source  String
+  year    Int?
+  summary String?
+
+  claim Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Newsletter
+// ---------------------------------------------------------------------------
+
+model NewsletterSubscriber {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  confirmedAt     DateTime?
+  unsubscribedAt  DateTime?
+  resendContactId String?
+  // Attribution fields
+  sourcePage      String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  referrer        String?
+  createdAt       DateTime  @default(now())
+}
+
+model NewsletterDigest {
+  id          String   @id @default(cuid())
+  slug        String?  @unique
+  subject     String
+  html        String?
+  text        String?
+  sentCount   Int      @default(0)
+  failedCount Int      @default(0)
+  sentAt      DateTime @default(now())
+}
+
+model CreatorNotification {
+  id        String   @id @default(cuid())
+  videoId   String   @unique
+  channelId String
+  email     String
+  sentAt    DateTime @default(now())
+
+  video   Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  channel Channel @relation(fields: [channelId], references: [id])
+}
+
+model MonthlyReport {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  periodStart DateTime
+  periodEnd   DateTime
+  stats       Json
+  createdAt   DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Monetization
+// ---------------------------------------------------------------------------
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String             @unique
+  stripePriceId        String
+  status               SubscriptionStatus
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+model AffiliateLink {
+  id          String   @id @default(cuid())
+  label       String
+  url         String
+  productName String
+  commission  String?
+  isActive    Boolean  @default(true)
+  topicSlug   String?
+  createdAt   DateTime @default(now())
+}
+
+model Sponsor {
+  id        String    @id @default(cuid())
+  name      String
+  copyText  String
+  ctaText   String
+  ctaUrl    String
+  isActive  Boolean   @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Admin workflow
+// ---------------------------------------------------------------------------
+
+model AdminReview {
+  id                   String       @id @default(cuid())
+  videoId              String
+  action               ReviewAction
+  note                 String?
+  acknowledgedHighRisk Boolean      @default(false)
+  acknowledgedBy       String?
+  createdAt            DateTime     @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+model ProcessingJob {
+  id           String    @id @default(cuid())
+  videoId      String    @unique
+  status       JobStatus @default(QUEUED)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum PublishStatus {
+  PENDING
+  PROCESSED
+  REJECTED
+  PUBLISHED
+}
+
+enum EvidenceStatus {
+  SUPPORTED
+  MIXED
+  WEAK
+  UNSUPPORTED
+  NOT_CHECKED
+}
+
+enum ClaimCategory {
+  NUTRITION
+  EXERCISE
+  HORMONES
+  MENTAL_HEALTH
+  SUPPLEMENTS
+  MEDICATIONS
+  CANCER
+  LONGEVITY
+  SEXUAL_HEALTH
+  OTHER
+}
+
+enum ReviewAction {
+  APPROVED
+  REJECTED
+  FLAGGED_HIGH_RISK
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+  INCOMPLETE
+  PAUSED
+}
+
+// ---------------------------------------------------------------------------
+// Social Content Engine
+// ---------------------------------------------------------------------------
+
+enum Platform {
+  YOUTUBE_COMMUNITY
+  TIKTOK
+  REDDIT
+  X
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+  FAILED
+}
+
+enum SourceType {
+  VIDEO_SUMMARY
+  CLAIM
+  TOPIC_PAGE
+  WEEKLY_DIGEST
+}
+
+enum MediaType {
+  VIDEO
+  TEXT
+  IMAGE
+}
+
+model SocialPost {
+  id             String                 @id @default(cuid())
+  platform       Platform
+  status         PostStatus             @default(DRAFT)
+  sourceType     SourceType
+  sourceId       String
+  hook           String
+  script         String
+  caption        String
+  hashtags       String[]
+  utmUrl         String
+  riskLevel      RiskLevel              @default(LOW)
+  requiresReview Boolean                @default(true)
+  scheduledAt    DateTime?
+  publishedAt    DateTime?
+  platformPostId String?
+  platformUrl    String?
+  templateId     String?
+  template       SocialTemplate?        @relation(fields: [templateId], references: [id])
+  attempts       SocialPublishAttempt[]
+  metrics        SocialMetric[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+}
+
+model SocialTemplate {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  platform  Platform?
+  hook      String
+  script    String
+  caption   String
+  hashtags  String[]
+  posts     SocialPost[]
+  createdAt DateTime     @default(now())
+}
+
+model SocialAccount {
+  id           String    @id @default(cuid())
+  platform     Platform  @unique
+  handle       String?
+  /// Encrypted access token — never returned to client
+  accessToken  String
+  refreshToken String?
+  tokenExpiry  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model SocialPublishAttempt {
+  id          String     @id @default(cuid())
+  postId      String
+  post        SocialPost @relation(fields: [postId], references: [id])
+  success     Boolean
+  errorCode   String?
+  errorMsg    String?
+  response    Json?
+  attemptedAt DateTime   @default(now())
+}
+
+model SocialMetric {
+  id         String     @id @default(cuid())
+  postId     String
+  post       SocialPost @relation(fields: [postId], references: [id])
+  views      Int        @default(0)
+  likes      Int        @default(0)
+  shares     Int        @default(0)
+  clicks     Int        @default(0)
+  recordedAt DateTime   @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Growth — Outreach CRM
+// ---------------------------------------------------------------------------
+
+enum OutreachContactType {
+  YOUTUBE_CREATOR
+  NEWSLETTER_PUBLISHER
+  FITNESS_BLOGGER
+  COACH
+  PODCAST_HOST
+  SPONSOR_PROSPECT
+  HEALTH_TECH_FOUNDER
+}
+
+enum OutreachStatus {
+  NOT_CONTACTED
+  EMAIL_SENT
+  REPLIED
+  MEETING_BOOKED
+  DEAL_IN_PROGRESS
+  CLOSED_WON
+  CLOSED_LOST
+  FOLLOW_UP_NEEDED
+}
+
+model OutreachContact {
+  id                String              @id @default(cuid())
+  name              String
+  contactType       OutreachContactType
+  email             String?
+  socialUrl         String?
+  relatedContentUrl String?
+  status            OutreachStatus      @default(NOT_CONTACTED)
+  lastContactedAt   DateTime?
+  nextFollowUpAt    DateTime?
+  notes             String?
+  result            String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Growth — Marketing Campaigns
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Growth — 90-Day Plan
+// ---------------------------------------------------------------------------
+
+enum GrowthPhase {
+  FOUNDATION
+  DISTRIBUTION
+  OPTIMISATION
+  SCALE
+}
+
+enum GrowthTaskPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum GrowthTaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  SKIPPED
+}
+
+model GrowthPlanTask {
+  id          String             @id @default(cuid())
+  uniqueKey   String             @unique
+  phase       GrowthPhase
+  sortOrder   Int                @default(0)
+  dayStart    Int
+  dayEnd      Int
+  title       String
+  description String?
+  adminPath   String?
+  priority    GrowthTaskPriority @default(MEDIUM)
+  status      GrowthTaskStatus   @default(TODO)
+  notes       String?
+  completedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model MarketingCampaign {
+  id          String    @id @default(cuid())
+  name        String
+  platform    String
+  budget      Float?
+  landingPage String?
+  utmUrl      String?
+  clicks      Int       @default(0)
+  signups     Int       @default(0)
+  notes       String?
+  isActive    Boolean   @default(true)
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
