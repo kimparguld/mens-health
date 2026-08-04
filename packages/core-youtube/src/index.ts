@@ -7,3 +7,11 @@ export type {
 
 export { detectsClickbait, scoreVideo } from "./scoring";
 export type { ScoreInput, ScoreOutput } from "./scoring";
+
+export {
+  TopicCandidateSchema,
+  scoreTopicPopularity,
+  isHighRiskCandidate,
+  mergeTopicSeeds,
+} from "./topic-discovery";
+export type { TopicCandidate, TopicSeedLike } from "./topic-discovery";
