@@ -486,7 +486,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <textarea
           readOnly
           rows={2}
-          className="w-full rounded border border-hairline bg-surface p-2 font-mono text-xs text-ink-muted/70"
+          className="w-full rounded border border-hairline bg-paper p-2 font-mono text-xs text-ink-muted/60"
           defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by Hype Check" width="210" height="50" /></a>`}
         />
       </section>
