@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-type BrandLogotypeSize = 'sm' | 'md';
+type BrandLogotypeSize = 'sm' | 'md' | 'lg';
 
 interface BrandLogotypeProps {
   className?: string;
@@ -16,9 +16,16 @@ const SIZE_STYLES: Record<BrandLogotypeSize, CSSProperties> = {
     '--mh-logo-mark-size': '2.35rem',
     '--mh-logo-wordmark-size': '1.35rem',
   } as CSSProperties,
+  lg: {
+    '--mh-logo-mark-size': '3.35rem',
+    '--mh-logo-wordmark-size': '1.85rem',
+  } as CSSProperties,
 };
 
-export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProps) {
+export function BrandLogotype({
+  className = '',
+  size = 'md',
+}: BrandLogotypeProps) {
   return (
     <span
       className={`mh-logotype ${className}`.trim()}
