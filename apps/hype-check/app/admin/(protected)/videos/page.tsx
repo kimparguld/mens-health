@@ -2,6 +2,7 @@ import { db } from '@/lib/db/prisma';
 import Link from 'next/link';
 import BulkPublishTable from './BulkPublishTable';
 import NoSummaryCheckbox from './NoSummaryCheckbox';
+import HasSummaryCheckbox from './HasSummaryCheckbox';
 
 const ALLOWED_PAGE_SIZES = ['25', '50', '100', 'all'] as const;
 type PageSizeOption = (typeof ALLOWED_PAGE_SIZES)[number];
@@ -32,6 +33,7 @@ export default async function AdminVideoQueuePage({
     status?: string;
     q?: string;
     noSummary?: string;
+    hasSummary?: string;
     sort?: string;
     dir?: string;
     pageSize?: string;
@@ -42,6 +44,7 @@ export default async function AdminVideoQueuePage({
     status = 'DRAFT',
     q = '',
     noSummary,
+    hasSummary,
     sort: sortParam,
     dir: dirParam,
     pageSize: pageSizeParam,
@@ -77,6 +80,8 @@ export default async function AdminVideoQueuePage({
   const safeQ = showSearch ? q.trim() : '';
   const showNoSummaryFilter = showSearch;
   const filterNoSummary = showNoSummaryFilter && noSummary === 'true';
+  const filterHasSummary =
+    showNoSummaryFilter && !filterNoSummary && hasSummary === 'true';
 
   const where = {
     status: safeStatus,
@@ -92,6 +97,9 @@ export default async function AdminVideoQueuePage({
       : {}),
     ...(filterNoSummary
       ? { sourceVideos: { none: { summaries: { some: {} } } } }
+      : {}),
+    ...(filterHasSummary
+      ? { sourceVideos: { some: { summaries: { some: {} } } } }
       : {}),
   };
 
@@ -140,6 +148,7 @@ export default async function AdminVideoQueuePage({
     const params = new URLSearchParams({ status: safeStatus, page: String(p) });
     if (safeQ) params.set('q', safeQ);
     if (filterNoSummary) params.set('noSummary', 'true');
+    if (filterHasSummary) params.set('hasSummary', 'true');
     if (sortField !== 'updated') params.set('sort', sortField);
     if (sortDir !== 'desc') params.set('dir', sortDir);
     if (pageSize !== '25') params.set('pageSize', pageSize);
@@ -150,6 +159,7 @@ export default async function AdminVideoQueuePage({
     const params = new URLSearchParams({ status: safeStatus });
     if (safeQ) params.set('q', safeQ);
     if (filterNoSummary) params.set('noSummary', 'true');
+    if (filterHasSummary) params.set('hasSummary', 'true');
     if (sortField !== 'updated') params.set('sort', sortField);
     if (sortDir !== 'desc') params.set('dir', sortDir);
     if (size !== '25') params.set('pageSize', size);
@@ -159,6 +169,7 @@ export default async function AdminVideoQueuePage({
   const baseQuery: Record<string, string> = { status: safeStatus };
   if (safeQ) baseQuery.q = safeQ;
   if (filterNoSummary) baseQuery.noSummary = 'true';
+  if (filterHasSummary) baseQuery.hasSummary = 'true';
   if (pageSize !== '25') baseQuery.pageSize = pageSize;
 
   return (
@@ -212,6 +223,7 @@ export default async function AdminVideoQueuePage({
             </Link>
           )}
           <NoSummaryCheckbox checked={filterNoSummary} />
+          <HasSummaryCheckbox checked={filterHasSummary} />
         </form>
       )}
 

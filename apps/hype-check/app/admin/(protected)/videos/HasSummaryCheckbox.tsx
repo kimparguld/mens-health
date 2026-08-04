@@ -2,17 +2,17 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function NoSummaryCheckbox({ checked }: { checked: boolean }) {
+export default function HasSummaryCheckbox({ checked }: { checked: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const params = new URLSearchParams(searchParams.toString());
     if (e.target.checked) {
-      params.set("noSummary", "true");
-      params.delete("hasSummary");
-    } else {
+      params.set("hasSummary", "true");
       params.delete("noSummary");
+    } else {
+      params.delete("hasSummary");
     }
     // Reset to page 1 when filter changes
     params.delete("page");
@@ -27,7 +27,7 @@ export default function NoSummaryCheckbox({ checked }: { checked: boolean }) {
         onChange={handleChange}
         className="rounded border-gray-300"
       />
-      Show videos without summaries
+      Show videos with summaries
     </label>
   );
 }

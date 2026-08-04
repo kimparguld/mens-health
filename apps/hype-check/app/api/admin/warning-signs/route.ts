@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/prisma";
+import { RISK_RANK } from "@/lib/videos/process-video-pipeline";
 import { z } from "zod";
 import type { NextRequest } from "next/server";
 
@@ -35,6 +36,17 @@ export async function POST(request: NextRequest) {
   const warningSign = await db.warningSign.create({
     data: { subjectId, text, severity, source: source ?? null },
   });
+
+  // A HIGH-severity warning sign must escalate the subject's risk level
+  // exactly like the AI-extraction write paths do, whether it was typed in
+  // by an admin or found by the pipeline — this is what keeps the video
+  // behind the admin-approval gate (isEligibleForAutoPublish).
+  if (RISK_RANK[severity] > RISK_RANK[subject.riskLevel]) {
+    await db.subject.update({
+      where: { id: subject.id },
+      data: { riskLevel: severity },
+    });
+  }
 
   return Response.json({ ok: true, warningSign });
 }
