@@ -7,11 +7,11 @@ import { buildBreadcrumbSchema } from '@menhealth/core-seo';
 import {
   Breadcrumbs,
   Disclaimer,
-  EvidenceBadge,
   JsonLd,
   NewsletterInlineCTA,
   VideoCard,
 } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -203,7 +203,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       <span className="flex-1 text-gray-800">
                         &ldquo;{claim.text}&rdquo;
                       </span>
-                      <EvidenceBadge status={claim.evidenceStatus} />
+                      <EvidenceStamp status={claim.evidenceStatus} />
                       {claim.slug && (
                         <Link
                           href={`/claims/${claim.slug}`}
@@ -228,7 +228,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                   &ldquo;{overhypedClaim.text}&rdquo;
                 </p>
                 <div className="mt-2 flex items-center gap-2">
-                  <EvidenceBadge status={overhypedClaim.evidenceStatus} />
+                  <EvidenceStamp status={overhypedClaim.evidenceStatus} />
                   {overhypedClaim.slug && (
                     <Link
                       href={`/claims/${overhypedClaim.slug}`}

@@ -20,14 +20,14 @@ import {
   AdSlot,
   AffiliateDisclosure,
   Disclaimer,
-  EvidenceBadge,
   JsonLd,
   NewsletterFooterCTA,
   NewsletterStickyCTA,
-  RiskBadge,
   SponsorBlock,
   VideoCard,
 } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -220,7 +220,7 @@ export default async function TopicPage({
         </nav>
 
         <div className="mb-2 flex items-center gap-2">
-          {topicSeed.isHighRisk && <RiskBadge level="HIGH" />}
+          {topicSeed.isHighRisk && <RiskStamp level="HIGH" />}
         </div>
 
         <h1 className="text-4xl font-bold text-gray-900">{topicSeed.name}</h1>
@@ -310,7 +310,7 @@ export default async function TopicPage({
                     <span className="flex-1 text-sm text-gray-800">
                       &ldquo;{claim.text}&rdquo;
                     </span>
-                    <EvidenceBadge
+                    <EvidenceStamp
                       status={claim.evidenceStatus}
                       showNotChecked
                     />
@@ -332,7 +332,7 @@ export default async function TopicPage({
                     <span className="flex-1 text-sm text-gray-800">
                       &ldquo;{claim.text}&rdquo;
                     </span>
-                    <EvidenceBadge status={claim.evidenceStatus} />
+                    <EvidenceStamp status={claim.evidenceStatus} />
                   </li>
                 ))}
           </ul>
