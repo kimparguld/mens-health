@@ -2,7 +2,8 @@ import { db } from '@/lib/db/prisma';
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { buildItemListSchema } from '@menhealth/core-seo';
-import { Disclaimer, EvidenceBadge, JsonLd } from '@menhealth/ui';
+import { Disclaimer, JsonLd } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -87,7 +88,7 @@ export default async function ClaimsIndexPage() {
                   </p>
                 </div>
                 {claim.evidenceStatus && (
-                  <EvidenceBadge status={claim.evidenceStatus} />
+                  <EvidenceStamp status={claim.evidenceStatus} />
                 )}
               </Link>
             </li>

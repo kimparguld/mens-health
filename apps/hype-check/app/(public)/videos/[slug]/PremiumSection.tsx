@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth";
 import { premium } from "@/lib/flags/feature-flags";
-import { PremiumGate, EvidenceBadge, RiskBadge } from "@menhealth/ui";
+import { PremiumGate } from "@menhealth/ui";
+import { EvidenceStamp } from "@/components/ui/EvidenceStamp";
+import { RiskStamp } from "@/components/ui/RiskStamp";
 type Claim = {
   id: string;
   text: string;
@@ -20,8 +22,8 @@ export async function PremiumSection({ claims }: { claims: Claim[] }) {
         {claims.map((claim) => (
           <div key={claim.id} className="rounded-lg border border-gray-200 p-4">
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <RiskBadge level={claim.riskLevel as "LOW" | "MEDIUM" | "HIGH"} />
-              <EvidenceBadge
+              <RiskStamp level={claim.riskLevel as "LOW" | "MEDIUM" | "HIGH"} />
+              <EvidenceStamp
                 status={
                   claim.evidenceStatus as
                     | "SUPPORTED"

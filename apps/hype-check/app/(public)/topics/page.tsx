@@ -1,7 +1,8 @@
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import { buildItemListSchema } from '@menhealth/core-seo';
-import { JsonLd, RiskBadge } from '@menhealth/ui';
+import { JsonLd } from '@menhealth/ui';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -42,7 +43,7 @@ export default function TopicsIndexPage() {
                 <span className="text-base font-semibold text-gray-900">
                   {topic.name}
                 </span>
-                {topic.isHighRisk && <RiskBadge level="HIGH" />}
+                {topic.isHighRisk && <RiskStamp level="HIGH" />}
               </div>
               <span className="mt-1 text-sm text-gray-500">
                 {topic.description}

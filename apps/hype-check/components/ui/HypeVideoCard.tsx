@@ -1,6 +1,7 @@
-import { EvidenceBadge, RiskBadge } from '@menhealth/ui';
 import Image from 'next/image';
 import Link from 'next/link';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import { VerdictStamp, type VerdictType } from './VerdictStamp';
 
 type HypeVideoCardProps = {
@@ -65,13 +66,13 @@ export function HypeVideoCard({
               {name}
             </span>
           ))}
-          {riskLevel && riskLevel !== 'LOW' && <RiskBadge level={riskLevel} />}
+          {riskLevel && riskLevel !== 'LOW' && <RiskStamp level={riskLevel} />}
         </div>
         {(verdict || evidenceLabel || watchTimeMin) && (
           <div className="flex flex-wrap items-center gap-1.5">
             <VerdictStamp verdict={verdict} />
             {!verdict && evidenceLabel && (
-              <EvidenceBadge status={evidenceLabel} />
+              <EvidenceStamp status={evidenceLabel} />
             )}
             {watchTimeMin && (
               <span className="text-xs text-gray-500">
