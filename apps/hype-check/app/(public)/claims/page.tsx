@@ -1,9 +1,9 @@
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import { db } from '@/lib/db/prisma';
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { buildItemListSchema } from '@menhealth/core-seo';
 import { Disclaimer, JsonLd } from '@menhealth/ui';
-import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -62,7 +62,10 @@ export default async function ClaimsIndexPage() {
         evidence quality.
       </p>
 
-      <Disclaimer text={DISCLAIMER_TEXT} />
+      <Disclaimer
+        text={DISCLAIMER_TEXT}
+        className="border-gray-200 bg-white text-gray-500"
+      />
 
       <ul className="mt-8 divide-y divide-gray-100">
         {claims.length === 0 && (

@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import { Disclaimer } from "@menhealth/ui";
-import { DISCLAIMER_TEXT } from "@/lib/site-brand";
+import { DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { Disclaimer } from '@menhealth/ui';
+import type { Metadata } from 'next';
 export const metadata: Metadata = {
-  title: "Disclaimer",
+  title: 'Disclaimer',
   description:
-    "Important information about the nature of Hype Check content and its limitations.",
+    'Important information about the nature of Hype Check content and its limitations.',
 };
 
 export default function DisclaimerPage() {
@@ -30,11 +30,11 @@ export default function DisclaimerPage() {
           financial, legal, investment, or other professional advice.
         </p>
         <p>
-          The claims, evidence reviews, and verdicts published on this site
-          are generated with AI assistance and reviewed editorially. A verdict
-          is our independent assessment based on available evidence at the
-          time of review — it is not a guarantee, certification, or warranty
-          about any product, company, or individual.
+          The claims, evidence reviews, and verdicts published on this site are
+          generated with AI assistance and reviewed editorially. A verdict is
+          our independent assessment based on available evidence at the time of
+          review — it is not a guarantee, certification, or warranty about any
+          product, company, or individual.
         </p>
       </section>
 
@@ -43,8 +43,8 @@ export default function DisclaimerPage() {
           Do your own research
         </h2>
         <p>
-          Before making any purchase, investment, or business decision based
-          on content discussed on this site, do your own research and, where
+          Before making any purchase, investment, or business decision based on
+          content discussed on this site, do your own research and, where
           appropriate, consult a qualified financial, legal, or other
           professional who can evaluate your individual circumstances.
         </p>
@@ -56,15 +56,15 @@ export default function DisclaimerPage() {
         </h2>
         <p>
           Products, companies, and offers change quickly. Information on this
-          site may become outdated. We make reasonable efforts to keep
-          content current but cannot guarantee that every verdict reflects
-          the latest state of a product or company. Verdicts are reviewed
-          periodically but are not updated in real time.
+          site may become outdated. We make reasonable efforts to keep content
+          current but cannot guarantee that every verdict reflects the latest
+          state of a product or company. Verdicts are reviewed periodically but
+          are not updated in real time.
         </p>
         <p>
           Hype Check is not responsible for any actions taken based on the
-          content of this website, or for any consequences arising from
-          reliance on information presented here.
+          content of this website, or for any consequences arising from reliance
+          on information presented here.
         </p>
       </section>
 
@@ -73,15 +73,18 @@ export default function DisclaimerPage() {
           Third-party content
         </h2>
         <p>
-          The videos embedded on this site are produced by third-party
-          YouTube creators. Hype Check does not endorse the views, claims, or
-          advice of any individual creator. Verdicts and evidence reviews
-          represent our independent editorial assessment, not the creator&apos;s
-          own statements.
+          The videos embedded on this site are produced by third-party YouTube
+          creators. Hype Check does not endorse the views, claims, or advice of
+          any individual creator. Verdicts and evidence reviews represent our
+          independent editorial assessment, not the creator&apos;s own
+          statements.
         </p>
       </section>
 
-      <Disclaimer text={DISCLAIMER_TEXT} />
+      <Disclaimer
+        text={DISCLAIMER_TEXT}
+        className="border-gray-200 bg-white text-gray-500"
+      />
     </main>
   );
 }

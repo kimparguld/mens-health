@@ -1,3 +1,4 @@
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import { GLOSSARY_TERMS, getGlossaryTerm } from '@/lib/seo/glossary';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
@@ -6,7 +7,6 @@ import {
   buildDefinedTermSchema,
 } from '@menhealth/core-seo';
 import { Disclaimer, JsonLd } from '@menhealth/ui';
-import { RiskStamp } from '@/components/ui/RiskStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -145,7 +145,10 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
         </Link>
       </section>
 
-      <Disclaimer text={DISCLAIMER_TEXT} />
+      <Disclaimer
+        text={DISCLAIMER_TEXT}
+        className="border-gray-200 bg-white text-gray-500"
+      />
     </main>
   );
 }

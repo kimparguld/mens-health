@@ -1,15 +1,10 @@
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import { adsConfig } from '@/lib/ads-config';
 import { db } from '@/lib/db/prisma';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { buildBreadcrumbSchema } from '@menhealth/core-seo';
-import {
-  AdSlot,
-  Disclaimer,
-  JsonLd,
-  NewsletterFooterCTA,
-} from '@menhealth/ui';
-import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
-import { RiskStamp } from '@/components/ui/RiskStamp';
+import { AdSlot, Disclaimer, JsonLd, NewsletterFooterCTA } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -250,7 +245,10 @@ export default async function ClaimPage({ params }: { params: Params }) {
         </div>
 
         <div className="mt-10">
-          <Disclaimer text={DISCLAIMER_TEXT} />
+          <Disclaimer
+            text={DISCLAIMER_TEXT}
+            className="border-gray-200 bg-white text-gray-500"
+          />
         </div>
       </main>
     </>

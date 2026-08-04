@@ -102,7 +102,10 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <Disclaimer text={DISCLAIMER_TEXT} />
+      <Disclaimer
+        text={DISCLAIMER_TEXT}
+        className="border-gray-200 bg-white text-gray-500"
+      />
     </main>
   );
 }
