@@ -23,7 +23,6 @@ import {
   EvidenceBadge,
   JsonLd,
   NewsletterFooterCTA,
-  NewsletterInlineCTA,
   NewsletterStickyCTA,
   RiskBadge,
   SponsorBlock,
@@ -291,11 +290,6 @@ export default async function TopicPage({
           </dl>
         </section>
       )}
-
-      <NewsletterInlineCTA
-        headline={`Get the weekly ${topicSeed.name} digest`}
-        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No hype, just evidence."
-      />
 
       <AdSlot slot="between-content" className="mb-10" config={adsConfig} />
 

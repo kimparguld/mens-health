@@ -22,7 +22,6 @@ import {
   Disclaimer,
   EvidenceBadge,
   JsonLd,
-  NewsletterInlineCTA,
   NewsletterSignupForm,
   NewsletterStickyCTA,
   RiskBadge,
@@ -342,11 +341,6 @@ export default async function VideoPage({ params }: { params: Params }) {
           )}
         </>
       )}
-
-      <NewsletterInlineCTA
-        headline="Enjoying this breakdown? Get one every week."
-        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No hype, just evidence."
-      />
 
       <AdSlot slot="between-content" className="mb-8" config={adsConfig} />
 
