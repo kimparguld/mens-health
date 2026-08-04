@@ -171,6 +171,23 @@ model Topic {
   subjects SubjectTopic[]
 }
 
+/// A candidate topic surfaced by the automated discovery job — requires
+/// explicit admin approval before it's merged into the live topic list
+/// (see getAllTopicSeeds in lib/youtube/topics.ts). Never auto-promoted.
+model TopicSuggestion {
+  id                  String           @id @default(cuid())
+  slug                String           @unique
+  name                String
+  query               String
+  description         String
+  suggestedIsHighRisk Boolean          @default(false)
+  popularityScore     Int
+  evidence            Json
+  status              SuggestionStatus @default(PENDING)
+  createdAt           DateTime         @default(now())
+  reviewedAt          DateTime?
+}
+
 model SubjectTopic {
   subjectId String
   topicId   String
@@ -561,6 +578,12 @@ enum InternalVerdictType {
   UNVERIFIED
   INSUFFICIENT_EVIDENCE
   PENDING_REVIEW
+}
+
+enum SuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum SubmissionStatus {
