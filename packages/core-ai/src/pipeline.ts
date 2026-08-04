@@ -7,6 +7,20 @@ export type { Result } from "./result";
 export type AiPipelineOptions = {
   /** Substituted into every prompt in place of the old hardcoded "MenHealth Digest". */
   siteName: string;
+  /**
+   * One-clause description of what this site is, substituted into every
+   * prompt in place of the old hardcoded "a men's health content curation
+   * platform" / "a men's health video review site". E.g. "a men's health
+   * content curation platform" or "a platform that reviews trending
+   * products, courses, and money-making claims for hype vs. reality".
+   */
+  domainDescription: string;
+  /**
+   * One-clause description of who FAQ content is written for, substituted
+   * into generateTopicFaq's prompt in place of the old hardcoded "men aged
+   * 30–55 who are health-conscious but not medical professionals".
+   */
+  audienceDescription: string;
 };
 
 // --- summarizeVideo ---------------------------------------------------------
@@ -146,23 +160,28 @@ export type FaqGenerationInput = {
 };
 
 /**
- * Binds the 5 AI content-generation functions to this site's AI client and
- * brand name, so callers keep calling `summarizeVideo(input)` etc. exactly
- * as before (see apps/menhealth/lib/ai/pipeline.ts).
+ * Binds the 5 AI content-generation functions to this site's AI client,
+ * brand name, and domain/audience description, so callers keep calling
+ * `summarizeVideo(input)` etc. exactly as before (see
+ * apps/menhealth/lib/ai/pipeline.ts).
  *
- * Note: prompt wording below still references men's-health domain examples
- * (TRT, hormones, testosterone, "men aged 30–55") the same way
- * lib/seo/topic-content.ts and lib/seo/glossary.ts do — a new site in a
- * different topic vertical should review and adjust this wording, not just
- * the siteName.
+ * Note: extractClaims/factCheckClaim's prompt wording and the claim
+ * category enum below are still hardcoded to men's-health vocabulary
+ * (NUTRITION/HORMONES/CANCER/etc., "TRT, medications, supplements") because
+ * they're directly coupled to the Prisma `ClaimCategory` enum, which is
+ * itself part of the app's own schema — not something this shared package
+ * can parameterize away. A new site in a different topic vertical needs its
+ * own category taxonomy end-to-end (Prisma schema + this package's claim
+ * prompt + the admin claim editor), not just new siteName/domainDescription
+ * values.
  */
 export function createAiPipeline(client: AiClient, options: AiPipelineOptions) {
-  const { siteName } = options;
+  const { siteName, domainDescription, audienceDescription } = options;
 
   async function summarizeVideo(
     input: SummaryInput,
   ): Promise<Result<SummaryOutput>> {
-    const prompt = `You are an editorial analyst for ${siteName}, a men's health content curation platform.
+    const prompt = `You are an editorial analyst for ${siteName}, ${domainDescription}.
 
 Analyze the following YouTube video metadata and produce a structured editorial summary.
 
@@ -384,7 +403,7 @@ Respond ONLY with the JSON object.`;
   async function generateEditorialTitle(
     input: EditorialTitleInput,
   ): Promise<Result<string>> {
-    const prompt = `You are an SEO editor for ${siteName}, a men's health video review site.
+    const prompt = `You are an SEO editor for ${siteName}, ${domainDescription}.
 
 The video below was reviewed. Its raw YouTube title is often clickbait or doesn't match how people actually search. Write a clear, editorial title for our review page that:
 - Describes what the video claims or covers, in plain search-friendly language
@@ -452,7 +471,7 @@ Respond ONLY with the JSON object. No markdown, no explanation.`;
             .join("\n")
         : "No videos available yet.";
 
-    const prompt = `You are an editorial analyst for ${siteName}, a men's health content curation platform.
+    const prompt = `You are an editorial analyst for ${siteName}, ${domainDescription}.
 
 Generate an SEO-optimised intro paragraph and 3–5 Frequently Asked Questions for the topic: "${input.topicName}".
 
@@ -462,7 +481,7 @@ Recent published videos on this topic:
 ${videoContext}
 
 RULES:
-- Write for men aged 30–55 who are health-conscious but not medical professionals.
+- Write for ${audienceDescription}.
 - Do NOT present content as medical advice. Use neutral, evidence-aware language.
 - Questions must be things people actually search for.
 - Answers must be factual, concise (2–4 sentences), and reference established evidence where possible.

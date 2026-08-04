@@ -126,7 +126,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
         {/* Claim heading */}
         <article>
           <p className="mb-3 text-xs font-semibold tracking-widest text-indigo-600 uppercase">
-            Health claim
+            Claim
           </p>
           <h1 className="text-2xl leading-snug font-bold text-gray-900 sm:text-3xl">
             &ldquo;{claim.text}&rdquo;

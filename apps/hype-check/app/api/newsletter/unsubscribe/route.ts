@@ -61,7 +61,7 @@ function unsubscribeHtml(email: string, wasAlready: boolean): string {
   const safeAppUrl = escapeHtml(appUrl);
   const message = wasAlready
     ? `${safeEmail} was already unsubscribed.`
-    : `${safeEmail} has been unsubscribed from MenHealth Digest.`;
+    : `${safeEmail} has been unsubscribed from Hype Check.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -70,7 +70,7 @@ function unsubscribeHtml(email: string, wasAlready: boolean): string {
   <h1 style="font-size:24px;">✓ Unsubscribed</h1>
   <p>${message}</p>
   <p style="margin-top:32px;">
-    <a href="${safeAppUrl}" style="color:#2563eb;">Back to MenHealth Digest</a>
+    <a href="${safeAppUrl}" style="color:#2563eb;">Back to Hype Check</a>
   </p>
 </body>
 </html>`;

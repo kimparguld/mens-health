@@ -9,20 +9,20 @@ const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
 
 export const metadata: Metadata = {
-  title: "Men's Health Glossary — Key Terms Explained",
+  title: "Hype Check Glossary — Key Terms Explained",
   description:
-    "Plain-English definitions for the hormones, lab markers, treatments, and training terms that come up across men's health content — testosterone, DHT, PSA, VO2 max, and more.",
+    "Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps — evidence score, risk level, guaranteed returns, and more.",
   alternates: { canonical: `${APP_URL}/glossary` },
   openGraph: {
-    title: "Men's Health Glossary — Key Terms Explained",
+    title: "Hype Check Glossary — Key Terms Explained",
     description:
-      "Plain-English definitions for the hormones, lab markers, treatments, and training terms that come up across men's health content.",
+      "Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps.",
     url: `${APP_URL}/glossary`,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Men's Health Glossary — Key Terms Explained",
+    title: "Hype Check Glossary — Key Terms Explained",
   },
 };
 
@@ -37,7 +37,7 @@ export default function GlossaryPage() {
   ]);
 
   const definedTermSetSchema = buildDefinedTermSetSchema({
-    name: "Men's Health Glossary",
+    name: "Hype Check Glossary",
     url: `${APP_URL}/glossary`,
     terms: sortedTerms.map((t) => ({
       name: t.term,
@@ -59,13 +59,13 @@ export default function GlossaryPage() {
 
       <header className="mb-10">
         <h1 className="text-4xl font-bold text-gray-900">
-          Men&apos;s Health Glossary
+          Hype Check Glossary
         </h1>
         <p className="mt-3 text-lg leading-relaxed text-gray-600">
-          Plain-English definitions for the hormones, lab markers, medications,
-          and training terms that come up again and again across men&apos;s
-          health content — so you can follow a video summary without
-          Googling every other word.
+          Plain-English definitions for the evidence, risk, and marketing
+          terms that come up again and again across the videos we review —
+          so you can follow a video summary without Googling every other
+          word.
         </p>
       </header>
 

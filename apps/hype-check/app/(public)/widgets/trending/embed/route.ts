@@ -38,7 +38,7 @@ export async function GET(req: Request): Promise<Response> {
   <style>body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:12px;}</style>
 </head>
 <body>
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">Reviewed by MenHealth Digest</div>
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">Reviewed by Hype Check</div>
   ${itemsHtml || '<p style="font-size:13px;color:#9ca3af;">No videos yet.</p>'}
 </body>
 </html>`;

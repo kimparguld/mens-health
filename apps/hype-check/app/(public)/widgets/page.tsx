@@ -6,27 +6,27 @@ const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
 
 export const metadata: Metadata = createMetadata({
-  title: "Free Embeddable Widget — MenHealth Digest",
+  title: "Free Embeddable Widget — Hype Check",
   description:
-    "Embed trending, evidence-checked men's health videos on your site — free JS widget, iframe, RSS, and JSON API.",
+    "Embed trending, evidence-checked reviews on your site — free JS widget, iframe, RSS, and JSON API.",
   path: "/widgets",
 });
 
 const scriptSnippet = `<script
   src="${APP_URL}/widgets/trending.js"
-  data-topic="testosterone"
+  data-topic="side-hustles"
   data-count="5">
 </script>`;
 
 const iframeSnippet = `<iframe
-  src="${APP_URL}/widgets/trending/embed?topic=testosterone&count=5"
+  src="${APP_URL}/widgets/trending/embed?topic=side-hustles&count=5"
   width="360"
   height="400"
   style="border:1px solid #e5e7eb;border-radius:8px;"
   loading="lazy">
 </iframe>`;
 
-const jsonSnippet = `GET ${APP_URL}/api/widgets/trending?topic=testosterone&count=5`;
+const jsonSnippet = `GET ${APP_URL}/api/widgets/trending?topic=side-hustles&count=5`;
 
 export default function WidgetsPage() {
   return (
@@ -35,9 +35,8 @@ export default function WidgetsPage() {
         Free Embeddable Widget
       </h1>
       <p className="mb-8 text-gray-600">
-        Show trending, evidence-checked men&apos;s health videos on your own
-        site — free, no signup required. Each item links back to our full
-        analysis.
+        Show trending, evidence-checked video reviews on your own site —
+        free, no signup required. Each item links back to our full analysis.
       </p>
 
       <section className="mb-10">

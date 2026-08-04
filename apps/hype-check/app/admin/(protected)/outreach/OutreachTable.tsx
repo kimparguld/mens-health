@@ -101,7 +101,7 @@ Best,
     name: "Sponsor conversation",
     body: `Hi [Name],
 
-I run MenHealth Digest, a site/newsletter that summarises trending men's health content and explains the evidence without hype.
+I run Hype Check, a site/newsletter that reviews trending products, courses, side hustles, and investment apps and gives an evidence-based verdict without the hype.
 
 I'm exploring a small number of relevant sponsors for readers interested in fitness, sleep, nutrition, and longevity.
 

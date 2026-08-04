@@ -6,7 +6,7 @@ import type { Metadata } from "next";
  * Permanent redirect to /newsletter.
  */
 export const metadata: Metadata = {
-  title: "Newsletter — MenHealth Digest",
+  title: "Newsletter — Hype Check",
   alternates: { canonical: "/newsletter" },
 };
 

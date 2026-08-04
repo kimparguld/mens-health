@@ -6,15 +6,15 @@ import { buildItemListSchema } from "@menhealth/core-seo";
 import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
-  title: "Men's Health Video Creators — MenHealth Digest",
+  title: "Video Creators — Hype Check",
   description:
-    "Browse the top men's health YouTube creators we track. Each creator's videos are summarised, scored, and checked for evidence quality.",
+    "Browse the top YouTube creators we track across trending products, courses, side hustles, and investment apps. Each creator's videos are summarised, scored, and checked for evidence quality.",
   path: "/creators",
 });
 
 export default function CreatorsIndexPage() {
   const itemListSchema = buildItemListSchema(
-    "Men's Health Video Creators",
+    "Hype Check Video Creators",
     CREATOR_SEEDS.map((creator) => ({
       name: creator.name,
       url: createCanonicalUrl(`/creators/${creator.slug}`),
@@ -28,8 +28,8 @@ export default function CreatorsIndexPage() {
         Creators
       </h1>
       <p className="mb-8 text-gray-600">
-        We track and analyse videos from these men&apos;s health creators.
-        Browse their top videos, summaries, and evidence ratings.
+        We track and analyse videos from these creators. Browse their top
+        videos, summaries, and evidence ratings.
       </p>
       <ul className="grid gap-4 sm:grid-cols-2">
         {CREATOR_SEEDS.map((creator) => (

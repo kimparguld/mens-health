@@ -3,12 +3,12 @@ import { SocialPostAiOutputSchema } from "@/lib/social/validation";
 
 describe("SocialPostAiOutputSchema", () => {
   const valid = {
-    hook: "This men's health claim is trending.",
+    hook: "This trending claim is going viral.",
     script:
       "A detailed script about the video content and what it means for you.",
     caption:
-      "Hook line.\n\nSummary sentence.\n\nEvidence label: Moderate\nRisk level: Low\n\nEducational only. Not medical advice.\n\nhttps://hype-check.net/videos/test?utm_source=youtube&utm_medium=shorts&utm_campaign=test\n\n#MensHealth #Fitness",
-    hashtags: ["MensHealth", "Fitness"],
+      "Hook line.\n\nSummary sentence.\n\nEvidence label: Moderate\nRisk level: Low\n\nEducational only. Not medical advice.\n\nhttps://hype-check.net/videos/test?utm_source=youtube&utm_medium=shorts&utm_campaign=test\n\n#HypeCheck #Trending",
+    hashtags: ["HypeCheck", "Trending"],
     requiresReview: false,
   };
 
@@ -34,7 +34,7 @@ describe("SocialPostAiOutputSchema", () => {
   it("rejects hashtags with spaces", () => {
     const result = SocialPostAiOutputSchema.safeParse({
       ...valid,
-      hashtags: ["Men's Health"],
+      hashtags: ["Hype Check"],
     });
     expect(result.success).toBe(false);
   });
@@ -43,7 +43,7 @@ describe("SocialPostAiOutputSchema", () => {
     // The schema allows # prefix
     const result = SocialPostAiOutputSchema.safeParse({
       ...valid,
-      hashtags: ["#MensHealth"],
+      hashtags: ["#HypeCheck"],
     });
     expect(result.success).toBe(true);
   });

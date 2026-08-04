@@ -5,17 +5,17 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: "The 5-Minute Men's Health Digest — Free Weekly Newsletter",
+  title: 'The 5-Minute Hype Check Digest — Free Weekly Newsletter',
   description:
-    "Get 5 trending men's health videos summarised, 3 claims checked against the evidence, and 1 practical takeaway — every week. No miracle cures.",
+    'Get 5 trending products, courses, and side hustles summarised, 3 claims checked against the evidence, and 1 practical takeaway — every week. No miracle-earnings nonsense.',
   path: '/newsletter',
 });
 
 const benefits = [
   {
     icon: '📺',
-    title: '5 trending videos summarised',
-    body: "We watch and summarise the week's biggest men's health videos so you don't have to.",
+    title: '5 trending picks summarised',
+    body: "We review the week's biggest trending products, courses, and side hustles so you don't have to.",
   },
   {
     icon: '🔬',
@@ -29,8 +29,8 @@ const benefits = [
   },
   {
     icon: '🚫',
-    title: 'No miracle-cure nonsense',
-    body: 'High-risk claims are labelled. We tell you when the evidence is weak.',
+    title: 'No miracle-earnings nonsense',
+    body: 'Risky and scam-adjacent claims are labelled. We tell you when the evidence is weak.',
   },
 ];
 
@@ -43,11 +43,11 @@ export default function NewsletterPage() {
           Free newsletter
         </p>
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900">
-          The 5-Minute Men&apos;s Health Digest
+          The 5-Minute Hype Check Digest
         </h1>
         <p className="mx-auto mb-8 max-w-md text-lg text-gray-600">
-          Every week: 5 videos summarised, 3 claims checked, 1 takeaway. No
-          hype. No fear-mongering. Unsubscribe any time.
+          Every week: 5 trending picks summarised, 3 claims checked, 1
+          takeaway. No fluff. No fear-mongering. Unsubscribe any time.
         </p>
         <div className="mx-auto">
           <NewsletterSignupForm className="flex-col items-stretch" />
@@ -92,7 +92,7 @@ export default function NewsletterPage() {
               Sample issue · Week of 16 June 2025
             </p>
             <p className="mt-1 text-sm text-gray-600">
-              Men&apos;s health intel, without the noise.
+              Hype check intel, without the noise.
             </p>
           </div>
 
@@ -103,16 +103,15 @@ export default function NewsletterPage() {
                 Top Video This Week
               </p>
               <p className="font-semibold text-gray-900">
-                &ldquo;Morning Sunlight for Testosterone — Does It Actually
-                Work?&rdquo;
+                &ldquo;This AI Trading Bot Promises 40% Monthly Returns — Legit?&rdquo;
               </p>
               <p className="mt-1 text-gray-500">
-                Andrew Huberman Lab · 2.4M views
+                Wealth Hacks Daily · 2.4M views
               </p>
               <p className="mt-2 text-gray-700">
-                Claims morning light exposure boosts testosterone via cortisol
-                rhythm. Mechanistic plausibility is solid; direct RCT evidence
-                in humans is limited.
+                Claims a proprietary algorithm consistently outperforms the
+                market. Backtested results look strong; independent,
+                live-account verification is limited.
               </p>
             </div>
 
@@ -125,18 +124,19 @@ export default function NewsletterPage() {
                 {[
                   {
                     claim:
-                      'Sleep matters more than supplements for testosterone.',
+                      'Diversified index funds outperform actively picked stocks over time.',
                     badge: 'Claim checked — strong evidence',
                     color: 'bg-indigo-100 text-indigo-800',
                   },
                   {
                     claim:
-                      'Cold showers significantly raise testosterone levels.',
+                      'This course guarantees a 6-figure income within 90 days.',
                     badge: 'Claim checked — weak evidence',
                     color: 'bg-orange-100 text-orange-800',
                   },
                   {
-                    claim: 'Creatine accelerates hair loss in young men.',
+                    claim:
+                      "This app's 'auto-invest' feature beats manual investing.",
                     badge: 'Claim checked — mixed / early',
                     color: 'bg-amber-100 text-amber-800',
                   },
@@ -164,9 +164,10 @@ export default function NewsletterPage() {
                 Practical Takeaway
               </p>
               <p className="font-medium text-indigo-900">
-                Prioritise 7–9 hours of sleep before adding any supplement
-                stack. The evidence for sleep is substantially stronger than for
-                most marketed testosterone boosters.
+                Start with a low-cost index fund before paying for any
+                &ldquo;proprietary&rdquo; trading course. The evidence for
+                boring, diversified investing is substantially stronger than
+                for most marketed strategies.
               </p>
             </div>
 
@@ -176,7 +177,8 @@ export default function NewsletterPage() {
                 Most Overhyped Claim This Week
               </p>
               <p className="text-gray-700">
-                &ldquo;This one herb doubled testosterone in 30 days.&rdquo; —
+                &ldquo;This one course turned a broke college dropout into a
+                millionaire in 6 months.&rdquo; —
                 <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
                   Claim checked — not supported
                 </span>
@@ -190,13 +192,13 @@ export default function NewsletterPage() {
               </p>
               <div className="flex flex-wrap gap-3 text-sm">
                 <Link
-                  href="/topics/testosterone"
+                  href="/topics/investment-apps"
                   className="text-indigo-700 hover:underline"
                 >
-                  Testosterone hub →
+                  Investment apps hub →
                 </Link>
                 <Link
-                  href="/rankings/testosterone"
+                  href="/rankings/investment-apps"
                   className="text-indigo-700 hover:underline"
                 >
                   Weekly rankings →
@@ -230,12 +232,12 @@ export default function NewsletterPage() {
             {
               href: '/topics',
               title: 'Topic Hubs',
-              desc: 'Deep dives into testosterone, sleep, longevity, and more.',
+              desc: 'Deep dives into investment apps, side hustles, courses, and more.',
             },
             {
               href: '/rankings',
               title: 'Weekly Rankings',
-              desc: "Top-ranked men's health videos scored by evidence quality.",
+              desc: 'Top-ranked trending products and courses scored by evidence quality.',
             },
             {
               href: '/creators',
@@ -243,7 +245,7 @@ export default function NewsletterPage() {
               desc: 'See which channels we cover and their claim track record.',
             },
             {
-              href: '/weekly/testosterone',
+              href: '/weekly/investment-apps',
               title: "This Week's Picks",
               desc: 'Top videos, claims checked, and a practical takeaway.',
             },
@@ -268,11 +270,12 @@ export default function NewsletterPage() {
       {/* Trust block */}
       <section className="mb-12 text-center">
         <h2 className="mb-3 text-base font-semibold text-gray-900">
-          We take health content seriously
+          We take evidence seriously
         </h2>
         <p className="mb-4 text-sm text-gray-600">
-          High-risk claims are labelled and reviewed before publishing. AI
-          summaries are editorial aids, not financial or legal advice.
+          Risky and scam-adjacent claims are labelled and reviewed before
+          publishing. AI summaries are editorial aids, not financial or legal
+          advice.
         </p>
         <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
           <Link
@@ -302,7 +305,8 @@ export default function NewsletterPage() {
           Ready to get the digest?
         </h2>
         <p className="mb-6 text-sm text-indigo-700">
-          Join readers who want clear, evidence-aware men&apos;s health content.
+          Join readers who want clear, evidence-aware verdicts on trending
+          hype.
         </p>
         <div className="mx-auto max-w-sm">
           <NewsletterSignupForm />

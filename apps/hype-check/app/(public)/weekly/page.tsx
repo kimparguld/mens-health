@@ -4,9 +4,9 @@ import { TOPIC_SEEDS } from "@/lib/youtube/topics";
 import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
-  title: "Weekly Men's Health Trend Pages — MenHealth Digest",
+  title: "Weekly Trend Pages — Hype Check",
   description:
-    "The top trending men's health videos summarised each week by topic. Evidence labels, claim checks, practical takeaways.",
+    "The top trending videos summarised each week by topic. Evidence labels, claim checks, practical takeaways.",
   path: "/weekly",
 });
 
@@ -17,8 +17,8 @@ export default function WeeklyIndexPage() {
         Weekly Trend Pages
       </h1>
       <p className="mb-8 text-gray-600">
-        Choose a topic to see the week&apos;s best men&apos;s health videos,
-        summarised and evidence-checked.
+        Choose a topic to see the week&apos;s best videos, summarised and
+        evidence-checked.
       </p>
       <ul className="grid gap-4 sm:grid-cols-2">
         {TOPIC_SEEDS.map((topic) => (

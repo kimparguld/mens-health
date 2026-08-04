@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-// We're aliased on a second domain (mens-healths.com) that serves the exact
-// same app. Search engines penalize/waste crawl budget on duplicate domains,
+// If this app is ever aliased on a second domain serving the exact same
+// content, search engines penalize/waste crawl budget on duplicate domains,
 // so we 308-redirect any non-canonical custom domain to the canonical one
 // instead of relying solely on <link rel="canonical">. Vercel preview
 // deployments (*.vercel.app) and localhost are left alone so previews and

@@ -23,7 +23,7 @@ export async function generateMetadata({
   const stats = report.stats as unknown as MonthlyReportStats;
 
   return createMetadata({
-    title: `${stats.periodLabel} Men's Health Video Report — MenHealth Digest`,
+    title: `${stats.periodLabel} Report — Hype Check`,
     description: `${stats.videosPublished} videos reviewed, ${stats.claimsAssessed} claims assessed in ${stats.periodLabel}. Evidence quality, risk levels, and sourcing breakdown.`,
     path: `/reports/${slug}`,
     type: "article",
@@ -47,11 +47,11 @@ export default async function ReportPage({ params }: { params: Params }) {
       </nav>
 
       <h1 className="mb-2 text-3xl font-bold tracking-tight text-gray-900">
-        {stats.periodLabel} Men&apos;s Health Video Report
+        {stats.periodLabel} Report
       </h1>
       <p className="mb-6 text-gray-600">
         {stats.videosPublished} videos reviewed, {stats.claimsAssessed} claims
-        assessed. Methodology: every video published on MenHealth Digest in
+        assessed. Methodology: every video published on Hype Check in
         this period, with claims extracted and evidence-checked as described
         on our{" "}
         <Link href="/editorial-process" className="text-blue-600 hover:underline">

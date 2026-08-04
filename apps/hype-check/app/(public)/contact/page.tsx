@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with MenHealth Digest.",
+  description: "Get in touch with Hype Check.",
 };
 
 export default function ContactPage() {

@@ -4,9 +4,9 @@ import { db } from "@/lib/db/prisma";
 import Link from "next/link";
 
 export const metadata: Metadata = createMetadata({
-  title: "Newsletter Archive — MenHealth Digest",
+  title: "Newsletter Archive — Hype Check",
   description:
-    "Past issues of the MenHealth Digest weekly newsletter — trending videos, claims checked, and practical takeaways.",
+    "Past issues of the Hype Check weekly newsletter — trending products, claims checked, and practical takeaways.",
   path: "/newsletter/archive",
 });
 

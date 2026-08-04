@@ -45,21 +45,21 @@ export async function generateMetadata({
   const canonical = `${APP_URL}/topics/${slug}`;
 
   return {
-    title: `${topic.name} — Men's Health Guide`,
+    title: `${topic.name} — Hype Check`,
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${topic.name} — MenHealth Digest`,
+      title: `${topic.name} — Hype Check`,
       description,
       url: canonical,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${topic.name} — MenHealth Digest`,
+      title: `${topic.name} — Hype Check`,
       description,
     },
-    keywords: [topic.name, "men's health", 'health guide', 'evidence-based'],
+    keywords: [topic.name, 'legit or scam', 'evidence-based review', 'is it worth it'],
   };
 }
 
@@ -273,7 +273,7 @@ export default async function TopicPage({
 
       <NewsletterInlineCTA
         headline={`Get the weekly ${topicSeed.name} digest`}
-        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
+        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No hype, just evidence."
       />
 
       <AdSlot slot="between-content" className="mb-10" config={adsConfig} />
@@ -532,7 +532,7 @@ export default async function TopicPage({
       </div>
 
       <Disclaimer text={DISCLAIMER_TEXT} />
-      <NewsletterStickyCTA label="Free weekly men's health digest" />
+      <NewsletterStickyCTA label="Free weekly Hype Check digest" />
     </main>
   );
 }

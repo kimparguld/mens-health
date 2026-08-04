@@ -38,16 +38,16 @@ export async function notifyCreatorIfApplicable(videoId: string): Promise<void> 
   const fromEmail =
     env.RESEND_FROM_EMAIL ?? `digest@${new URL(appUrl).hostname}`;
 
-  const subject = "Your video was featured on MenHealth Digest";
+  const subject = "Your video was featured on Hype Check";
   const html = `<p>Hi ${seed.name},</p>
-<p>We included your video "${video.title}" in a MenHealth Digest review.</p>
+<p>We included your video "${video.title}" in a Hype Check review.</p>
 <ul>
   <li>Evidence rating: ${evidenceLabel(video.evidenceScore)}</li>
   <li>Risk rating: ${video.riskLevel}</li>
 </ul>
 <p>You can view the full analysis here: <a href="${reviewUrl}">${reviewUrl}</a></p>
 <p>If we misunderstood a claim or missed a source, just reply to this email with a correction — we review and update pages when creators flag something.</p>
-<p>— MenHealth Digest</p>`;
+<p>— Hype Check</p>`;
 
   try {
     const { error } = await resend.emails.send({

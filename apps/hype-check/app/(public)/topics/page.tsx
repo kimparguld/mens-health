@@ -6,15 +6,15 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: "Men's Health Topics — MenHealth Digest",
+  title: "Topics — Hype Check",
   description:
-    "Browse every men's health topic we track — testosterone, sleep, muscle gain, longevity, and more — each with evidence-checked video summaries and FAQs.",
+    "Browse every topic we track — AI tools, side hustles, online courses, viral products, investment apps, and more — each with evidence-checked video summaries and FAQs.",
   path: '/topics',
 });
 
 export default function TopicsIndexPage() {
   const itemListSchema = buildItemListSchema(
-    "Men's Health Topics",
+    "Hype Check Topics",
     TOPIC_SEEDS.map((topic) => ({
       name: topic.name,
       url: createCanonicalUrl(`/topics/${topic.slug}`),
@@ -28,8 +28,8 @@ export default function TopicsIndexPage() {
         Topics
       </h1>
       <p className="mb-8 text-gray-600">
-        Every men&apos;s health topic we track, each with evidence-checked video
-        summaries, common myths, and frequently asked questions.
+        Every topic we track, each with evidence-checked video summaries,
+        common myths, and frequently asked questions.
       </p>
       <ul className="grid gap-4 sm:grid-cols-2">
         {TOPIC_SEEDS.map((topic) => (

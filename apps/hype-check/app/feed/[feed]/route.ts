@@ -21,17 +21,17 @@ const SPECIAL_FEEDS: Record<
   }
 > = {
   "weekly.xml": {
-    title: "MenHealth Digest — This Week",
+    title: "Hype Check — This Week",
     description: "Videos published in the last 7 days.",
     load: getWeeklyFeedVideos,
   },
   "high-risk.xml": {
-    title: "MenHealth Digest — High Risk Claims",
-    description: "Videos flagged for high-risk health claims.",
+    title: "Hype Check — High Risk Claims",
+    description: "Videos flagged for high-risk claims.",
     load: getHighRiskFeedVideos,
   },
   "strong-evidence.xml": {
-    title: "MenHealth Digest — Strong Evidence",
+    title: "Hype Check — Strong Evidence",
     description: "Videos whose claims are backed by strong evidence.",
     load: getStrongEvidenceFeedVideos,
   },
@@ -65,7 +65,7 @@ export async function GET(
   const videos = await getTopicFeedVideos(topic.slug);
   const xml = buildRssFeed(
     {
-      title: `MenHealth Digest — ${topic.name}`,
+      title: `Hype Check — ${topic.name}`,
       description: topic.description,
       link: `${appUrl}/topics/${topic.slug}`,
     },
