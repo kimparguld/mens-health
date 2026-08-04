@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, EB_Garamond } from "next/font/google";
+import { Inter, Zilla_Slab } from "next/font/google";
 import { Suspense } from "react";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
@@ -16,11 +16,10 @@ const inter = Inter({
   display: "swap",
 });
 
-const ebGaramond = EB_Garamond({
-  variable: "--font-logotype",
+const zillaSlab = Zilla_Slab({
+  variable: "--font-slab",
   subsets: ["latin"],
-  weight: "600",
-  style: "italic",
+  weight: "700",
   display: "swap",
 });
 
@@ -82,7 +81,7 @@ export default function RootLayout({
     <>
       <html
         lang="en"
-        className={`${inter.variable} ${ebGaramond.variable} h-full antialiased`}
+        className={`${inter.variable} ${zillaSlab.variable} h-full antialiased`}
       >
         <body className="flex min-h-full flex-col">
           {adsEnabled && (
