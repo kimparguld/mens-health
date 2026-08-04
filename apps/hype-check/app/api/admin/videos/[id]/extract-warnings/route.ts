@@ -1,0 +1,91 @@
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db/prisma";
+import { extractWarningsCostsDisclosures } from "@/lib/ai/extract-warnings-costs-disclosures";
+import { revalidateTag } from "next/cache";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
+export async function POST(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const session = await auth();
+  if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { id } = await params;
+
+  const subject = await db.subject.findUnique({
+    where: { id },
+    include: {
+      sourceVideos: {
+        take: 1,
+        orderBy: { createdAt: "desc" },
+        include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+      },
+    },
+  });
+
+  if (!subject) {
+    return NextResponse.json({ error: "Video not found" }, { status: 404 });
+  }
+
+  const sourceVideo = subject.sourceVideos[0];
+  const summary = sourceVideo?.summaries[0];
+  if (!sourceVideo || !summary) {
+    return NextResponse.json(
+      { error: "Generate a summary for this video first" },
+      { status: 400 },
+    );
+  }
+
+  const result = await extractWarningsCostsDisclosures({
+    title: sourceVideo.title,
+    description: sourceVideo.description ?? "",
+    shortSummary: summary.shortSummary,
+  });
+
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error.message }, { status: 500 });
+  }
+
+  const { warningSigns, costItems, disclosures } = result.value;
+
+  if (warningSigns.length > 0) {
+    await db.warningSign.createMany({
+      data: warningSigns.map((w) => ({
+        subjectId: subject.id,
+        text: w.text,
+        severity: w.severity,
+        source: "ai-extraction",
+      })),
+    });
+  }
+  if (costItems.length > 0) {
+    await db.costItem.createMany({
+      data: costItems.map((c) => ({
+        subjectId: subject.id,
+        label: c.label,
+        amount: c.amount,
+        isHidden: c.isHidden,
+        notes: c.notes ?? null,
+      })),
+    });
+  }
+  if (disclosures.length > 0) {
+    await db.disclosure.createMany({
+      data: disclosures.map((d) => ({
+        subjectId: subject.id,
+        text: d.text,
+        detected: d.detected,
+        source: "ai-extraction",
+      })),
+    });
+  }
+
+  revalidateTag("videos", "max");
+  revalidateTag(`video:${subject.slug}`, "max");
+
+  return NextResponse.json({ ok: true });
+}
