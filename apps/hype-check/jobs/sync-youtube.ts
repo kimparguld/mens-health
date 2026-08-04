@@ -1,7 +1,7 @@
 import { db } from "@/lib/db/prisma";
 import { searchAndEnrichVideos } from "@/lib/youtube/client";
 import { scoreVideo, detectsClickbait } from "@/lib/youtube/scoring";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
+import { getAllTopicSeeds } from "@/lib/youtube/topics";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -51,7 +51,9 @@ export async function syncYouTubeVideos(): Promise<{
   let skipped = 0;
   let errors = 0;
 
-  for (const topic of TOPIC_SEEDS) {
+  const topics = await getAllTopicSeeds();
+
+  for (const topic of topics) {
     try {
       // Upsert topic
       const dbTopic = await db.topic.upsert({
