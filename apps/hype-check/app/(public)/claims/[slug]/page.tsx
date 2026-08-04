@@ -5,11 +5,11 @@ import { buildBreadcrumbSchema } from '@menhealth/core-seo';
 import {
   AdSlot,
   Disclaimer,
-  EvidenceBadge,
   JsonLd,
   NewsletterFooterCTA,
-  RiskBadge,
 } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -147,8 +147,8 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
           {/* Badges */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <EvidenceBadge status={claim.evidenceStatus} showNotChecked />
-            <RiskBadge level={claim.riskLevel} />
+            <EvidenceStamp status={claim.evidenceStatus} showNotChecked />
+            <RiskStamp level={claim.riskLevel} />
             <span className="text-xs text-gray-400 capitalize">
               {claim.claimType.replace(/_/g, ' ').toLowerCase()}
             </span>

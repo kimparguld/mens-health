@@ -4,11 +4,11 @@ import { CREATOR_SEEDS } from '@/lib/youtube/creators';
 import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
 import {
   Disclaimer,
-  EvidenceBadge,
   JsonLd,
   NewsletterFooterCTA,
   VideoCard,
 } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -393,7 +393,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                       <span className="flex-1 text-gray-800">
                         &ldquo;{claim.text}&rdquo;
                       </span>
-                      <EvidenceBadge
+                      <EvidenceStamp
                         status={claim.evidenceStatus}
                         showNotChecked
                       />

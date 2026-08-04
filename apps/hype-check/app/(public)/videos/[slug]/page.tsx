@@ -20,14 +20,14 @@ import {
   AdSlot,
   AffiliateDisclosure,
   Disclaimer,
-  EvidenceBadge,
   JsonLd,
   NewsletterSignupForm,
   NewsletterStickyCTA,
-  RiskBadge,
   SponsorBlock,
   YouTubePlayer,
 } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -205,10 +205,10 @@ export default async function VideoPage({ params }: { params: Params }) {
             {vt.topic.name}
           </Link>
         ))}
-        <EvidenceBadge
+        <EvidenceStamp
           status={video.claims[0]?.evidenceStatus ?? 'NOT_CHECKED'}
         />
-        <RiskBadge level={video.riskLevel} />
+        <RiskStamp level={video.riskLevel} />
       </div>
 
       {/* Title */}
@@ -360,8 +360,8 @@ export default async function VideoPage({ params }: { params: Params }) {
                   className="hover:border-ink-muted/30 block rounded-lg border border-gray-200 p-4 transition-colors"
                 >
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <RiskBadge level={claim.riskLevel} />
-                    <EvidenceBadge status={claim.evidenceStatus} />
+                    <RiskStamp level={claim.riskLevel} />
+                    <EvidenceStamp status={claim.evidenceStatus} />
                   </div>
                   <p className="text-sm font-medium text-gray-900">
                     {claim.text}
