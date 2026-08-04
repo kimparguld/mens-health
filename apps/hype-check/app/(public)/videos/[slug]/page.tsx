@@ -297,8 +297,8 @@ export default async function VideoPage({ params }: { params: Params }) {
             </div>
           )}
           {warnings.length > 0 && (
-            <div className="border-verdict-risky/30 bg-verdict-risky/10 text-verdict-risky rounded-lg border px-4 py-3 text-sm">
-              <span className="font-semibold">Be careful: </span>
+            <div className="border-verdict-risky/30 bg-verdict-risky/10 text-ink-muted rounded-lg border px-4 py-3 text-sm">
+              <span className="text-verdict-risky font-semibold">Be careful: </span>
               {warnings[0]}
             </div>
           )}

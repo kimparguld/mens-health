@@ -20,7 +20,7 @@ export async function PremiumSection({ claims }: { claims: Claim[] }) {
     <PremiumGate isPremium={isPremium} premiumEnabled={premium?.isEnabled() ?? false}>
       <div className="space-y-4">
         {claims.map((claim) => (
-          <div key={claim.id} className="rounded-lg border border-gray-200 p-4">
+          <div key={claim.id} className="rounded-lg border border-hairline p-4">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <RiskStamp level={claim.riskLevel as "LOW" | "MEDIUM" | "HIGH"} />
               <EvidenceStamp
@@ -34,9 +34,9 @@ export async function PremiumSection({ claims }: { claims: Claim[] }) {
                 }
               />
             </div>
-            <p className="text-sm font-medium text-gray-900">{claim.text}</p>
+            <p className="text-sm font-medium text-ink-muted">{claim.text}</p>
             {claim.explanation && (
-              <p className="mt-1 text-xs text-gray-500">{claim.explanation}</p>
+              <p className="mt-1 text-xs text-ink-muted/60">{claim.explanation}</p>
             )}
           </div>
         ))}

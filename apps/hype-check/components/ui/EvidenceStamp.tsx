@@ -1,3 +1,5 @@
+import { STAMP_BASE_CLASS } from './stampStyles';
+
 const EVIDENCE_CONFIG: Record<string, { label: string; className: string }> = {
   SUPPORTED: {
     label: 'Claim checked — strong evidence',
@@ -37,7 +39,7 @@ export function EvidenceStamp({
 
   return (
     <span
-      className={`inline-block rounded-sm border-[1.5px] px-2 py-0.5 font-slab text-[0.65rem] font-bold tracking-wide uppercase ${config?.className}`}
+      className={`${STAMP_BASE_CLASS} ${config?.className}`}
     >
       {config?.label}
     </span>
