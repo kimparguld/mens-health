@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f5f1e8;
+  --surface: #fbf9f4;
+  --ink: #14110f;
+  --ink-muted: #6b6459;
+  --hairline: #d9d2c3;
+  --brand-red: #c1272d;
+  --verdict-legit: #1e7a46;
+  --verdict-misleading: #a6791f;
+  --verdict-overpriced: #c1652b;
+  --verdict-risky: #b8452b;
+  --verdict-scam: #c1272d;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-hairline: var(--hairline);
+  --color-brand-red: var(--brand-red);
+  --color-verdict-legit: var(--verdict-legit);
+  --color-verdict-misleading: var(--verdict-misleading);
+  --color-verdict-overpriced: var(--verdict-overpriced);
+  --color-verdict-risky: var(--verdict-risky);
+  --color-verdict-scam: var(--verdict-scam);
   --font-sans: var(--font-inter);
+  --font-slab: var(--font-slab);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #14110f;
+    --surface: #1c1815;
+    --ink: #f5f1e8;
+    --ink-muted: #b5aea0;
+    --hairline: #3a342c;
+    --brand-red: #e2555a;
+    --verdict-legit: #34a868;
+    --verdict-misleading: #d9a83b;
+    --verdict-overpriced: #e08a4c;
+    --verdict-risky: #e0684c;
+    --verdict-scam: #e2555a;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--paper);
+  color: var(--ink);
   font-family:
     var(--font-sans),
     system-ui,
@@ -50,22 +78,19 @@ a {
 }
 
 .mh-logotype {
-  --mh-logo-mark-size: 2.45rem;
-  --mh-logo-wordmark-height: 2.45rem;
-  --mh-logo-top-size: 0.66rem;
-  --mh-logo-bottom-size: 1.2rem;
+  --mh-logo-mark-size: 2.35rem;
+  --mh-logo-wordmark-size: 1.35rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.62rem;
-  color: #4338ca;
-  padding-top: 0.3rem;
+  gap: 0.5rem;
+  color: var(--ink);
 }
 
 .mh-logotype-mark {
   width: var(--mh-logo-mark-size);
   height: var(--mh-logo-mark-size);
   display: inline-flex;
-  filter: drop-shadow(0 5px 11px rgba(67, 56, 202, 0.22));
+  transform: rotate(-4deg);
 }
 
 .mh-logotype-mark svg {
@@ -73,50 +98,22 @@ a {
   height: 100%;
 }
 
-.mh-logotype-mark-wave {
-  stroke: #eef2ff;
-  stroke-width: 3.2;
-  opacity: 0.95;
+.mh-logotype-mark-burst {
+  fill: var(--ink);
 }
 
-.mh-logotype-mark-shield {
-  fill: rgba(238, 242, 255, 0.78);
-  stroke: rgba(79, 70, 229, 0.88);
-  stroke-width: 1.6;
+.mh-logotype-mark-check {
+  stroke: var(--paper);
+  stroke-width: 3.4;
 }
 
 .mh-logotype-wordmark {
-  min-height: var(--mh-logo-wordmark-height);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  line-height: 1.06;
-  padding-block: 0.05rem 0.09rem;
-  white-space: nowrap;
-  overflow: visible;
-}
-
-.mh-logotype-top {
-  display: block;
-  font-size: var(--mh-logo-top-size);
-  letter-spacing: 0.22em;
+  font-family: var(--font-slab), Georgia, "Times New Roman", serif;
   font-weight: 700;
-  color: #4338ca;
-  padding-top: 0.1rem;
-  text-transform: uppercase;
-}
-
-.mh-logotype-bottom {
-  display: block;
-  line-height: 1.3;
-  font-size: var(--mh-logo-bottom-size);
-  font-family:
-    var(--font-logotype), "Iowan Old Style", "Palatino Linotype",
-    "Book Antiqua", serif;
-  font-style: italic;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: #3730a3;
+  font-size: var(--mh-logo-wordmark-size);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 .mh-logotype:hover .mh-logotype-mark,
@@ -124,45 +121,23 @@ a {
   animation: mh-logo-pulse 600ms ease-out;
 }
 
-.mh-logotype:hover .mh-logotype-bottom,
-.mh-logotype:focus-visible .mh-logotype-bottom {
-  background: linear-gradient(90deg, #00150f, #00150f, #00150f);
-  background-size: 210% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: mh-logo-sweep 850ms ease-out;
-}
-
-@keyframes mh-logo-sweep {
-  0% {
-    background-position: 100% 0;
-  }
-
-  100% {
-    background-position: 0 0;
-  }
-}
-
 @keyframes mh-logo-pulse {
   0% {
-    transform: scale(1);
+    transform: rotate(-4deg) scale(1);
   }
 
   50% {
-    transform: scale(1.08);
+    transform: rotate(-4deg) scale(1.08);
   }
 
   100% {
-    transform: scale(1);
+    transform: rotate(-4deg) scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .mh-logotype:hover .mh-logotype-mark,
-  .mh-logotype:focus-visible .mh-logotype-mark,
-  .mh-logotype:hover .mh-logotype-bottom,
-  .mh-logotype:focus-visible .mh-logotype-bottom {
+  .mh-logotype:focus-visible .mh-logotype-mark {
     animation: none;
   }
 }
