@@ -30,22 +30,6 @@
   --font-slab: var(--font-slab);
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #14110f;
-    --surface: #1c1815;
-    --ink: #4f39f6;
-    --ink-muted: #b5aea0;
-    --hairline: #3a342c;
-    --brand-red: #e2555a;
-    --verdict-legit: #34a868;
-    --verdict-misleading: #d9a83b;
-    --verdict-overpriced: #e08a4c;
-    --verdict-risky: #e0684c;
-    --verdict-scam: #e2555a;
-  }
-} */
-
 body {
   background: var(--paper);
   color: var(--ink-muted);
