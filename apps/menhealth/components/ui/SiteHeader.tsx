@@ -127,7 +127,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/60 backdrop-blur-sm">
+      <header className="border-hairline sticky top-0 z-30 border-b bg-white/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-2 lg:py-4">
           <Link
             href="/"
@@ -221,14 +221,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               <button
                 type="button"
                 onClick={closeDrawer}
-                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 aria-label="Close menu"
               >
                 <CloseIcon />
               </button>
             </div>
 
-            <div className="mx-6 border-t border-gray-100" />
+            <div className="mx-6 border-hairline border-t" />
 
             {/* Nav links */}
             <nav className="flex flex-1 flex-col overflow-y-auto px-4 py-4">
@@ -242,7 +242,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                   {link.label}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
+                    className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-700"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -257,7 +257,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 </Link>
               ))}
 
-              <div className="mx-2 my-3 border-t border-gray-100" />
+              <div className="mx-2 my-3 border-hairline border-t" />
               {premium?.isEnabled() && (
                 <>
                   {user ? (
@@ -269,7 +269,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                       {user.name ?? user.email ?? 'Account'}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
+                        className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-700"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -291,7 +291,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                       Sign in
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
+                        className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-700"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

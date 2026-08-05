@@ -59,7 +59,7 @@ export default async function ClaimsIndexPage() {
 
       <ul className="mt-8 divide-y divide-gray-100">
         {claims.length === 0 && (
-          <li className="py-6 text-center text-sm text-gray-500">
+          <li className="py-6 text-center text-sm text-gray-700">
             No claims published yet. Check back soon.
           </li>
         )}
@@ -72,7 +72,7 @@ export default async function ClaimsIndexPage() {
                   <p className="text-sm font-medium text-gray-900 group-hover:text-emerald-700">
                     {claim.text}
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">
+                  <p className="mt-1 text-xs text-gray-600">
                     {claim.video.channel.title} — {claim.video.title}
                   </p>
                 </div>

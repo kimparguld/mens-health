@@ -17,7 +17,7 @@ export function RiskBadge({ level }: { level: string }) {
   const config = RISK_CONFIG[level] ?? RISK_CONFIG['LOW'];
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config?.className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium ${config?.className}`}
     >
       {config?.label}
     </span>

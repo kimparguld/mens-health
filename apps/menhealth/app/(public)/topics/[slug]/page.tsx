@@ -203,7 +203,7 @@ export default async function TopicPage({
 
       {/* Hero */}
       <header className="mb-8">
-        <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
+        <nav className="mb-3 text-sm text-gray-700" aria-label="Breadcrumb">
           <Link href="/" className="hover:underline">
             Home
           </Link>{' '}
@@ -250,7 +250,7 @@ export default async function TopicPage({
           <h2 className="mb-1 text-xl font-semibold text-gray-900">
             Evidence overview
           </h2>
-          <p className="mb-4 text-sm text-gray-500">
+          <p className="mb-4 text-sm text-gray-700">
             How claims about {topicSeed.name.toLowerCase()} across all reviewed
             videos stack up against the evidence.
           </p>
@@ -272,7 +272,7 @@ export default async function TopicPage({
                 key={row.label}
                 className="rounded-xl border border-gray-200 bg-white px-4 py-3"
               >
-                <dt className="text-xs text-gray-500">{row.label}</dt>
+                <dt className="text-xs text-gray-700">{row.label}</dt>
                 <dd className="mt-1 text-xl font-semibold text-gray-900">
                   {row.value}
                 </dd>
@@ -377,7 +377,7 @@ export default async function TopicPage({
 
       {/* Video grid */}
       {publishedVideos.length === 0 ? (
-        <p className="text-gray-500">No published videos for this topic yet.</p>
+        <p className="text-gray-700">No published videos for this topic yet.</p>
       ) : (
         <section className="mb-12">
           {/* Featured this week: always top 3 across all pages */}
@@ -443,7 +443,7 @@ export default async function TopicPage({
           className="mb-12 flex items-center justify-between text-sm"
           aria-label="Pagination"
         >
-          <span className="text-gray-500">
+          <span className="text-gray-700">
             Page {page} of {totalPages}
           </span>
           <div className="flex gap-2">
@@ -523,7 +523,7 @@ export default async function TopicPage({
                   {link.label}
                 </a>
                 {link.commission && (
-                  <span className="ml-2 text-xs text-gray-400">
+                  <span className="ml-2 text-xs text-gray-600">
                     ({link.commission} commission)
                   </span>
                 )}

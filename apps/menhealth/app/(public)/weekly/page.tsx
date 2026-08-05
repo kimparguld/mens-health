@@ -30,7 +30,7 @@ export default function WeeklyIndexPage() {
               <span className="text-base font-semibold text-gray-900">
                 Best {topic.name} videos this week
               </span>
-              <span className="mt-1 text-sm text-gray-500">
+              <span className="mt-1 text-sm text-gray-700">
                 {topic.description}
               </span>
             </Link>

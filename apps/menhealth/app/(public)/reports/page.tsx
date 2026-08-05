@@ -28,7 +28,7 @@ export default async function ReportsIndexPage() {
       </p>
       <ul className="divide-y divide-gray-100">
         {reports.length === 0 && (
-          <li className="py-6 text-center text-sm text-gray-500">
+          <li className="py-6 text-center text-sm text-gray-700">
             No reports published yet. Check back next month.
           </li>
         )}

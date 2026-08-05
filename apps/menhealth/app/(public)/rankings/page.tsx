@@ -41,7 +41,7 @@ export default function RankingsIndexPage() {
               <span className="text-base font-semibold text-gray-900">
                 {topic.name}
               </span>
-              <span className="mt-1 text-sm text-gray-500">
+              <span className="mt-1 text-sm text-gray-700">
                 {topic.description}
               </span>
             </Link>
