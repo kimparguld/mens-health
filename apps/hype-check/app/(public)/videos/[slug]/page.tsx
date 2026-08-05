@@ -25,7 +25,6 @@ import {
   Disclaimer,
   JsonLd,
   NewsletterSignupForm,
-  NewsletterStickyCTA,
   SponsorBlock,
   YouTubePlayer,
 } from '@menhealth/ui';
@@ -357,12 +356,14 @@ export default async function VideoPage({ params }: { params: Params }) {
             Warning Signs
           </h2>
           <ul className="space-y-2">
-            {video.warningSigns.map((w: (typeof video.warningSigns)[number]) => (
-              <li key={w.id} className="flex items-start gap-2">
-                <RiskStamp level={w.severity} />
-                <span className="text-ink-muted/90 text-sm">{w.text}</span>
-              </li>
-            ))}
+            {video.warningSigns.map(
+              (w: (typeof video.warningSigns)[number]) => (
+                <li key={w.id} className="flex items-start gap-2">
+                  <RiskStamp level={w.severity} />
+                  <span className="text-ink-muted/90 text-sm">{w.text}</span>
+                </li>
+              )
+            )}
           </ul>
         </section>
       )}
@@ -542,10 +543,10 @@ export default async function VideoPage({ params }: { params: Params }) {
       {/* Disclosures */}
       {(() => {
         const disclosedItems = video.disclosures.filter(
-          (d: (typeof video.disclosures)[number]) => d.detected,
+          (d: (typeof video.disclosures)[number]) => d.detected
         );
         const undisclosedItems = video.disclosures.filter(
-          (d: (typeof video.disclosures)[number]) => !d.detected,
+          (d: (typeof video.disclosures)[number]) => !d.detected
         );
 
         return (
@@ -629,7 +630,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             Join readers who want clear, evidence-aware verdicts on trending
             hype.
           </p>
-          <NewsletterSignupForm />
+          <NewsletterSignupForm site="hype-check" />
           <p className="mt-3 text-xs text-white/40">
             Unsubscribe any time. No spam.
           </p>
@@ -641,7 +642,6 @@ export default async function VideoPage({ params }: { params: Params }) {
         text={DISCLAIMER_TEXT}
         className="border-gray-200 bg-white text-gray-500"
       />
-      <NewsletterStickyCTA label="Free weekly Hype Check digest" />
     </main>
   );
 }

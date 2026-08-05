@@ -1,32 +1,41 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { Suspense } from "react";
-import { YouTubePlayer, AdSlot, Disclaimer, AffiliateDisclosure, SponsorBlock, EvidenceBadge, RiskBadge, NewsletterInlineCTA, NewsletterFooterCTA, NewsletterStickyCTA, JsonLd } from "@menhealth/ui";
-import { PremiumSection } from "./PremiumSection";
-import { adsConfig } from "@/lib/ads-config";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
+import { adsConfig } from '@/lib/ads-config';
 import {
-  buildVideoObjectSchema,
-  buildBreadcrumbSchema,
-  buildArticleSchema,
-} from "@menhealth/core-seo";
+  getPublishedVideoSlugByYouTubeId,
+  getRelatedVideos,
+  getVideoBySlug,
+  getVideoBySlugForMeta,
+} from '@/lib/db/queries';
 import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
-} from "@/lib/monetization/resolvers";
-import { redirect } from "next/navigation";
+} from '@/lib/monetization/resolvers';
+import { getGlossaryTermsForTopics } from '@/lib/seo/glossary';
+import { MEDICAL_DISCLAIMER_TEXT, SITE_NAME } from '@/lib/site-brand';
 import {
-  getVideoBySlug,
-  getVideoBySlugForMeta,
-  getPublishedVideoSlugByYouTubeId,
-  getRelatedVideos,
-} from "@/lib/db/queries";
-import { getGlossaryTermsForTopics } from "@/lib/seo/glossary";
-import { SITE_NAME } from "@/lib/site-brand";
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+  buildVideoObjectSchema,
+} from '@menhealth/core-seo';
+import {
+  AdSlot,
+  AffiliateDisclosure,
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterFooterCTA,
+  NewsletterInlineCTA,
+  RiskBadge,
+  SponsorBlock,
+  YouTubePlayer,
+} from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { Suspense } from 'react';
+import { PremiumSection } from './PremiumSection';
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ slug: string }>;
 
@@ -38,10 +47,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const video = await getVideoBySlugForMeta(slug);
 
-  if (!video) return { title: "Video Not Found" };
+  if (!video) return { title: 'Video Not Found' };
 
   const description =
-    video.summaries[0]?.shortSummary ?? video.description ?? "";
+    video.summaries[0]?.shortSummary ?? video.description ?? '';
   const canonical = `${APP_URL}/videos/${slug}`;
   const displayTitle = video.editorialTitle ?? video.title;
 
@@ -51,21 +60,21 @@ export async function generateMetadata({
     alternates: { canonical },
     keywords: [
       "men's health",
-      "health video summary",
-      "evidence-based health",
+      'health video summary',
+      'evidence-based health',
       video.title,
     ],
     openGraph: {
       title: displayTitle,
       description,
       url: canonical,
-      type: "article",
+      type: 'article',
       publishedTime: new Date(video.publishedAt).toISOString(),
       modifiedTime: new Date(video.updatedAt).toISOString(),
       images: video.thumbnailUrl ? [{ url: video.thumbnailUrl }] : [],
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: displayTitle,
       description,
       images: video.thumbnailUrl ? [video.thumbnailUrl] : [],
@@ -110,7 +119,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const firstTopic = video.topics[0]?.topic;
   const glossaryTerms = getGlossaryTermsForTopics(
-    video.topics.map((vt: (typeof video.topics)[number]) => vt.topic.slug),
+    video.topics.map((vt: (typeof video.topics)[number]) => vt.topic.slug)
   );
 
   const [sponsor, affiliateLinks, relatedVideos] = await Promise.all([
@@ -121,7 +130,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const videoSchema = buildVideoObjectSchema({
     title: video.title,
-    description: summary?.shortSummary ?? video.description ?? "",
+    description: summary?.shortSummary ?? video.description ?? '',
     thumbnailUrl: video.thumbnailUrl,
     publishedAt: video.publishedAt,
     channelTitle: video.channel.title,
@@ -134,7 +143,7 @@ export default async function VideoPage({ params }: { params: Params }) {
   const displayTitle = video.editorialTitle ?? video.title;
 
   const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
+    { name: 'Home', url: APP_URL },
     ...(firstTopic
       ? [{ name: firstTopic.name, url: `${APP_URL}/topics/${firstTopic.slug}` }]
       : []),
@@ -143,7 +152,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const articleSchema = buildArticleSchema({
     headline: displayTitle,
-    description: summary?.shortSummary ?? video.description ?? "",
+    description: summary?.shortSummary ?? video.description ?? '',
     imageUrl: video.thumbnailUrl,
     publishedAt: video.publishedAt,
     updatedAt: video.updatedAt,
@@ -162,8 +171,8 @@ export default async function VideoPage({ params }: { params: Params }) {
       <nav className="mb-6 text-sm text-gray-500">
         <Link href="/" className="hover:underline">
           Home
-        </Link>{" "}
-        /{" "}
+        </Link>{' '}
+        /{' '}
         {video.topics[0] && (
           <>
             <Link
@@ -171,8 +180,8 @@ export default async function VideoPage({ params }: { params: Params }) {
               className="hover:underline"
             >
               {video.topics[0].topic.name}
-            </Link>{" "}
-            /{" "}
+            </Link>{' '}
+            /{' '}
           </>
         )}
         <span className="text-gray-900">{displayTitle}</span>
@@ -190,7 +199,7 @@ export default async function VideoPage({ params }: { params: Params }) {
           </Link>
         ))}
         <EvidenceBadge
-          status={video.claims[0]?.evidenceStatus ?? "NOT_CHECKED"}
+          status={video.claims[0]?.evidenceStatus ?? 'NOT_CHECKED'}
         />
         <RiskBadge level={video.riskLevel} />
       </div>
@@ -207,7 +216,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Meta */}
       <p className="mb-1 text-sm text-gray-500">
-        Channel:{" "}
+        Channel:{' '}
         <a
           href={`https://www.youtube.com/channel/${video.channel.youtubeId}`}
           target="_blank"
@@ -216,7 +225,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         >
           {video.channel.title}
         </a>
-        {" · "}
+        {' · '}
         <a
           href={`https://www.youtube.com/watch?v=${video.youtubeVideoId}`}
           target="_blank"
@@ -229,7 +238,9 @@ export default async function VideoPage({ params }: { params: Params }) {
       {summary?.reviewerName && (
         <p className="mb-1 text-sm text-gray-500">
           Reviewed by {summary.reviewerName}
-          {summary.reviewerCredentials ? `, ${summary.reviewerCredentials}` : ""}
+          {summary.reviewerCredentials
+            ? `, ${summary.reviewerCredentials}`
+            : ''}
         </p>
       )}
       <p className="mb-6 text-xs text-gray-400">
@@ -508,7 +519,6 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Disclaimer — required on every video page */}
       <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
-      <NewsletterStickyCTA label="Free weekly men's health digest" />
     </main>
   );
 }

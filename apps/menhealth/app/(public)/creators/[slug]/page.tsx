@@ -1,8 +1,14 @@
-import { NewsletterFooterCTA, JsonLd, Disclaimer, EvidenceBadge, VideoCard } from "@menhealth/ui";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { db } from '@/lib/db/prisma';
-import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
+import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
+import {
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterFooterCTA,
+  VideoCard,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';

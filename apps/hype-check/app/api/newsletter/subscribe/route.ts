@@ -41,8 +41,12 @@ function isRateLimited(
   return false;
 }
 
-// Generic response so attackers cannot enumerate subscribers.
-const GENERIC_OK = NextResponse.json({ ok: true });
+// Generic response so attackers cannot enumerate subscribers. A fresh
+// NextResponse must be created per call — its body is a one-shot stream,
+// so a single shared instance returns an empty body after its first use.
+function genericOk(): NextResponse {
+  return NextResponse.json({ ok: true });
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // Rate limit by IP
@@ -50,7 +54,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   if (isRateLimited(ipAttempts, ip, MAX_ATTEMPTS_PER_IP)) {
     // Return generic success to prevent enumeration
-    return GENERIC_OK;
+    return genericOk();
   }
 
   let body: unknown;
@@ -76,7 +80,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   // Rate limit by normalised email address
   if (isRateLimited(emailAttempts, email, MAX_ATTEMPTS_PER_EMAIL)) {
-    return GENERIC_OK;
+    return genericOk();
   }
 
   const attribution = {
@@ -93,7 +97,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (existing && !existing.unsubscribedAt) {
     // Return generic success — do not reveal that the address is already subscribed.
-    return GENERIC_OK;
+    return genericOk();
   }
 
   // Single opt-in: there is no separate confirmation email/link, so being
@@ -114,14 +118,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         unsubscribed: false,
         ...(segmentId ? { segments: [{ id: segmentId }] } : {}),
       });
-      if (result.data?.id && !subscriber.resendContactId) {
+      if (result.error) {
+        // The Resend SDK does not throw on API errors, only returns them.
+        console.error("Resend contact sync failed:", result.error);
+      } else if (result.data?.id && !subscriber.resendContactId) {
         await db.newsletterSubscriber.update({
           where: { email },
           data: { resendContactId: result.data.id },
         });
       }
-    } catch {
+    } catch (err) {
       // Non-fatal: subscription is recorded in DB regardless
+      console.error("Resend contact sync threw:", err);
     }
   }
 
@@ -136,15 +144,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         env.RESEND_FROM_EMAIL ?? `digest@${new URL(appUrl).hostname}`;
       const unsubscribeUrl = `${appUrl}/api/newsletter/unsubscribe?id=${subscriber.id}`;
 
-      await resend.emails.send({
+      const sendResult = await resend.emails.send({
         from: fromEmail,
         to: [email],
         subject: welcomeSubject,
         html: buildWelcomeHtml(appUrl, unsubscribeUrl),
         text: buildWelcomeText(appUrl, unsubscribeUrl),
       });
-    } catch {
+      if (sendResult.error) {
+        // The Resend SDK does not throw on API errors, only returns them —
+        // without this check, delivery failures are invisible.
+        console.error("Welcome email send failed:", sendResult.error);
+      }
+    } catch (err) {
       // Non-fatal: subscription is recorded in DB regardless
+      console.error("Welcome email send threw:", err);
     }
   }
 

@@ -306,7 +306,7 @@ export default function NewsletterPage() {
           Join readers who want clear, evidence-aware verdicts on trending hype.
         </p>
         <div className="mx-auto max-w-sm">
-          <NewsletterSignupForm />
+          <NewsletterSignupForm site="hype-check" />
         </div>
       </section>
 

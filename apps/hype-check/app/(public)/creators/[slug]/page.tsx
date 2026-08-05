@@ -437,6 +437,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
         <NewsletterFooterCTA
           headline="Follow the evidence, not the hype"
           description="Get the 5-minute Hype Check digest every Friday — trending videos, summarised claims, evidence notes."
+          site="hype-check"
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">

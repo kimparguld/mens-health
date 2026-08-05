@@ -69,7 +69,7 @@ export default async function NewsletterIssuePage({
           Get next week&apos;s issue
         </h2>
         <div className="mt-4">
-          <NewsletterSignupForm />
+          <NewsletterSignupForm site="hype-check" />
         </div>
       </div>
     </main>

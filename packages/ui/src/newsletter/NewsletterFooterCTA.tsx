@@ -1,18 +1,32 @@
+import { twMerge } from 'tailwind-merge';
 import { NewsletterSignupForm } from '../ui/NewsletterSignupForm';
 
 type Props = {
   headline: string;
   description: string;
+  site?: string;
 };
 
-export function NewsletterFooterCTA({ headline, description }: Props) {
+export function NewsletterFooterCTA({ headline, description, site = 'menhealth' }: Props) {
+  let wrapperClass = 'border-gray-200 bg-gray-50 py-12';
+  let titleClass = 'text-emerald-700';
+  let headlineClass = 'text-2xl text-gray-900';
+  let descriptionClass = 'text-sm text-gray-500';
+
+  if (site === 'hype-check') {
+    wrapperClass = 'border-hairline bg-ink-muted rounded-xl border px-6 py-8 text-center';
+    titleClass = 'text-ink';
+    headlineClass = 'text-xl text-white';
+    descriptionClass = 'text-sm text-white/60';
+  }
+
   return (
-    <section className="border-t border-gray-200 bg-gray-50 py-12">
+    <section className={twMerge('border-t', wrapperClass)}>
       <div className="mx-auto max-w-xl px-4 text-center">
-        <p className="mb-1 text-xs font-semibold tracking-wide text-emerald-700 uppercase">Free newsletter</p>
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">{headline}</h2>
-        <p className="mb-6 text-sm text-gray-500">{description}</p>
-        <NewsletterSignupForm />
+        <p className={twMerge('mb-1 text-xs font-semibold tracking-wide uppercase', titleClass)}>Free newsletter</p>
+        <h2 className={twMerge('mb-2  font-bold ', headlineClass)}>{headline}</h2>
+        <p className={twMerge('mb-6 ', descriptionClass)}>{description}</p>
+        <NewsletterSignupForm site={site} />
         <p className="mt-3 text-xs text-gray-400">Unsubscribe any time. No spam.</p>
       </div>
     </section>
