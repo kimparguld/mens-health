@@ -44,7 +44,7 @@ export default function WidgetsPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">
           JavaScript widget (recommended)
         </h2>
-        <p className="mb-3 text-sm text-gray-500">
+        <p className="mb-3 text-sm text-gray-700">
           Renders inline wherever you place the script tag.
         </p>
         <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
@@ -56,7 +56,7 @@ export default function WidgetsPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">
           iframe embed
         </h2>
-        <p className="mb-3 text-sm text-gray-500">
+        <p className="mb-3 text-sm text-gray-700">
           Use this if your site strips inline scripts.
         </p>
         <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
@@ -68,7 +68,7 @@ export default function WidgetsPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">
           JSON API
         </h2>
-        <p className="mb-3 text-sm text-gray-500">
+        <p className="mb-3 text-sm text-gray-700">
           For custom integrations. Returns evidence label, risk level, and a
           link to the full review for each video. CORS-enabled.
         </p>
@@ -81,7 +81,7 @@ export default function WidgetsPage() {
         <h2 className="mb-2 text-lg font-semibold text-gray-900">
           RSS feeds
         </h2>
-        <p className="mb-3 text-sm text-gray-500">
+        <p className="mb-3 text-sm text-gray-700">
           Subscribe in Feedly or any reader — one feed per topic, plus
           site-wide, weekly, high-risk, and strong-evidence feeds.
         </p>

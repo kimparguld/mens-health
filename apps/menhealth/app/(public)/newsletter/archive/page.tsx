@@ -28,7 +28,7 @@ export default async function NewsletterArchivePage() {
       </p>
       <ul className="divide-y divide-gray-100">
         {issues.length === 0 && (
-          <li className="py-6 text-center text-sm text-gray-500">
+          <li className="py-6 text-center text-sm text-gray-700">
             No issues published yet. Check back soon.
           </li>
         )}
@@ -40,7 +40,7 @@ export default async function NewsletterArchivePage() {
             >
               {issue.subject}
             </Link>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-gray-600">
               {issue.sentAt.toLocaleDateString()}
             </p>
           </li>

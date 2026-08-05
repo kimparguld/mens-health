@@ -41,17 +41,17 @@ export default async function AccountPage() {
 
       {/* Profile */}
       <section className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold tracking-wide text-gray-500 uppercase">
+        <h2 className="mb-4 text-sm font-semibold tracking-wide text-gray-700 uppercase">
           Profile
         </h2>
         <dl className="space-y-3 text-sm">
           <div className="flex justify-between">
-            <dt className="text-gray-500">Email</dt>
+            <dt className="text-gray-700">Email</dt>
             <dd className="font-medium text-gray-900">{user.email ?? "—"}</dd>
           </div>
           {user.name && (
             <div className="flex justify-between">
-              <dt className="text-gray-500">Name</dt>
+              <dt className="text-gray-700">Name</dt>
               <dd className="font-medium text-gray-900">{user.name}</dd>
             </div>
           )}
@@ -60,7 +60,7 @@ export default async function AccountPage() {
 
       {/* Subscription */}
       <section className="mb-6 rounded-xl border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-sm font-semibold tracking-wide text-gray-500 uppercase">
+        <h2 className="mb-4 text-sm font-semibold tracking-wide text-gray-700 uppercase">
           Subscription
         </h2>
         {isPremium ? (
@@ -71,7 +71,7 @@ export default async function AccountPage() {
               </span>
             </div>
             {periodEnd && (
-              <p className="text-gray-500">
+              <p className="text-gray-700">
                 {subscription?.cancelAtPeriodEnd
                   ? `Cancels on ${periodEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`
                   : `Renews on ${periodEnd.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`}
@@ -81,7 +81,7 @@ export default async function AccountPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm text-gray-500">You are on the free plan.</p>
+            <p className="text-sm text-gray-700">You are on the free plan.</p>
             <Link
               href="/upgrade"
               className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"

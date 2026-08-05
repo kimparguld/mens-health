@@ -51,7 +51,7 @@ export default function NewsletterPage() {
         </p>
         <div className="mx-auto">
           <NewsletterSignupForm className="flex-col items-stretch" />
-          <p className="mt-2 text-xs text-gray-400">
+          <p className="mt-2 text-xs text-gray-600">
             Free forever. Unsubscribe any time.
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function NewsletterPage() {
               <h3 className="mt-2 text-sm font-semibold text-gray-900">
                 {b.title}
               </h3>
-              <p className="mt-1 text-sm text-gray-500">{b.body}</p>
+              <p className="mt-1 text-sm text-gray-700">{b.body}</p>
             </li>
           ))}
         </ul>
@@ -99,14 +99,14 @@ export default function NewsletterPage() {
           <div className="divide-y divide-gray-100 text-sm">
             {/* Top Video */}
             <div className="px-6 py-5">
-              <p className="mb-2 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+              <p className="mb-2 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
                 Top Video This Week
               </p>
               <p className="font-semibold text-gray-900">
                 &ldquo;Morning Sunlight for Testosterone — Does It Actually
                 Work?&rdquo;
               </p>
-              <p className="mt-1 text-gray-500">
+              <p className="mt-1 text-gray-700">
                 Andrew Huberman Lab · 2.4M views
               </p>
               <p className="mt-2 text-gray-700">
@@ -118,7 +118,7 @@ export default function NewsletterPage() {
 
             {/* 3 Claims Checked */}
             <div className="px-6 py-5">
-              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
                 3 Claims Checked
               </p>
               <ul className="space-y-3">
@@ -185,7 +185,7 @@ export default function NewsletterPage() {
 
             {/* Explore More */}
             <div className="px-6 py-5">
-              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
                 Explore More
               </p>
               <div className="flex flex-wrap gap-3 text-sm">
@@ -201,12 +201,12 @@ export default function NewsletterPage() {
                 >
                   Weekly rankings →
                 </Link>
-                <Link href="/topics" className="text-gray-500 hover:underline">
+                <Link href="/topics" className="text-gray-700 hover:underline">
                   All topics →
                 </Link>
                 <Link
                   href="/creators"
-                  className="text-gray-500 hover:underline"
+                  className="text-gray-700 hover:underline"
                 >
                   All creators →
                 </Link>
@@ -214,7 +214,7 @@ export default function NewsletterPage() {
             </div>
           </div>
         </div>
-        <p className="mt-3 text-center text-xs text-gray-400">
+        <p className="mt-3 text-center text-xs text-gray-600">
           Sample only. Actual claims and evidence ratings are generated from
           real published videos and reviewed before sending.
         </p>
@@ -259,7 +259,7 @@ export default function NewsletterPage() {
               className="rounded-xl border border-gray-200 bg-white px-5 py-4 hover:border-emerald-300 hover:shadow-sm"
             >
               <p className="font-semibold text-gray-900">{item.title} →</p>
-              <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
+              <p className="mt-1 text-sm text-gray-700">{item.desc}</p>
             </Link>
           ))}
         </div>
@@ -274,7 +274,7 @@ export default function NewsletterPage() {
           High-risk claims are labelled and reviewed before publishing. AI
           summaries are editorial aids, not medical advice.
         </p>
-        <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
+        <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-700">
           <Link
             href="/medical-disclaimer"
             className="underline hover:text-gray-900"

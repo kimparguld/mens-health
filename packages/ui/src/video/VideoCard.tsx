@@ -39,7 +39,7 @@ export function VideoCard({
   return (
     <Link
       href={`/videos/${slug}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="border-hairline group flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       {thumbnailUrl && (
         <div className="relative aspect-video w-full bg-gray-100">
@@ -69,19 +69,19 @@ export function VideoCard({
           <div className="flex flex-wrap items-center gap-1.5">
             {evidenceLabel && <EvidenceBadge status={evidenceLabel} />}
             {watchTimeMin && (
-              <span className="text-xs text-gray-400">
+              <span className="text-sm text-gray-600">
                 {watchTimeMin} min watch
               </span>
             )}
           </div>
         )}
-        <h3 className="line-clamp-2 text-sm font-semibold text-gray-900 group-hover:text-emerald-700">
+        <h3 className="line-clamp-2 text-base font-semibold text-gray-900 group-hover:text-emerald-700">
           {title}
         </h3>
         {shortSummary && (
-          <p className="line-clamp-2 text-xs text-gray-500">{shortSummary}</p>
+          <p className="line-clamp-2 text-sm text-gray-700">{shortSummary}</p>
         )}
-        <p className="mt-auto text-xs text-gray-400">{channelTitle}</p>
+        <p className="mt-auto text-sm text-gray-600">{channelTitle}</p>
       </div>
     </Link>
   );

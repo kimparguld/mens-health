@@ -8,10 +8,10 @@ type Props = {
 };
 
 export function NewsletterFooterCTA({ headline, description, site = 'menhealth' }: Props) {
-  let wrapperClass = 'border-gray-200 bg-gray-50 py-12';
+  let wrapperClass = 'border-hairline bg-gray-50 py-12';
   let titleClass = 'text-emerald-700';
   let headlineClass = 'text-2xl text-gray-900';
-  let descriptionClass = 'text-sm text-gray-500';
+  let descriptionClass = 'text-base text-gray-700';
 
   if (site === 'hype-check') {
     wrapperClass = 'border-hairline bg-ink-muted rounded-xl border px-6 py-8 text-center';
@@ -27,7 +27,7 @@ export function NewsletterFooterCTA({ headline, description, site = 'menhealth' 
         <h2 className={twMerge('mb-2  font-bold ', headlineClass)}>{headline}</h2>
         <p className={twMerge('mb-6 ', descriptionClass)}>{description}</p>
         <NewsletterSignupForm site={site} />
-        <p className="mt-3 text-xs text-gray-400">Unsubscribe any time. No spam.</p>
+        <p className="mt-3 text-sm text-gray-600">Unsubscribe any time. No spam.</p>
       </div>
     </section>
   );
