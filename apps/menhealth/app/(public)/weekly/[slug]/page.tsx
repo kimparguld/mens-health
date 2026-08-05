@@ -126,7 +126,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
 
         {videos.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center">
-            <p className="text-gray-500">
+            <p className="text-gray-700">
               No videos published this week yet. Check back soon.
             </p>
             <Link
@@ -232,7 +232,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             )}
 
             {/* All videos */}
-            <p className="mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+            <p className="mb-3 text-xs font-semibold tracking-wide text-gray-700 uppercase">
               All videos this week
             </p>
             <ol className="space-y-16">
@@ -284,7 +284,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
         )}
 
         <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
-          <p className="mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+          <p className="mb-3 text-xs font-semibold tracking-wide text-gray-700 uppercase">
             Explore More
           </p>
           <ul className="flex flex-wrap gap-3 text-sm">

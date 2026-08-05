@@ -50,7 +50,7 @@ export default function GlossaryPage() {
     <main className="mx-auto max-w-4xl px-4 py-10">
       <JsonLd schema={[breadcrumbSchema, definedTermSetSchema]} />
 
-      <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
+      <nav className="mb-3 text-sm text-gray-700" aria-label="Breadcrumb">
         <Link href="/" className="hover:underline">
           Home
         </Link>{" "}

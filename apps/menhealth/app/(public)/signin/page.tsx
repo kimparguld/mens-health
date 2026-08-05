@@ -54,7 +54,7 @@ export default function SignInPage(_props: {
     <main className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
         <h1 className="mb-1 text-xl font-bold text-gray-900">Sign in</h1>
-        <p className="mb-6 text-sm text-gray-500">
+        <p className="mb-6 text-sm text-gray-700">
           Create a free account or sign in to track your content.
         </p>
 
@@ -80,7 +80,7 @@ export default function SignInPage(_props: {
 
         <div className="my-5 flex items-center gap-3">
           <hr className="flex-1 border-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
+          <span className="text-xs text-gray-600">or</span>
           <hr className="flex-1 border-gray-200" />
         </div>
 
@@ -110,7 +110,7 @@ export default function SignInPage(_props: {
           Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-xs text-gray-400">
+        <p className="mt-6 text-center text-xs text-gray-600">
           By signing in you agree to our terms and privacy policy.
         </p>
       </div>

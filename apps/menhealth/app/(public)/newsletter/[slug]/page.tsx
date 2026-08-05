@@ -39,7 +39,7 @@ export default async function NewsletterIssuePage({
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
-      <nav className="mb-6 text-sm text-gray-500">
+      <nav className="mb-6 text-sm text-gray-700">
         <Link href="/newsletter" className="hover:underline">
           Newsletter
         </Link>{" "}
@@ -53,7 +53,7 @@ export default async function NewsletterIssuePage({
       <h1 className="mb-1 text-2xl font-bold text-gray-900">
         {issue.subject}
       </h1>
-      <p className="mb-6 text-sm text-gray-400">
+      <p className="mb-6 text-sm text-gray-600">
         {issue.sentAt.toLocaleDateString()}
       </p>
 

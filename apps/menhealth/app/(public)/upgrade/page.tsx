@@ -42,7 +42,7 @@ export default function UpgradePage() {
           <h1 className="mt-4 text-3xl font-bold text-gray-900">
             Go deeper on men&apos;s health
           </h1>
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2 text-gray-700">
             Evidence-first content. No noise. Cancel anytime.
           </p>
         </div>
@@ -61,7 +61,7 @@ export default function UpgradePage() {
 
         <div className="mb-6 text-center">
           <span className="text-4xl font-bold text-gray-900">$9</span>
-          <span className="text-gray-500"> / month</span>
+          <span className="text-gray-700"> / month</span>
         </div>
 
         {error && (
@@ -78,7 +78,7 @@ export default function UpgradePage() {
           {loading ? "Redirecting…" : "Start premium — $9/mo"}
         </button>
 
-        <p className="mt-4 text-center text-xs text-gray-400">
+        <p className="mt-4 text-center text-xs text-gray-600">
           Secure checkout via Stripe. You can cancel at any time.
         </p>
       </div>

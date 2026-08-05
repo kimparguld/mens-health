@@ -97,9 +97,9 @@ export default async function WeeklyRankingPage({
       <JsonLd schema={listSchema} />
       <main>
         {/* Header */}
-        <section className="border-b border-gray-100 bg-white py-12">
+        <section className="border-b border-hairline bg-white py-12">
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-400">
+            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-600">
               <Link href="/" className="hover:text-gray-600">
                 Home
               </Link>
@@ -116,19 +116,19 @@ export default async function WeeklyRankingPage({
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Best {seed.name} Videos This Week
             </h1>
-            <p className="mt-3 max-w-xl text-base text-gray-500">
+            <p className="mt-3 max-w-xl text-base text-gray-700">
               {isFallback
                 ? `Top-ranked ${seed.name.toLowerCase()} videos on YouTube — summarised and scored for evidence quality.`
                 : `Top-ranked ${seed.name.toLowerCase()} videos added this week — summarised and scored for evidence quality.`}
             </p>
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs text-gray-600">
               {isFallback ? 'All-time top picks' : `Updated ${weekLabel}`}
             </p>
           </div>
         </section>
 
         {/* How rankings work */}
-        <section className="border-b border-gray-100 bg-gray-50 py-8">
+        <section className="border-b border-hairline bg-gray-50 py-8">
           <div className="mx-auto max-w-4xl px-4">
             <details className="group">
               <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-gray-700">
@@ -167,7 +167,7 @@ export default async function WeeklyRankingPage({
                     <p className="font-semibold text-gray-800">
                       {item.icon} {item.label}
                     </p>
-                    <p className="mt-1 text-gray-500">{item.desc}</p>
+                    <p className="mt-1 text-gray-700">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -180,7 +180,7 @@ export default async function WeeklyRankingPage({
           <div className="mx-auto max-w-4xl px-4">
             {displayVideos.length === 0 ? (
               <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
-                <p className="text-gray-500">
+                <p className="text-gray-700">
                   No videos indexed yet for this topic.{' '}
                   <Link href="/" className="text-emerald-600 hover:underline">
                     Browse all topics →
@@ -221,7 +221,7 @@ export default async function WeeklyRankingPage({
         </section>
 
         {/* Navigation links */}
-        <section className="border-t border-gray-100 bg-gray-50 py-8">
+        <section className="border-t border-hairline bg-gray-50 py-8">
           <div className="mx-auto flex max-w-4xl flex-wrap gap-4 px-4">
             <Link
               href={`/topics/${topic}`}
@@ -239,7 +239,7 @@ export default async function WeeklyRankingPage({
         </section>
 
         {/* Cross-links to other weekly rankings */}
-        <section className="border-t border-gray-100 bg-gray-50 py-10">
+        <section className="border-t border-hairline bg-gray-50 py-10">
           <div className="mx-auto max-w-4xl px-4">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">
               Other weekly rankings

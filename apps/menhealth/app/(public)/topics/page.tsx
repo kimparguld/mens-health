@@ -44,7 +44,7 @@ export default function TopicsIndexPage() {
                 </span>
                 {topic.isHighRisk && <RiskBadge level="HIGH" />}
               </div>
-              <span className="mt-1 text-sm text-gray-500">
+              <span className="mt-1 text-sm text-gray-700">
                 {topic.description}
               </span>
             </Link>

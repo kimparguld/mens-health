@@ -187,9 +187,9 @@ export default async function CreatorPage({ params }: { params: Params }) {
       <JsonLd schema={[breadcrumb, personSchema]} />
       <main>
         {/* Header */}
-        <section className="border-b border-gray-100 bg-white py-12">
+        <section className="border-b border-hairline bg-white py-12">
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-400">
+            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-600">
               <Link href="/" className="hover:text-gray-600">
                 Home
               </Link>
@@ -206,7 +206,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
               {creator.name}
             </h1>
             {creator.credentials && (
-              <p className="mt-1 text-sm font-medium text-gray-500">
+              <p className="mt-1 text-sm font-medium text-gray-700">
                 {creator.credentials}
               </p>
             )}
@@ -246,7 +246,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
             {/* Trust score if available */}
             {channel && (
-              <p className="mt-3 text-xs text-gray-400">
+              <p className="mt-3 text-xs text-gray-600">
                 Trust score:{' '}
                 <span className="font-medium text-gray-600">
                   {(channel.trustScore * 100).toFixed(0)}
@@ -260,12 +260,12 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
         {/* Evidence scorecard */}
         {scorecard.claimsAssessed > 0 && (
-          <section className="border-b border-gray-100 bg-white py-10">
+          <section className="border-b border-hairline bg-white py-10">
             <div className="mx-auto max-w-4xl px-4">
               <h2 className="mb-1 text-lg font-semibold text-gray-900">
                 Evidence Scorecard
               </h2>
-              <p className="mb-6 text-sm text-gray-500">
+              <p className="mb-6 text-sm text-gray-700">
                 A factual summary of claims we&apos;ve checked from{' '}
                 {creator.name}&apos;s videos — not an overall opinion of the
                 creator.
@@ -286,9 +286,9 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 ].map((row) => (
                   <div
                     key={row.label}
-                    className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
+                    className="rounded-xl border border-hairline bg-gray-50 px-4 py-3"
                   >
-                    <dt className="text-xs text-gray-500">{row.label}</dt>
+                    <dt className="text-xs text-gray-700">{row.label}</dt>
                     <dd className="mt-1 text-xl font-semibold text-gray-900">
                       {row.value}
                     </dd>
@@ -310,7 +310,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
             {videos.length === 0 ? (
               <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
-                <p className="text-gray-500">
+                <p className="text-gray-700">
                   {channel
                     ? "Videos from this creator will appear here once they've been indexed."
                     : "We haven't indexed any videos from this creator yet — our system surfaces videos by topic, so coverage varies by creator."}
@@ -346,7 +346,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
         </section>
 
         {/* Other creators */}
-        <section className="border-t border-gray-100 bg-gray-50 py-10">
+        <section className="border-t border-hairline bg-gray-50 py-10">
           <div className="mx-auto max-w-4xl px-4">
             {/* Most common topics */}
             {topTopics.length > 0 && (
@@ -362,7 +362,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                       className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-emerald-300 hover:text-emerald-700"
                     >
                       {t.name}{' '}
-                      <span className="text-gray-400">({t.count})</span>
+                      <span className="text-gray-600">({t.count})</span>
                     </Link>
                   ))}
                 </div>
@@ -379,7 +379,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                   {claims.map((claim) => (
                     <li
                       key={claim.id}
-                      className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm"
+                      className="flex flex-wrap items-center gap-2 rounded-xl border border-hairline bg-white px-4 py-3 text-sm"
                     >
                       <span className="flex-1 text-gray-800">
                         &ldquo;{claim.text}&rdquo;

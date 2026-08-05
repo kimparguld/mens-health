@@ -168,7 +168,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       <JsonLd schema={articleSchema} />
 
       {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-gray-500">
+      <nav className="mb-6 text-sm text-gray-700">
         <Link href="/" className="hover:underline">
           Home
         </Link>{' '}
@@ -209,13 +209,13 @@ export default async function VideoPage({ params }: { params: Params }) {
         {displayTitle}
       </h1>
       {video.editorialTitle && video.editorialTitle !== video.title && (
-        <p className="mb-2 text-sm text-gray-400">
+        <p className="mb-2 text-sm text-gray-600">
           Originally titled: &ldquo;{video.title}&rdquo;
         </p>
       )}
 
       {/* Meta */}
-      <p className="mb-1 text-sm text-gray-500">
+      <p className="mb-1 text-sm text-gray-700">
         Channel:{' '}
         <a
           href={`https://www.youtube.com/channel/${video.channel.youtubeId}`}
@@ -236,14 +236,14 @@ export default async function VideoPage({ params }: { params: Params }) {
         </a>
       </p>
       {summary?.reviewerName && (
-        <p className="mb-1 text-sm text-gray-500">
+        <p className="mb-1 text-sm text-gray-700">
           Reviewed by {summary.reviewerName}
           {summary.reviewerCredentials
             ? `, ${summary.reviewerCredentials}`
             : ''}
         </p>
       )}
-      <p className="mb-6 text-xs text-gray-400">
+      <p className="mb-6 text-xs text-gray-600">
         Published {new Date(video.publishedAt).toLocaleDateString()}
         {new Date(video.updatedAt).getTime() !==
           new Date(video.publishedAt).getTime() &&
@@ -363,7 +363,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                     {claim.text}
                   </p>
                   {claim.explanation && (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-700">
                       {claim.explanation}
                     </p>
                   )}
@@ -445,7 +445,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                 >
                   {rv.title}
                 </Link>
-                <span className="ml-2 text-xs text-gray-400">
+                <span className="ml-2 text-xs text-gray-600">
                   {rv.channel.title}
                 </span>
               </li>
@@ -461,7 +461,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <h2 className="mb-2 text-sm font-semibold text-gray-900">
           Are you the creator of this video?
         </h2>
-        <p className="mb-3 text-sm text-gray-500">
+        <p className="mb-3 text-sm text-gray-700">
           Embed this badge on your site or in your video description to link
           back to our review.
         </p>
@@ -498,7 +498,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                   {link.label}
                 </a>
                 {link.commission && (
-                  <span className="ml-2 text-xs text-gray-400">
+                  <span className="ml-2 text-xs text-gray-600">
                     ({link.commission} commission)
                   </span>
                 )}

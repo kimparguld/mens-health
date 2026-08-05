@@ -42,7 +42,7 @@ export default async function PublicLayout({
 
       <div className="flex-1">{children}</div>
 
-      <footer className="border-t border-gray-200 bg-gray-50">
+      <footer className="border-hairline border-t bg-gray-50">
         <div className="mx-auto max-w-280 px-4 py-12">
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {/* Brand */}
@@ -53,11 +53,11 @@ export default async function PublicLayout({
               >
                 <BrandLogotype size="md" />
               </Link>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
+              <p className="mt-2 text-sm leading-relaxed text-gray-700">
                 Evidence-aware summaries of trending men&apos;s health content —
                 without the hype.
               </p>
-              <ul className="mt-4 space-y-1 text-xs text-gray-500">
+              <ul className="mt-4 space-y-1 text-xs text-gray-700">
                 <li>✓ Educational content only. Not medical advice.</li>
                 <li>✓ We do not host or restream YouTube videos.</li>
                 <li>✓ Affiliate links are clearly disclosed.</li>
@@ -67,7 +67,7 @@ export default async function PublicLayout({
             {/* About links */}
             <div>
               <h3 className="text-sm font-semibold text-gray-900">About</h3>
-              <ul className="mt-3 space-y-2 text-sm text-gray-500">
+              <ul className="mt-3 space-y-2 text-sm text-gray-700">
                 <li>
                   <Link href="/about" className="hover:text-gray-900">
                     About Us
@@ -135,7 +135,7 @@ export default async function PublicLayout({
                   Top Topics
                 </Link>
               </h3>
-              <ul className="mt-3 space-y-2 text-sm text-gray-500">
+              <ul className="mt-3 space-y-2 text-sm text-gray-700">
                 {FOOTER_TOPICS.map((topic) => (
                   <li key={topic.slug}>
                     <Link
@@ -158,7 +158,7 @@ export default async function PublicLayout({
             </div>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-6 text-xs text-gray-400">
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-gray-200 pt-6 text-xs text-gray-600">
             <p>
               © {new Date().getFullYear()} MenHealth Digest. All rights
               reserved.

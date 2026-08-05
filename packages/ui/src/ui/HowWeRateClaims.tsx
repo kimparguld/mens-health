@@ -33,17 +33,17 @@ const RATINGS = [
 
 export function HowWeRateClaims() {
   return (
-    <section className="bg-gray-50 py-14">
+    <section className="border-hairline border-t bg-gray-50 py-14">
       <div className="mx-auto max-w-[1120px] px-4">
         <h2 className="mb-2 text-2xl font-bold text-gray-900">How our evidence labels work</h2>
-        <p className="mb-8 text-gray-600">Every claim we review gets one of five evidence ratings.</p>
+        <p className="mb-8 text-gray-700">Every claim we review gets one of five evidence ratings.</p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {RATINGS.map(({ label, className, description }) => (
-            <div key={label} className="border-hairline rounded-md border bg-white p-3">
-              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}>
+            <div key={label} className="border-hairline rounded-md border bg-white p-4">
+              <span className={`inline-block rounded-full px-2.5 py-0.5 text-sm font-medium ${className}`}>
                 {label}
               </span>
-              <p className="mt-3 text-sm leading-relaxed text-gray-600">{description}</p>
+              <p className="mt-3 text-sm leading-relaxed text-gray-700">{description}</p>
             </div>
           ))}
         </div>

@@ -111,7 +111,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
       <JsonLd schema={breadcrumb} />
       <main className="mx-auto max-w-2xl px-4 py-12">
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 text-xs text-gray-400">
+        <nav className="mb-6 flex items-center gap-2 text-xs text-gray-600">
           <Link href="/" className="hover:text-gray-600">
             Home
           </Link>
@@ -143,7 +143,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <EvidenceBadge status={claim.evidenceStatus} showNotChecked />
             <RiskBadge level={claim.riskLevel} />
-            <span className="text-xs text-gray-400 capitalize">
+            <span className="text-xs text-gray-600 capitalize">
               {claim.category.replace(/_/g, ' ').toLowerCase()}
             </span>
           </div>
@@ -180,7 +180,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
                 {claim.sources.map((source) => (
                   <li
                     key={source.id}
-                    className="rounded-lg border border-gray-100 bg-gray-50 p-4"
+                    className="rounded-lg border border-hairline bg-gray-50 p-4"
                   >
                     <a
                       href={source.url}
@@ -190,7 +190,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
                     >
                       {source.title}
                     </a>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-xs text-gray-700">
                       {source.source}
                       {source.year ? `, ${source.year}` : ''}
                     </p>
@@ -207,7 +207,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
           {/* Source video */}
           <section className="mt-10 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="mb-1 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+            <p className="mb-1 text-xs font-semibold tracking-wide text-gray-600 uppercase">
               Extracted from
             </p>
             <Link
@@ -216,7 +216,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
             >
               {video.title}
             </Link>
-            <p className="mt-0.5 text-sm text-gray-500">
+            <p className="mt-0.5 text-sm text-gray-700">
               {video.channel.title}
             </p>
             {summary && (
