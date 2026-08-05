@@ -1,4 +1,4 @@
-import Groq from "groq-sdk";
+import Groq from 'groq-sdk';
 
 export type AiMessage = { role: string; content: string };
 
@@ -15,6 +15,8 @@ export type AiClientConfig = {
    */
   openRouterModels?: string[];
   openAiApiKey?: string;
+  /** Defaults to "gpt-5.6-luna" (OpenAI's current budget model). */
+  openAiModel?: string;
   geminiApiKey?: string;
   /**
    * Model ID for the Anthropic branch only. Defaults to Haiku — this
@@ -24,34 +26,38 @@ export type AiClientConfig = {
   defaultModel?: string;
 };
 
-const DEFAULT_ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
-const DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b";
+const DEFAULT_ANTHROPIC_MODEL = 'claude-haiku-4-5';
+const DEFAULT_GROQ_MODEL = 'openai/gpt-oss-120b';
 const DEFAULT_OPENROUTER_MODELS = [
-  "openai/gpt-oss-120b:free",
-  "openai/gpt-oss-20b:free",
-  "mistralai/mistral-7b-instruct:free",
-  "microsoft/phi-3-mini-128k-instruct:free",
+  'nvidia/nemotron-3-ultra-550b-a55b:free',
+  'inclusionai/ling-3.0-flash:free',
+  'cohere/north-mini-code:free',
+  'poolside/laguna-s-2.1:free',
 ];
-const GEMINI_MODEL = "gemini-3.5-flash-lite";
+const DEFAULT_OPENAI_MODEL = 'gpt-5.6-luna';
+const GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
-async function callAnthropic(
-  messages: AiMessage[],
-  maxTokens: number,
-  model: string,
-  apiKey: string,
-): Promise<string> {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
+/** Labels a provider failure by its actual HTTP status instead of assuming 429. */
+function describeFailure(err: unknown): string {
+  const status = (err as { status?: number } | undefined)?.status;
+  const message = err instanceof Error ? err.message : String(err);
+  const reason = status === 429 ? 'rate limit hit' : `request failed${status ? ` (${status})` : ''}`;
+  return `${reason} — ${message}`;
+}
+
+async function callAnthropic(messages: AiMessage[], maxTokens: number, model: string, apiKey: string): Promise<string> {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
       model,
       max_tokens: maxTokens,
       messages,
-      tools: [{ type: "web_search_20250305", name: "web_search" }],
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
     }),
   });
   if (!res.ok) {
@@ -65,9 +71,9 @@ async function callAnthropic(
     content: Array<{ type: string; text?: string }>;
   };
   return data.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text ?? "")
-    .join("");
+    .filter((block) => block.type === 'text')
+    .map((block) => block.text ?? '')
+    .join('');
 }
 
 async function callOpenRouter(
@@ -76,10 +82,10 @@ async function callOpenRouter(
   model: string,
   apiKey: string,
 ): Promise<string> {
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
@@ -98,22 +104,18 @@ async function callOpenRouter(
   const data = (await res.json()) as {
     choices: Array<{ message: { content: string } }>;
   };
-  return data.choices[0]?.message?.content ?? "";
+  return data.choices[0]?.message?.content ?? '';
 }
 
-async function callOpenAI(
-  messages: AiMessage[],
-  maxTokens: number,
-  apiKey: string,
-): Promise<string> {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
+async function callOpenAI(messages: AiMessage[], maxTokens: number, model: string, apiKey: string): Promise<string> {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model,
       max_tokens: maxTokens,
       messages,
     }),
@@ -128,24 +130,18 @@ async function callOpenAI(
   const data = (await res.json()) as {
     choices: Array<{ message: { content: string } }>;
   };
-  return data.choices[0]?.message?.content ?? "";
+  return data.choices[0]?.message?.content ?? '';
 }
 
-async function callGemini(
-  messages: AiMessage[],
-  maxTokens: number,
-  apiKey: string,
-): Promise<string> {
-  const userMessage = messages.findLast((m) => m.role === "user");
+async function callGemini(messages: AiMessage[], maxTokens: number, apiKey: string): Promise<string> {
+  const userMessage = messages.findLast((m) => m.role === 'user');
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
     {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: userMessage?.content ?? "" }] },
-        ],
+        contents: [{ role: 'user', parts: [{ text: userMessage?.content ?? '' }] }],
         generationConfig: { maxOutputTokens: maxTokens },
       }),
     },
@@ -160,7 +156,7 @@ async function callGemini(
   const data = (await res.json()) as {
     candidates: Array<{ content: { parts: Array<{ text: string }> } }>;
   };
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 }
 
 export type AiClient = {
@@ -170,7 +166,7 @@ export type AiClient = {
         model: string;
         max_tokens: number;
         messages: AiMessage[];
-      }): Promise<{ content: Array<{ type: "text"; text: string }> }>;
+      }): Promise<{ content: Array<{ type: 'text'; text: string }> }>;
     };
   };
   /** This site's configured default model (Anthropic branch). */
@@ -188,10 +184,11 @@ export type AiClient = {
  * error the next provider is tried automatically.
  */
 export function createAiClient(config: AiClientConfig): AiClient {
-  const defaultModel = config.defaultModel ?? DEFAULT_ANTHROPIC_MODEL;
-  const groqModel = config.groqModel ?? DEFAULT_GROQ_MODEL;
-  const openRouterModels = config.openRouterModels ?? DEFAULT_OPENROUTER_MODELS;
-  const groq = new Groq({ apiKey: config.groqApiKey ?? "" });
+  const defaultModel = DEFAULT_ANTHROPIC_MODEL;
+  const groqModel = DEFAULT_GROQ_MODEL;
+  const openRouterModels = DEFAULT_OPENROUTER_MODELS;
+  const openAiModel = DEFAULT_OPENAI_MODEL;
+  const groq = new Groq({ apiKey: config.groqApiKey ?? '' });
 
   return {
     defaultModel,
@@ -201,18 +198,10 @@ export function createAiClient(config: AiClientConfig): AiClient {
           // 1️⃣ Anthropic
           if (config.anthropicApiKey) {
             try {
-              const text = await callAnthropic(
-                messages,
-                max_tokens,
-                model ?? defaultModel,
-                config.anthropicApiKey,
-              );
-              return { content: [{ type: "text" as const, text }] };
+              const text = await callAnthropic(messages, max_tokens, model ?? defaultModel, config.anthropicApiKey);
+              return { content: [{ type: 'text' as const, text }] };
             } catch (err) {
-              const message = err instanceof Error ? err.message : String(err);
-              console.warn(
-                `[AI] Anthropic rate limit hit — ${message} — falling back to Groq`,
-              );
+              console.warn(`[AI] Anthropic ${describeFailure(err)} — falling back to Groq`);
             }
           }
 
@@ -227,16 +216,13 @@ export function createAiClient(config: AiClientConfig): AiClient {
                 // they can burn the whole budget on reasoning and return empty
                 // content (finish_reason "length"). "low" keeps enough budget
                 // free for the actual JSON output.
-                reasoning_effort: "low",
+                reasoning_effort: 'low',
                 messages: messages as Groq.Chat.ChatCompletionMessageParam[],
               });
-              const text = completion.choices[0]?.message?.content ?? "";
-              return { content: [{ type: "text" as const, text }] };
+              const text = completion.choices[0]?.message?.content ?? '';
+              return { content: [{ type: 'text' as const, text }] };
             } catch (err) {
-              const message = err instanceof Error ? err.message : String(err);
-              console.warn(
-                `[AI] Groq rate limit hit — ${message} — falling back to OpenRouter`,
-              );
+              console.warn(`[AI] Groq ${describeFailure(err)} — falling back to OpenRouter`);
             }
           }
 
@@ -244,59 +230,37 @@ export function createAiClient(config: AiClientConfig): AiClient {
           if (config.openRouterApiKey) {
             for (const orModel of openRouterModels) {
               try {
-                const text = await callOpenRouter(
-                  messages,
-                  max_tokens,
-                  orModel,
-                  config.openRouterApiKey,
-                );
-                return { content: [{ type: "text" as const, text }] };
+                const text = await callOpenRouter(messages, max_tokens, orModel, config.openRouterApiKey);
+                return { content: [{ type: 'text' as const, text }] };
               } catch (err) {
-                const message = err instanceof Error ? err.message : String(err);
-                console.warn(
-                  `[AI] OpenRouter model "${orModel}" failed — ${message}`,
-                );
+                console.warn(`[AI] OpenRouter model "${orModel}" ${describeFailure(err)}`);
               }
             }
-            console.warn(
-              "[AI] All OpenRouter models failed — falling back to OpenAI/Gemini",
-            );
+            console.warn('[AI] All OpenRouter models failed — falling back to OpenAI/Gemini');
           }
 
           // 4️⃣ OpenAI
           if (config.openAiApiKey) {
             try {
-              const text = await callOpenAI(
-                messages,
-                max_tokens,
-                config.openAiApiKey,
-              );
-              return { content: [{ type: "text" as const, text }] };
+              const text = await callOpenAI(messages, max_tokens, openAiModel, config.openAiApiKey);
+              return { content: [{ type: 'text' as const, text }] };
             } catch (err) {
-              const message = err instanceof Error ? err.message : String(err);
-              console.warn(
-                `[AI] OpenAI rate limit hit — ${message} — falling back to Gemini`,
-              );
+              console.warn(`[AI] OpenAI ${describeFailure(err)} — falling back to Gemini`);
             }
           }
 
           // 5️⃣ Gemini
           if (config.geminiApiKey) {
             try {
-              const text = await callGemini(
-                messages,
-                max_tokens,
-                config.geminiApiKey,
-              );
-              return { content: [{ type: "text" as const, text }] };
+              const text = await callGemini(messages, max_tokens, config.geminiApiKey);
+              return { content: [{ type: 'text' as const, text }] };
             } catch (err) {
-              const message = err instanceof Error ? err.message : String(err);
-              console.warn(`[AI] Gemini rate limit hit — ${message}`);
+              console.warn(`[AI] Gemini ${describeFailure(err)}`);
             }
           }
 
           throw new Error(
-            "All AI providers exhausted or unconfigured. Set GROQ_API_KEY, OPENROUTER_API_KEY, or GEMINI_API_KEY.",
+            'All AI providers exhausted or unconfigured. Set GROQ_API_KEY, OPENROUTER_API_KEY, or GEMINI_API_KEY.',
           );
         },
       },
