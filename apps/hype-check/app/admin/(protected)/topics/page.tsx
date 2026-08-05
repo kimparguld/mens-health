@@ -23,6 +23,14 @@ export default async function AdminTopicsPage() {
   const countMap = new Map(topicCounts.map((r) => [r.topicId, r._count._all]));
   const recordMap = new Map(topicRecords.map((r) => [r.slug, r]));
 
+  console.log(
+    pendingSuggestions.map((s) => ({
+      name: s.name,
+      query: s.query,
+      popularityScore: s.popularityScore,
+    }))
+  );
+
   return (
     <div className="max-w-4xl">
       <h1 className="mb-2 text-2xl font-bold text-gray-900">Topic Hubs</h1>
@@ -116,33 +124,54 @@ export default async function AdminTopicsPage() {
           </h2>
           <p className="mb-4 text-sm text-gray-500">
             Surfaced by the monthly discovery job from current YouTube search
-            volume. Approving queues the topic for the next video-sync run —
-            new videos will be discovered, scored, and processed for it — but
-            the public topic hub page is not yet wired to show it (tracked as
-            a follow-up). Rejecting is permanent; the same slug will not be
+            volume. Approving queues the topic for the next video-sync run — new
+            videos will be discovered, scored, and processed for it — but the
+            public topic hub page is not yet wired to show it (tracked as a
+            follow-up). Rejecting is permanent; the same slug will not be
             re-suggested.
           </p>
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Name</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Query</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Description</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Suggested risk</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Popularity</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Evidence</th>
-                  <th className="px-4 py-3 text-left font-medium text-gray-600">Actions</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Query
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Description
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Suggested risk
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Popularity
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Evidence
+                  </th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {pendingSuggestions.map((s) => {
-                  const evidence = s.evidence as { title: string; viewCount: number }[];
+                  const evidence = s.evidence as {
+                    title: string;
+                    viewCount: number;
+                  }[];
                   return (
                     <tr key={s.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">{s.name}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">
+                        {s.name}
+                      </td>
                       <td className="px-4 py-3 text-gray-500">{s.query}</td>
-                      <td className="px-4 py-3 text-gray-500">{s.description}</td>
+                      <td className="px-4 py-3 text-gray-500">
+                        {s.description}
+                      </td>
                       <td className="px-4 py-3">
                         {s.suggestedIsHighRisk ? (
                           <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
@@ -154,7 +183,9 @@ export default async function AdminTopicsPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{s.popularityScore.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {s.popularityScore.toLocaleString()}
+                      </td>
                       <td className="px-4 py-3 text-xs text-gray-500">
                         {evidence.map((v) => v.title).join('; ')}
                       </td>
