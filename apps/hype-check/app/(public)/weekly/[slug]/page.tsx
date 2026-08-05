@@ -118,7 +118,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
         />
 
         <header className="mb-12">
-          <p className="text-ink-muted mb-1 text-xs font-semibold tracking-wide uppercase">
+          <p className="text-ink-muted mb-1 text-sm font-semibold tracking-wide uppercase">
             {weekLabel}
           </p>
           <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
@@ -147,7 +147,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* Top Video This Week */}
             {topVideo && (
               <section className="mb-12">
-                <p className="text-ink-muted mb-3 text-xs font-semibold tracking-wide uppercase">
+                <p className="text-ink-muted mb-3 text-sm font-semibold tracking-wide uppercase">
                   Top Video This Week
                 </p>
                 <div className="rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
@@ -176,7 +176,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                   Array.isArray(topVideoSummary.takeaways) &&
                   (topVideoSummary.takeaways as string[]).length > 0 && (
                     <div className="border-ink-muted/20 mt-4 rounded-xl border bg-indigo-50 px-5 py-4">
-                      <p className="text-ink-muted mb-2 text-xs font-semibold tracking-wide uppercase">
+                      <p className="text-ink-muted mb-2 text-sm font-semibold tracking-wide uppercase">
                         Practical Takeaway
                       </p>
                       <p className="text-ink-muted/80 text-sm">
@@ -190,7 +190,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* 3 Claims Checked */}
             {checkedClaims.length > 0 && (
               <section className="mb-12">
-                <p className="text-ink-muted mb-3 text-xs font-semibold tracking-wide uppercase">
+                <p className="text-ink-muted mb-3 text-sm font-semibold tracking-wide uppercase">
                   {checkedClaims.length} Claim
                   {checkedClaims.length !== 1 ? 's' : ''} Checked This Week
                 </p>
@@ -207,7 +207,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       {claim.slug && (
                         <Link
                           href={`/claims/${claim.slug}`}
-                          className="text-ink-muted text-xs font-medium hover:underline"
+                          className="text-ink-muted text-sm font-medium hover:underline"
                         >
                           See evidence →
                         </Link>
@@ -221,7 +221,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* Most Overhyped Claim */}
             {overhypedClaim && (
               <section className="mb-12 rounded-xl border border-red-200 bg-red-50 px-5 py-5">
-                <p className="mb-2 text-xs font-semibold tracking-wide text-red-700 uppercase">
+                <p className="mb-2 text-sm font-semibold tracking-wide text-red-700 uppercase">
                   Most Overhyped Claim This Week
                 </p>
                 <p className="text-sm font-medium text-gray-900">
@@ -232,7 +232,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                   {overhypedClaim.slug && (
                     <Link
                       href={`/claims/${overhypedClaim.slug}`}
-                      className="text-xs text-red-700 hover:underline"
+                      className="text-sm text-red-700 hover:underline"
                     >
                       See the evidence →
                     </Link>
@@ -242,7 +242,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             )}
 
             {/* All videos */}
-            <p className="mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+            <p className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">
               All videos this week
             </p>
             <ol className="space-y-16">
@@ -298,7 +298,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
         )}
 
         <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 px-5 py-5">
-          <p className="mb-3 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+          <p className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">
             Explore More
           </p>
           <ul className="flex flex-wrap gap-3 text-sm">

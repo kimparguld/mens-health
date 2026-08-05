@@ -57,7 +57,7 @@ export default async function PublicLayout({
                 Evidence-based verdicts on trending products, courses, and side
                 hustles — without the hype.
               </p>
-              <ul className="mt-4 space-y-1 text-xs text-white/60">
+              <ul className="mt-4 space-y-1 text-sm text-white/60">
                 <li>✓ Educational content only. Not financial advice.</li>
                 <li>✓ We do not host or restream YouTube videos.</li>
                 <li>✓ Affiliate links are clearly disclosed.</li>
@@ -173,7 +173,7 @@ export default async function PublicLayout({
             </div>
           </div>
 
-          <div className="border-hairline mt-10 flex flex-wrap items-center justify-between gap-2 border-t pt-6 text-xs text-white/80">
+          <div className="border-hairline mt-10 flex flex-wrap items-center justify-between gap-2 border-t pt-6 text-sm text-white/80">
             <p>© {new Date().getFullYear()} Hype Check. All rights reserved.</p>
             <div className="flex gap-4">
               <Link href="/privacy" className="text-white/80 hover:text-white">

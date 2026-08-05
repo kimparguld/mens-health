@@ -102,7 +102,7 @@ export default async function WeeklyRankingPage({
         {/* Header */}
         <section className="border-b border-gray-100 bg-white py-12">
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-400">
+            <nav className="mb-4 flex items-center gap-2 text-sm text-gray-400">
               <Link href="/" className="hover:text-gray-600">
                 Home
               </Link>
@@ -113,7 +113,7 @@ export default async function WeeklyRankingPage({
               <span>/</span>
               <span className="text-gray-600">This Week</span>
             </nav>
-            <p className="text-ink-muted/60 mb-2 text-xs font-semibold tracking-widest uppercase">
+            <p className="text-ink-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
               Weekly ranking
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -124,7 +124,7 @@ export default async function WeeklyRankingPage({
                 ? `Top-ranked ${seed.name.toLowerCase()} videos on YouTube — summarised and scored for evidence quality.`
                 : `Top-ranked ${seed.name.toLowerCase()} videos added this week — summarised and scored for evidence quality.`}
             </p>
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-sm text-gray-400">
               {isFallback ? 'All-time top picks' : `Updated ${weekLabel}`}
             </p>
           </div>
@@ -140,7 +140,7 @@ export default async function WeeklyRankingPage({
                 </span>
                 How rankings work
               </summary>
-              <div className="mt-3 grid gap-3 pl-5 text-xs text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-3 grid gap-3 pl-5 text-sm text-gray-600 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   {
                     icon: '📅',
@@ -261,7 +261,7 @@ export default async function WeeklyRankingPage({
                   <Link
                     key={t.slug}
                     href={`/rankings/${t.slug}`}
-                    className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700"
+                    className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
                   >
                     {t.name}
                   </Link>

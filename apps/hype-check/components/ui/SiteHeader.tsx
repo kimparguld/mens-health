@@ -29,12 +29,6 @@ const navLinks = [
       'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-ink',
   },
   {
-    href: '/creators',
-    label: 'Creators',
-    className:
-      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-ink',
-  },
-  {
     href: '/weekly',
     label: 'Weekly',
     className:

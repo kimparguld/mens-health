@@ -42,14 +42,14 @@ export default function CreatorsIndexPage() {
                 {creator.name}
               </span>
               {creator.credentials && (
-                <span className="text-ink mt-0.5 text-xs font-medium">
+                <span className="text-ink mt-0.5 text-sm font-medium">
                   {creator.credentials}
                 </span>
               )}
               <span className="mt-1 text-sm text-gray-500">
                 {creator.description}
               </span>
-              <span className="mt-2 text-xs text-gray-400">
+              <span className="mt-2 text-sm text-gray-400">
                 {creator.specialty}
               </span>
             </Link>

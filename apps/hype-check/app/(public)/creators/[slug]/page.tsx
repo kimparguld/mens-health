@@ -188,7 +188,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
         {/* Header */}
         <section className="border-b border-gray-100 bg-white py-12">
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-400">
+            <nav className="mb-4 flex items-center gap-2 text-sm text-gray-400">
               <Link href="/" className="hover:text-gray-600">
                 Home
               </Link>
@@ -198,7 +198,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
               <span className="text-gray-600">{creator.name}</span>
             </nav>
 
-            <p className="text-ink-muted/60 mb-2 text-xs font-semibold tracking-widest uppercase">
+            <p className="text-ink-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
               Creator profile
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -218,7 +218,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
               {creator.specialty.split(', ').map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+                  className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700"
                 >
                   {tag}
                 </span>
@@ -245,7 +245,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
             {/* Trust score if available */}
             {channel && (
-              <p className="mt-3 text-xs text-gray-400">
+              <p className="mt-3 text-sm text-gray-400">
                 Trust score:{' '}
                 <span className="font-medium text-gray-600">
                   {(channel.trustScore * 100).toFixed(0)}
@@ -287,7 +287,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     key={row.label}
                     className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
                   >
-                    <dt className="text-xs text-gray-500">{row.label}</dt>
+                    <dt className="text-sm text-gray-500">{row.label}</dt>
                     <dd className="mt-1 text-xl font-semibold text-gray-900">
                       {row.value}
                     </dd>
@@ -364,7 +364,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     <Link
                       key={t.slug}
                       href={`/topics/${t.slug}`}
-                      className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700"
+                      className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
                     >
                       {t.name}{' '}
                       <span className="text-gray-400">({t.count})</span>
@@ -396,7 +396,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                       {claim.slug && (
                         <Link
                           href={`/claims/${claim.slug}`}
-                          className="text-ink-muted text-xs hover:underline"
+                          className="text-ink-muted text-sm hover:underline"
                         >
                           See evidence →
                         </Link>
@@ -408,7 +408,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
             )}
 
             {/* Creator disclaimer */}
-            <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               Hype Check does not endorse, represent, or have an affiliation
               with {creator.name}. This page presents an independent summary of
               publicly available content. Always evaluate claims critically and
@@ -424,7 +424,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 <Link
                   key={c.slug}
                   href={`/creators/${c.slug}`}
-                  className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700"
+                  className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
                 >
                   {c.name}
                 </Link>

@@ -112,7 +112,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
       <JsonLd schema={breadcrumb} />
       <main className="mx-auto max-w-2xl px-4 py-12">
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 text-xs text-gray-400">
+        <nav className="mb-6 flex items-center gap-2 text-sm text-gray-400">
           <Link href="/" className="hover:text-gray-600">
             Home
           </Link>
@@ -133,7 +133,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
         {/* Claim heading */}
         <article>
-          <p className="text-ink-muted/60 mb-3 text-xs font-semibold tracking-widest uppercase">
+          <p className="text-ink-muted/60 mb-3 text-sm font-semibold tracking-widest uppercase">
             Claim
           </p>
           <h1 className="text-2xl leading-snug font-bold text-gray-900 sm:text-3xl">
@@ -144,7 +144,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <EvidenceStamp status={claim.evidenceStatus} showNotChecked />
             <RiskStamp level={claim.riskLevel} />
-            <span className="text-xs text-gray-400 capitalize">
+            <span className="text-sm text-gray-400 capitalize">
               {claim.claimType.replace(/_/g, ' ').toLowerCase()}
             </span>
           </div>
@@ -191,7 +191,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
                     >
                       {source.title}
                     </a>
-                    <p className="mt-0.5 text-xs text-gray-500">
+                    <p className="mt-0.5 text-sm text-gray-500">
                       {source.source}
                       {source.year ? `, ${source.year}` : ''}
                     </p>
@@ -208,7 +208,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
           {/* Source video */}
           <section className="mt-10 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="mb-1 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+            <p className="mb-1 text-sm font-semibold tracking-wide text-gray-400 uppercase">
               Extracted from
             </p>
             <Link

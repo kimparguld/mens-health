@@ -40,7 +40,7 @@ export default async function NewsletterArchivePage() {
             >
               {issue.subject}
             </Link>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-sm text-gray-400">
               {issue.sentAt.toLocaleDateString()}
             </p>
           </li>

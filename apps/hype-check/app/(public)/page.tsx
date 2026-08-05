@@ -71,7 +71,7 @@ async function FeaturedInsight() {
         <div className="border-hairline rounded-md border bg-white p-6 sm:p-8">
           {featuredClaim && (
             <div className="mb-4">
-              <p className="text-ink-muted text-xs font-semibold tracking-wide uppercase">
+              <p className="text-ink-muted text-sm font-semibold tracking-wide uppercase">
                 The claim
               </p>
               <p className="text-ink mt-1 text-lg font-semibold">
@@ -80,7 +80,7 @@ async function FeaturedInsight() {
             </div>
           )}
           <div className="mb-5">
-            <p className="text-xs font-semibold tracking-wide text-black uppercase">
+            <p className="text-sm font-semibold tracking-wide text-black uppercase">
               Our take
             </p>
             <p className="text-ink-muted mt-1 leading-relaxed">
@@ -99,11 +99,11 @@ async function FeaturedInsight() {
               </>
             )}
             {featuredWatchMin && (
-              <span className="text-ink-muted text-xs">
+              <span className="text-ink-muted text-sm">
                 {featuredWatchMin} min watch
               </span>
             )}
-            <span className="text-ink-muted text-xs">~ 2 min read</span>
+            <span className="text-ink-muted text-sm">~ 2 min read</span>
           </div>
           <Link
             href={`/videos/${featuredVideo.slug}`}
@@ -127,7 +127,7 @@ async function TrendingVideos() {
   return (
     <section id="trending" className="py-14">
       <div className="mx-auto max-w-[1120px] px-4">
-        <h2 className="font-slab text-ink-muted mb-6 text-2xl font-bold">
+        <h2 className="font-slab text-ink-muted mb-6 text-3xl font-bold">
           Trending summaries
         </h2>
         {videos.length === 0 ? (
@@ -226,7 +226,7 @@ export default async function HomePage() {
       {/* Topic cards */}
       <section id="topics" className="py-14">
         <div className="mx-auto min-h-[652px] max-w-[1120px] px-4 lg:min-h-[354px]">
-          <h2 className="font-slab text-ink-muted mb-6 text-2xl font-bold">
+          <h2 className="font-slab text-ink-muted mb-6 text-3xl font-bold">
             Browse by topic
           </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -237,10 +237,10 @@ export default async function HomePage() {
                 className="group border-hairline hover:border-ink-muted rounded-md border bg-white p-4 transition-colors"
               >
                 <p className="text-ink-muted font-semibold">{topic.name}</p>
-                <p className="mt-1 line-clamp-2 text-xs leading-snug text-gray-600">
+                <p className="mt-1 line-clamp-2 text-sm leading-snug text-gray-600">
                   {topic.description}
                 </p>
-                <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-xs font-medium underline underline-offset-2">
+                <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-sm font-medium underline underline-offset-2">
                   Explore →
                 </p>
               </Link>
@@ -288,7 +288,7 @@ export default async function HomePage() {
       {/* Newsletter */}
       <section className="bg-surface py-16">
         <div className="mx-auto max-w-lg px-4 text-center">
-          <h2 className="font-slab text-ink text-2xl font-bold">
+          <h2 className="font-slab text-ink text-3xl font-bold">
             Get the 5-minute Hype Check Digest
           </h2>
           <p className="mt-2 text-sm text-white/80">Every week:</p>

@@ -242,7 +242,7 @@ export default async function TopicPage({
           <ol className="space-y-2">
             {staticContent.beginnerGuide.steps.map((step, i) => (
               <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="bg-ink-muted/60 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white">
+                <span className="bg-ink-muted/60 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
                   {i + 1}
                 </span>
                 {step}
@@ -280,7 +280,7 @@ export default async function TopicPage({
                 key={row.label}
                 className="rounded-xl border border-gray-200 bg-white px-4 py-3"
               >
-                <dt className="text-xs text-gray-500">{row.label}</dt>
+                <dt className="text-sm text-gray-500">{row.label}</dt>
                 <dd className="mt-1 text-xl font-semibold text-gray-900">
                   {row.value}
                 </dd>
@@ -316,7 +316,7 @@ export default async function TopicPage({
                     {claim.slug && (
                       <Link
                         href={`/claims/${claim.slug}`}
-                        className="text-ink-muted text-xs font-medium hover:underline"
+                        className="text-ink-muted text-sm font-medium hover:underline"
                       >
                         See evidence →
                       </Link>
@@ -538,7 +538,7 @@ export default async function TopicPage({
                   {link.label}
                 </a>
                 {link.commission && (
-                  <span className="ml-2 text-xs text-gray-400">
+                  <span className="ml-2 text-sm text-gray-400">
                     ({link.commission} commission)
                   </span>
                 )}
