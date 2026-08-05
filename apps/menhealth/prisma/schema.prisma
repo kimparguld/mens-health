@@ -123,6 +123,9 @@ model Topic {
   videos VideoTopic[]
 }
 
+/// A candidate topic surfaced by the automated discovery job — requires
+/// explicit admin approval before it's merged into the live topic list
+/// (see getAllTopicSeeds in lib/youtube/topics.ts). Never auto-promoted.
 model TopicSuggestion {
   id                  String           @id @default(cuid())
   slug                String           @unique
