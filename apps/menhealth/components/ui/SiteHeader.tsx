@@ -143,28 +143,32 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 {link.label}
               </Link>
             ))}
-            {user ? (
-              <Link
-                href="/account"
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
-              >
-                {user.name ?? user.email ?? 'Account'}
-              </Link>
-            ) : (
-              <Link
-                href="/signin"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                Sign in
-              </Link>
-            )}
-            {!user?.isPremium && premium?.isEnabled() && (
-              <Link
-                href="/upgrade"
-                className="rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700"
-              >
-                Go premium
-              </Link>
+            {premium?.isEnabled() && (
+              <>
+                {user ? (
+                  <Link
+                    href="/account"
+                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+                  >
+                    {user.name ?? user.email ?? 'Account'}
+                  </Link>
+                ) : (
+                  <Link
+                    href="/signin"
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    Sign in
+                  </Link>
+                )}
+                {!user?.isPremium && (
+                  <Link
+                    href="/upgrade"
+                    className="rounded-lg bg-emerald-600 px-3 py-1.5 font-semibold text-white hover:bg-emerald-700"
+                  >
+                    Go premium
+                  </Link>
+                )}
+              </>
             )}
           </nav>
 
@@ -254,51 +258,54 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               ))}
 
               <div className="mx-2 my-3 border-t border-gray-100" />
-
-              {user ? (
-                <Link
-                  href="/account"
-                  onClick={closeDrawer}
-                  className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium text-gray-800 transition-colors hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
-                >
-                  {user.name ?? user.email ?? 'Account'}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              ) : (
-                <Link
-                  href="/signin"
-                  onClick={closeDrawer}
-                  className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium text-gray-800 transition-colors hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
-                >
-                  Sign in
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
+              {premium?.isEnabled() && (
+                <>
+                  {user ? (
+                    <Link
+                      href="/account"
+                      onClick={closeDrawer}
+                      className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium text-gray-800 transition-colors hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
+                    >
+                      {user.name ?? user.email ?? 'Account'}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/signin"
+                      onClick={closeDrawer}
+                      className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-medium text-gray-800 transition-colors hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100"
+                    >
+                      Sign in
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-gray-300 transition-transform group-hover:translate-x-0.5 group-hover:text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </Link>
+                  )}
+                </>
               )}
             </nav>
 

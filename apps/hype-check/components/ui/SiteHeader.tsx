@@ -148,25 +148,34 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 {link.label}
               </Link>
             ))}
-            {user ? (
-              <Link
-                href="/account"
-                className="hover:decoration-ink font-semibold text-white/60 underline decoration-transparent decoration-2 underline-offset-4"
-              >
-                {user.name ?? user.email ?? 'Account'}
-              </Link>
-            ) : (
-              <Link href="/signin" className="text-ink-muted hover:text-ink">
-                Sign in
-              </Link>
-            )}
-            {!user?.isPremium && premium?.isEnabled() && (
-              <Link
-                href="/upgrade"
-                className="bg-ink text-paper hover:bg-ink-muted rounded-sm px-3 py-1.5 font-semibold"
-              >
-                Go premium
-              </Link>
+            {premium?.isEnabled() && (
+              <>
+                {user ? (
+                  <Link
+                    href="/account"
+                    className="hover:decoration-ink font-semibold text-white/60 underline decoration-transparent decoration-2 underline-offset-4"
+                  >
+                    {user.name ?? user.email ?? 'Account'}
+                  </Link>
+                ) : (
+                  premium?.isEnabled() && (
+                    <Link
+                      href="/signin"
+                      className="text-ink-muted hover:text-ink"
+                    >
+                      Sign in
+                    </Link>
+                  )
+                )}
+                {!user?.isPremium && (
+                  <Link
+                    href="/upgrade"
+                    className="bg-ink text-paper hover:bg-ink-muted rounded-sm px-3 py-1.5 font-semibold"
+                  >
+                    Go premium
+                  </Link>
+                )}
+              </>
             )}
           </nav>
 
@@ -256,51 +265,54 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               ))}
 
               <div className="border-hairline mx-2 my-3 border-t" />
-
-              {user ? (
-                <Link
-                  href="/account"
-                  onClick={closeDrawer}
-                  className="group text-ink-muted/80 hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
-                >
-                  {user.name ?? user.email ?? 'Account'}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-ink-muted/80 group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              ) : (
-                <Link
-                  href="/signin"
-                  onClick={closeDrawer}
-                  className="group text-ink hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
-                >
-                  Sign in
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-hairline group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
+              {premium?.isEnabled() && (
+                <>
+                  {user ? (
+                    <Link
+                      href="/account"
+                      onClick={closeDrawer}
+                      className="group text-ink-muted/80 hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
+                    >
+                      {user.name ?? user.email ?? 'Account'}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-ink-muted/80 group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/signin"
+                      onClick={closeDrawer}
+                      className="group text-ink hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
+                    >
+                      Sign in
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-hairline group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </Link>
+                  )}
+                </>
               )}
             </nav>
 
