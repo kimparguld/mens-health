@@ -61,7 +61,7 @@ export function HypeVideoCard({
           {topicNames.slice(0, 2).map((name) => (
             <span
               key={name}
-              className="border-hairline text-ink-muted rounded-full border px-2 py-0.5 text-xs font-medium"
+              className="border-hairline text-ink-muted rounded-full border px-2.5 py-0.5 text-sm font-medium"
             >
               {name}
             </span>
@@ -75,7 +75,7 @@ export function HypeVideoCard({
               <EvidenceStamp status={evidenceLabel} />
             )}
             {watchTimeMin && (
-              <span className="text-xs text-gray-500">
+              <span className="text-sm text-gray-600">
                 {watchTimeMin} min watch
               </span>
             )}
@@ -85,9 +85,9 @@ export function HypeVideoCard({
           {title}
         </h3>
         {shortSummary && (
-          <p className="text-ink-muted line-clamp-2 text-xs">{shortSummary}</p>
+          <p className="text-ink-muted line-clamp-2 text-sm">{shortSummary}</p>
         )}
-        <p className="mt-auto text-xs text-gray-500">{channelTitle}</p>
+        <p className="mt-auto text-sm text-gray-600">{channelTitle}</p>
       </div>
     </Link>
   );

@@ -33,7 +33,7 @@ export function ManageSubscriptionButton() {
       >
         {loading ? "Redirecting…" : "Manage subscription"}
       </button>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 }

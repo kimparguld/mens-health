@@ -68,7 +68,7 @@ export default function SignInPage(_props: {
             required
             className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
           />
-          {error && <p className="text-xs text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
             disabled={loading}
@@ -80,7 +80,7 @@ export default function SignInPage(_props: {
 
         <div className="my-5 flex items-center gap-3">
           <hr className="flex-1 border-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
+          <span className="text-sm text-gray-400">or</span>
           <hr className="flex-1 border-gray-200" />
         </div>
 
@@ -110,7 +110,7 @@ export default function SignInPage(_props: {
           Continue with Google
         </button>
 
-        <p className="mt-6 text-center text-xs text-gray-400">
+        <p className="mt-6 text-center text-sm text-gray-400">
           By signing in you agree to our terms and privacy policy.
         </p>
       </div>

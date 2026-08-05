@@ -36,7 +36,7 @@ export default function UpgradePage() {
     <main className="mx-auto max-w-2xl px-4 py-16">
       <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
         <div className="mb-6 text-center">
-          <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold tracking-wide text-blue-700 uppercase">
+          <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold tracking-wide text-blue-700 uppercase">
             Premium
           </span>
           <h1 className="mt-4 text-3xl font-bold text-gray-900">
@@ -78,7 +78,7 @@ export default function UpgradePage() {
           {loading ? 'Redirecting…' : 'Start premium — $9/mo'}
         </button>
 
-        <p className="mt-4 text-center text-xs text-gray-400">
+        <p className="mt-4 text-center text-sm text-gray-400">
           Secure checkout via Stripe. You can cancel at any time.
         </p>
       </div>

@@ -66,7 +66,7 @@ export default async function AccountPage() {
         {isPremium ? (
           <div className="space-y-3 text-sm">
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+              <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-sm font-semibold text-green-700">
                 Premium active
               </span>
             </div>

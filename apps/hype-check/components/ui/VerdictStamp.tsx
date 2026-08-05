@@ -14,7 +14,7 @@ const VERDICT_STYLES: Record<VerdictType, string> = {
 };
 
 const SIZE_STYLES: Record<'sm' | 'lg', string> = {
-  sm: 'px-2.5 py-0.5 text-xs',
+  sm: 'px-2.5 py-0.5 text-sm',
   lg: 'px-4 py-1.5 text-base',
 };
 

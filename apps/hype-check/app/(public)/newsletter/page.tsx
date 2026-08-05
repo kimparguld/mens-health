@@ -39,7 +39,7 @@ export default function NewsletterPage() {
     <main className="mx-auto max-w-2xl px-4 py-16">
       {/* Hero */}
       <header className="mb-12 text-center">
-        <p className="text-ink-muted mb-2 text-xs font-semibold tracking-widest uppercase">
+        <p className="text-ink-muted mb-2 text-sm font-semibold tracking-widest uppercase">
           Free newsletter
         </p>
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900">
@@ -51,7 +51,7 @@ export default function NewsletterPage() {
         </p>
         <div className="mx-auto">
           <NewsletterSignupForm className="flex-col items-stretch" />
-          <p className="mt-2 text-xs text-gray-400">
+          <p className="mt-2 text-sm text-gray-400">
             Free forever. Unsubscribe any time.
           </p>
         </div>
@@ -88,7 +88,7 @@ export default function NewsletterPage() {
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
           {/* Issue header */}
           <div className="border-ink-muted/10 border-b bg-indigo-50 px-6 py-4">
-            <p className="text-ink-muted text-xs font-semibold tracking-widest uppercase">
+            <p className="text-ink-muted text-sm font-semibold tracking-widest uppercase">
               Sample issue · Week of 16 June 2025
             </p>
             <p className="mt-1 text-sm text-gray-600">
@@ -217,7 +217,7 @@ export default function NewsletterPage() {
             </div>
           </div>
         </div>
-        <p className="mt-3 text-center text-xs text-gray-400">
+        <p className="mt-3 text-center text-sm text-gray-400">
           Sample only. Actual claims and evidence ratings are generated from
           real published videos and reviewed before sending.
         </p>
