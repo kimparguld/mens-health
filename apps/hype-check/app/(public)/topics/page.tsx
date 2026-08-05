@@ -48,7 +48,7 @@ export default function TopicsIndexPage() {
               <span className="mt-1 text-sm text-gray-500">
                 {topic.description}
               </span>
-              <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-xs font-medium underline underline-offset-4">
+              <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-sm font-medium underline underline-offset-4">
                 Explore →
               </p>
             </Link>
