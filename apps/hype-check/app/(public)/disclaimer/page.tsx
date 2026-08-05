@@ -1,11 +1,13 @@
+import { createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { Disclaimer } from '@menhealth/ui';
 import type { Metadata } from 'next';
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: 'Disclaimer',
   description:
     'Important information about the nature of Hype Check content and its limitations.',
-};
+  path: '/disclaimer',
+});
 
 export default function DisclaimerPage() {
   return (

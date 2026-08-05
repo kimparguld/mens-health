@@ -36,7 +36,7 @@ export async function generateMetadata({
   const creator = CREATOR_SEEDS.find((c) => c.slug === slug);
   if (!creator) return { title: 'Creator Not Found' };
 
-  const title = `${creator.name} — Hype Check`;
+  const title = creator.name;
   const description = `${creator.description} Browse ${creator.name}'s top videos, summarised and fact-checked.`;
   const canonical = `${APP_URL}/creators/${slug}`;
 

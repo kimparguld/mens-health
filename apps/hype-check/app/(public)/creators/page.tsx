@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Video Creators — Hype Check',
+  title: 'Video Creators',
   description:
     "Browse the top YouTube creators we track across trending products, courses, side hustles, and investment apps. Each creator's videos are summarised, scored, and checked for evidence quality.",
   path: '/creators',

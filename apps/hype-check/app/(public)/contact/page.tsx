@@ -1,9 +1,11 @@
+import { createMetadata } from '@/lib/seo/site-metadata';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: 'Contact',
   description: 'Get in touch with Hype Check.',
-};
+  path: '/contact',
+});
 
 export default function ContactPage() {
   return (

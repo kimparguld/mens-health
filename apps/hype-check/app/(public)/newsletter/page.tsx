@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: 'The 5-Minute Hype Check Digest — Free Weekly Newsletter',
+  title: 'The 5-Minute Digest — Free Weekly Newsletter',
   description:
     'Get 5 trending products, courses, and side hustles summarised, 3 claims checked against the evidence, and 1 practical takeaway — every week. No miracle-earnings nonsense.',
   path: '/newsletter',
@@ -50,7 +50,10 @@ export default function NewsletterPage() {
           No fluff. No fear-mongering. Unsubscribe any time.
         </p>
         <div className="mx-auto">
-          <NewsletterSignupForm className="flex-col items-stretch" />
+          <NewsletterSignupForm
+            className="flex-col items-stretch"
+            site="hype-check"
+          />
           <p className="mt-2 text-sm text-gray-400">
             Free forever. Unsubscribe any time.
           </p>
@@ -99,7 +102,7 @@ export default function NewsletterPage() {
           <div className="divide-y divide-gray-100 text-sm">
             {/* Top Video */}
             <div className="px-6 py-5">
-              <p className="mb-2 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+              <p className="mb-2 text-xs font-semibold tracking-widest text-gray-400 uppercase">
                 Top Video This Week
               </p>
               <p className="font-semibold text-gray-900">
@@ -118,7 +121,7 @@ export default function NewsletterPage() {
 
             {/* 3 Claims Checked */}
             <div className="px-6 py-5">
-              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+              <p className="mb-3 text-xs font-semibold tracking-widest text-gray-400 uppercase">
                 3 Claims Checked
               </p>
               <ul className="space-y-3">
@@ -147,7 +150,7 @@ export default function NewsletterPage() {
                     className="flex flex-wrap items-start gap-2"
                   >
                     <span
-                      className={`mt-0.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${item.color}`}
+                      className={`mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium ${item.color}`}
                     >
                       {item.badge}
                     </span>
@@ -161,7 +164,7 @@ export default function NewsletterPage() {
 
             {/* Practical Takeaway */}
             <div className="bg-indigo-50 px-6 py-5">
-              <p className="text-ink-muted/60 mb-1 text-[11px] font-semibold tracking-widest uppercase">
+              <p className="text-ink-muted/60 mb-1 text-xs font-semibold tracking-widest uppercase">
                 Practical Takeaway
               </p>
               <p className="text-ink-muted/90 font-medium">
@@ -174,13 +177,13 @@ export default function NewsletterPage() {
 
             {/* Most Overhyped */}
             <div className="bg-red-50 px-6 py-5">
-              <p className="mb-1 text-[11px] font-semibold tracking-widest text-red-600 uppercase">
+              <p className="mb-1 text-xs font-semibold tracking-widest text-red-600 uppercase">
                 Most Overhyped Claim This Week
               </p>
               <p className="text-gray-700">
                 &ldquo;This one course turned a broke college dropout into a
                 millionaire in 6 months.&rdquo; —
-                <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                   Claim checked — not supported
                 </span>
               </p>
@@ -188,7 +191,7 @@ export default function NewsletterPage() {
 
             {/* Explore More */}
             <div className="px-6 py-5">
-              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-400 uppercase">
+              <p className="mb-3 text-xs font-semibold tracking-widest text-gray-400 uppercase">
                 Explore More
               </p>
               <div className="flex flex-wrap gap-3 text-sm">

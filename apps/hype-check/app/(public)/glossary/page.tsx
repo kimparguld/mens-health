@@ -11,12 +11,12 @@ import Link from 'next/link';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = {
-  title: 'Hype Check Glossary — Key Terms Explained',
+  title: 'Glossary — Key Terms Explained',
   description:
     'Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps — evidence score, risk level, guaranteed returns, and more.',
   alternates: { canonical: `${APP_URL}/glossary` },
   openGraph: {
-    title: 'Hype Check Glossary — Key Terms Explained',
+    title: 'Glossary — Key Terms Explained',
     description:
       'Plain-English definitions for the terms that come up across trending products, courses, side hustles, and investment apps.',
     url: `${APP_URL}/glossary`,
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hype Check Glossary — Key Terms Explained',
+    title: 'Glossary — Key Terms Explained',
   },
 };
 

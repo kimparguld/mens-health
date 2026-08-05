@@ -1,11 +1,13 @@
+import { createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { Disclaimer } from '@menhealth/ui';
 import type { Metadata } from 'next';
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: 'About Us',
   description:
     'Why Hype Check exists, what we do, and how we approach reviews of trending products, courses, and investment apps.',
-};
+  path: '/about',
+});
 
 export default function AboutPage() {
   return (

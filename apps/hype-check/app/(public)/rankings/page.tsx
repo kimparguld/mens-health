@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Weekly Video Rankings — Hype Check',
+  title: 'Weekly Video Rankings',
   description:
     'The top-ranked videos by topic this week — scored for evidence quality, trending reach, and practical value.',
   path: '/rankings',

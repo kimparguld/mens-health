@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Monthly Reports — Hype Check',
+  title: 'Monthly Reports',
   description:
     "Data-driven monthly reports on the claims we've checked: evidence quality, risk levels, and sourcing across everything we've reviewed.",
   path: '/reports',
