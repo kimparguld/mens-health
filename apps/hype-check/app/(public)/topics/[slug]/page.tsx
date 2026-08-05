@@ -54,18 +54,18 @@ export async function generateMetadata({
   const canonical = `${APP_URL}/topics/${slug}`;
 
   return {
-    title: `${topic.name} — Hype Check`,
+    title: topic.name,
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${topic.name} — Hype Check`,
+      title: topic.name,
       description,
       url: canonical,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${topic.name} — Hype Check`,
+      title: topic.name,
       description,
     },
     keywords: [

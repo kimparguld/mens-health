@@ -45,7 +45,7 @@ export async function generateMetadata({
   if (!seed) return { title: 'Not Found' };
 
   return createMetadata({
-    title: `Best ${seed.name} Videos This Week — Hype Check`,
+    title: `Best ${seed.name} Videos This Week`,
     description: `The top trending ${seed.name.toLowerCase()} videos summarised this week. Evidence labels, practical takeaways, and claim checks — no hype.`,
     path: `/weekly/${slug}`,
   });

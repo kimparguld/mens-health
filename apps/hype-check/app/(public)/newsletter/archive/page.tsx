@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Newsletter Archive — Hype Check',
+  title: 'Newsletter Archive',
   description:
     'Past issues of the Hype Check weekly newsletter — trending products, claims checked, and practical takeaways.',
   path: '/newsletter/archive',

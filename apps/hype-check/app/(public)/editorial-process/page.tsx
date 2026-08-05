@@ -1,10 +1,12 @@
+import { createMetadata } from '@/lib/seo/site-metadata';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: 'Editorial Process',
   description:
     'How Hype Check finds, processes, and publishes reviews of trending products, courses, and investment apps.',
-};
+  path: '/editorial-process',
+});
 
 export default function EditorialProcessPage() {
   return (

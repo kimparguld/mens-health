@@ -4,6 +4,7 @@ import { BrandLogotype } from '@/components/ui/BrandLogotype';
 import { premium } from '@/lib/flags/feature-flags';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 type SessionUser = {
   name?: string | null;
@@ -45,6 +46,7 @@ const navLinks = [
     label: 'Newsletter',
     className:
       'rounded-sm bg-ink px-3 py-1.5 font-semibold text-paper hover:bg-ink/80',
+    mobileClass: 'bg-ink text-white hover:bg-ink/80 py-3 ',
   },
 ];
 
@@ -127,7 +129,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
   return (
     <>
       <header className="border-hairline bg-ink-muted sticky top-0 z-30 border-b backdrop-blur-sm">
-        <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-2 lg:py-4">
+        <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-3 lg:py-4">
           <Link
             href="/"
             className="focus-visible:ring-ink/40 rounded-md focus-visible:ring-2 focus-visible:outline-none"
@@ -234,31 +236,38 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             {/* Nav links */}
             <nav className="flex flex-1 flex-col overflow-y-auto bg-white px-4 py-4">
               {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={closeDrawer}
-                  className="group text-ink-muted hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
-                >
-                  {link.label}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="text-ink-muted group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
+                <>
+                  {link.href === '/newsletter' && (
+                    <div className="border-hairline -mx-4 mt-3 mb-6 border-t" />
+                  )}
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeDrawer}
+                    className={twMerge(
+                      'group text-ink-muted hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors',
+                      link.mobileClass
+                    )}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
+                    {link.label}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </Link>
+                </>
               ))}
 
-              <div className="border-hairline mx-2 my-3 border-t" />
               {premium?.isEnabled() && (
                 <>
                   {user ? (

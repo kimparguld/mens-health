@@ -1,10 +1,12 @@
+import { createMetadata } from '@/lib/seo/site-metadata';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: 'Affiliate Disclosure',
   description:
     'Our affiliate disclosure policy in compliance with FTC endorsement guidelines.',
-};
+  path: '/affiliate-disclosure',
+});
 
 export default function AffiliateDisclosurePage() {
   return (

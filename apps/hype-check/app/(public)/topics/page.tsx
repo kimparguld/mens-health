@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Topics — Hype Check',
+  title: 'Topics',
   description:
     'Browse every topic we track — AI tools, side hustles, online courses, viral products, investment apps, and more — each with evidence-checked video summaries and FAQs.',
   path: '/topics',

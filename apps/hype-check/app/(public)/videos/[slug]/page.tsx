@@ -30,7 +30,7 @@ import {
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { PremiumSection } from './PremiumSection';
 
@@ -105,7 +105,7 @@ export default async function VideoPage({ params }: { params: Params }) {
     if (youtubeId) {
       const canonicalSlug = await getPublishedVideoSlugByYouTubeId(youtubeId);
       if (canonicalSlug && canonicalSlug !== slug) {
-        redirect(`/videos/${canonicalSlug}`);
+        permanentRedirect(`/videos/${canonicalSlug}`);
       }
     }
     notFound();

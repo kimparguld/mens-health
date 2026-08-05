@@ -6,7 +6,7 @@ const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
 
 export const metadata: Metadata = createMetadata({
-  title: "Free Embeddable Widget — Hype Check",
+  title: "Free Embeddable Widget",
   description:
     "Embed trending, evidence-checked reviews on your site — free JS widget, iframe, RSS, and JSON API.",
   path: "/widgets",

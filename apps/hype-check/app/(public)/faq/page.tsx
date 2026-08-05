@@ -9,20 +9,20 @@ import Link from 'next/link';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = {
-  title: "Men's Health FAQ — Common Questions, Answered With Evidence",
+  title: 'FAQ — Common Questions, Answered With Evidence',
   description:
-    'Answers to the most common questions about testosterone, sleep, muscle gain, longevity, and more — every answer graded by the strength of its evidence.',
+    'Answers to the most common questions about trending products, courses, side hustles, and investment apps — every answer graded by the strength of its evidence.',
   alternates: { canonical: `${APP_URL}/faq` },
   openGraph: {
-    title: "Men's Health FAQ — Common Questions, Answered With Evidence",
+    title: 'FAQ — Common Questions, Answered With Evidence',
     description:
-      'Answers to the most common questions about testosterone, sleep, muscle gain, longevity, and more.',
+      'Answers to the most common questions about trending products, courses, side hustles, and investment apps.',
     url: `${APP_URL}/faq`,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Men's Health FAQ",
+    title: 'FAQ',
   },
 };
 

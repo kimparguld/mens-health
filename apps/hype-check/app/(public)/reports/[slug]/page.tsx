@@ -23,7 +23,7 @@ export async function generateMetadata({
   const stats = report.stats as unknown as MonthlyReportStats;
 
   return createMetadata({
-    title: `${stats.periodLabel} Report — Hype Check`,
+    title: `${stats.periodLabel} Report`,
     description: `${stats.videosPublished} videos reviewed, ${stats.claimsAssessed} claims assessed in ${stats.periodLabel}. Evidence quality, risk levels, and sourcing breakdown.`,
     path: `/reports/${slug}`,
     type: 'article',

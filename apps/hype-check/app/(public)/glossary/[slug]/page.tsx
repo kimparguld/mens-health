@@ -28,7 +28,7 @@ export async function generateMetadata({
   if (!term) return { title: 'Term Not Found' };
 
   const canonical = `${APP_URL}/glossary/${slug}`;
-  const title = `What is ${term.term}? — Hype Check Glossary`;
+  const title = `What is ${term.term}? — Glossary`;
 
   return {
     title,

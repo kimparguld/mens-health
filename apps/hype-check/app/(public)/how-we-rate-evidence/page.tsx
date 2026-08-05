@@ -1,10 +1,12 @@
+import { createMetadata } from '@/lib/seo/site-metadata';
 import { HowWeRateClaims } from '@menhealth/ui';
 import type { Metadata } from 'next';
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: 'How We Rate Evidence',
   description:
     'How Hype Check evaluates product, course, and investment claims and assigns evidence ratings to video content.',
-};
+  path: '/how-we-rate-evidence',
+});
 
 export default function HowWeRateEvidencePage() {
   return (

@@ -10,7 +10,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = createMetadata({
-  title: 'Claims — Hype Check',
+  title: 'Claims',
   description:
     'Browse claims extracted from the videos we review, each reviewed and rated for evidence quality.',
   path: '/claims',
