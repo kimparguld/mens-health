@@ -1,9 +1,13 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import type { MonthlyReportStats } from "@/lib/reports/generate-monthly-report";
+import { db } from '@/lib/db/prisma';
+import type { MonthlyReportStats } from '@/lib/reports/generate-monthly-report';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ slug: string }>;
 
@@ -18,15 +22,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const report = await getReport(slug);
-  if (!report) return { title: "Report Not Found" };
+  if (!report) return { title: 'Report Not Found' };
 
   const stats = report.stats as unknown as MonthlyReportStats;
 
   return createMetadata({
-    title: `${stats.periodLabel} Men's Health Video Report — MenHealth Digest`,
+    title: `${stats.periodLabel} Men's Health Video Report`,
     description: `${stats.videosPublished} videos reviewed, ${stats.claimsAssessed} claims assessed in ${stats.periodLabel}. Evidence quality, risk levels, and sourcing breakdown.`,
     path: `/reports/${slug}`,
-    type: "article",
+    type: 'article',
   });
 }
 
@@ -38,23 +42,26 @@ export default async function ReportPage({ params }: { params: Params }) {
   const stats = report.stats as unknown as MonthlyReportStats;
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <nav className="mb-6 text-sm text-gray-700">
-        <Link href="/reports" className="hover:underline">
-          Reports
-        </Link>{" "}
-        / <span className="text-gray-900">{stats.periodLabel}</span>
-      </nav>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Reports', href: '/reports' },
+          { label: stats.periodLabel, href: `/reports/${slug}` },
+        ]}
+      />
 
       <h1 className="mb-2 text-3xl font-bold tracking-tight text-gray-900">
         {stats.periodLabel} Men&apos;s Health Video Report
       </h1>
       <p className="mb-6 text-gray-600">
         {stats.videosPublished} videos reviewed, {stats.claimsAssessed} claims
-        assessed. Methodology: every video published on MenHealth Digest in
-        this period, with claims extracted and evidence-checked as described
-        on our{" "}
-        <Link href="/editorial-process" className="text-blue-600 hover:underline">
+        assessed. Methodology: every video published on MenHealth Digest in this
+        period, with claims extracted and evidence-checked as described on our{' '}
+        <Link
+          href="/editorial-process"
+          className="text-blue-600 hover:underline"
+        >
           editorial process page
         </Link>
         .
@@ -81,7 +88,7 @@ export default async function ReportPage({ params }: { params: Params }) {
           </thead>
           <tbody>
             {stats.claimVerdictBreakdown.map((row) => (
-              <tr key={row.status} className="border-b border-hairline">
+              <tr key={row.status} className="border-hairline border-b">
                 <td className="py-2 text-gray-800">{row.status}</td>
                 <td className="py-2 text-gray-600">{row.count}</td>
                 <td className="py-2 text-gray-600">{row.percent}%</td>
@@ -105,7 +112,7 @@ export default async function ReportPage({ params }: { params: Params }) {
           </thead>
           <tbody>
             {stats.riskLevelBreakdown.map((row) => (
-              <tr key={row.level} className="border-b border-hairline">
+              <tr key={row.level} className="border-hairline border-b">
                 <td className="py-2 text-gray-800">{row.level}</td>
                 <td className="py-2 text-gray-600">{row.count}</td>
                 <td className="py-2 text-gray-600">{row.percent}%</td>
@@ -130,7 +137,7 @@ export default async function ReportPage({ params }: { params: Params }) {
             </thead>
             <tbody>
               {stats.topicsByHighRiskShare.map((row) => (
-                <tr key={row.topic} className="border-b border-hairline">
+                <tr key={row.topic} className="border-hairline border-b">
                   <td className="py-2 text-gray-800">{row.topic}</td>
                   <td className="py-2 text-gray-600">
                     {row.highRiskVideos} / {row.totalVideos}
@@ -158,7 +165,7 @@ export default async function ReportPage({ params }: { params: Params }) {
             </thead>
             <tbody>
               {stats.creatorsBySourcing.map((row) => (
-                <tr key={row.creator} className="border-b border-hairline">
+                <tr key={row.creator} className="border-hairline border-b">
                   <td className="py-2 text-gray-800">{row.creator}</td>
                   <td className="py-2 text-gray-600">{row.claimsAssessed}</td>
                   <td className="py-2 text-gray-600">
@@ -185,7 +192,7 @@ export default async function ReportPage({ params }: { params: Params }) {
             </thead>
             <tbody>
               {stats.claimCategoryBreakdown.map((row) => (
-                <tr key={row.category} className="border-b border-hairline">
+                <tr key={row.category} className="border-hairline border-b">
                   <td className="py-2 text-gray-800">{row.category}</td>
                   <td className="py-2 text-gray-600">{row.count}</td>
                 </tr>

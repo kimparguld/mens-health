@@ -51,6 +51,14 @@ a {
   transition: all 0.2s ease-in-out;
 }
 
+.link {
+  @apply decoration-hairline hover:decoration-ink-muted text-sm font-medium underline underline-offset-4;
+}
+
+.heading {
+  @apply font-slab text-ink-muted mb-3 text-3xl font-bold;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

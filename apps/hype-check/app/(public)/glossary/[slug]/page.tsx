@@ -2,11 +2,8 @@ import { RiskStamp } from '@/components/ui/RiskStamp';
 import { GLOSSARY_TERMS, getGlossaryTerm } from '@/lib/seo/glossary';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
-import {
-  buildBreadcrumbSchema,
-  buildDefinedTermSchema,
-} from '@menhealth/core-seo';
-import { Disclaimer, JsonLd } from '@menhealth/ui';
+import { buildDefinedTermSchema } from '@menhealth/core-seo';
+import { Disclaimer, JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -63,12 +60,6 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
     6
   );
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Glossary', url: `${APP_URL}/glossary` },
-    { name: term.term, url: `${APP_URL}/glossary/${slug}` },
-  ]);
-
   const definedTermSchema = buildDefinedTermSchema({
     name: term.term,
     description: term.longDefinition,
@@ -77,27 +68,21 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <JsonLd schema={[breadcrumbSchema, definedTermSchema]} />
-
-      <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{' '}
-        /{' '}
-        <Link href="/glossary" className="hover:underline">
-          Glossary
-        </Link>{' '}
-        / <span className="text-gray-900">{term.term}</span>
-      </nav>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Glossary', href: '/glossary' },
+          { label: term.term, href: `/glossary/${slug}` },
+        ]}
+      />
+      <JsonLd schema={definedTermSchema} />
 
       <header className="mb-8">
         <div className="mb-2 flex items-center gap-2">
           {isHighRiskTerm && <RiskStamp level="HIGH" />}
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-          {term.term}
-        </h1>
+        <h1 className="heading">{term.term}</h1>
         <p className="mt-4 text-lg leading-relaxed text-gray-600">
           {term.longDefinition}
         </p>
@@ -113,7 +98,7 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
               <Link
                 key={topic.slug}
                 href={`/topics/${topic.slug}`}
-                className="text-ink-muted hover:bg-ink-muted/10 border-ink-muted/20 rounded-full border bg-indigo-50 px-3 py-1.5 text-sm font-medium"
+                className="text-ink-muted border-ink-muted/20 hover:border-ink-muted/60 rounded-full border bg-white px-3 py-1.5 text-sm font-medium"
               >
                 {topic.name} →
               </Link>
@@ -139,7 +124,7 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
         </div>
         <Link
           href="/glossary"
-          className="text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
+          className="link text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
         >
           Browse the full glossary →
         </Link>

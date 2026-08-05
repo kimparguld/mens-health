@@ -5,12 +5,10 @@ import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
 import { createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
-import { buildBreadcrumbSchema } from '@menhealth/core-seo';
 import {
-  Breadcrumbs,
   Disclaimer,
-  JsonLd,
   NewsletterInlineCTA,
+  PageBreadcrumbs,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -100,30 +98,21 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
         })
       : null)) ?? null;
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Weekly trends', url: `${APP_URL}/weekly` },
-    { name: seed.name, url: `${APP_URL}/weekly/${slug}` },
-  ]);
-
   return (
     <>
-      <JsonLd schema={breadcrumbSchema} />
-      <main className="mx-auto max-w-4xl px-4 py-10">
-        <Breadcrumbs
-          items={[
+      <main className="mx-auto max-w-4xl px-4 py-6">
+        <PageBreadcrumbs
+          baseUrl={APP_URL}
+          trail={[
             { label: 'Weekly trends', href: '/weekly' },
-            { label: seed.name },
+            { label: seed.name, href: `/weekly/${slug}` },
           ]}
         />
-
         <header className="mb-12">
           <p className="text-ink-muted mb-1 text-sm font-semibold tracking-wide uppercase">
             {weekLabel}
           </p>
-          <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-            Best {seed.name} Videos This Week
-          </h1>
+          <h1 className="heading">Best {seed.name} Videos This Week</h1>
           <p className="text-base text-gray-600">
             The top trending {seed.name.toLowerCase()} content, summarised and
             checked. Evidence labels on every video. No miracle cures.
@@ -147,7 +136,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* Top Video This Week */}
             {topVideo && (
               <section className="mb-12">
-                <p className="text-ink-muted mb-3 text-sm font-semibold tracking-wide uppercase">
+                <p className="text-ink-muted mb-3 text-base font-semibold tracking-wide uppercase">
                   Top Video This Week
                 </p>
                 <div className="rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
@@ -189,8 +178,8 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
 
             {/* 3 Claims Checked */}
             {checkedClaims.length > 0 && (
-              <section className="mb-12">
-                <p className="text-ink-muted mb-3 text-sm font-semibold tracking-wide uppercase">
+              <section className="mb-4">
+                <p className="text-ink-muted mb-3 text-base font-semibold tracking-wide uppercase">
                   {checkedClaims.length} Claim
                   {checkedClaims.length !== 1 ? 's' : ''} Checked This Week
                 </p>
@@ -198,20 +187,23 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                   {checkedClaims.map((claim) => (
                     <li
                       key={claim.id}
-                      className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-4 text-sm"
+                      className="flex flex-col flex-wrap gap-2 rounded-xl border border-gray-200 bg-white px-5 py-4 text-sm"
                     >
                       <span className="flex-1 text-gray-800">
                         &ldquo;{claim.text}&rdquo;
                       </span>
-                      <EvidenceStamp status={claim.evidenceStatus} />
-                      {claim.slug && (
-                        <Link
-                          href={`/claims/${claim.slug}`}
-                          className="text-ink-muted text-sm font-medium hover:underline"
-                        >
-                          See evidence →
-                        </Link>
-                      )}
+
+                      <span className="flex flex-col items-center gap-3 lg:flex-row">
+                        <EvidenceStamp status={claim.evidenceStatus} />
+                        {claim.slug && (
+                          <Link
+                            href={`/claims/${claim.slug}`}
+                            className="link text-ink-muted text-sm font-medium hover:underline"
+                          >
+                            See evidence →
+                          </Link>
+                        )}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -220,19 +212,19 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
 
             {/* Most Overhyped Claim */}
             {overhypedClaim && (
-              <section className="mb-12 rounded-xl border border-red-200 bg-red-50 px-5 py-5">
+              <section className="mb-4 rounded-xl border border-red-200 bg-red-50 px-5 py-5">
                 <p className="mb-2 text-sm font-semibold tracking-wide text-red-700 uppercase">
                   Most Overhyped Claim This Week
                 </p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-semibold tracking-wide text-gray-900">
                   &ldquo;{overhypedClaim.text}&rdquo;
                 </p>
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2 flex flex-col items-center gap-2 lg:flex-row">
                   <EvidenceStamp status={overhypedClaim.evidenceStatus} />
                   {overhypedClaim.slug && (
                     <Link
                       href={`/claims/${overhypedClaim.slug}`}
-                      className="text-sm text-red-700 hover:underline"
+                      className="link text-sm text-red-700 hover:underline"
                     >
                       See the evidence →
                     </Link>
@@ -242,7 +234,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             )}
 
             {/* All videos */}
-            <p className="mb-3 text-sm font-semibold tracking-wide text-gray-500 uppercase">
+            <p className="text-ink-muted mt-10 mb-3 text-base font-semibold tracking-wide uppercase">
               All videos this week
             </p>
             <ol className="space-y-16">
@@ -286,7 +278,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       )}
                     <Link
                       href={`/videos/${video.slug}`}
-                      className="text-ink-muted mt-2 ml-3 inline-block text-sm font-medium hover:underline"
+                      className="link text-ink-muted mt-2 ml-3 inline-block text-sm font-medium hover:underline"
                     >
                       Read full summary →
                     </Link>
@@ -354,7 +346,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
               <Link
                 key={t.slug}
                 href={`/weekly/${t.slug}`}
-                className="hover:border-ink-muted/30 hover:text-ink-muted/80 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-colors"
+                className="hover:border-ink-muted/30 hover:text-ink/80 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-colors"
               >
                 {t.name}
               </Link>

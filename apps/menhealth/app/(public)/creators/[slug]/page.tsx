@@ -1,12 +1,13 @@
 import { db } from '@/lib/db/prisma';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
-import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
+import { buildPersonSchema } from '@menhealth/core-seo';
 import {
   Disclaimer,
   EvidenceBadge,
   JsonLd,
   NewsletterFooterCTA,
+  PageBreadcrumbs,
   VideoCard,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
@@ -168,12 +169,6 @@ export default async function CreatorPage({ params }: { params: Params }) {
         })
       : [];
 
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Creators', url: `${APP_URL}/creators` },
-    { name: creator.name, url: `${APP_URL}/creators/${slug}` },
-  ]);
-
   const personSchema = buildPersonSchema({
     name: creator.name,
     description: creator.description,
@@ -184,21 +179,18 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
   return (
     <>
-      <JsonLd schema={[breadcrumb, personSchema]} />
       <main>
         {/* Header */}
-        <section className="border-b border-hairline bg-white py-12">
+        <section className="border-hairline border-b bg-white py-6">
+          <PageBreadcrumbs
+            baseUrl={APP_URL}
+            trail={[
+              { label: 'Creators', href: '/creators' },
+              { label: creator.name, href: `/creators/${slug}` },
+            ]}
+          />
+          <JsonLd schema={personSchema} />
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-600">
-              <Link href="/" className="hover:text-gray-600">
-                Home
-              </Link>
-              <span>/</span>
-              <span className="text-gray-600">Creators</span>
-              <span>/</span>
-              <span className="text-gray-600">{creator.name}</span>
-            </nav>
-
             <p className="mb-2 text-xs font-semibold tracking-widest text-emerald-600 uppercase">
               Creator profile
             </p>
@@ -260,7 +252,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
         {/* Evidence scorecard */}
         {scorecard.claimsAssessed > 0 && (
-          <section className="border-b border-hairline bg-white py-10">
+          <section className="border-hairline border-b bg-white py-10">
             <div className="mx-auto max-w-4xl px-4">
               <h2 className="mb-1 text-lg font-semibold text-gray-900">
                 Evidence Scorecard
@@ -286,7 +278,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 ].map((row) => (
                   <div
                     key={row.label}
-                    className="rounded-xl border border-hairline bg-gray-50 px-4 py-3"
+                    className="border-hairline rounded-xl border bg-gray-50 px-4 py-3"
                   >
                     <dt className="text-xs text-gray-700">{row.label}</dt>
                     <dd className="mt-1 text-xl font-semibold text-gray-900">
@@ -346,7 +338,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
         </section>
 
         {/* Other creators */}
-        <section className="border-t border-hairline bg-gray-50 py-10">
+        <section className="border-hairline border-t bg-gray-50 py-10">
           <div className="mx-auto max-w-4xl px-4">
             {/* Most common topics */}
             {topTopics.length > 0 && (
@@ -379,7 +371,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                   {claims.map((claim) => (
                     <li
                       key={claim.id}
-                      className="flex flex-wrap items-center gap-2 rounded-xl border border-hairline bg-white px-4 py-3 text-sm"
+                      className="border-hairline flex flex-wrap items-center gap-2 rounded-xl border bg-white px-4 py-3 text-sm"
                     >
                       <span className="flex-1 text-gray-800">
                         &ldquo;{claim.text}&rdquo;

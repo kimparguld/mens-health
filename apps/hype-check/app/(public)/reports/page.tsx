@@ -1,7 +1,10 @@
 import { db } from '@/lib/db/prisma';
 import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Monthly Reports',
@@ -18,10 +21,12 @@ export default async function ReportsIndexPage() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Monthly Reports
-      </h1>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Reports', href: '/reports' }]}
+      />
+      <h1 className="heading">Monthly Reports</h1>
       <p className="mb-8 text-gray-600">
         Data-driven summaries of every video and claim we&apos;ve reviewed,
         published monthly with a downloadable CSV.

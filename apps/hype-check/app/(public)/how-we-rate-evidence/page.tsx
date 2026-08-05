@@ -1,6 +1,8 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
-import { HowWeRateClaims } from '@menhealth/ui';
+import { HowWeRateClaims, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 export const metadata: Metadata = createMetadata({
   title: 'How We Rate Evidence',
   description:
@@ -10,11 +12,15 @@ export const metadata: Metadata = createMetadata({
 
 export default function HowWeRateEvidencePage() {
   return (
-    <main className="pb-16">
-      <div className="mx-auto max-w-[720px] px-4 py-12">
-        <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
-          How we rate evidence
-        </h1>
+    <main>
+      <div className="mx-auto max-w-[720px] px-4 py-6">
+        <PageBreadcrumbs
+          baseUrl={APP_URL}
+          trail={[
+            { label: 'How we rate evidence', href: '/how-we-rate-evidence' },
+          ]}
+        />
+        <h1 className="heading">How we rate evidence</h1>
         <p className="mb-8 text-lg leading-relaxed text-gray-600">
           Not all hype is equal. Here is how we assess the claims made in the
           videos we summarise.
@@ -98,9 +104,7 @@ export default function HowWeRateEvidencePage() {
           </p>
         </section>
       </div>
-
-      {/* Evidence label grid */}
-      <HowWeRateClaims />
+      <HowWeRateClaims site="hype-check" />
     </main>
   );
 }

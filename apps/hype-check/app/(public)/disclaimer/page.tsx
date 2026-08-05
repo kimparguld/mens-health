@@ -1,7 +1,9 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
-import { Disclaimer } from '@menhealth/ui';
+import { Disclaimer, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 export const metadata: Metadata = createMetadata({
   title: 'Disclaimer',
   description:
@@ -11,10 +13,12 @@ export const metadata: Metadata = createMetadata({
 
 export default function DisclaimerPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
-      <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
-        Disclaimer
-      </h1>
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Disclaimer', href: '/disclaimer' }]}
+      />
+      <h1 className="heading">Disclaimer</h1>
       <p className="mb-8 text-lg leading-relaxed text-gray-600">
         Please read this carefully before acting on any content you read here.
       </p>

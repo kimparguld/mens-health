@@ -1,13 +1,12 @@
 import { adsConfig } from '@/lib/ads-config';
 import { db } from '@/lib/db/prisma';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
-import { buildBreadcrumbSchema } from '@menhealth/core-seo';
 import {
   AdSlot,
   Disclaimer,
   EvidenceBadge,
-  JsonLd,
   NewsletterFooterCTA,
+  PageBreadcrumbs,
   RiskBadge,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
@@ -80,17 +79,6 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
   const { video } = claim;
   const summary = video.summaries[0];
-  const firstTopic = video.topics[0]?.topic;
-
-  const canonicalSlug = claim.slug ?? claim.id;
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Claims', url: `${APP_URL}/claims` },
-    {
-      name: claim.text.slice(0, 60),
-      url: `${APP_URL}/claims/${canonicalSlug}`,
-    },
-  ]);
 
   const EVIDENCE_EXPLANATION: Record<string, string> = {
     SUPPORTED:
@@ -108,29 +96,17 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
   return (
     <>
-      <JsonLd schema={breadcrumb} />
-      <main className="mx-auto max-w-2xl px-4 py-12">
-        {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 text-xs text-gray-600">
-          <Link href="/" className="hover:text-gray-600">
-            Home
-          </Link>
-          <span>/</span>
-          {firstTopic && (
-            <>
-              <Link
-                href={`/topics/${firstTopic.slug}`}
-                className="hover:text-gray-600"
-              >
-                {firstTopic.name}
-              </Link>
-              <span>/</span>
-            </>
-          )}
-          <span className="text-gray-600">Claim</span>
-        </nav>
-
-        {/* Claim heading */}
+      <main className="mx-auto max-w-2xl px-4 py-6">
+        <PageBreadcrumbs
+          baseUrl={APP_URL}
+          trail={[
+            { label: 'Claims', href: '/claims' },
+            {
+              label: claim.text.slice(0, 60),
+              href: `/claims/${claim.slug ?? claim.id}`,
+            },
+          ]}
+        />
         <article>
           <p className="mb-3 text-xs font-semibold tracking-widest text-emerald-600 uppercase">
             Health claim
@@ -180,7 +156,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
                 {claim.sources.map((source) => (
                   <li
                     key={source.id}
-                    className="rounded-lg border border-hairline bg-gray-50 p-4"
+                    className="border-hairline rounded-lg border bg-gray-50 p-4"
                   >
                     <a
                       href={source.url}
@@ -240,7 +216,6 @@ export default async function ClaimPage({ params }: { params: Params }) {
           <NewsletterFooterCTA
             headline="Get the weekly evidence digest"
             description="5 claims reviewed each Friday. No hype."
-            site="hype-check"
           />
         </div>
 

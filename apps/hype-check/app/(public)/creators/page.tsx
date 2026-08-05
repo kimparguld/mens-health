@@ -1,9 +1,11 @@
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
 import { buildItemListSchema } from '@menhealth/core-seo';
-import { JsonLd } from '@menhealth/ui';
+import { JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Video Creators',
@@ -22,7 +24,11 @@ export default function CreatorsIndexPage() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Creators', href: '/creators' }]}
+      />
       <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Creators

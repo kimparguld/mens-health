@@ -3,7 +3,7 @@
 import { BrandLogotype } from '@/components/ui/BrandLogotype';
 import { premium } from '@/lib/flags/feature-flags';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 type SessionUser = {
@@ -236,7 +236,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             {/* Nav links */}
             <nav className="flex flex-1 flex-col overflow-y-auto bg-white px-4 py-4">
               {navLinks.map((link) => (
-                <>
+                <Fragment key={link.href}>
                   {link.href === '/newsletter' && (
                     <div className="border-hairline -mx-4 mt-3 mb-6 border-t" />
                   )}
@@ -265,7 +265,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                       />
                     </svg>
                   </Link>
-                </>
+                </Fragment>
               ))}
 
               {premium?.isEnabled() && (

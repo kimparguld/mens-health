@@ -1,12 +1,15 @@
-import { JsonLd, RiskBadge } from "@menhealth/ui";
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
-import { buildItemListSchema } from '@menhealth/core-seo';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { buildItemListSchema } from '@menhealth/core-seo';
+import { JsonLd, PageBreadcrumbs, RiskBadge } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+
 export const metadata: Metadata = createMetadata({
-  title: "Men's Health Topics — MenHealth Digest",
+  title: "Men's Health Topics",
   description:
     "Browse every men's health topic we track — testosterone, sleep, muscle gain, longevity, and more — each with evidence-checked video summaries and FAQs.",
   path: '/topics',
@@ -22,7 +25,11 @@ export default function TopicsIndexPage() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Topics', href: '/topics' }]}
+      />
       <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Topics

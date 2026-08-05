@@ -1,28 +1,28 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { getAllTopicSeo } from "@/lib/seo/topic-faq";
-import { JsonLd, Disclaimer } from "@menhealth/ui";
-import { buildBreadcrumbSchema, buildFaqSchema } from "@menhealth/core-seo";
-import type { FaqEntry } from "@menhealth/core-seo";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
+import { getAllTopicSeo } from '@/lib/seo/topic-faq';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import type { FaqEntry } from '@menhealth/core-seo';
+import { buildFaqSchema } from '@menhealth/core-seo';
+import { Disclaimer, JsonLd, PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = {
   title: "Men's Health FAQ — Common Questions, Answered With Evidence",
   description:
-    "Answers to the most common questions about testosterone, sleep, muscle gain, longevity, and more — every answer graded by the strength of its evidence.",
+    'Answers to the most common questions about testosterone, sleep, muscle gain, longevity, and more — every answer graded by the strength of its evidence.',
   alternates: { canonical: `${APP_URL}/faq` },
   openGraph: {
     title: "Men's Health FAQ — Common Questions, Answered With Evidence",
     description:
-      "Answers to the most common questions about testosterone, sleep, muscle gain, longevity, and more.",
+      'Answers to the most common questions about testosterone, sleep, muscle gain, longevity, and more.',
     url: `${APP_URL}/faq`,
-    type: "website",
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
     title: "Men's Health FAQ",
   },
 };
@@ -37,22 +37,15 @@ export default function FaqPage() {
 
   const allFaqs: FaqEntry[] = sections.flatMap((s) => s.faq);
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "FAQ", url: `${APP_URL}/faq` },
-  ]);
   const faqSchema = buildFaqSchema(allFaqs);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <JsonLd schema={[breadcrumbSchema, faqSchema]} />
-
-      <nav className="mb-3 text-sm text-gray-700" aria-label="Breadcrumb">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{" "}
-        / <span className="text-gray-900">FAQ</span>
-      </nav>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'FAQ', href: '/faq' }]}
+      />
+      <JsonLd schema={faqSchema} />
 
       <header className="mb-10">
         <h1 className="text-4xl font-bold text-gray-900">
@@ -60,9 +53,12 @@ export default function FaqPage() {
         </h1>
         <p className="mt-3 text-lg leading-relaxed text-gray-600">
           Straight answers to the questions we see most, organised by topic.
-          Every claim on this site is graded by the strength of its
-          supporting evidence — see{" "}
-          <Link href="/how-we-rate-evidence" className="text-emerald-700 hover:underline">
+          Every claim on this site is graded by the strength of its supporting
+          evidence — see{' '}
+          <Link
+            href="/how-we-rate-evidence"
+            className="text-emerald-700 hover:underline"
+          >
             how we rate evidence
           </Link>
           .
@@ -82,7 +78,11 @@ export default function FaqPage() {
       </nav>
 
       {sections.map(({ topic, faq }) => (
-        <section key={topic.slug} id={topic.slug} className="mb-10 scroll-mt-20">
+        <section
+          key={topic.slug}
+          id={topic.slug}
+          className="mb-10 scroll-mt-20"
+        >
           <h2 className="mb-4 text-xl font-semibold text-gray-900">
             <Link
               href={`/topics/${topic.slug}`}

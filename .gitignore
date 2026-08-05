@@ -48,3 +48,4 @@ apps/*/prisma/migrations
 
 apps/*/info.txt
 .superpowers/
+.claude/worktrees

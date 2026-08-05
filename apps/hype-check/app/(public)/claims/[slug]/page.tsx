@@ -3,8 +3,12 @@ import { RiskStamp } from '@/components/ui/RiskStamp';
 import { adsConfig } from '@/lib/ads-config';
 import { db } from '@/lib/db/prisma';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
-import { buildBreadcrumbSchema } from '@menhealth/core-seo';
-import { AdSlot, Disclaimer, JsonLd, NewsletterFooterCTA } from '@menhealth/ui';
+import {
+  AdSlot,
+  Disclaimer,
+  NewsletterFooterCTA,
+  PageBreadcrumbs,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -79,19 +83,8 @@ export default async function ClaimPage({ params }: { params: Params }) {
   const { subject } = claim;
   const sourceVideo = subject.sourceVideos[0];
   const summary = sourceVideo?.summaries[0];
-  const firstTopic = subject.topics[0]?.topic;
   const displayTitle =
     subject.editorialTitle ?? sourceVideo?.title ?? subject.name;
-
-  const canonicalSlug = claim.slug ?? claim.id;
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Claims', url: `${APP_URL}/claims` },
-    {
-      name: claim.text.slice(0, 60),
-      url: `${APP_URL}/claims/${canonicalSlug}`,
-    },
-  ]);
 
   const EVIDENCE_EXPLANATION: Record<string, string> = {
     SUPPORTED:
@@ -109,36 +102,22 @@ export default async function ClaimPage({ params }: { params: Params }) {
 
   return (
     <>
-      <JsonLd schema={breadcrumb} />
-      <main className="mx-auto max-w-2xl px-4 py-12">
-        {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 text-sm text-gray-400">
-          <Link href="/" className="hover:text-gray-600">
-            Home
-          </Link>
-          <span>/</span>
-          {firstTopic && (
-            <>
-              <Link
-                href={`/topics/${firstTopic.slug}`}
-                className="hover:text-gray-600"
-              >
-                {firstTopic.name}
-              </Link>
-              <span>/</span>
-            </>
-          )}
-          <span className="text-gray-600">Claim</span>
-        </nav>
-
-        {/* Claim heading */}
+      <main className="mx-auto max-w-2xl px-4 py-6">
+        <PageBreadcrumbs
+          baseUrl={APP_URL}
+          trail={[
+            { label: 'Claims', href: '/claims' },
+            {
+              label: claim.text.slice(0, 60),
+              href: `/claims/${claim.slug ?? claim.id}`,
+            },
+          ]}
+        />
         <article>
           <p className="text-ink-muted/60 mb-3 text-sm font-semibold tracking-widest uppercase">
             Claim
           </p>
-          <h1 className="text-2xl leading-snug font-bold text-gray-900 sm:text-3xl">
-            &ldquo;{claim.text}&rdquo;
-          </h1>
+          <h1 className="heading">&ldquo;{claim.text}&rdquo;</h1>
 
           {/* Badges */}
           <div className="mt-4 flex flex-wrap items-center gap-2">

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 
 /**
@@ -6,10 +6,10 @@ import type { Metadata } from "next";
  * Permanent redirect to /newsletter.
  */
 export const metadata: Metadata = {
-  title: "Newsletter — MenHealth Digest",
+  title: "Newsletter",
   alternates: { canonical: "/newsletter" },
 };
 
 export default function DigestRedirectPage() {
-  redirect("/newsletter");
+  permanentRedirect("/newsletter");
 }

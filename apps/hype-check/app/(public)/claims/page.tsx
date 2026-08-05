@@ -3,11 +3,13 @@ import { db } from '@/lib/db/prisma';
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { buildItemListSchema } from '@menhealth/core-seo';
-import { Disclaimer, JsonLd } from '@menhealth/ui';
+import { Disclaimer, JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Claims',
@@ -52,11 +54,13 @@ export default async function ClaimsIndexPage() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Claims', href: '/claims' }]}
+      />
       <JsonLd schema={itemListSchema} />
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Claims
-      </h1>
+      <h1 className="heading">Claims</h1>
       <p className="mb-4 text-gray-600">
         Claims extracted from published videos we review, each rated for
         evidence quality.

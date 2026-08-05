@@ -3,8 +3,13 @@ import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
 import { db } from '@/lib/db/prisma';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { CREATOR_SEEDS } from '@/lib/youtube/creators';
-import { buildBreadcrumbSchema, buildPersonSchema } from '@menhealth/core-seo';
-import { Disclaimer, JsonLd, NewsletterFooterCTA } from '@menhealth/ui';
+import { buildPersonSchema } from '@menhealth/core-seo';
+import {
+  Disclaimer,
+  JsonLd,
+  NewsletterFooterCTA,
+  PageBreadcrumbs,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -167,12 +172,6 @@ export default async function CreatorPage({ params }: { params: Params }) {
         })
       : [];
 
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Creators', url: `${APP_URL}/creators` },
-    { name: creator.name, url: `${APP_URL}/creators/${slug}` },
-  ]);
-
   const personSchema = buildPersonSchema({
     name: creator.name,
     description: creator.description,
@@ -183,21 +182,18 @@ export default async function CreatorPage({ params }: { params: Params }) {
 
   return (
     <>
-      <JsonLd schema={[breadcrumb, personSchema]} />
+      <JsonLd schema={personSchema} />
       <main>
         {/* Header */}
-        <section className="border-b border-gray-100 bg-white py-12">
+        <section className="border-b border-gray-100 bg-white py-6">
+          <PageBreadcrumbs
+            baseUrl={APP_URL}
+            trail={[
+              { label: 'Creators', href: '/creators' },
+              { label: creator.name, href: `/creators/${slug}` },
+            ]}
+          />
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-sm text-gray-400">
-              <Link href="/" className="hover:text-gray-600">
-                Home
-              </Link>
-              <span>/</span>
-              <span className="text-gray-600">Creators</span>
-              <span>/</span>
-              <span className="text-gray-600">{creator.name}</span>
-            </nav>
-
             <p className="text-ink-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
               Creator profile
             </p>

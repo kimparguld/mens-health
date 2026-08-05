@@ -143,10 +143,7 @@ export default async function PublicLayout({
             {/* Top topics */}
             <div>
               <h3 className="text-ink text-md mb-2 font-semibold">
-                <Link
-                  href="/topics"
-                  className="hover:text-ink-muted/80 text-ink"
-                >
+                <Link href="/topics" className="hover:text-ink/80 text-ink">
                   Top Topics
                 </Link>
               </h3>
@@ -164,7 +161,7 @@ export default async function PublicLayout({
                 <li>
                   <Link
                     href="/topics"
-                    className="text-ink hover:text-ink-muted/80 font-medium"
+                    className="text-ink hover:text-ink/80 font-medium"
                   >
                     View all topics →
                   </Link>

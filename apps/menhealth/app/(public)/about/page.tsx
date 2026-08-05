@@ -1,15 +1,24 @@
-import type { Metadata } from "next";
-import { Disclaimer } from "@menhealth/ui";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
-export const metadata: Metadata = {
-  title: "About Us",
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { Disclaimer, PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+export const metadata: Metadata = createMetadata({
+  title: 'About Us',
   description:
     "Why MenHealth Digest exists, what we do, and how we approach men's health content.",
-};
+  path: '/about',
+});
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'About', href: '/about' }]}
+      />
       <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         About MenHealth Digest
       </h1>
@@ -70,7 +79,7 @@ export default function AboutPage() {
           embed on this site is an official YouTube player.
         </p>
         <p>
-          Want to know more about how our evidence labels work?{" "}
+          Want to know more about how our evidence labels work?{' '}
           <a
             href="/how-we-rate-evidence"
             className="text-emerald-600 hover:underline"

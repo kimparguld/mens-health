@@ -75,7 +75,7 @@ export function HypeVideoCard({
               <EvidenceStamp status={evidenceLabel} />
             )}
             {watchTimeMin && (
-              <span className="text-sm text-gray-600">
+              <span className="text-xs text-gray-500">
                 {watchTimeMin} min watch
               </span>
             )}
@@ -87,7 +87,7 @@ export function HypeVideoCard({
         {shortSummary && (
           <p className="text-ink-muted line-clamp-2 text-sm">{shortSummary}</p>
         )}
-        <p className="mt-auto text-sm text-gray-600">{channelTitle}</p>
+        <p className="mt-auto text-xs text-gray-500">{channelTitle}</p>
       </div>
     </Link>
   );

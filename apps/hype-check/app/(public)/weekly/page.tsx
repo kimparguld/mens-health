@@ -1,7 +1,10 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Weekly Trend Pages',
@@ -12,10 +15,12 @@ export const metadata: Metadata = createMetadata({
 
 export default function WeeklyIndexPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Weekly Trend Pages
-      </h1>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Weekly trends', href: '/weekly' }]}
+      />
+      <h1 className="heading">Weekly Trend Pages</h1>
       <p className="mb-8 text-gray-600">
         Choose a topic to see the week&apos;s best videos, summarised and
         evidence-checked.

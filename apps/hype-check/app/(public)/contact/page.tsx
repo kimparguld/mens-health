@@ -1,5 +1,8 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Contact',
@@ -10,6 +13,10 @@ export const metadata: Metadata = createMetadata({
 export default function ContactPage() {
   return (
     <main className="mx-auto max-w-[720px] px-4 py-12">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Contact', href: '/contact' }]}
+      />
       <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         Contact us
       </h1>

@@ -1,5 +1,8 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Editorial Process',
@@ -10,10 +13,12 @@ export const metadata: Metadata = createMetadata({
 
 export default function EditorialProcessPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
-      <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
-        Our editorial process
-      </h1>
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Editorial process', href: '/editorial-process' }]}
+      />
+      <h1 className="heading">Our editorial process</h1>
       <p className="mb-8 text-lg leading-relaxed text-gray-600">
         How a YouTube video goes from discovery to a published review on Hype
         Check.

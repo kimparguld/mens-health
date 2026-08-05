@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { GLOSSARY_TERMS, getGlossaryTerm } from "@/lib/seo/glossary";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { JsonLd, Disclaimer, RiskBadge } from "@menhealth/ui";
-import { buildBreadcrumbSchema, buildDefinedTermSchema } from "@menhealth/core-seo";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
+import { GLOSSARY_TERMS, getGlossaryTerm } from '@/lib/seo/glossary';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { buildDefinedTermSchema } from '@menhealth/core-seo';
+import { Disclaimer, JsonLd, PageBreadcrumbs, RiskBadge } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ slug: string }>;
 
@@ -22,7 +22,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const term = getGlossaryTerm(slug);
-  if (!term) return { title: "Term Not Found" };
+  if (!term) return { title: 'Term Not Found' };
 
   const canonical = `${APP_URL}/glossary/${slug}`;
   const title = `What is ${term.term}? — Men's Health Glossary`;
@@ -35,40 +35,30 @@ export async function generateMetadata({
       title,
       description: term.shortDefinition,
       url: canonical,
-      type: "article",
+      type: 'article',
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title,
       description: term.shortDefinition,
     },
   };
 }
 
-export default async function GlossaryTermPage({
-  params,
-}: {
-  params: Params;
-}) {
+export default async function GlossaryTermPage({ params }: { params: Params }) {
   const { slug } = await params;
   const term = getGlossaryTerm(slug);
   if (!term) notFound();
 
   const relatedTopics = TOPIC_SEEDS.filter((t) =>
-    term.relatedTopicSlugs.includes(t.slug),
+    term.relatedTopicSlugs.includes(t.slug)
   );
   const isHighRiskTerm = relatedTopics.some((t) => t.isHighRisk);
 
   const otherTerms = GLOSSARY_TERMS.filter((t) => t.slug !== term.slug).slice(
     0,
-    6,
+    6
   );
-
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Glossary", url: `${APP_URL}/glossary` },
-    { name: term.term, url: `${APP_URL}/glossary/${slug}` },
-  ]);
 
   const definedTermSchema = buildDefinedTermSchema({
     name: term.term,
@@ -78,19 +68,15 @@ export default async function GlossaryTermPage({
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <JsonLd schema={[breadcrumbSchema, definedTermSchema]} />
-
-      <nav className="mb-3 text-sm text-gray-700" aria-label="Breadcrumb">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{" "}
-        /{" "}
-        <Link href="/glossary" className="hover:underline">
-          Glossary
-        </Link>{" "}
-        / <span className="text-gray-900">{term.term}</span>
-      </nav>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Glossary', href: '/glossary' },
+          { label: term.term, href: `/glossary/${slug}` },
+        ]}
+      />
+      <JsonLd schema={definedTermSchema} />
 
       <header className="mb-8">
         <div className="mb-2 flex items-center gap-2">
