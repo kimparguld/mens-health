@@ -116,9 +116,11 @@ export default async function AdminTopicsPage() {
           </h2>
           <p className="mb-4 text-sm text-gray-500">
             Surfaced by the monthly discovery job from current YouTube search
-            volume. Approving merges a topic into the live pipeline at runtime —
-            it does not edit site.config.ts. Rejecting is permanent; the same
-            slug will not be re-suggested.
+            volume. Approving queues the topic for the next video-sync run —
+            new videos will be discovered, scored, and processed for it — but
+            the public topic hub page is not yet wired to show it (tracked as
+            a follow-up). Rejecting is permanent; the same slug will not be
+            re-suggested.
           </p>
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -126,6 +128,7 @@ export default async function AdminTopicsPage() {
                 <tr>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Name</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Query</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-600">Description</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Suggested risk</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Popularity</th>
                   <th className="px-4 py-3 text-left font-medium text-gray-600">Evidence</th>
@@ -139,6 +142,7 @@ export default async function AdminTopicsPage() {
                     <tr key={s.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium text-gray-900">{s.name}</td>
                       <td className="px-4 py-3 text-gray-500">{s.query}</td>
+                      <td className="px-4 py-3 text-gray-500">{s.description}</td>
                       <td className="px-4 py-3">
                         {s.suggestedIsHighRisk ? (
                           <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
