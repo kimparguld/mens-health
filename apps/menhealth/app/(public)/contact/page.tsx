@@ -1,13 +1,23 @@
-import type { Metadata } from "next";
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "Get in touch with MenHealth Digest.",
-};
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+
+export const metadata: Metadata = createMetadata({
+  title: 'Contact',
+  description: 'Get in touch with MenHealth Digest.',
+  path: '/contact',
+});
 
 export default function ContactPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Contact', href: '/contact' }]}
+      />
       <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         Contact us
       </h1>
@@ -22,7 +32,7 @@ export default function ContactPage() {
             General enquiries
           </h2>
           <p className="text-sm text-gray-600">
-            For anything not listed below, email us at{" "}
+            For anything not listed below, email us at{' '}
             <a
               href="mailto:hello@menhealth-digest.com"
               className="text-emerald-600 hover:underline"
@@ -38,13 +48,13 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600">
             Found a factual error in a summary or an incorrect evidence rating?
-            Email{" "}
+            Email{' '}
             <a
               href="mailto:corrections@menhealth-digest.com"
               className="text-emerald-600 hover:underline"
             >
               corrections@menhealth-digest.com
-            </a>{" "}
+            </a>{' '}
             with the video title and a description of the issue. We aim to
             respond within 3 business days.
           </p>
@@ -56,7 +66,7 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600">
             For advertising, sponsorship, or affiliate programme enquiries,
-            email{" "}
+            email{' '}
             <a
               href="mailto:partnerships@menhealth-digest.com"
               className="text-emerald-600 hover:underline"
@@ -74,7 +84,7 @@ export default function ContactPage() {
           </h2>
           <p className="text-sm text-gray-600">
             To request deletion of your personal data or exercise any other data
-            rights, email{" "}
+            rights, email{' '}
             <a
               href="mailto:privacy@menhealth-digest.com"
               className="text-emerald-600 hover:underline"

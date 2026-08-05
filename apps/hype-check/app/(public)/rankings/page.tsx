@@ -1,9 +1,11 @@
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import { buildItemListSchema } from '@menhealth/core-seo';
-import { JsonLd } from '@menhealth/ui';
+import { JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Weekly Video Rankings',
@@ -22,11 +24,13 @@ export default function RankingsIndexPage() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Rankings', href: '/rankings' }]}
+      />
       <JsonLd schema={itemListSchema} />
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Weekly Rankings
-      </h1>
+      <h1 className="heading">Weekly Rankings</h1>
       <p className="mb-8 text-gray-600">
         Each week we score and rank the top videos by topic. Choose a topic to
         see this week&apos;s leaderboard.

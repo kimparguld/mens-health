@@ -65,7 +65,7 @@ async function FeaturedInsight() {
   return (
     <section className="bg-surface py-12">
       <div className="mx-auto max-w-[1120px] px-4">
-        <p className="mb-5 text-sm font-semibold tracking-widest text-white/80 uppercase">
+        <p className="mb-5 text-sm font-semibold tracking-widest text-white/90 uppercase">
           Today&apos;s top insight
         </p>
         <div className="border-hairline rounded-md border bg-white p-6 sm:p-8">
@@ -214,10 +214,7 @@ export default async function HomePage() {
 
       <Suspense
         fallback={
-          <div
-            className="bg-surface min-h-[420px] py-12 lg:min-h-[358px]"
-            aria-hidden
-          />
+          <div className="bg-surface min-h-[420px] py-12" aria-hidden />
         }
       >
         <FeaturedInsight />
@@ -312,7 +309,7 @@ export default async function HomePage() {
       </section>
 
       {/* How we rate claims */}
-      <HowWeRateClaims />
+      <HowWeRateClaims site="hype-check" />
     </main>
   );
 }

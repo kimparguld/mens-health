@@ -1,18 +1,26 @@
-import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import Link from "next/link";
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = createMetadata({
-  title: "Weekly Men's Health Trend Pages — MenHealth Digest",
+  title: "Weekly Men's Health Trend Pages",
   description:
     "The top trending men's health videos summarised each week by topic. Evidence labels, claim checks, practical takeaways.",
-  path: "/weekly",
+  path: '/weekly',
 });
 
 export default function WeeklyIndexPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Weekly trends', href: '/weekly' }]}
+      />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Weekly Trend Pages
       </h1>

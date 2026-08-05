@@ -11,11 +11,7 @@ import { getTopicSeo } from '@/lib/seo/topic-faq';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { FaqEntry } from '@menhealth/core-seo';
-import {
-  buildBreadcrumbSchema,
-  buildFaqSchema,
-  buildItemListSchema,
-} from '@menhealth/core-seo';
+import { buildFaqSchema, buildItemListSchema } from '@menhealth/core-seo';
 import {
   AdSlot,
   AffiliateDisclosure,
@@ -24,6 +20,7 @@ import {
   JsonLd,
   NewsletterFooterCTA,
   NewsletterInlineCTA,
+  PageBreadcrumbs,
   RiskBadge,
   SponsorBlock,
   VideoCard,
@@ -60,14 +57,14 @@ export async function generateMetadata({
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${topic.name} — MenHealth Digest`,
+      title: `${topic.name} — Men's Health Guide`,
       description,
       url: canonical,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${topic.name} — MenHealth Digest`,
+      title: `${topic.name} — Men's Health Guide`,
       description,
     },
     keywords: [topic.name, "men's health", 'health guide', 'evidence-based'],
@@ -170,11 +167,6 @@ export default async function TopicPage({
   ]);
 
   // JSON-LD schemas
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: topicSeed.name, url: `${APP_URL}/topics/${slug}` },
-  ]);
-
   const itemListSchema =
     publishedVideos.length > 0
       ? buildItemListSchema(
@@ -189,13 +181,19 @@ export default async function TopicPage({
   const faqSchema = seo && seo.faq.length > 0 ? buildFaqSchema(seo.faq) : null;
 
   const schemas = [
-    breadcrumbSchema,
     ...(itemListSchema ? [itemListSchema] : []),
     ...(faqSchema ? [faqSchema] : []),
   ];
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className="mx-auto max-w-4xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Topics', href: '/topics' },
+          { label: topicSeed.name, href: `/topics/${slug}` },
+        ]}
+      />
       {/* Inject JSON-LD */}
       {schemas.map((schema, i) => (
         <JsonLd key={i} schema={schema} />
@@ -203,13 +201,6 @@ export default async function TopicPage({
 
       {/* Hero */}
       <header className="mb-8">
-        <nav className="mb-3 text-sm text-gray-700" aria-label="Breadcrumb">
-          <Link href="/" className="hover:underline">
-            Home
-          </Link>{' '}
-          / <span className="text-gray-900">{topicSeed.name}</span>
-        </nav>
-
         <div className="mb-2 flex items-center gap-2">
           {topicSeed.isHighRisk && <RiskBadge level="HIGH" />}
         </div>

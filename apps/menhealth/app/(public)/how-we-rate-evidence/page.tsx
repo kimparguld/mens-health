@@ -1,15 +1,26 @@
-import type { Metadata } from "next";
-import { HowWeRateClaims } from "@menhealth/ui";
-export const metadata: Metadata = {
-  title: "How We Rate Evidence",
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { HowWeRateClaims, PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+export const metadata: Metadata = createMetadata({
+  title: 'How We Rate Evidence',
   description:
-    "How MenHealth Digest evaluates health claims and assigns evidence ratings to video content.",
-};
+    'How MenHealth Digest evaluates health claims and assigns evidence ratings to video content.',
+  path: '/how-we-rate-evidence',
+});
 
 export default function HowWeRateEvidencePage() {
   return (
     <main className="pb-16">
-      <div className="mx-auto max-w-[720px] px-4 py-12">
+      <div className="mx-auto max-w-[720px] px-4 py-6">
+        <PageBreadcrumbs
+          baseUrl={APP_URL}
+          trail={[
+            { label: 'How we rate evidence', href: '/how-we-rate-evidence' },
+          ]}
+        />
         <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
           How we rate evidence
         </h1>
@@ -83,7 +94,7 @@ export default function HowWeRateEvidencePage() {
             cannot guarantee every rating reflects the very latest research.
           </p>
           <p>
-            If you believe a rating is wrong, please{" "}
+            If you believe a rating is wrong, please{' '}
             <a href="/contact" className="text-emerald-600 hover:underline">
               contact us
             </a>

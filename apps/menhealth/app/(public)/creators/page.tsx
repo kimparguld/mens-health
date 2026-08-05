@@ -1,15 +1,18 @@
-import type { Metadata } from "next";
-import { createMetadata, createCanonicalUrl } from "@/lib/seo/site-metadata";
-import { CREATOR_SEEDS } from "@/lib/youtube/creators";
-import { JsonLd } from "@menhealth/ui";
-import { buildItemListSchema } from "@menhealth/core-seo";
-import Link from "next/link";
+import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
+import { CREATOR_SEEDS } from '@/lib/youtube/creators';
+import { buildItemListSchema } from '@menhealth/core-seo';
+import { JsonLd, PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = createMetadata({
-  title: "Men's Health Video Creators — MenHealth Digest",
+  title: "Men's Health Video Creators",
   description:
     "Browse the top men's health YouTube creators we track. Each creator's videos are summarised, scored, and checked for evidence quality.",
-  path: "/creators",
+  path: '/creators',
 });
 
 export default function CreatorsIndexPage() {
@@ -18,11 +21,15 @@ export default function CreatorsIndexPage() {
     CREATOR_SEEDS.map((creator) => ({
       name: creator.name,
       url: createCanonicalUrl(`/creators/${creator.slug}`),
-    })),
+    }))
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Creators', href: '/creators' }]}
+      />
       <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Creators

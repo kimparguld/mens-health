@@ -9,6 +9,8 @@ export { NewsletterInlineCTA } from './newsletter/NewsletterInlineCTA';
 
 export { Breadcrumbs } from './seo/Breadcrumbs';
 export { JsonLd } from './seo/JsonLd';
+export { PageBreadcrumbs } from './seo/PageBreadcrumbs';
+export type { BreadcrumbTrailItem } from './seo/PageBreadcrumbs';
 export { RelatedClaims } from './seo/RelatedClaims';
 export { RelatedTopics } from './seo/RelatedTopics';
 export { RelatedVideos } from './seo/RelatedVideos';

@@ -1,24 +1,32 @@
-import type { Metadata } from "next";
-import { createMetadata, createCanonicalUrl } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import { EvidenceBadge, Disclaimer, JsonLd } from "@menhealth/ui";
-import { buildItemListSchema } from "@menhealth/core-seo";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
-import Link from "next/link";
+import { db } from '@/lib/db/prisma';
+import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { buildItemListSchema } from '@menhealth/core-seo';
+import {
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  PageBreadcrumbs,
+} from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = createMetadata({
-  title: "Health Claims — MenHealth Digest",
+  title: 'Health Claims',
   description:
     "Browse health claims extracted from men's health videos, each reviewed and rated for evidence quality.",
-  path: "/claims",
+  path: '/claims',
 });
 
 export default async function ClaimsIndexPage() {
   const claims = await db.claim.findMany({
-    where: { video: { status: "PUBLISHED" } },
-    orderBy: { createdAt: "desc" },
+    where: { video: { status: 'PUBLISHED' } },
+    orderBy: { createdAt: 'desc' },
     take: 60,
     select: {
       id: true,
@@ -35,17 +43,21 @@ export default async function ClaimsIndexPage() {
   });
 
   const itemListSchema = buildItemListSchema(
-    "Health Claims",
+    'Health Claims',
     claims
       .filter((c) => c.slug != null)
       .map((c) => ({
         name: c.text,
         url: createCanonicalUrl(`/claims/${c.slug}`),
-      })),
+      }))
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Claims', href: '/claims' }]}
+      />
       <JsonLd schema={itemListSchema} />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Health Claims

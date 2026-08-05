@@ -2,8 +2,8 @@ import { getAllTopicSeo } from '@/lib/seo/topic-faq';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { FaqEntry } from '@menhealth/core-seo';
-import { buildBreadcrumbSchema, buildFaqSchema } from '@menhealth/core-seo';
-import { Disclaimer, JsonLd } from '@menhealth/ui';
+import { buildFaqSchema } from '@menhealth/core-seo';
+import { Disclaimer, JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
@@ -36,27 +36,18 @@ export default function FaqPage() {
 
   const allFaqs: FaqEntry[] = sections.flatMap((s) => s.faq);
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'FAQ', url: `${APP_URL}/faq` },
-  ]);
   const faqSchema = buildFaqSchema(allFaqs);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <JsonLd schema={[breadcrumbSchema, faqSchema]} />
-
-      <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{' '}
-        / <span className="text-gray-900">FAQ</span>
-      </nav>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'FAQ', href: '/faq' }]}
+      />
+      <JsonLd schema={faqSchema} />
 
       <header className="mb-10">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Frequently Asked Questions
-        </h1>
+        <h1 className="heading">Frequently Asked Questions</h1>
         <p className="mt-3 text-lg leading-relaxed text-gray-600">
           Straight answers to the questions we see most, organised by topic.
           Every claim on this site is graded by the strength of its supporting

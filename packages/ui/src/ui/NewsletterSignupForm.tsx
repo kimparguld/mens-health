@@ -45,9 +45,7 @@ export function NewsletterSignupForm({ compact = false, className, site = 'menhe
     setEmail('');
   }
 
-  if (status === 'success') {
-    return <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">{message}</p>;
-  }
+  let successClass = 'bg-green-50 text-green-800';
 
   let inputClass =
     'flex-1 rounded-lg border bg-white border-gray-800 px-4 py-2.5 text-sm text-black focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none disabled:opacity-50';
@@ -56,9 +54,14 @@ export function NewsletterSignupForm({ compact = false, className, site = 'menhe
     'rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50';
 
   if (site === 'hype-check') {
+    successClass = 'bg-white text-ink';
     inputClass =
       'flex-1 rounded-lg border bg-white border-gray-800 px-4 py-2.5 text-sm text-black focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none disabled:opacity-50';
     btnClass = 'rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-ink/80 disabled:opacity-50';
+  }
+
+  if (status === 'success') {
+    return <p className={twMerge('rounded-lg px-4 py-3 text-base', successClass)}>{message}</p>;
   }
 
   return (

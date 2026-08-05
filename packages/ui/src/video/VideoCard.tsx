@@ -1,7 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import { EvidenceBadge } from "../ui/EvidenceBadge";
-import { RiskBadge } from "../ui/RiskBadge";
+import Image from 'next/image';
+import Link from 'next/link';
+import { EvidenceBadge } from '../ui/EvidenceBadge';
+import { RiskBadge } from '../ui/RiskBadge';
 
 type VideoCardProps = {
   slug: string;
@@ -33,8 +33,7 @@ export function VideoCard({
 }: VideoCardProps) {
   const watchTimeMin = durationSeconds ? Math.ceil(durationSeconds / 60) : null;
 
-  const sizes =
-    customSizes ?? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw";
+  const sizes = customSizes ?? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
 
   return (
     <Link
@@ -43,45 +42,27 @@ export function VideoCard({
     >
       {thumbnailUrl && (
         <div className="relative aspect-video w-full bg-gray-100">
-          <Image
-            src={thumbnailUrl}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes={sizes}
-            priority={priority}
-          />
+          <Image src={thumbnailUrl} alt={title} fill className="object-cover" sizes={sizes} priority={priority} />
         </div>
       )}
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex flex-wrap items-center gap-1.5">
           {topicNames.slice(0, 2).map((name) => (
-            <span
-              key={name}
-              className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800"
-            >
+            <span key={name} className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
               {name}
             </span>
           ))}
-          {riskLevel && riskLevel !== "LOW" && <RiskBadge level={riskLevel} />}
+          {riskLevel && riskLevel !== 'LOW' && <RiskBadge level={riskLevel} />}
         </div>
         {(evidenceLabel || watchTimeMin) && (
           <div className="flex flex-wrap items-center gap-1.5">
             {evidenceLabel && <EvidenceBadge status={evidenceLabel} />}
-            {watchTimeMin && (
-              <span className="text-sm text-gray-600">
-                {watchTimeMin} min watch
-              </span>
-            )}
+            {watchTimeMin && <span className="text-xs text-gray-500">{watchTimeMin} min watch</span>}
           </div>
         )}
-        <h3 className="line-clamp-2 text-base font-semibold text-gray-900 group-hover:text-emerald-700">
-          {title}
-        </h3>
-        {shortSummary && (
-          <p className="line-clamp-2 text-sm text-gray-700">{shortSummary}</p>
-        )}
-        <p className="mt-auto text-sm text-gray-600">{channelTitle}</p>
+        <h3 className="line-clamp-2 text-base font-semibold text-gray-900 group-hover:text-emerald-700">{title}</h3>
+        {shortSummary && <p className="line-clamp-2 text-sm text-gray-700">{shortSummary}</p>}
+        <p className="mt-auto text-xs text-gray-500">{channelTitle}</p>
       </div>
     </Link>
   );

@@ -1,14 +1,26 @@
-import type { Metadata } from "next";
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: "Affiliate Disclosure",
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+
+export const metadata: Metadata = createMetadata({
+  title: 'Affiliate Disclosure',
   description:
-    "Our affiliate disclosure policy in compliance with FTC endorsement guidelines.",
-};
+    'Our affiliate disclosure policy in compliance with FTC endorsement guidelines.',
+  path: '/affiliate-disclosure',
+});
 
 export default function AffiliateDisclosurePage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Affiliate disclosure', href: '/affiliate-disclosure' },
+        ]}
+      />
       <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         Affiliate disclosure
       </h1>
@@ -77,7 +89,7 @@ export default function AffiliateDisclosurePage() {
           featured or linked on this site.
         </p>
         <p>
-          If you have questions about our affiliate relationships, please{" "}
+          If you have questions about our affiliate relationships, please{' '}
           <a href="/contact" className="text-emerald-600 hover:underline">
             contact us
           </a>

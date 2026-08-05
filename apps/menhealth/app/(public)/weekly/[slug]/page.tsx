@@ -1,16 +1,21 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
-import { getTopicBySlug, getWeeklyRankingVideos } from "@/lib/db/queries";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { VideoCard, Disclaimer, EvidenceBadge, NewsletterInlineCTA, Breadcrumbs, JsonLd } from "@menhealth/ui";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
-import { buildBreadcrumbSchema } from "@menhealth/core-seo";
-import { db } from "@/lib/db/prisma";
+import { db } from '@/lib/db/prisma';
+import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  Disclaimer,
+  EvidenceBadge,
+  NewsletterInlineCTA,
+  PageBreadcrumbs,
+  VideoCard,
+} from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 type Params = Promise<{ slug: string }>;
 
@@ -20,7 +25,7 @@ function getWeekLabel(): string {
   // ISO week number
   const start = new Date(y, 0, 1);
   const week = Math.ceil(
-    ((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7,
+    ((now.getTime() - start.getTime()) / 86400000 + start.getDay() + 1) / 7
   );
   return `Week ${week}, ${y}`;
 }
@@ -36,10 +41,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const seed = TOPIC_SEEDS.find((t) => t.slug === slug);
-  if (!seed) return { title: "Not Found" };
+  if (!seed) return { title: 'Not Found' };
 
   return createMetadata({
-    title: `Best ${seed.name} Videos This Week — MenHealth Digest`,
+    title: `Best ${seed.name} Videos This Week`,
     description: `The top trending ${seed.name.toLowerCase()} videos summarised this week. Evidence labels, practical takeaways, and claim checks — no hype.`,
     path: `/weekly/${slug}`,
   });
@@ -66,11 +71,11 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
       ? await db.claim.findMany({
           where: {
             videoId: { in: videoIds },
-            evidenceStatus: { not: "NOT_CHECKED" },
+            evidenceStatus: { not: 'NOT_CHECKED' },
             slug: { not: null },
           },
           take: 3,
-          orderBy: { riskLevel: "desc" },
+          orderBy: { riskLevel: 'desc' },
           select: {
             id: true,
             text: true,
@@ -87,30 +92,23 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
       ? db.claim.findFirst({
           where: {
             videoId: { in: videoIds },
-            evidenceStatus: { in: ["WEAK", "UNSUPPORTED"] },
+            evidenceStatus: { in: ['WEAK', 'UNSUPPORTED'] },
           },
-          orderBy: { riskLevel: "desc" },
+          orderBy: { riskLevel: 'desc' },
           select: { text: true, evidenceStatus: true, slug: true },
         })
       : null)) ?? null;
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: "Home", url: APP_URL },
-    { name: "Weekly trends", url: `${APP_URL}/weekly` },
-    { name: seed.name, url: `${APP_URL}/weekly/${slug}` },
-  ]);
-
   return (
     <>
-      <JsonLd schema={breadcrumbSchema} />
-      <main className="mx-auto max-w-4xl px-4 py-10">
-        <Breadcrumbs
-          items={[
-            { label: "Weekly trends", href: "/weekly" },
-            { label: seed.name },
+      <main className="mx-auto max-w-4xl px-4 py-6">
+        <PageBreadcrumbs
+          baseUrl={APP_URL}
+          trail={[
+            { label: 'Weekly trends', href: '/weekly' },
+            { label: seed.name, href: `/weekly/${slug}` },
           ]}
         />
-
         <header className="mb-12">
           <p className="mb-1 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
             {weekLabel}
@@ -155,7 +153,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                     topicNames={topVideo.topics.map((vt) => vt.topic.name)}
                     riskLevel={topVideo.riskLevel}
                     evidenceLabel={
-                      topVideo.evidenceScore != null ? "SUPPORTED" : undefined
+                      topVideo.evidenceScore != null ? 'SUPPORTED' : undefined
                     }
                     durationSeconds={topVideo.durationSeconds ?? undefined}
                     customSizes="100vw"
@@ -182,7 +180,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
               <section className="mb-12">
                 <p className="mb-3 text-xs font-semibold tracking-wide text-emerald-700 uppercase">
                   {checkedClaims.length} Claim
-                  {checkedClaims.length !== 1 ? "s" : ""} Checked This Week
+                  {checkedClaims.length !== 1 ? 's' : ''} Checked This Week
                 </p>
                 <ul className="space-y-3">
                   {checkedClaims.map((claim) => (
@@ -256,8 +254,8 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       riskLevel={video.riskLevel}
                       evidenceLabel={
                         video.evidenceScore != null
-                          ? "SUPPORTED"
-                          : "NOT_CHECKED"
+                          ? 'SUPPORTED'
+                          : 'NOT_CHECKED'
                       }
                       durationSeconds={video.durationSeconds ?? undefined}
                       customSizes="100vw"

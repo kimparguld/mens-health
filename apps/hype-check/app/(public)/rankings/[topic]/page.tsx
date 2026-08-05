@@ -2,11 +2,13 @@ import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
 import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { buildItemListSchema } from '@menhealth/core-seo';
 import {
-  buildBreadcrumbSchema,
-  buildItemListSchema,
-} from '@menhealth/core-seo';
-import { Disclaimer, JsonLd, NewsletterFooterCTA } from '@menhealth/ui';
+  Disclaimer,
+  JsonLd,
+  NewsletterFooterCTA,
+  PageBreadcrumbs,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -73,12 +75,6 @@ export default async function WeeklyRankingPage({
     : [];
   const isFallback = false;
 
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Rankings', url: `${APP_URL}/rankings` },
-    { name: seed.name, url: `${APP_URL}/rankings/${topic}` },
-  ]);
-
   const listSchema = buildItemListSchema(
     `Best ${seed.name} Videos This Week`,
     displayVideos.map((v) => ({
@@ -96,29 +92,22 @@ export default async function WeeklyRankingPage({
 
   return (
     <>
-      <JsonLd schema={breadcrumb} />
       <JsonLd schema={listSchema} />
       <main>
         {/* Header */}
-        <section className="border-b border-gray-100 bg-white py-12">
+        <section className="border-b border-gray-100 bg-white py-6">
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-sm text-gray-400">
-              <Link href="/" className="hover:text-gray-600">
-                Home
-              </Link>
-              <span>/</span>
-              <Link href={`/topics/${topic}`} className="hover:text-gray-600">
-                {seed.name}
-              </Link>
-              <span>/</span>
-              <span className="text-gray-600">This Week</span>
-            </nav>
+            <PageBreadcrumbs
+              baseUrl={APP_URL}
+              trail={[
+                { label: 'Rankings', href: '/rankings' },
+                { label: seed.name, href: `/rankings/${topic}` },
+              ]}
+            />
             <p className="text-ink-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
               Weekly ranking
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Best {seed.name} Videos This Week
-            </h1>
+            <h1 className="heading">Best {seed.name} Videos This Week</h1>
             <p className="mt-3 max-w-xl text-base text-gray-500">
               {isFallback
                 ? `Top-ranked ${seed.name.toLowerCase()} videos on YouTube — summarised and scored for evidence quality.`
@@ -269,18 +258,17 @@ export default async function WeeklyRankingPage({
             </div>
           </div>
         </section>
+        <div className="mx-auto max-w-4xl px-4">
+          {/* Newsletter */}
+          <NewsletterFooterCTA
+            headline={`Get the weekly ${seed.name} digest`}
+            description="Top 5 videos, summarised claims, and evidence notes — every Friday."
+            site="hype-check"
+          />
 
-        {/* Newsletter */}
-        <NewsletterFooterCTA
-          headline={`Get the weekly ${seed.name} digest`}
-          description="Top 5 videos, summarised claims, and evidence notes — every Friday."
-          site="hype-check"
-        />
-
-        <div className="mx-auto max-w-4xl px-4 pb-10">
           <Disclaimer
             text={DISCLAIMER_TEXT}
-            className="border-gray-200 bg-white text-gray-500"
+            className="my-6 border-gray-200 bg-white text-gray-500"
           />
         </div>
       </main>

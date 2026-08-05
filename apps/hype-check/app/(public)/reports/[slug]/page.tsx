@@ -1,9 +1,12 @@
 import { db } from '@/lib/db/prisma';
 import type { MonthlyReportStats } from '@/lib/reports/generate-monthly-report';
 import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 type Params = Promise<{ slug: string }>;
 
@@ -38,17 +41,16 @@ export default async function ReportPage({ params }: { params: Params }) {
   const stats = report.stats as unknown as MonthlyReportStats;
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <nav className="mb-6 text-sm text-gray-500">
-        <Link href="/reports" className="hover:underline">
-          Reports
-        </Link>{' '}
-        / <span className="text-gray-900">{stats.periodLabel}</span>
-      </nav>
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Reports', href: '/reports' },
+          { label: stats.periodLabel, href: `/reports/${slug}` },
+        ]}
+      />
 
-      <h1 className="mb-2 text-3xl font-bold tracking-tight text-gray-900">
-        {stats.periodLabel} Report
-      </h1>
+      <h1 className="heading">{stats.periodLabel} Report</h1>
       <p className="mb-6 text-gray-600">
         {stats.videosPublished} videos reviewed, {stats.claimsAssessed} claims
         assessed. Methodology: every video published on Hype Check in this

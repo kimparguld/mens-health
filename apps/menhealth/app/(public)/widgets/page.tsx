@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { TOPIC_SEEDS } from "@/lib/youtube/topics";
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = createMetadata({
-  title: "Free Embeddable Widget — MenHealth Digest",
+  title: 'Free Embeddable Widget',
   description:
     "Embed trending, evidence-checked men's health videos on your site — free JS widget, iframe, RSS, and JSON API.",
-  path: "/widgets",
+  path: '/widgets',
 });
 
 const scriptSnippet = `<script
@@ -30,7 +31,11 @@ const jsonSnippet = `GET ${APP_URL}/api/widgets/trending?topic=testosterone&coun
 
 export default function WidgetsPage() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
+    <main className="mx-auto max-w-2xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Widgets', href: '/widgets' }]}
+      />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Free Embeddable Widget
       </h1>
@@ -65,9 +70,7 @@ export default function WidgetsPage() {
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-2 text-lg font-semibold text-gray-900">
-          JSON API
-        </h2>
+        <h2 className="mb-2 text-lg font-semibold text-gray-900">JSON API</h2>
         <p className="mb-3 text-sm text-gray-700">
           For custom integrations. Returns evidence label, risk level, and a
           link to the full review for each video. CORS-enabled.
@@ -78,9 +81,7 @@ export default function WidgetsPage() {
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-2 text-lg font-semibold text-gray-900">
-          RSS feeds
-        </h2>
+        <h2 className="mb-2 text-lg font-semibold text-gray-900">RSS feeds</h2>
         <p className="mb-3 text-sm text-gray-700">
           Subscribe in Feedly or any reader — one feed per topic, plus
           site-wide, weekly, high-risk, and strong-evidence feeds.

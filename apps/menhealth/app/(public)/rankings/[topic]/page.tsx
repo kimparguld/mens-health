@@ -1,8 +1,14 @@
-import { NewsletterFooterCTA, JsonLd, Disclaimer, VideoCard } from "@menhealth/ui";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
 import { getTopicBySlug, getWeeklyRankingVideos } from '@/lib/db/queries';
-import { buildBreadcrumbSchema, buildItemListSchema } from '@menhealth/core-seo';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import { buildItemListSchema } from '@menhealth/core-seo';
+import {
+  Disclaimer,
+  JsonLd,
+  NewsletterFooterCTA,
+  PageBreadcrumbs,
+  VideoCard,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -70,12 +76,6 @@ export default async function WeeklyRankingPage({
     : [];
   const isFallback = false;
 
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Rankings', url: `${APP_URL}/rankings` },
-    { name: seed.name, url: `${APP_URL}/rankings/${topic}` },
-  ]);
-
   const listSchema = buildItemListSchema(
     `Best ${seed.name} Videos This Week`,
     displayVideos.map((v) => ({
@@ -93,23 +93,18 @@ export default async function WeeklyRankingPage({
 
   return (
     <>
-      <JsonLd schema={breadcrumb} />
-      <JsonLd schema={listSchema} />
       <main>
         {/* Header */}
-        <section className="border-b border-hairline bg-white py-12">
+        <section className="border-hairline border-b bg-white py-6">
           <div className="mx-auto max-w-4xl px-4">
-            <nav className="mb-4 flex items-center gap-2 text-xs text-gray-600">
-              <Link href="/" className="hover:text-gray-600">
-                Home
-              </Link>
-              <span>/</span>
-              <Link href={`/topics/${topic}`} className="hover:text-gray-600">
-                {seed.name}
-              </Link>
-              <span>/</span>
-              <span className="text-gray-600">This Week</span>
-            </nav>
+            <PageBreadcrumbs
+              baseUrl={APP_URL}
+              trail={[
+                { label: 'Rankings', href: '/rankings' },
+                { label: seed.name, href: `/rankings/${topic}` },
+              ]}
+            />
+            <JsonLd schema={listSchema} />
             <p className="mb-2 text-xs font-semibold tracking-widest text-emerald-600 uppercase">
               Weekly ranking
             </p>
@@ -128,7 +123,7 @@ export default async function WeeklyRankingPage({
         </section>
 
         {/* How rankings work */}
-        <section className="border-b border-hairline bg-gray-50 py-8">
+        <section className="border-hairline border-b bg-gray-50 py-8">
           <div className="mx-auto max-w-4xl px-4">
             <details className="group">
               <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-gray-700">
@@ -221,7 +216,7 @@ export default async function WeeklyRankingPage({
         </section>
 
         {/* Navigation links */}
-        <section className="border-t border-hairline bg-gray-50 py-8">
+        <section className="border-hairline border-t bg-gray-50 py-8">
           <div className="mx-auto flex max-w-4xl flex-wrap gap-4 px-4">
             <Link
               href={`/topics/${topic}`}
@@ -239,7 +234,7 @@ export default async function WeeklyRankingPage({
         </section>
 
         {/* Cross-links to other weekly rankings */}
-        <section className="border-t border-hairline bg-gray-50 py-10">
+        <section className="border-hairline border-t bg-gray-50 py-10">
           <div className="mx-auto max-w-4xl px-4">
             <h2 className="mb-4 text-sm font-semibold text-gray-700">
               Other weekly rankings

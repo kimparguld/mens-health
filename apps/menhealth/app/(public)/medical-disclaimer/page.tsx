@@ -1,15 +1,24 @@
-import type { Metadata } from "next";
-import { Disclaimer } from "@menhealth/ui";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
-export const metadata: Metadata = {
-  title: "Medical Disclaimer",
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { Disclaimer, PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+export const metadata: Metadata = createMetadata({
+  title: 'Medical Disclaimer',
   description:
-    "Important information about the nature of MenHealth Digest content and its limitations.",
-};
+    'Important information about the nature of MenHealth Digest content and its limitations.',
+  path: '/medical-disclaimer',
+});
 
 export default function MedicalDisclaimerPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Medical disclaimer', href: '/medical-disclaimer' }]}
+      />
       <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         Medical disclaimer
       </h1>

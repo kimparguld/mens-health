@@ -1,8 +1,15 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
-import { Disclaimer, NewsletterSignupForm } from '@menhealth/ui';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import {
+  Disclaimer,
+  NewsletterSignupForm,
+  PageBreadcrumbs,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = createMetadata({
   title: "The 5-Minute Men's Health Digest — Free Weekly Newsletter",
@@ -36,7 +43,11 @@ const benefits = [
 
 export default function NewsletterPage() {
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
+    <main className="mx-auto max-w-2xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Newsletter', href: '/newsletter' }]}
+      />
       {/* Hero */}
       <header className="mb-12 text-center">
         <p className="mb-2 text-xs font-semibold tracking-widest text-emerald-700 uppercase">
@@ -99,7 +110,7 @@ export default function NewsletterPage() {
           <div className="divide-y divide-gray-100 text-sm">
             {/* Top Video */}
             <div className="px-6 py-5">
-              <p className="mb-2 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
+              <p className="mb-2 text-xs font-semibold tracking-widest text-gray-600 uppercase">
                 Top Video This Week
               </p>
               <p className="font-semibold text-gray-900">
@@ -118,7 +129,7 @@ export default function NewsletterPage() {
 
             {/* 3 Claims Checked */}
             <div className="px-6 py-5">
-              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
+              <p className="mb-3 text-xs font-semibold tracking-widest text-gray-600 uppercase">
                 3 Claims Checked
               </p>
               <ul className="space-y-3">
@@ -146,7 +157,7 @@ export default function NewsletterPage() {
                     className="flex flex-wrap items-start gap-2"
                   >
                     <span
-                      className={`mt-0.5 rounded-full px-2 py-0.5 text-[11px] font-medium ${item.color}`}
+                      className={`mt-0.5 rounded-full px-2 py-0.5 text-xs font-medium ${item.color}`}
                     >
                       {item.badge}
                     </span>
@@ -160,7 +171,7 @@ export default function NewsletterPage() {
 
             {/* Practical Takeaway */}
             <div className="bg-emerald-50 px-6 py-5">
-              <p className="mb-1 text-[11px] font-semibold tracking-widest text-emerald-600 uppercase">
+              <p className="mb-1 text-sm font-semibold tracking-widest text-emerald-600 uppercase">
                 Practical Takeaway
               </p>
               <p className="font-medium text-emerald-900">
@@ -172,12 +183,12 @@ export default function NewsletterPage() {
 
             {/* Most Overhyped */}
             <div className="bg-red-50 px-6 py-5">
-              <p className="mb-1 text-[11px] font-semibold tracking-widest text-red-600 uppercase">
+              <p className="mb-1 text-xs font-semibold tracking-widest text-red-600 uppercase">
                 Most Overhyped Claim This Week
               </p>
               <p className="text-gray-700">
                 &ldquo;This one herb doubled testosterone in 30 days.&rdquo; —
-                <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                   Claim checked — not supported
                 </span>
               </p>
@@ -185,7 +196,7 @@ export default function NewsletterPage() {
 
             {/* Explore More */}
             <div className="px-6 py-5">
-              <p className="mb-3 text-[11px] font-semibold tracking-widest text-gray-600 uppercase">
+              <p className="mb-3 text-xs font-semibold tracking-widest text-gray-600 uppercase">
                 Explore More
               </p>
               <div className="flex flex-wrap gap-3 text-sm">

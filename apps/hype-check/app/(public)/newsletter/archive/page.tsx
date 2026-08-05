@@ -1,7 +1,10 @@
 import { db } from '@/lib/db/prisma';
 import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Newsletter Archive',
@@ -19,10 +22,15 @@ export default async function NewsletterArchivePage() {
   });
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Newsletter Archive
-      </h1>
+    <main className="mx-auto max-w-2xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Newsletter', href: '/newsletter' },
+          { label: 'Archive', href: '/newsletter/archive' },
+        ]}
+      />
+      <h1 className="heading">Newsletter Archive</h1>
       <p className="mb-8 text-gray-600">
         Every past issue of the weekly digest, published as a permanent page.
       </p>

@@ -1,13 +1,23 @@
-import type { Metadata } from "next";
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How MenHealth Digest collects, uses, and protects your data.",
-};
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
+
+export const metadata: Metadata = createMetadata({
+  title: 'Privacy Policy',
+  description: 'How MenHealth Digest collects, uses, and protects your data.',
+  path: '/privacy',
+});
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Privacy', href: '/privacy' }]}
+      />
       <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
         Privacy policy
       </h1>
@@ -93,7 +103,7 @@ export default function PrivacyPage() {
         <p>
           You can unsubscribe from the newsletter at any time using the
           unsubscribe link in any digest email. To request deletion of your
-          account or personal data,{" "}
+          account or personal data,{' '}
           <a href="/contact" className="text-emerald-600 hover:underline">
             contact us
           </a>
@@ -104,7 +114,7 @@ export default function PrivacyPage() {
       <section className="mb-10 space-y-4 leading-relaxed text-gray-700">
         <h2 className="text-xl font-semibold text-gray-900">Contact</h2>
         <p>
-          If you have questions about how we handle your data, please{" "}
+          If you have questions about how we handle your data, please{' '}
           <a href="/contact" className="text-emerald-600 hover:underline">
             get in touch
           </a>

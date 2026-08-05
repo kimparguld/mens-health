@@ -1,10 +1,12 @@
+import { RiskStamp } from '@/components/ui/RiskStamp';
 import { createCanonicalUrl, createMetadata } from '@/lib/seo/site-metadata';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import { buildItemListSchema } from '@menhealth/core-seo';
-import { JsonLd } from '@menhealth/ui';
-import { RiskStamp } from '@/components/ui/RiskStamp';
+import { JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Topics',
@@ -23,11 +25,13 @@ export default function TopicsIndexPage() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Topics', href: '/topics' }]}
+      />
       <JsonLd schema={itemListSchema} />
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
-        Topics
-      </h1>
+      <h1 className="heading">Topics</h1>
       <p className="mb-8 text-gray-600">
         Every topic we track, each with evidence-checked video summaries, common
         myths, and frequently asked questions.

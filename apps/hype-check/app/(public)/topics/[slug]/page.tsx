@@ -14,17 +14,14 @@ import { getTopicSeo } from '@/lib/seo/topic-faq';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { FaqEntry } from '@menhealth/core-seo';
-import {
-  buildBreadcrumbSchema,
-  buildFaqSchema,
-  buildItemListSchema,
-} from '@menhealth/core-seo';
+import { buildFaqSchema, buildItemListSchema } from '@menhealth/core-seo';
 import {
   AdSlot,
   AffiliateDisclosure,
   Disclaimer,
   JsonLd,
   NewsletterFooterCTA,
+  PageBreadcrumbs,
   SponsorBlock,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
@@ -178,11 +175,6 @@ export default async function TopicPage({
   ]);
 
   // JSON-LD schemas
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: topicSeed.name, url: `${APP_URL}/topics/${slug}` },
-  ]);
-
   const itemListSchema =
     publishedVideos.length > 0
       ? buildItemListSchema(
@@ -197,13 +189,19 @@ export default async function TopicPage({
   const faqSchema = seo && seo.faq.length > 0 ? buildFaqSchema(seo.faq) : null;
 
   const schemas = [
-    breadcrumbSchema,
     ...(itemListSchema ? [itemListSchema] : []),
     ...(faqSchema ? [faqSchema] : []),
   ];
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
+    <main className="mx-auto max-w-4xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Topics', href: '/topics' },
+          { label: topicSeed.name, href: `/topics/${slug}` },
+        ]}
+      />
       {/* Inject JSON-LD */}
       {schemas.map((schema, i) => (
         <JsonLd key={i} schema={schema} />
@@ -211,18 +209,13 @@ export default async function TopicPage({
 
       {/* Hero */}
       <header className="mb-8">
-        <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
-          <Link href="/" className="hover:underline">
-            Home
-          </Link>{' '}
-          / <span className="text-gray-900">{topicSeed.name}</span>
-        </nav>
-
         <div className="mb-2 flex items-center gap-2">
           {topicSeed.isHighRisk && <RiskStamp level="HIGH" />}
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900">{topicSeed.name}</h1>
+        <h1 className="font-slab text-ink-muted mb-3 text-4xl font-bold">
+          {topicSeed.name}
+        </h1>
 
         {seo ? (
           <p className="mt-3 text-lg leading-relaxed text-gray-600">
@@ -316,7 +309,7 @@ export default async function TopicPage({
                     {claim.slug && (
                       <Link
                         href={`/claims/${claim.slug}`}
-                        className="text-ink-muted text-sm font-medium hover:underline"
+                        className="link text-ink-muted text-sm font-medium hover:underline"
                       >
                         See evidence →
                       </Link>
@@ -337,7 +330,7 @@ export default async function TopicPage({
           </ul>
           <Link
             href={`/rankings/${slug}`}
-            className="text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
+            className="link text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
           >
             See top-ranked videos for {topicSeed.name} →
           </Link>
@@ -485,7 +478,7 @@ export default async function TopicPage({
 
       {seo && seo.faq.length > 0 && (
         <section className="mb-12">
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">
+          <h2 className="font-slab text-ink-muted mb-6 text-3xl font-bold">
             Frequently Asked Questions
           </h2>
           <div className="divide-y rounded-xl border bg-white">

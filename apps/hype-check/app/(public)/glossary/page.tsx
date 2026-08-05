@@ -1,11 +1,8 @@
 import { GLOSSARY_TERMS } from '@/lib/seo/glossary';
 import { DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
-import {
-  buildBreadcrumbSchema,
-  buildDefinedTermSetSchema,
-} from '@menhealth/core-seo';
-import { Disclaimer, JsonLd } from '@menhealth/ui';
+import { buildDefinedTermSetSchema } from '@menhealth/core-seo';
+import { Disclaimer, JsonLd, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
@@ -33,11 +30,6 @@ export default function GlossaryPage() {
     a.term.localeCompare(b.term)
   );
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Glossary', url: `${APP_URL}/glossary` },
-  ]);
-
   const definedTermSetSchema = buildDefinedTermSetSchema({
     name: 'Hype Check Glossary',
     url: `${APP_URL}/glossary`,
@@ -49,20 +41,15 @@ export default function GlossaryPage() {
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <JsonLd schema={[breadcrumbSchema, definedTermSetSchema]} />
-
-      <nav className="mb-3 text-sm text-gray-500" aria-label="Breadcrumb">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{' '}
-        / <span className="text-gray-900">Glossary</span>
-      </nav>
+    <main className="mx-auto max-w-4xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Glossary', href: '/glossary' }]}
+      />
+      <JsonLd schema={definedTermSetSchema} />
 
       <header className="mb-10">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Hype Check Glossary
-        </h1>
+        <h1 className="heading">Hype Check Glossary</h1>
         <p className="mt-3 text-lg leading-relaxed text-gray-600">
           Plain-English definitions for the evidence, risk, and marketing terms
           that come up again and again across the videos we review — so you can

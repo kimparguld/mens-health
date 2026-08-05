@@ -13,7 +13,6 @@ import { getGlossaryTermsForTopics } from '@/lib/seo/glossary';
 import { MEDICAL_DISCLAIMER_TEXT, SITE_NAME } from '@/lib/site-brand';
 import {
   buildArticleSchema,
-  buildBreadcrumbSchema,
   buildVideoObjectSchema,
 } from '@menhealth/core-seo';
 import {
@@ -24,13 +23,14 @@ import {
   JsonLd,
   NewsletterFooterCTA,
   NewsletterInlineCTA,
+  PageBreadcrumbs,
   RiskBadge,
   SponsorBlock,
   YouTubePlayer,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { PremiumSection } from './PremiumSection';
 
@@ -103,7 +103,7 @@ export default async function VideoPage({ params }: { params: Params }) {
     if (youtubeId) {
       const canonicalSlug = await getPublishedVideoSlugByYouTubeId(youtubeId);
       if (canonicalSlug && canonicalSlug !== slug) {
-        redirect(`/videos/${canonicalSlug}`);
+        permanentRedirect(`/videos/${canonicalSlug}`);
       }
     }
     notFound();
@@ -142,14 +142,6 @@ export default async function VideoPage({ params }: { params: Params }) {
 
   const displayTitle = video.editorialTitle ?? video.title;
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    ...(firstTopic
-      ? [{ name: firstTopic.name, url: `${APP_URL}/topics/${firstTopic.slug}` }]
-      : []),
-    { name: displayTitle, url: `${APP_URL}/videos/${video.slug}` },
-  ]);
-
   const articleSchema = buildArticleSchema({
     headline: displayTitle,
     description: summary?.shortSummary ?? video.description ?? '',
@@ -162,30 +154,18 @@ export default async function VideoPage({ params }: { params: Params }) {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          ...(firstTopic
+            ? [{ label: firstTopic.name, href: `/topics/${firstTopic.slug}` }]
+            : []),
+          { label: displayTitle, href: `/videos/${video.slug}` },
+        ]}
+      />
       <JsonLd schema={videoSchema} />
-      <JsonLd schema={breadcrumbSchema} />
       <JsonLd schema={articleSchema} />
-
-      {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-gray-700">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{' '}
-        /{' '}
-        {video.topics[0] && (
-          <>
-            <Link
-              href={`/topics/${video.topics[0].topic.slug}`}
-              className="hover:underline"
-            >
-              {video.topics[0].topic.name}
-            </Link>{' '}
-            /{' '}
-          </>
-        )}
-        <span className="text-gray-900">{displayTitle}</span>
-      </nav>
 
       {/* Metadata badges */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -342,7 +322,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Claims */}
       {video.claims.length > 0 && (
-        <section className="mb-8">
+        <section className="my-8">
           <h2 className="mb-3 text-xl font-semibold text-gray-900">
             Health Claims in This Video
           </h2>

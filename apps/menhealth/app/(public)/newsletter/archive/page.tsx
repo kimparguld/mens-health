@@ -1,25 +1,36 @@
-import type { Metadata } from "next";
-import { createMetadata } from "@/lib/seo/site-metadata";
-import { db } from "@/lib/db/prisma";
-import Link from "next/link";
+import { db } from '@/lib/db/prisma';
+import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = createMetadata({
-  title: "Newsletter Archive — MenHealth Digest",
+  title: 'Newsletter Archive',
   description:
-    "Past issues of the MenHealth Digest weekly newsletter — trending videos, claims checked, and practical takeaways.",
-  path: "/newsletter/archive",
+    'Past issues of the MenHealth Digest weekly newsletter — trending videos, claims checked, and practical takeaways.',
+  path: '/newsletter/archive',
 });
 
 export default async function NewsletterArchivePage() {
   const issues = await db.newsletterDigest.findMany({
     where: { slug: { not: null } },
-    orderBy: { sentAt: "desc" },
+    orderBy: { sentAt: 'desc' },
     take: 100,
     select: { slug: true, subject: true, sentAt: true },
   });
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
+    <main className="mx-auto max-w-2xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Newsletter', href: '/newsletter' },
+          { label: 'Archive', href: '/newsletter/archive' },
+        ]}
+      />
       <h1 className="mb-3 text-3xl font-bold tracking-tight text-gray-900">
         Newsletter Archive
       </h1>

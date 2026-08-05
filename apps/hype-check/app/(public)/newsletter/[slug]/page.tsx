@@ -1,9 +1,10 @@
 import { db } from '@/lib/db/prisma';
 import { createMetadata } from '@/lib/seo/site-metadata';
-import { NewsletterSignupForm } from '@menhealth/ui';
+import { NewsletterSignupForm, PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 type Params = Promise<{ slug: string }>;
 
 async function getIssue(slug: string) {
@@ -38,19 +39,17 @@ export default async function NewsletterIssuePage({
   if (!issue || !issue.html) notFound();
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <nav className="mb-6 text-sm text-gray-500">
-        <Link href="/newsletter" className="hover:underline">
-          Newsletter
-        </Link>{' '}
-        /{' '}
-        <Link href="/newsletter/archive" className="hover:underline">
-          Archive
-        </Link>{' '}
-        / <span className="text-gray-900">{issue.subject}</span>
-      </nav>
+    <main className="mx-auto max-w-2xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          { label: 'Newsletter', href: '/newsletter' },
+          { label: 'Archive', href: '/newsletter/archive' },
+          { label: issue.subject, href: `/newsletter/${slug}` },
+        ]}
+      />
 
-      <h1 className="mb-1 text-2xl font-bold text-gray-900">{issue.subject}</h1>
+      <h1 className="heading">{issue.subject}</h1>
       <p className="mb-6 text-sm text-gray-400">
         {issue.sentAt.toLocaleDateString()}
       </p>

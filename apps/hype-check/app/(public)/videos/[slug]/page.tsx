@@ -16,7 +16,6 @@ import { getGlossaryTermsForTopics } from '@/lib/seo/glossary';
 import { DISCLAIMER_TEXT, SITE_NAME } from '@/lib/site-brand';
 import {
   buildArticleSchema,
-  buildBreadcrumbSchema,
   buildVideoObjectSchema,
 } from '@menhealth/core-seo';
 import {
@@ -25,6 +24,7 @@ import {
   Disclaimer,
   JsonLd,
   NewsletterSignupForm,
+  PageBreadcrumbs,
   SponsorBlock,
   YouTubePlayer,
 } from '@menhealth/ui';
@@ -149,14 +149,6 @@ export default async function VideoPage({ params }: { params: Params }) {
     durationSeconds: video.durationSeconds,
   });
 
-  const breadcrumbSchema = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    ...(firstTopic
-      ? [{ name: firstTopic.name, url: `${APP_URL}/topics/${firstTopic.slug}` }]
-      : []),
-    { name: displayTitle, url: `${APP_URL}/videos/${video.slug}` },
-  ]);
-
   const articleSchema = buildArticleSchema({
     headline: displayTitle,
     description: summary?.shortSummary ?? video.description ?? '',
@@ -169,30 +161,18 @@ export default async function VideoPage({ params }: { params: Params }) {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[
+          ...(firstTopic
+            ? [{ label: firstTopic.name, href: `/topics/${firstTopic.slug}` }]
+            : []),
+          { label: displayTitle, href: `/videos/${video.slug}` },
+        ]}
+      />
       <JsonLd schema={videoSchema} />
-      <JsonLd schema={breadcrumbSchema} />
       <JsonLd schema={articleSchema} />
-
-      {/* Breadcrumb */}
-      <nav className="text-ink-muted/60 mb-6 text-sm">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>{' '}
-        /{' '}
-        {video.topics[0] && (
-          <>
-            <Link
-              href={`/topics/${video.topics[0].topic.slug}`}
-              className="hover:underline"
-            >
-              {video.topics[0].topic.name}
-            </Link>{' '}
-            /{' '}
-          </>
-        )}
-        <span className="text-ink-muted">{displayTitle}</span>
-      </nav>
 
       {/* Metadata badges */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -212,9 +192,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       </div>
 
       {/* Title */}
-      <h1 className="text-ink-muted mb-2 text-3xl leading-tight font-bold">
-        {displayTitle}
-      </h1>
+      <h1 className="heading">{displayTitle}</h1>
       {video.editorialTitle &&
         sourceVideo?.title &&
         video.editorialTitle !== sourceVideo.title && (

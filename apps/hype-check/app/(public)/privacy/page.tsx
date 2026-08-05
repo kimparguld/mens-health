@@ -1,5 +1,8 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
+import { PageBreadcrumbs } from '@menhealth/ui';
 import type { Metadata } from 'next';
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = createMetadata({
   title: 'Privacy Policy',
@@ -9,10 +12,12 @@ export const metadata: Metadata = createMetadata({
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto max-w-[720px] px-4 py-12">
-      <h1 className="mb-4 text-3xl font-bold tracking-tight text-gray-900">
-        Privacy policy
-      </h1>
+    <main className="mx-auto max-w-[720px] px-4 py-6">
+      <PageBreadcrumbs
+        baseUrl={APP_URL}
+        trail={[{ label: 'Privacy', href: '/privacy' }]}
+      />
+      <h1 className="heading">Privacy policy</h1>
       <p className="mb-2 text-sm text-gray-500">Last updated: July 2026</p>
       <p className="mb-8 text-lg leading-relaxed text-gray-600">
         We collect as little data as possible and are transparent about what we
