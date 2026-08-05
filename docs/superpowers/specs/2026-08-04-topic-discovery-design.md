@@ -36,6 +36,15 @@ it" — topics only grow when a human happens to think of one.
 - No changes to the per-video AI/compliance pipeline. Approved topics flow
   through the exact same `sync-youtube` → scoring → risk-gate path as
   hardcoded topics; nothing about that pipeline changes.
+- Wiring public-facing surfaces (topic hub pages, sitemap, rankings, FAQ
+  page, `RelatedTopics` component, `generateStaticParams`, etc.) to read
+  from `getAllTopicSeeds()` instead of the static `TOPIC_SEEDS` array is
+  deferred to a follow-up. This was discovered as a gap during final
+  whole-branch review — only `jobs/sync-youtube.ts` and the admin topics
+  page were wired to the DB-backed list — not originally scoped for this
+  feature. It's recorded here as a known limitation: an approved suggestion
+  starts real video discovery/processing via `sync-youtube`, but does not
+  yet appear on the public topic hub until that follow-up lands.
 
 ## Approach
 
@@ -66,16 +75,24 @@ cron (monthly, per site)
        5. isHighRiskCandidate(candidate, siteConfig.highRiskTopicKeywords)
        6. upsert a PENDING TopicSuggestion row per surviving candidate
   -> admin reviews queue at /admin/topics
-       - Approve: upserts a `Topic` DB row, marks suggestion APPROVED
-       - Reject: marks suggestion REJECTED (never resurfaced)
+       - Approve: PATCH app/api/admin/topic-suggestions/[id]/route.ts flips
+         suggestion status to APPROVED and sets reviewedAt — it does not
+         touch the `Topic` table itself
+       - Reject: same route flips status to REJECTED (never resurfaced)
   -> jobs/sync-youtube.ts and the admin topics table both read
      getAllTopicSeeds() = site.config TOPIC_SEEDS ∪ APPROVED TopicSuggestions
+  -> the next sync-youtube run upserts a `Topic` DB row for every seed
+     getAllTopicSeeds() returns, including newly-approved ones — approval
+     doesn't create the `Topic` row immediately, the next monthly sync does
 ```
 
 Approved suggestions never touch `site.config.ts`. They live in the
 `TopicSuggestion` table and get merged into the working topic list at
 runtime, which is why `sync-youtube.ts` and the admin topics page switch from
 importing the static `TOPIC_SEEDS` array to calling `getAllTopicSeeds()`.
+Approval only flips the suggestion's `status`; the corresponding `Topic` row
+appears lazily on the next `sync-youtube` run rather than being created
+synchronously, deliberately avoiding two code paths that write to `Topic`.
 
 ### Shared logic (`packages/core-youtube/src/topic-discovery.ts`)
 
@@ -144,12 +161,19 @@ Identical in both apps, since both already share the `TOPIC_SEEDS` /
 7. **Admin `app/admin/(protected)/topics/`**:
    - `page.tsx`: switch its topic table to `getAllTopicSeeds()`; add a
      "Suggested topics" section below listing `PENDING` `TopicSuggestion`
-     rows with their popularity score and sample evidence.
-   - `actions.ts` (new, `"use server"`): `approveTopicSuggestion(id)` and
-     `rejectTopicSuggestion(id)`, gated by the same admin session check the
-     rest of `/admin` relies on (inherited from the protected layout).
-     Approve upserts the `Topic` DB row and flips status to `APPROVED`;
-     reject just flips status. Both revalidate the topics page.
+     rows (including their AI-written description) with their popularity
+     score and sample evidence.
+   - `app/api/admin/topic-suggestions/[id]/route.ts` (new PATCH route
+     handler, not a server action): gated by the same admin session check
+     the rest of `/admin` relies on (inherited from the protected layout).
+     Takes `{ action: "approve" | "reject" }` and only flips the
+     suggestion's `status` to `APPROVED`/`REJECTED` and sets `reviewedAt` —
+     it does not touch the `Topic` table. The `Topic` row for a
+     newly-approved suggestion is created lazily by the next
+     `sync-youtube` run, which already upserts a `Topic` row for every
+     seed `getAllTopicSeeds()` returns. A client component
+     (`TopicSuggestionActions.tsx`) calls this route and refreshes the
+     page on success.
 
 ### Compliance
 
@@ -174,7 +198,7 @@ app's `__tests__/`, e.g. `__tests__/scoring.test.ts` already does this for
   on conflict), `parseTopicCandidates` (valid JSON, malformed JSON rejected).
 - No test coverage needed for the cron route itself (thin auth-check +
   delegate, matches how sibling cron routes are already left untested) or
-  the admin server actions (thin DB mutation + redirect, same reasoning).
+  the admin PATCH route handler (thin DB mutation, same reasoning).
 
 ## Notes on process
 
