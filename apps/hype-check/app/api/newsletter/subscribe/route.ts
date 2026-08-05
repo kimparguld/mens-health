@@ -125,5 +125,28 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
   }
 
+  // Send the welcome email — non-fatal, subscription is recorded regardless.
+  if (env.RESEND_API_KEY) {
+    try {
+      const { resend } = await import("@/lib/resend/client");
+      const { welcomeSubject, buildWelcomeHtml, buildWelcomeText } =
+        await import("@/lib/newsletter/welcome");
+      const appUrl = env.NEXT_PUBLIC_APP_URL;
+      const fromEmail =
+        env.RESEND_FROM_EMAIL ?? `digest@${new URL(appUrl).hostname}`;
+      const unsubscribeUrl = `${appUrl}/api/newsletter/unsubscribe?id=${subscriber.id}`;
+
+      await resend.emails.send({
+        from: fromEmail,
+        to: [email],
+        subject: welcomeSubject,
+        html: buildWelcomeHtml(appUrl, unsubscribeUrl),
+        text: buildWelcomeText(appUrl, unsubscribeUrl),
+      });
+    } catch {
+      // Non-fatal: subscription is recorded in DB regardless
+    }
+  }
+
   return NextResponse.json({ ok: true, alreadySubscribed: false });
 }

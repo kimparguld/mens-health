@@ -10,4 +10,7 @@ export type {
   DigestBrandConfig,
 } from "./digest";
 
+export { createWelcomeEmailBuilder } from "./welcome";
+export type { WelcomeEmailLink, WelcomeEmailBrandConfig } from "./welcome";
+
 export { createResendClient } from "./resend";
