@@ -34,7 +34,7 @@ export async function PremiumSection({ claims }: { claims: Claim[] }) {
             </div>
             <p className="text-sm font-medium text-gray-900">{claim.text}</p>
             {claim.explanation && (
-              <p className="mt-1 text-xs text-gray-500">{claim.explanation}</p>
+              <p className="mt-1 text-xs text-gray-700">{claim.explanation}</p>
             )}
           </div>
         ))}

@@ -46,10 +46,10 @@ export default function CreatorsIndexPage() {
                   {creator.credentials}
                 </span>
               )}
-              <span className="mt-1 text-sm text-gray-500">
+              <span className="mt-1 text-sm text-gray-700">
                 {creator.description}
               </span>
-              <span className="mt-2 text-xs text-gray-400">
+              <span className="mt-2 text-xs text-gray-600">
                 {creator.specialty}
               </span>
             </Link>

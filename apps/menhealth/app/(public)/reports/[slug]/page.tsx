@@ -39,7 +39,7 @@ export default async function ReportPage({ params }: { params: Params }) {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <nav className="mb-6 text-sm text-gray-500">
+      <nav className="mb-6 text-sm text-gray-700">
         <Link href="/reports" className="hover:underline">
           Reports
         </Link>{" "}
@@ -73,7 +73,7 @@ export default async function ReportPage({ params }: { params: Params }) {
         </h2>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b text-left text-gray-500">
+            <tr className="border-b text-left text-gray-700">
               <th className="py-2">Status</th>
               <th className="py-2">Count</th>
               <th className="py-2">%</th>
@@ -81,7 +81,7 @@ export default async function ReportPage({ params }: { params: Params }) {
           </thead>
           <tbody>
             {stats.claimVerdictBreakdown.map((row) => (
-              <tr key={row.status} className="border-b border-gray-100">
+              <tr key={row.status} className="border-b border-hairline">
                 <td className="py-2 text-gray-800">{row.status}</td>
                 <td className="py-2 text-gray-600">{row.count}</td>
                 <td className="py-2 text-gray-600">{row.percent}%</td>
@@ -97,7 +97,7 @@ export default async function ReportPage({ params }: { params: Params }) {
         </h2>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b text-left text-gray-500">
+            <tr className="border-b text-left text-gray-700">
               <th className="py-2">Level</th>
               <th className="py-2">Count</th>
               <th className="py-2">%</th>
@@ -105,7 +105,7 @@ export default async function ReportPage({ params }: { params: Params }) {
           </thead>
           <tbody>
             {stats.riskLevelBreakdown.map((row) => (
-              <tr key={row.level} className="border-b border-gray-100">
+              <tr key={row.level} className="border-b border-hairline">
                 <td className="py-2 text-gray-800">{row.level}</td>
                 <td className="py-2 text-gray-600">{row.count}</td>
                 <td className="py-2 text-gray-600">{row.percent}%</td>
@@ -122,7 +122,7 @@ export default async function ReportPage({ params }: { params: Params }) {
           </h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500">
+              <tr className="border-b text-left text-gray-700">
                 <th className="py-2">Topic</th>
                 <th className="py-2">High-risk / total</th>
                 <th className="py-2">%</th>
@@ -130,7 +130,7 @@ export default async function ReportPage({ params }: { params: Params }) {
             </thead>
             <tbody>
               {stats.topicsByHighRiskShare.map((row) => (
-                <tr key={row.topic} className="border-b border-gray-100">
+                <tr key={row.topic} className="border-b border-hairline">
                   <td className="py-2 text-gray-800">{row.topic}</td>
                   <td className="py-2 text-gray-600">
                     {row.highRiskVideos} / {row.totalVideos}
@@ -150,7 +150,7 @@ export default async function ReportPage({ params }: { params: Params }) {
           </h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500">
+              <tr className="border-b text-left text-gray-700">
                 <th className="py-2">Creator</th>
                 <th className="py-2">Claims assessed</th>
                 <th className="py-2">Avg. sources / claim</th>
@@ -158,7 +158,7 @@ export default async function ReportPage({ params }: { params: Params }) {
             </thead>
             <tbody>
               {stats.creatorsBySourcing.map((row) => (
-                <tr key={row.creator} className="border-b border-gray-100">
+                <tr key={row.creator} className="border-b border-hairline">
                   <td className="py-2 text-gray-800">{row.creator}</td>
                   <td className="py-2 text-gray-600">{row.claimsAssessed}</td>
                   <td className="py-2 text-gray-600">
@@ -178,14 +178,14 @@ export default async function ReportPage({ params }: { params: Params }) {
           </h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b text-left text-gray-500">
+              <tr className="border-b text-left text-gray-700">
                 <th className="py-2">Category</th>
                 <th className="py-2">Count</th>
               </tr>
             </thead>
             <tbody>
               {stats.claimCategoryBreakdown.map((row) => (
-                <tr key={row.category} className="border-b border-gray-100">
+                <tr key={row.category} className="border-b border-hairline">
                   <td className="py-2 text-gray-800">{row.category}</td>
                   <td className="py-2 text-gray-600">{row.count}</td>
                 </tr>
