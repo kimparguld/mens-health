@@ -25,7 +25,6 @@ import {
   Disclaimer,
   JsonLd,
   NewsletterFooterCTA,
-  NewsletterStickyCTA,
   SponsorBlock,
 } from '@menhealth/ui';
 import type { Metadata } from 'next';
@@ -555,6 +554,7 @@ export default async function TopicPage({
         <NewsletterFooterCTA
           headline="Get the weekly digest"
           description="5 videos summarised · 3 claims checked · 1 practical takeaway"
+          site="hype-check"
         />
       </div>
 
@@ -562,7 +562,6 @@ export default async function TopicPage({
         text={DISCLAIMER_TEXT}
         className="border-gray-200 bg-white text-gray-500"
       />
-      <NewsletterStickyCTA label="Free weekly Hype Check digest" />
     </main>
   );
 }

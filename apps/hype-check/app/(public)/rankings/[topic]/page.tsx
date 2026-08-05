@@ -274,6 +274,7 @@ export default async function WeeklyRankingPage({
         <NewsletterFooterCTA
           headline={`Get the weekly ${seed.name} digest`}
           description="Top 5 videos, summarised claims, and evidence notes — every Friday."
+          site="hype-check"
         />
 
         <div className="mx-auto max-w-4xl px-4 pb-10">

@@ -1,22 +1,33 @@
-import { AdSlot, SponsorBlock, NewsletterFooterCTA, NewsletterInlineCTA, NewsletterStickyCTA, JsonLd, AffiliateDisclosure, Disclaimer, EvidenceBadge, RiskBadge, VideoCard } from "@menhealth/ui";
-import { MEDICAL_DISCLAIMER_TEXT } from "@/lib/site-brand";
-import { adsConfig } from '@/lib/ads-config';
 import { RelatedTopics } from '@/components/topic/RelatedTopics';
+import { adsConfig } from '@/lib/ads-config';
 import { db } from '@/lib/db/prisma';
 import { getTopicBySlug, getTopicVideos } from '@/lib/db/queries';
 import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from '@/lib/monetization/resolvers';
+import { getTopicContent } from '@/lib/seo/topic-content';
+import { getTopicSeo } from '@/lib/seo/topic-faq';
+import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
+import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { FaqEntry } from '@menhealth/core-seo';
 import {
   buildBreadcrumbSchema,
   buildFaqSchema,
   buildItemListSchema,
 } from '@menhealth/core-seo';
-import { getTopicContent } from '@/lib/seo/topic-content';
-import { getTopicSeo } from '@/lib/seo/topic-faq';
-import { TOPIC_SEEDS } from '@/lib/youtube/topics';
+import {
+  AdSlot,
+  AffiliateDisclosure,
+  Disclaimer,
+  EvidenceBadge,
+  JsonLd,
+  NewsletterFooterCTA,
+  NewsletterInlineCTA,
+  RiskBadge,
+  SponsorBlock,
+  VideoCard,
+} from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -271,17 +282,12 @@ export default async function TopicPage({
         </section>
       )}
 
-      <NewsletterInlineCTA
-        headline={`Get the weekly ${topicSeed.name} digest`}
-        description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
-      />
-
       <AdSlot slot="between-content" className="mb-10" config={adsConfig} />
 
       {/* Top Claims */}
       {(topicClaims.length > 0 ||
         (staticContent?.topClaims?.length ?? 0) > 0) && (
-        <section className="mb-10">
+        <section className="my-10">
           <h2 className="mb-4 text-xl font-semibold text-gray-900">
             Top claims in this topic
           </h2>
@@ -402,7 +408,12 @@ export default async function TopicPage({
             </>
           )}
 
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+          <NewsletterInlineCTA
+            headline={`Get the weekly ${topicSeed.name} digest`}
+            description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No miracle-cure nonsense."
+          />
+
+          <h2 className="mt-6 mb-4 text-xl font-semibold text-gray-900">
             All videos
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -532,7 +543,6 @@ export default async function TopicPage({
       </div>
 
       <Disclaimer text={MEDICAL_DISCLAIMER_TEXT} />
-      <NewsletterStickyCTA label="Free weekly men's health digest" />
     </main>
   );
 }

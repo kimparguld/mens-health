@@ -4,10 +4,7 @@ import { RiskStamp } from '@/components/ui/RiskStamp';
 import { VerdictStamp } from '@/components/ui/VerdictStamp';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
-import {
-  HowWeRateClaims,
-  NewsletterSignupForm,
-} from '@menhealth/ui';
+import { HowWeRateClaims, NewsletterSignupForm } from '@menhealth/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -309,7 +306,7 @@ export default async function HomePage() {
             <li>No get-rich-quick nonsense</li>
           </ul>
           <div className="mt-6">
-            <NewsletterSignupForm />
+            <NewsletterSignupForm site="hype-check" />
           </div>
         </div>
       </section>

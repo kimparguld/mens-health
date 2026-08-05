@@ -341,6 +341,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
           <NewsletterInlineCTA
             headline={`Get next week's best ${seed.name.toLowerCase()} videos in your inbox`}
             description="5 trending videos summarised · 3 claims checked · 1 practical takeaway — every week. No hype, just evidence."
+            site="hype-check"
           />
         </div>
 

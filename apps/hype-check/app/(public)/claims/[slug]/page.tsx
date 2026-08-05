@@ -241,6 +241,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
           <NewsletterFooterCTA
             headline="Get the weekly evidence digest"
             description="5 claims reviewed each Friday. No hype."
+            site="hype-check"
           />
         </div>
 
