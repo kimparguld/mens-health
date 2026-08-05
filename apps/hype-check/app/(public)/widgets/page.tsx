@@ -46,7 +46,7 @@ export default function WidgetsPage() {
         <p className="mb-3 text-sm text-gray-500">
           Renders inline wherever you place the script tag.
         </p>
-        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
+        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
           <code>{scriptSnippet}</code>
         </pre>
       </section>
@@ -58,7 +58,7 @@ export default function WidgetsPage() {
         <p className="mb-3 text-sm text-gray-500">
           Use this if your site strips inline scripts.
         </p>
-        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
+        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
           <code>{iframeSnippet}</code>
         </pre>
       </section>
@@ -71,7 +71,7 @@ export default function WidgetsPage() {
           For custom integrations. Returns evidence label, risk level, and a
           link to the full review for each video. CORS-enabled.
         </p>
-        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
+        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
           <code>{jsonSnippet}</code>
         </pre>
       </section>
@@ -84,7 +84,7 @@ export default function WidgetsPage() {
           Subscribe in Feedly or any reader — one feed per topic, plus
           site-wide, weekly, high-risk, and strong-evidence feeds.
         </p>
-        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-xs text-gray-100">
+        <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100">
           <code>{`${APP_URL}/feed.xml`}</code>
         </pre>
       </section>
@@ -97,7 +97,7 @@ export default function WidgetsPage() {
           {TOPIC_SEEDS.map((t) => (
             <span
               key={t.slug}
-              className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+              className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700"
             >
               {t.slug}
             </span>

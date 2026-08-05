@@ -200,7 +200,7 @@ export default async function VideoPage({ params }: { params: Params }) {
           <Link
             key={vt.topicId}
             href={`/topics/${vt.topic.slug}`}
-            className="bg-ink-muted/10 hover:bg-ink-muted/20 text-ink-muted/80 rounded-full px-2.5 py-0.5 text-xs font-medium"
+            className="bg-ink-muted/10 hover:bg-ink-muted/20 text-ink-muted/80 rounded-full px-2.5 py-0.5 text-sm font-medium"
           >
             {vt.topic.name}
           </Link>
@@ -252,7 +252,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             : ''}
         </p>
       )}
-      <p className="text-ink-muted/50 mb-6 text-xs">
+      <p className="text-ink-muted/50 mb-6 text-sm">
         Published {new Date(publishedAt).toLocaleDateString()}
         {new Date(video.updatedAt).getTime() !==
           new Date(publishedAt).getTime() &&
@@ -386,7 +386,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                 <span className="text-ink-muted/90">
                   {c.label}
                   {c.isHidden && (
-                    <span className="text-verdict-risky ml-2 text-xs font-semibold uppercase">
+                    <span className="text-verdict-risky ml-2 text-sm font-semibold uppercase">
                       Hidden fee
                     </span>
                   )}
@@ -423,11 +423,11 @@ export default async function VideoPage({ params }: { params: Params }) {
                     {claim.text}
                   </p>
                   {claim.explanation && (
-                    <p className="text-ink-muted/60 mt-1 text-xs">
+                    <p className="text-ink-muted/60 mt-1 text-sm">
                       {claim.explanation}
                     </p>
                   )}
-                  <p className="text-ink-muted/60 mt-2 text-xs font-medium">
+                  <p className="text-ink-muted/60 mt-2 text-sm font-medium">
                     View evidence review →
                   </p>
                 </Link>
@@ -505,7 +505,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                 >
                   {rv.editorialTitle ?? rv.name}
                 </Link>
-                <span className="text-ink-muted/50 ml-2 text-xs">
+                <span className="text-ink-muted/50 ml-2 text-sm">
                   {rv.channel?.title ?? ''}
                 </span>
               </li>
@@ -535,7 +535,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <textarea
           readOnly
           rows={2}
-          className="border-hairline bg-paper text-ink-muted/60 w-full rounded border p-2 font-mono text-xs"
+          className="border-hairline bg-paper text-ink-muted/60 w-full rounded border p-2 font-mono text-sm"
           defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by Hype Check" width="210" height="50" /></a>`}
         />
       </section>
@@ -605,7 +605,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                   {link.label}
                 </a>
                 {link.commission && (
-                  <span className="text-ink-muted/50 ml-2 text-xs">
+                  <span className="text-ink-muted/50 ml-2 text-sm">
                     ({link.commission} commission)
                   </span>
                 )}
@@ -620,7 +620,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       <section className="border-hairline bg-ink-muted mb-8 rounded-xl border px-6 py-8 text-center">
         <div className="mx-auto max-w-xl px-4 text-center">
-          <p className="text-ink mb-1 text-xs font-semibold tracking-wide uppercase">
+          <p className="text-ink mb-1 text-sm font-semibold tracking-wide uppercase">
             Free newsletter
           </p>
           <h2 className="mb-2 text-2xl font-bold text-white">
@@ -631,7 +631,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             hype.
           </p>
           <NewsletterSignupForm site="hype-check" />
-          <p className="mt-3 text-xs text-white/40">
+          <p className="mt-3 text-sm text-white/40">
             Unsubscribe any time. No spam.
           </p>
         </div>

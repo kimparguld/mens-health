@@ -86,7 +86,7 @@ export default async function ClaimsIndexPage() {
                   <p className="group-hover:text-ink-muted text-sm font-medium text-gray-900">
                     {claim.text}
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">
+                  <p className="mt-1 text-sm text-gray-400">
                     {claim.subject.channel?.title ?? ''} — {videoTitle}
                   </p>
                 </div>
