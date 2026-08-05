@@ -8,7 +8,7 @@ import { scoreTopicPopularity, isHighRiskCandidate } from "@menhealth/core-youtu
 // Median views (last 90 days) across a candidate's top search results.
 // Low enough to catch a genuinely emerging niche, high enough to filter out
 // queries with no real audience on YouTube.
-const MIN_POPULARITY_SCORE = 5_000;
+const MIN_POPULARITY_SCORE = 1_000;
 const SEARCH_RESULTS_PER_CANDIDATE = 10;
 const EVIDENCE_SAMPLE_SIZE = 3;
 
