@@ -310,5 +310,74 @@ export function createSocialPostGenerator(config: SocialPostGeneratorConfig) {
     return { ok: true, value: { postId: updated.id } };
   }
 
-  return { generateSocialPost, regenerateSocialPost };
+  /**
+   * Hand-edit a draft's content. Re-runs the same forbidden-pattern and
+   * platform-constraint checks generation uses, but not the high-risk /
+   * requiresReview gate — that classification was made at generation time
+   * from the source video, and the admin making the edit is already the
+   * person that gate exists to route the post to.
+   */
+  async function updateSocialPostDraft(
+    postId: string,
+    edits: {
+      hook?: string;
+      script?: string;
+      caption?: string;
+      hashtags?: string[];
+    },
+  ): Promise<Result<{ postId: string }>> {
+    const post = await config.db.socialPost.findUnique({ where: { id: postId } });
+    if (!post) {
+      return { ok: false, error: new Error(`Social post ${postId} not found`) };
+    }
+    if (post.status === "PUBLISHED") {
+      return {
+        ok: false,
+        error: new Error(`Cannot edit a post with status ${post.status}`),
+      };
+    }
+
+    const hook = edits.hook ?? post.hook;
+    const script = edits.script ?? post.script;
+    const caption = edits.caption ?? post.caption;
+    const hashtags = (edits.hashtags ?? post.hashtags).map((h: string) =>
+      h.startsWith("#") ? h : `#${h}`,
+    );
+
+    const captionCheck = checkForbiddenPatterns(caption, config.forbiddenPatterns);
+    const scriptCheck = checkForbiddenPatterns(script, config.forbiddenPatterns);
+    if (captionCheck.matched || scriptCheck.matched) {
+      const violations = [...captionCheck.violations, ...scriptCheck.violations];
+      return {
+        ok: false,
+        error: new Error(
+          `Edited content contains forbidden patterns: ${violations.map((v) => v.reason).join(", ")}`,
+        ),
+      };
+    }
+
+    const constraintErrors = validatePlatformConstraints(post.platform, {
+      caption,
+      hashtags,
+      script,
+      hook,
+    }).filter((e) => !(post.platform === "X" && e.startsWith("Caption exceeds")));
+    if (constraintErrors.length > 0) {
+      return {
+        ok: false,
+        error: new Error(
+          `Platform constraint violations: ${constraintErrors.join("; ")}`,
+        ),
+      };
+    }
+
+    const updated = await config.db.socialPost.update({
+      where: { id: postId },
+      data: { hook, script, caption, hashtags },
+    });
+
+    return { ok: true, value: { postId: updated.id } };
+  }
+
+  return { generateSocialPost, regenerateSocialPost, updateSocialPostDraft };
 }

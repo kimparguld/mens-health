@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   generateSocialPost,
   regenerateSocialPost,
+  updateSocialPostDraft,
 } from "@/lib/social/generate-social-post";
 
 const {
@@ -37,7 +38,12 @@ vi.mock("@/lib/ai/client", () => ({
 }));
 
 vi.mock("@/lib/social/platform-rules", () => ({
-  FORBIDDEN_PATTERNS: [],
+  FORBIDDEN_PATTERNS: [
+    {
+      pattern: /this\s+cures?/i,
+      reason: "Unsubstantiated cure claim",
+    },
+  ],
   HIGH_RISK_TOPIC_KEYWORDS: [],
 }));
 
@@ -170,6 +176,87 @@ describe("regenerateSocialPost", () => {
     mockSocialPostFindUnique.mockResolvedValue(null);
 
     const result = await regenerateSocialPost("missing");
+
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe("updateSocialPostDraft", () => {
+  const EXISTING_POST = {
+    id: "post_1",
+    status: "DRAFT",
+    platform: "YOUTUBE_COMMUNITY",
+    hook: "Original hook that is long enough.",
+    script: "",
+    caption: "Original caption that is long enough to pass validation.",
+    hashtags: ["#MensHealth"],
+  };
+
+  it("rejects editing a PUBLISHED post", async () => {
+    mockSocialPostFindUnique.mockResolvedValue({
+      ...EXISTING_POST,
+      status: "PUBLISHED",
+    });
+
+    const result = await updateSocialPostDraft("post_1", {
+      caption: "Updated caption text.",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(mockSocialPostUpdate).not.toHaveBeenCalled();
+  });
+
+  it("rejects edited content that trips a forbidden pattern", async () => {
+    mockSocialPostFindUnique.mockResolvedValue(EXISTING_POST);
+
+    const result = await updateSocialPostDraft("post_1", {
+      caption: "This cures low energy fast.",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(mockSocialPostUpdate).not.toHaveBeenCalled();
+  });
+
+  it("rejects edited content that violates platform constraints", async () => {
+    mockSocialPostFindUnique.mockResolvedValue({
+      ...EXISTING_POST,
+      platform: "X",
+    });
+
+    const result = await updateSocialPostDraft("post_1", {
+      hashtags: ["one", "two", "three", "four"],
+    });
+
+    expect(result.ok).toBe(false);
+    expect(mockSocialPostUpdate).not.toHaveBeenCalled();
+  });
+
+  it("merges edits, normalizes hashtags, and persists", async () => {
+    mockSocialPostFindUnique.mockResolvedValue(EXISTING_POST);
+    mockSocialPostUpdate.mockResolvedValue({ id: "post_1" });
+
+    const result = await updateSocialPostDraft("post_1", {
+      caption: "An updated caption that is long enough to pass validation.",
+      hashtags: ["Fitness"],
+    });
+
+    expect(result.ok).toBe(true);
+    const updateArgs = mockSocialPostUpdate.mock.calls[0]![0] as {
+      data: { caption: string; hashtags: string[]; hook: string };
+    };
+    expect(updateArgs.data.caption).toBe(
+      "An updated caption that is long enough to pass validation.",
+    );
+    expect(updateArgs.data.hashtags).toEqual(["#Fitness"]);
+    expect(updateArgs.data.hook).toBe(EXISTING_POST.hook);
+  });
+
+  it("fails when the post does not exist", async () => {
+    mockSocialPostFindUnique.mockResolvedValue(null);
+
+    const result = await updateSocialPostDraft("missing", {
+      caption: "New caption text here.",
+    });
 
     expect(result.ok).toBe(false);
   });

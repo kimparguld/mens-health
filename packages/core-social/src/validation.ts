@@ -58,3 +58,16 @@ export const GeneratePostSchema = z.object({
 });
 
 export type GeneratePostInput = z.infer<typeof GeneratePostSchema>;
+
+export const UpdateDraftSchema = z.object({
+  hook: z.string().min(5).max(300).optional(),
+  script: z.string().min(0).max(3000).optional(),
+  caption: z.string().min(10).max(40000).optional(),
+  hashtags: z
+    .array(z.string().regex(/^#?\w+$/))
+    .min(0)
+    .max(30)
+    .optional(),
+});
+
+export type UpdateDraftInput = z.infer<typeof UpdateDraftSchema>;
