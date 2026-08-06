@@ -16,7 +16,7 @@
 
 @theme inline {
   --color-paper: var(--paper);
-  --color-surface: var(--surface);
+  --color-surface: var(--color-gray-900);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-hairline: var(--hairline);
@@ -152,3 +152,8 @@ a {
     animation: none;
   }
 }
+
+/* Tailwind's content scanner doesn't see packages/ui/src — these token
+   classes are only ever referenced there (never spelled out in this app's
+   own source), so force-generate them here. */
+@source inline("bg-success-bg text-success-text bg-bg-surface bg-bg-muted border-text-primary text-text-primary text-text-muted text-error-text focus:border-text-primary focus:ring-text-primary");
