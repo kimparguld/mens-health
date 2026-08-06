@@ -42,7 +42,7 @@ export default async function PublicLayout({
 
       <div className="flex-1">{children}</div>
 
-      <footer className="border-hairline border-t bg-gray-50">
+      <footer className="border-hairline border-t bg-emerald-50">
         <div className="mx-auto max-w-280 px-4 py-12">
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
             {/* Brand */}
