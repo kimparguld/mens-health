@@ -1,7 +1,11 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { regenerateSocialPost } from "@/lib/social/generate-social-post";
+import {
+  regenerateSocialPost,
+  isNotFoundError,
+  isConflictError,
+} from "@/lib/social/generate-social-post";
 import { ApprovePostSchema } from "@/lib/social/validation";
 
 export async function POST(
@@ -23,14 +27,13 @@ export async function POST(
 
   const result = await regenerateSocialPost(id);
   if (!result.ok) {
-    const message = result.error.message;
-    if (message.includes("not found")) {
-      return NextResponse.json({ error: message }, { status: 404 });
+    if (isNotFoundError(result.error)) {
+      return NextResponse.json({ error: result.error.message }, { status: 404 });
     }
-    if (message.startsWith("Cannot ")) {
-      return NextResponse.json({ error: message }, { status: 409 });
+    if (isConflictError(result.error)) {
+      return NextResponse.json({ error: result.error.message }, { status: 409 });
     }
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: result.error.message }, { status: 500 });
   }
 
   return NextResponse.json(result.value);
