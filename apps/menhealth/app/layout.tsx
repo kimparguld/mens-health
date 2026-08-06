@@ -5,7 +5,6 @@ import {
   buildWebSiteSchema,
 } from '@menhealth/core-seo';
 import { JsonLd } from '@menhealth/ui';
-import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
@@ -88,7 +87,6 @@ export default function RootLayout({
         lang="en"
         className={`${inter.variable} ${ebGaramond.variable} h-full antialiased`}
       >
-        <GoogleTagManager gtmId="G-T4EKPX0Q0R" />
         <body className="flex min-h-full flex-col">
           {adsEnabled && (
             <Script

@@ -66,7 +66,10 @@ export function NewsletterSignupForm({ compact = false, className, site = 'menhe
   }
 
   return (
-    <form onSubmit={handleSubmit} className={twMerge('flex flex-row gap-2 items-center', className)}>
+    <form
+      onSubmit={handleSubmit}
+      className={twMerge('flex lg:flex-row flex-col gap-2 lg:items-center items-stretch', className)}
+    >
       <label htmlFor="newsletter-email" className="sr-only">
         Email address
       </label>

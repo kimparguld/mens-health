@@ -135,3 +135,10 @@ a {
     animation: none;
   }
 }
+
+@source inline(
+  "{sm:,md:,lg:,xl:,2xl:}items-{center,baseline,start,end,stretch,flex-start,flex-end,first,last,odd,even,self-start,self-end,self-center,self-baseline,self-stretch}"
+);
+@source inline(
+  "{sm:,md:,lg:,xl:,2xl:}flex-{col,row,row-reverse,col-reverse,wrap,wrap-reverse,no-wrap}"
+);
