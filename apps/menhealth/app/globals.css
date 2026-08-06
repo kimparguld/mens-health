@@ -21,6 +21,27 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --font-sans: var(--font-inter);
+
+  /* Shared UI token contract — see docs/superpowers/specs/2026-08-06-shared-ui-theming-design.md */
+  --color-bg-page: var(--background);
+  --color-bg-surface: white;
+  --color-bg-muted: var(--surface-alt);
+  --color-text-primary: var(--foreground);
+  --color-success-bg: var(--color-green-50);
+  --color-success-text: var(--color-green-800);
+  --color-status-strong: var(--color-emerald-800);
+  --color-status-strong-soft: var(--color-emerald-100);
+  --color-status-moderate: var(--color-teal-800);
+  --color-status-moderate-soft: var(--color-teal-100);
+  --color-status-mixed: var(--color-amber-800);
+  --color-status-mixed-soft: var(--color-amber-100);
+  --color-status-weak: var(--color-orange-800);
+  --color-status-weak-soft: var(--color-orange-100);
+  --color-status-unsupported: var(--color-red-800);
+  --color-status-unsupported-soft: var(--color-red-100);
+  --color-status-none: var(--color-gray-600);
+  --color-status-none-soft: var(--color-gray-100);
+  --color-error-text: var(--color-red-600);
 }
 
 @media (prefers-color-scheme: dark) {

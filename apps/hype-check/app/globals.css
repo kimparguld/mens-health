@@ -16,9 +16,9 @@
 
 @theme inline {
   --color-paper: var(--paper);
-  --color-surface: var(--color-gray-900);
+  --color-surface: var(--surface);
   --color-ink: var(--ink);
-  --color-ink-muted: var(--color-gray-900);
+  --color-ink-muted: var(--ink-muted);
   --color-hairline: var(--hairline);
   --color-brand-red: var(--brand-red);
   --color-verdict-legit: var(--verdict-legit);
@@ -28,6 +28,25 @@
   --color-verdict-scam: var(--verdict-scam);
   --font-sans: var(--font-inter);
   --font-slab: var(--font-slab);
+
+  /* Shared UI token contract — see docs/superpowers/specs/2026-08-06-shared-ui-theming-design.md */
+  --color-bg-page: var(--paper);
+  --color-bg-surface: white;
+  --color-bg-muted: var(--surface);
+  --color-bg-emphasis: var(--ink-muted);
+  --color-text-primary: var(--ink-muted);
+  --color-text-muted: var(--ink-muted);
+  --color-text-on-emphasis: white;
+  --color-accent: var(--ink);
+  --color-success-bg: white;
+  --color-success-text: var(--ink);
+  --color-status-strong: var(--verdict-legit);
+  --color-status-moderate: var(--verdict-legit);
+  --color-status-mixed: var(--verdict-misleading);
+  --color-status-weak: var(--verdict-overpriced);
+  --color-status-unsupported: var(--verdict-scam);
+  --color-status-none: var(--ink-muted);
+  --color-error-text: var(--color-red-600);
 }
 
 body {
