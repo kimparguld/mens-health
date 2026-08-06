@@ -10,8 +10,13 @@ export {
   RejectPostSchema,
   SchedulePostSchema,
   GeneratePostSchema,
+  UpdateDraftSchema,
 } from "./validation";
-export type { SocialPostAiOutput, GeneratePostInput } from "./validation";
+export type {
+  SocialPostAiOutput,
+  GeneratePostInput,
+  UpdateDraftInput,
+} from "./validation";
 
 export {
   buildXPrompt,

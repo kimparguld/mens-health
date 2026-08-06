@@ -40,7 +40,7 @@ async function fetchContext(videoId: string): Promise<VideoContext | null> {
   };
 }
 
-export const { generateSocialPost, regenerateSocialPost } =
+export const { generateSocialPost, regenerateSocialPost, updateSocialPostDraft } =
   createSocialPostGenerator({
     db,
     fetchContext,
