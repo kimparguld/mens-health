@@ -87,7 +87,7 @@ export default function WeeklyGrowthPage() {
                   {t.link ? (
                     <Link
                       href={t.link}
-                      className="text-ink-muted hover:text-ink-muted/90 underline"
+                      className="text-muted hover:text-muted/90 underline"
                     >
                       {t.task}
                     </Link>

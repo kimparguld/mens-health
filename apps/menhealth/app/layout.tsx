@@ -1,60 +1,64 @@
-import type { Metadata } from "next";
-import { Inter, EB_Garamond } from "next/font/google";
-import { Suspense } from "react";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { JsonLd } from "@menhealth/ui";
-import { buildWebSiteSchema, buildOrganizationSchema } from "@menhealth/core-seo";
-import { env } from "@/env";
-import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site-brand";
-import "./globals.css";
+import { env } from '@/env';
+import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site-brand';
+import {
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+} from '@menhealth/core-seo';
+import { JsonLd } from '@menhealth/ui';
+import { GoogleTagManager } from '@next/third-parties/google';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import type { Metadata } from 'next';
+import { EB_Garamond, Inter } from 'next/font/google';
+import Script from 'next/script';
+import { Suspense } from 'react';
+import './globals.css';
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const ebGaramond = EB_Garamond({
-  variable: "--font-logotype",
-  subsets: ["latin"],
-  weight: "600",
-  style: "italic",
-  display: "swap",
+  variable: '--font-logotype',
+  subsets: ['latin'],
+  weight: '600',
+  style: 'italic',
+  display: 'swap',
 });
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.menhealth-digest.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
     default: "MenHealth Digest — Evidence-Aware Men's Health Summaries",
-    template: "%s — MenHealth Digest",
+    template: '%s — MenHealth Digest',
   },
   description:
     "Daily summaries of the most important men's health videos, ranked and fact-checked. Fitness, testosterone, sleep, nutrition, longevity — without the hype.",
   alternates: {
     canonical: APP_URL,
     types: {
-      "application/rss+xml": `${APP_URL}/feed.xml`,
+      'application/rss+xml': `${APP_URL}/feed.xml`,
     },
   },
   openGraph: {
-    siteName: "MenHealth Digest",
-    type: "website",
-    locale: "en_US",
+    siteName: 'MenHealth Digest',
+    type: 'website',
+    locale: 'en_US',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
   },
   verification: {
     ...(env.GOOGLE_SITE_VERIFICATION
       ? { google: env.GOOGLE_SITE_VERIFICATION }
       : {}),
     ...(env.BING_SITE_VERIFICATION
-      ? { other: { "msvalidate.01": env.BING_SITE_VERIFICATION } }
+      ? { other: { 'msvalidate.01': env.BING_SITE_VERIFICATION } }
       : {}),
   },
   robots: {
@@ -63,15 +67,15 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-snippet": -1,
-      "max-image-preview": "large",
-      "max-video-preview": -1,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
     },
   },
 };
 
 const adsEnabled =
-  env.NEXT_PUBLIC_ADS_ENABLED === "true" && !!env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  env.NEXT_PUBLIC_ADS_ENABLED === 'true' && !!env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 export default function RootLayout({
   children,
@@ -84,6 +88,7 @@ export default function RootLayout({
         lang="en"
         className={`${inter.variable} ${ebGaramond.variable} h-full antialiased`}
       >
+        <GoogleTagManager gtmId="G-T4EKPX0Q0R" />
         <body className="flex min-h-full flex-col">
           {adsEnabled && (
             <Script

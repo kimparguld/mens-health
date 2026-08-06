@@ -4,8 +4,7 @@ import { STAMP_BASE_CLASS } from './stampStyles';
 const RISK_CONFIG: Record<string, { label: string; className: string }> = {
   LOW: {
     label: 'Low risk',
-    className:
-      'border-ink-muted/40 text-ink-muted/60 relative -top-0.5 rotate-2',
+    className: 'border-muted/40 text-muted/60 relative -top-0.5 rotate-2',
   },
   MEDIUM: {
     label: 'Medium risk',

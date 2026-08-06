@@ -178,7 +178,7 @@ export function SponsorForm({ defaultValues, sponsorId }: SponsorFormProps) {
           id="isActive"
           checked={form.isActive}
           onChange={(e) => set('isActive', e.target.checked)}
-          className="text-ink h-4 w-4 rounded border-gray-300"
+          className="text-accent h-4 w-4 rounded border-gray-300"
         />
         <label htmlFor="isActive" className="text-sm text-gray-700">
           Active (visible on site immediately)

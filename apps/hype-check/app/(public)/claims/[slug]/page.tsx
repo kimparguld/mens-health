@@ -114,7 +114,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
           ]}
         />
         <article>
-          <p className="text-ink-muted/60 mb-3 text-sm font-semibold tracking-widest uppercase">
+          <p className="text-muted/60 mb-3 text-sm font-semibold tracking-widest uppercase">
             Claim
           </p>
           <h1 className="heading">&ldquo;{claim.text}&rdquo;</h1>
@@ -166,7 +166,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-ink-muted font-medium text-gray-900"
+                      className="hover:text-muted font-medium text-gray-900"
                     >
                       {source.title}
                     </a>
@@ -192,7 +192,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
             </p>
             <Link
               href={`/videos/${subject.slug}`}
-              className="hover:text-ink-muted mt-1 block text-base font-semibold text-gray-900"
+              className="hover:text-muted mt-1 block text-base font-semibold text-gray-900"
             >
               {displayTitle}
             </Link>
@@ -206,7 +206,7 @@ export default async function ClaimPage({ params }: { params: Params }) {
             )}
             <Link
               href={`/videos/${subject.slug}`}
-              className="hover:text-ink-muted text-ink-muted/60 mt-4 inline-flex items-center gap-1 text-sm font-semibold"
+              className="hover:text-muted text-muted/60 mt-4 inline-flex items-center gap-1 text-sm font-semibold"
             >
               Watch breakdown →
             </Link>

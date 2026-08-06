@@ -41,7 +41,7 @@ export default function TopicsIndexPage() {
           <li key={topic.slug}>
             <Link
               href={`/topics/${topic.slug}`}
-              className="group border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
+              className="group border-hairline hover:border-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
             >
               <div className="flex items-center gap-2">
                 <span className="text-base font-semibold text-gray-900">
@@ -52,7 +52,7 @@ export default function TopicsIndexPage() {
               <span className="mt-1 text-sm text-gray-500">
                 {topic.description}
               </span>
-              <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-sm font-medium underline underline-offset-4">
+              <p className="text-accent decoration-hairline group-hover:decoration-accent mt-3 text-sm font-medium underline underline-offset-4">
                 Explore →
               </p>
             </Link>

@@ -153,7 +153,7 @@ export default async function GrowthAnalyticsPage() {
           <Link
             key={c.label}
             href={c.href}
-            className="hover:border-ink-muted/30 rounded-xl border border-gray-200 bg-white px-4 py-4 transition-colors"
+            className="hover:border-muted/30 rounded-xl border border-gray-200 bg-white px-4 py-4 transition-colors"
           >
             <p className="text-xs text-gray-500">{c.label}</p>
             <p className="mt-1 text-2xl font-bold text-gray-900">{c.value}</p>
@@ -315,7 +315,7 @@ export default async function GrowthAnalyticsPage() {
                 <Link
                   href={`/videos/${v.slug}`}
                   target="_blank"
-                  className="text-ink text-xs hover:underline"
+                  className="text-accent text-xs hover:underline"
                 >
                   View →
                 </Link>
@@ -360,11 +360,11 @@ export default async function GrowthAnalyticsPage() {
       </section>
 
       {/* Growth loop reminder */}
-      <section className="border-ink-muted/20 rounded-xl border bg-indigo-50 px-5 py-5">
-        <h2 className="text-ink-muted/90 mb-2 text-sm font-semibold">
+      <section className="border-muted/20 rounded-xl border bg-indigo-50 px-5 py-5">
+        <h2 className="text-muted/90 mb-2 text-sm font-semibold">
           Traffic loop
         </h2>
-        <div className="text-ink-muted/80 flex flex-wrap items-center gap-2 text-xs">
+        <div className="text-muted/80 flex flex-wrap items-center gap-2 text-xs">
           {[
             'SEO claim pages',
             'Social posts',
@@ -374,7 +374,7 @@ export default async function GrowthAnalyticsPage() {
             'Revenue',
           ].map((step, i, arr) => (
             <span key={step} className="flex items-center gap-2">
-              <span className="bg-ink-muted/10 rounded-full px-2 py-0.5 font-medium">
+              <span className="bg-muted/10 rounded-full px-2 py-0.5 font-medium">
                 {step}
               </span>
               {i < arr.length - 1 && <span>→</span>}
@@ -382,13 +382,10 @@ export default async function GrowthAnalyticsPage() {
           ))}
         </div>
         <div className="mt-3 flex gap-3 text-xs">
-          <Link href="/admin/growth-plan" className="text-ink-muted underline">
+          <Link href="/admin/growth-plan" className="text-muted underline">
             90-day plan →
           </Link>
-          <Link
-            href="/admin/weekly-growth"
-            className="text-ink-muted underline"
-          >
+          <Link href="/admin/weekly-growth" className="text-muted underline">
             Weekly workflow →
           </Link>
         </div>

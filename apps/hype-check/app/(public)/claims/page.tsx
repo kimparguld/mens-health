@@ -87,7 +87,7 @@ export default async function ClaimsIndexPage() {
             <li key={claim.id} className="py-4">
               <Link href={href} className="group flex items-start gap-3">
                 <div className="flex-1">
-                  <p className="group-hover:text-ink-muted text-sm font-medium text-gray-900">
+                  <p className="group-hover:text-muted text-sm font-medium text-gray-900">
                     {claim.text}
                   </p>
                   <p className="mt-1 text-sm text-gray-400">

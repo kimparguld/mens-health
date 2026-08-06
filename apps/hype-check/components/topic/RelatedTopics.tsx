@@ -18,7 +18,7 @@ export function RelatedTopics({ currentSlug }: { currentSlug: string }) {
           <Link
             key={topic.slug}
             href={`/topics/${topic.slug}`}
-            className="hover:border-ink hover:text-ink rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
+            className="hover:border-accent hover:text-accent rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
           >
             {topic.name} →
           </Link>

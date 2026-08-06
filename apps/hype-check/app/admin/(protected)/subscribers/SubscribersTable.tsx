@@ -147,7 +147,7 @@ export function SubscribersTable({
                           <button
                             onClick={() => callAction(sub.id, 'sync')}
                             disabled={loading !== null}
-                            className="text-ink text-xs font-medium hover:underline disabled:opacity-40"
+                            className="text-accent text-xs font-medium hover:underline disabled:opacity-40"
                           >
                             {loading === `${sub.id}:sync`
                               ? 'Syncing…'

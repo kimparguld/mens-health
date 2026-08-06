@@ -117,7 +117,7 @@ export default function GenerateSocialButton({ videoId }: { videoId: string }) {
         <button
           onClick={generate}
           disabled={selected.size === 0 || anyLoading}
-          className="bg-ink-muted/60 hover:bg-ink-muted/70 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="bg-muted/60 hover:bg-muted/70 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           {anyLoading ? 'Generating…' : 'Generate'}
         </button>

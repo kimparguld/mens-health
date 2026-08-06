@@ -61,7 +61,7 @@ export function HypeVideoCard({
           {topicNames.slice(0, 2).map((name) => (
             <span
               key={name}
-              className="border-hairline text-ink-muted rounded-full border px-2.5 py-0.5 text-sm font-medium"
+              className="border-hairline text-muted rounded-full border px-2.5 py-0.5 text-sm font-medium"
             >
               {name}
             </span>
@@ -81,11 +81,11 @@ export function HypeVideoCard({
             )}
           </div>
         )}
-        <h3 className="text-ink line-clamp-2 text-base font-semibold">
+        <h3 className="text-accent line-clamp-2 text-base font-semibold">
           {title}
         </h3>
         {shortSummary && (
-          <p className="text-ink-muted line-clamp-2 text-sm">{shortSummary}</p>
+          <p className="text-muted line-clamp-2 text-sm">{shortSummary}</p>
         )}
         <p className="mt-auto text-xs text-gray-500">{channelTitle}</p>
       </div>

@@ -58,7 +58,7 @@ export default function BulkPublishTable({
     if (sortField !== field)
       return <span className="ml-1 text-gray-300">↕</span>;
     return (
-      <span className="text-ink ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>
+      <span className="text-accent ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>
     );
   };
 
@@ -217,7 +217,7 @@ export default function BulkPublishTable({
                 <button
                   onClick={bulkGenerateSummaries}
                   disabled={loading !== null}
-                  className="text-ink rounded-lg border border-blue-600 px-4 py-1.5 text-sm font-medium hover:bg-blue-50 disabled:opacity-50"
+                  className="text-accent rounded-lg border border-blue-600 px-4 py-1.5 text-sm font-medium hover:bg-blue-50 disabled:opacity-50"
                 >
                   {loading === 'summaries'
                     ? 'Generating…'
@@ -359,7 +359,7 @@ export default function BulkPublishTable({
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/videos/${video.id}`}
-                    className="text-ink hover:underline"
+                    className="text-accent hover:underline"
                   >
                     Review
                   </Link>

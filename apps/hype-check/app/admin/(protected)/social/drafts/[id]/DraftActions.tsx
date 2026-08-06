@@ -170,7 +170,7 @@ export default function DraftActions({
             <button
               onClick={handleSchedule}
               disabled={loading !== null}
-              className="bg-ink-muted/60 hover:bg-ink-muted/70 rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+              className="bg-muted/60 hover:bg-muted/70 rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
             >
               {loading === 'schedule'
                 ? isScheduled
@@ -186,7 +186,7 @@ export default function DraftActions({
 
       {/* Scheduled info note — X only */}
       {isX && isScheduled && (
-        <p className="text-ink-muted/80 rounded bg-indigo-50 px-3 py-2 text-xs">
+        <p className="text-muted/80 rounded bg-indigo-50 px-3 py-2 text-xs">
           This post is scheduled and will be posted to X automatically by the
           cron job once the scheduled time passes.
         </p>
@@ -213,7 +213,7 @@ export default function DraftActions({
                       id={`check-${i}`}
                       checked={checklist[i]}
                       onChange={() => toggleCheck(i)}
-                      className="text-ink-muted/60 h-3.5 w-3.5 rounded border-gray-300"
+                      className="text-muted/60 h-3.5 w-3.5 rounded border-gray-300"
                     />
                     <label htmlFor={`check-${i}`} className="text-gray-700">
                       {item}

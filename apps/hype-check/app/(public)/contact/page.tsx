@@ -34,7 +34,7 @@ export default function ContactPage() {
             For anything not listed below, email us at{' '}
             <a
               href="mailto:hello@hype-check.net"
-              className="text-ink-muted/60 hover:underline"
+              className="text-muted/60 hover:underline"
             >
               hello@hype-check.net
             </a>
@@ -50,7 +50,7 @@ export default function ContactPage() {
             Email{' '}
             <a
               href="mailto:corrections@hype-check.net"
-              className="text-ink-muted/60 hover:underline"
+              className="text-muted/60 hover:underline"
             >
               corrections@hype-check.net
             </a>{' '}
@@ -68,7 +68,7 @@ export default function ContactPage() {
             email{' '}
             <a
               href="mailto:partnerships@hype-check.net"
-              className="text-ink-muted/60 hover:underline"
+              className="text-muted/60 hover:underline"
             >
               partnerships@hype-check.net
             </a>
@@ -86,7 +86,7 @@ export default function ContactPage() {
             rights, email{' '}
             <a
               href="mailto:privacy@hype-check.net"
-              className="text-ink-muted/60 hover:underline"
+              className="text-muted/60 hover:underline"
             >
               privacy@hype-check.net
             </a>

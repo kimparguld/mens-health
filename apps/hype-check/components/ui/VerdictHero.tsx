@@ -12,13 +12,13 @@ export function VerdictHero({ verdict, rationale }: VerdictHeroProps) {
         <>
           <VerdictStamp verdict={verdict} size="lg" />
           {rationale && (
-            <p className="text-ink-muted mt-3 text-sm leading-relaxed">
+            <p className="text-muted mt-3 text-sm leading-relaxed">
               {rationale}
             </p>
           )}
         </>
       ) : (
-        <p className="text-ink-muted/60 text-sm font-semibold tracking-wide uppercase">
+        <p className="text-muted/60 text-sm font-semibold tracking-wide uppercase">
           Not yet verdicted
         </p>
       )}

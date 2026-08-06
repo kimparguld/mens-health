@@ -109,7 +109,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
           ]}
         />
         <header className="mb-12">
-          <p className="text-ink-muted mb-1 text-sm font-semibold tracking-wide uppercase">
+          <p className="text-muted mb-1 text-sm font-semibold tracking-wide uppercase">
             {weekLabel}
           </p>
           <h1 className="heading">Best {seed.name} Videos This Week</h1>
@@ -126,7 +126,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             </p>
             <Link
               href={`/topics/${slug}`}
-              className="text-ink-muted/60 mt-3 inline-block text-sm font-semibold hover:underline"
+              className="text-muted/60 mt-3 inline-block text-sm font-semibold hover:underline"
             >
               Browse all {seed.name} videos →
             </Link>
@@ -136,7 +136,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* Top Video This Week */}
             {topVideo && (
               <section className="mb-12">
-                <p className="text-ink-muted mb-3 text-base font-semibold tracking-wide uppercase">
+                <p className="text-muted mb-3 text-base font-semibold tracking-wide uppercase">
                   Top Video This Week
                 </p>
                 <div className="rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
@@ -164,11 +164,11 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                 {topVideoSummary?.takeaways &&
                   Array.isArray(topVideoSummary.takeaways) &&
                   (topVideoSummary.takeaways as string[]).length > 0 && (
-                    <div className="border-ink-muted/20 mt-4 rounded-xl border bg-indigo-50 px-5 py-4">
-                      <p className="text-ink-muted mb-2 text-sm font-semibold tracking-wide uppercase">
+                    <div className="border-muted/20 mt-4 rounded-xl border bg-indigo-50 px-5 py-4">
+                      <p className="text-muted mb-2 text-sm font-semibold tracking-wide uppercase">
                         Practical Takeaway
                       </p>
-                      <p className="text-ink-muted/80 text-sm">
+                      <p className="text-muted/80 text-sm">
                         {(topVideoSummary.takeaways as string[])[0]}
                       </p>
                     </div>
@@ -179,7 +179,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             {/* 3 Claims Checked */}
             {checkedClaims.length > 0 && (
               <section className="mb-4">
-                <p className="text-ink-muted mb-3 text-base font-semibold tracking-wide uppercase">
+                <p className="text-muted mb-3 text-base font-semibold tracking-wide uppercase">
                   {checkedClaims.length} Claim
                   {checkedClaims.length !== 1 ? 's' : ''} Checked This Week
                 </p>
@@ -198,7 +198,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                         {claim.slug && (
                           <Link
                             href={`/claims/${claim.slug}`}
-                            className="link text-ink-muted text-sm font-medium hover:underline"
+                            className="link text-muted text-sm font-medium hover:underline"
                           >
                             See evidence →
                           </Link>
@@ -234,7 +234,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             )}
 
             {/* All videos */}
-            <p className="text-ink-muted mt-10 mb-3 text-base font-semibold tracking-wide uppercase">
+            <p className="text-muted mt-10 mb-3 text-base font-semibold tracking-wide uppercase">
               All videos this week
             </p>
             <ol className="space-y-16">
@@ -244,7 +244,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
 
                 return (
                   <li key={video.id} className="relative">
-                    <div className="bg-ink-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
+                    <div className="bg-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
                       {i + 1}
                     </div>
                     <HypeVideoCard
@@ -278,7 +278,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       )}
                     <Link
                       href={`/videos/${video.slug}`}
-                      className="link text-ink-muted mt-2 ml-3 inline-block text-sm font-medium hover:underline"
+                      className="link text-muted mt-2 ml-3 inline-block text-sm font-medium hover:underline"
                     >
                       Read full summary →
                     </Link>
@@ -297,7 +297,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             <li>
               <Link
                 href={`/topics/${slug}`}
-                className="text-ink-muted font-medium hover:underline"
+                className="text-muted font-medium hover:underline"
               >
                 {seed.name} topic hub →
               </Link>
@@ -305,7 +305,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             <li>
               <Link
                 href={`/rankings/${slug}`}
-                className="text-ink-muted font-medium hover:underline"
+                className="text-muted font-medium hover:underline"
               >
                 {seed.name} rankings →
               </Link>
@@ -346,7 +346,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
               <Link
                 key={t.slug}
                 href={`/weekly/${t.slug}`}
-                className="hover:border-ink-muted/30 hover:text-ink/80 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-colors"
+                className="hover:border-muted/30 hover:text-accent/80 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 transition-colors"
               >
                 {t.name}
               </Link>

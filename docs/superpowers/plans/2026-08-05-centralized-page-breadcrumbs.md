@@ -22,11 +22,13 @@
 ### Task 1: `PageBreadcrumbs` component
 
 **Files:**
+
 - Create: `packages/ui/src/seo/PageBreadcrumbs.tsx`
 - Modify: `packages/ui/src/index.ts` (add export)
 - Test: `apps/menhealth/__tests__/PageBreadcrumbs.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `Breadcrumbs` from `./Breadcrumbs` (props `{ items: { label: string; href?: string }[] }`), `JsonLd` from `./JsonLd` (props `{ schema: Record<string, unknown> | Record<string, unknown>[] }`), `buildBreadcrumbSchema` from `@menhealth/core-seo` (`(items: { name: string; url: string }[]) => Record<string, unknown>`).
 - Produces: `PageBreadcrumbs` component, `{ baseUrl: string; trail: BreadcrumbTrailItem[] }` props, and the `BreadcrumbTrailItem = { label: string; href: string }` type — both exported from `@menhealth/ui` and used by every later task.
 
@@ -50,7 +52,7 @@ describe('PageBreadcrumbs', () => {
           { label: 'Topics', href: '/topics' },
           { label: 'Testosterone', href: '/topics/testosterone' },
         ]}
-      />
+      />,
     );
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Topics')).toBeInTheDocument();
@@ -65,7 +67,7 @@ describe('PageBreadcrumbs', () => {
           { label: 'Topics', href: '/topics' },
           { label: 'Testosterone', href: '/topics/testosterone' },
         ]}
-      />
+      />,
     );
     expect(screen.getByText('Topics').closest('a')).not.toBeNull();
     expect(screen.getByText('Testosterone').closest('a')).toBeNull();
@@ -79,7 +81,7 @@ describe('PageBreadcrumbs', () => {
           { label: 'Claims', href: '/claims' },
           { label: 'Some claim text', href: '/claims/some-claim' },
         ]}
-      />
+      />,
     );
     const script = container.querySelector('script[type="application/ld+json"]');
     expect(script).not.toBeNull();
@@ -140,9 +142,7 @@ export function PageBreadcrumbs({ baseUrl, trail }: Props) {
     })),
   ]);
 
-  const visibleItems = trail.map((item, index) =>
-    index === trail.length - 1 ? { label: item.label } : item
-  );
+  const visibleItems = trail.map((item, index) => (index === trail.length - 1 ? { label: item.label } : item));
 
   return (
     <>
@@ -196,6 +196,7 @@ git commit -m "feat(ui): add PageBreadcrumbs component composing Breadcrumbs + J
 `claims/[slug]`, `creators/[slug]`, `faq`, `glossary`, `glossary/[slug]`, `rankings/[topic]`, `topics/[slug]`, `videos/[slug]`, `weekly/[slug]`, `reports/[slug]`, `newsletter/[slug]` — 11 files.
 
 **Interfaces:**
+
 - Consumes: `PageBreadcrumbs` and `BreadcrumbTrailItem` from `@menhealth/ui` (Task 1).
 - Produces: nothing consumed by later tasks — this task is self-contained.
 
@@ -212,14 +213,7 @@ import { buildBreadcrumbSchema } from '@menhealth/core-seo';
 to nothing (delete the line) — and change:
 
 ```ts
-import {
-  AdSlot,
-  Disclaimer,
-  EvidenceBadge,
-  JsonLd,
-  NewsletterFooterCTA,
-  RiskBadge,
-} from '@menhealth/ui';
+import { AdSlot, Disclaimer, EvidenceBadge, JsonLd, NewsletterFooterCTA, RiskBadge } from '@menhealth/ui';
 ```
 
 to:
@@ -239,21 +233,21 @@ import {
 Change:
 
 ```tsx
-  const canonicalSlug = claim.slug ?? claim.id;
-  const breadcrumb = buildBreadcrumbSchema([
-    { name: 'Home', url: APP_URL },
-    { name: 'Claims', url: `${APP_URL}/claims` },
-    {
-      name: claim.text.slice(0, 60),
-      url: `${APP_URL}/claims/${canonicalSlug}`,
-    },
-  ]);
+const canonicalSlug = claim.slug ?? claim.id;
+const breadcrumb = buildBreadcrumbSchema([
+  { name: 'Home', url: APP_URL },
+  { name: 'Claims', url: `${APP_URL}/claims` },
+  {
+    name: claim.text.slice(0, 60),
+    url: `${APP_URL}/claims/${canonicalSlug}`,
+  },
+]);
 ```
 
 to:
 
 ```tsx
-  const canonicalSlug = claim.slug ?? claim.id;
+const canonicalSlug = claim.slug ?? claim.id;
 ```
 
 Change:
@@ -308,18 +302,18 @@ Note: `firstTopic` was only used by the deleted nav block in this file — check
 
 Use the exact trail per file below. In each case: delete the old `<nav>` block, delete/trim the `buildBreadcrumbSchema` call (remove just the breadcrumb entry if it's merged into a `schemas` array or a multi-schema `JsonLd schema={[...]}`, per each file's existing structure — read the file first), add `PageBreadcrumbs` to the `@menhealth/ui` import, render `<PageBreadcrumbs baseUrl={APP_URL} trail={...} />` where the `<nav>` was.
 
-| File | Trail (exact) | Notes |
-|---|---|---|
-| `creators/[slug]/page.tsx` | `[{ label: 'Creators', href: '/creators' }, { label: creator.name, href: `/creators/${slug}` }]` | `JsonLd schema={[breadcrumb, personSchema]}` → keep `personSchema` only: `JsonLd schema={personSchema}`. Delete the `breadcrumb` variable. |
-| `faq/page.tsx` | `[{ label: 'FAQ', href: '/faq' }]` | `JsonLd schema={[breadcrumbSchema, faqSchema]}` → `JsonLd schema={faqSchema}`. Delete `breadcrumbSchema`. |
-| `glossary/page.tsx` | `[{ label: 'Glossary', href: '/glossary' }]` | `JsonLd schema={[breadcrumbSchema, definedTermSetSchema]}` → `JsonLd schema={definedTermSetSchema}`. Delete `breadcrumbSchema`. |
-| `glossary/[slug]/page.tsx` | `[{ label: 'Glossary', href: '/glossary' }, { label: term.term, href: `/glossary/${slug}` }]` | `JsonLd schema={[breadcrumbSchema, definedTermSchema]}` → `JsonLd schema={definedTermSchema}`. Delete `breadcrumbSchema`. |
-| `rankings/[topic]/page.tsx` | `[{ label: 'Rankings', href: '/rankings' }, { label: seed.name, href: `/rankings/${topic}` }]` | Two separate `<JsonLd schema={breadcrumb} />` / `<JsonLd schema={listSchema} />` tags → delete the breadcrumb one, keep `<JsonLd schema={listSchema} />`. Delete `breadcrumb` variable. |
-| `topics/[slug]/page.tsx` | `[{ label: 'Topics', href: '/topics' }, { label: topicSeed.name, href: `/topics/${slug}` }]` | **Adds the missing "Topics" list level** — today's trail is just `[Home, topicSeed.name]`, which is the drift bug from the design doc. `schemas` array built as `[breadcrumbSchema, ...itemListSchema, ...faqSchema]` → remove `breadcrumbSchema` from that array (keep the rest), delete the `breadcrumbSchema` variable. |
-| `videos/[slug]/page.tsx` | `[...(firstTopic ? [{ label: firstTopic.name, href: `/topics/${firstTopic.slug}` }] : []), { label: displayTitle, href: `/videos/${video.slug}` }]` | Three separate `<JsonLd>` tags (`videoSchema`, `breadcrumbSchema`, `articleSchema`) → delete only the breadcrumb one. Delete `breadcrumbSchema` variable. |
-| `weekly/[slug]/page.tsx` | `[{ label: 'Weekly trends', href: '/weekly' }, { label: seed.name, href: `/weekly/${slug}` }]` | Already uses `<Breadcrumbs items={[{ label: 'Weekly trends', href: '/weekly' }, { label: seed.name }]} />` directly — replace that `Breadcrumbs` usage with `PageBreadcrumbs` (same trail, now with `href` on both items) and delete the separate `<JsonLd schema={breadcrumbSchema} />` + `breadcrumbSchema` variable. Remove `Breadcrumbs` from the `@menhealth/ui` import, add `PageBreadcrumbs`. |
-| `reports/[slug]/page.tsx` | `[{ label: 'Reports', href: '/reports' }, { label: stats.periodLabel, href: `/reports/${slug}` }]` | This page has **no** JSON-LD breadcrumb schema today, only the visible `<nav>` — new behavior, it gains one. Add `import { PageBreadcrumbs } from '@menhealth/ui';`. Needs a local `APP_URL` constant — add `const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';` near the top (this file has none today). |
-| `newsletter/[slug]/page.tsx` | `[{ label: 'Newsletter', href: '/newsletter' }, { label: 'Archive', href: '/newsletter/archive' }, { label: issue.subject, href: `/newsletter/${slug}` }]` | Same as above: no existing schema, add `PageBreadcrumbs` import and a local `APP_URL` constant (same fallback literal). |
+| File                         | Trail (exact)                                                                                                                                              | Notes                                                                                                                                                                                                                                                                                                                                                                                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `creators/[slug]/page.tsx`   | `[{ label: 'Creators', href: '/creators' }, { label: creator.name, href: `/creators/${slug}` }]`                                                           | `JsonLd schema={[breadcrumb, personSchema]}` → keep `personSchema` only: `JsonLd schema={personSchema}`. Delete the `breadcrumb` variable.                                                                                                                                                                                                                                                           |
+| `faq/page.tsx`               | `[{ label: 'FAQ', href: '/faq' }]`                                                                                                                         | `JsonLd schema={[breadcrumbSchema, faqSchema]}` → `JsonLd schema={faqSchema}`. Delete `breadcrumbSchema`.                                                                                                                                                                                                                                                                                            |
+| `glossary/page.tsx`          | `[{ label: 'Glossary', href: '/glossary' }]`                                                                                                               | `JsonLd schema={[breadcrumbSchema, definedTermSetSchema]}` → `JsonLd schema={definedTermSetSchema}`. Delete `breadcrumbSchema`.                                                                                                                                                                                                                                                                      |
+| `glossary/[slug]/page.tsx`   | `[{ label: 'Glossary', href: '/glossary' }, { label: term.term, href: `/glossary/${slug}` }]`                                                              | `JsonLd schema={[breadcrumbSchema, definedTermSchema]}` → `JsonLd schema={definedTermSchema}`. Delete `breadcrumbSchema`.                                                                                                                                                                                                                                                                            |
+| `rankings/[topic]/page.tsx`  | `[{ label: 'Rankings', href: '/rankings' }, { label: seed.name, href: `/rankings/${topic}` }]`                                                             | Two separate `<JsonLd schema={breadcrumb} />` / `<JsonLd schema={listSchema} />` tags → delete the breadcrumb one, keep `<JsonLd schema={listSchema} />`. Delete `breadcrumb` variable.                                                                                                                                                                                                              |
+| `topics/[slug]/page.tsx`     | `[{ label: 'Topics', href: '/topics' }, { label: topicSeed.name, href: `/topics/${slug}` }]`                                                               | **Adds the missing "Topics" list level** — today's trail is just `[Home, topicSeed.name]`, which is the drift bug from the design doc. `schemas` array built as `[breadcrumbSchema, ...itemListSchema, ...faqSchema]` → remove `breadcrumbSchema` from that array (keep the rest), delete the `breadcrumbSchema` variable.                                                                           |
+| `videos/[slug]/page.tsx`     | `[...(firstTopic ? [{ label: firstTopic.name, href: `/topics/${firstTopic.slug}` }] : []), { label: displayTitle, href: `/videos/${video.slug}` }]`        | Three separate `<JsonLd>` tags (`videoSchema`, `breadcrumbSchema`, `articleSchema`) → delete only the breadcrumb one. Delete `breadcrumbSchema` variable.                                                                                                                                                                                                                                            |
+| `weekly/[slug]/page.tsx`     | `[{ label: 'Weekly trends', href: '/weekly' }, { label: seed.name, href: `/weekly/${slug}` }]`                                                             | Already uses `<Breadcrumbs items={[{ label: 'Weekly trends', href: '/weekly' }, { label: seed.name }]} />` directly — replace that `Breadcrumbs` usage with `PageBreadcrumbs` (same trail, now with `href` on both items) and delete the separate `<JsonLd schema={breadcrumbSchema} />` + `breadcrumbSchema` variable. Remove `Breadcrumbs` from the `@menhealth/ui` import, add `PageBreadcrumbs`. |
+| `reports/[slug]/page.tsx`    | `[{ label: 'Reports', href: '/reports' }, { label: stats.periodLabel, href: `/reports/${slug}` }]`                                                         | This page has **no** JSON-LD breadcrumb schema today, only the visible `<nav>` — new behavior, it gains one. Add `import { PageBreadcrumbs } from '@menhealth/ui';`. Needs a local `APP_URL` constant — add `const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.menhealth-digest.com';` near the top (this file has none today).                                                        |
+| `newsletter/[slug]/page.tsx` | `[{ label: 'Newsletter', href: '/newsletter' }, { label: 'Archive', href: '/newsletter/archive' }, { label: issue.subject, href: `/newsletter/${slug}` }]` | Same as above: no existing schema, add `PageBreadcrumbs` import and a local `APP_URL` constant (same fallback literal).                                                                                                                                                                                                                                                                              |
 
 - [ ] **Step 3: Typecheck**
 
@@ -351,12 +345,14 @@ git commit -m "refactor(menhealth): migrate pages with hand-rolled breadcrumbs t
 `claims/[slug]`, `creators/[slug]`, `faq`, `glossary`, `glossary/[slug]`, `rankings/[topic]`, `topics/[slug]`, `videos/[slug]`, `weekly/[slug]`, `reports/[slug]`, `newsletter/[slug]` — 11 files.
 
 **Interfaces:**
+
 - Consumes: `PageBreadcrumbs`, `BreadcrumbTrailItem` from `@menhealth/ui` (Task 1).
 - Produces: nothing consumed by later tasks.
 
-Identical transform to Task 2, applied to hype-check's copy of each page (same file paths under `apps/hype-check`, same trail data — labels are identical, only the site's `APP_URL` fallback literal differs: `'https://www.hype-check.net'`). hype-check's markup uses different Tailwind classes (dark-theme tokens like `text-gray-400`/`text-gray-500`/`text-ink-muted`) but the same structural nav-before-header pattern, same variable names (`firstTopic`, `creator.name`, `seed.name`, `topicSeed.name`, `displayTitle`, `stats.periodLabel`, `issue.subject`), so the same edits from Task 2's table apply file-for-file.
+Identical transform to Task 2, applied to hype-check's copy of each page (same file paths under `apps/hype-check`, same trail data — labels are identical, only the site's `APP_URL` fallback literal differs: `'https://www.hype-check.net'`). hype-check's markup uses different Tailwind classes (dark-theme tokens like `text-gray-400`/`text-gray-500`/`text-muted`) but the same structural nav-before-header pattern, same variable names (`firstTopic`, `creator.name`, `seed.name`, `topicSeed.name`, `displayTitle`, `stats.periodLabel`, `issue.subject`), so the same edits from Task 2's table apply file-for-file.
 
 Two hype-check-specific differences to account for:
+
 - `topics/[slug]/page.tsx`: same as menhealth — trail gains the missing `Topics` list level: `[{ label: 'Topics', href: '/topics' }, { label: topicSeed.name, href: `/topics/${slug}` }]`.
 - `rankings/[topic]/page.tsx` and `topics/[slug]/page.tsx` map `listSchema`/`itemListSchema` entries using `v.editorialTitle ?? v.sourceVideos[0]?.title ?? v.name` (hype-check's data model differs slightly from menhealth's) — that mapping is untouched by this migration, only the breadcrumb entry is removed.
 
@@ -398,6 +394,7 @@ git commit -m "refactor(hype-check): migrate pages with hand-rolled breadcrumbs 
 `about`, `affiliate-disclosure`, `claims`, `contact`, `creators`, `editorial-process`, `how-we-rate-evidence`, `newsletter`, `newsletter/archive`, `privacy`, `rankings`, `reports`, `topics`, `weekly`, `medical-disclaimer`, `widgets` — 16 files.
 
 **Interfaces:**
+
 - Consumes: `PageBreadcrumbs` from `@menhealth/ui` (Task 1).
 - Produces: nothing consumed by later tasks.
 
@@ -461,23 +458,23 @@ export default function AboutPage() {
 
 For each: add the `PageBreadcrumbs` import (merging into the file's existing `@menhealth/ui` import if one exists), add the `APP_URL` constant if missing, insert `<PageBreadcrumbs baseUrl={APP_URL} trail={...} />` as the first line inside the JSX returned from `<main ...>` (immediately after the opening `<main>` tag, before whatever was first — an `<h1>`, a `<JsonLd>` call, or a `<header>`).
 
-| File | Trail (exact) |
-|---|---|
-| `affiliate-disclosure/page.tsx` | `[{ label: 'Affiliate Disclosure', href: '/affiliate-disclosure' }]` |
-| `claims/page.tsx` | `[{ label: 'Claims', href: '/claims' }]` |
-| `contact/page.tsx` | `[{ label: 'Contact', href: '/contact' }]` |
-| `creators/page.tsx` | `[{ label: 'Creators', href: '/creators' }]` |
-| `editorial-process/page.tsx` | `[{ label: 'Editorial Process', href: '/editorial-process' }]` |
-| `how-we-rate-evidence/page.tsx` | `[{ label: 'How We Rate Evidence', href: '/how-we-rate-evidence' }]` |
-| `newsletter/page.tsx` | `[{ label: 'Newsletter', href: '/newsletter' }]` |
-| `newsletter/archive/page.tsx` | `[{ label: 'Newsletter', href: '/newsletter' }, { label: 'Archive', href: '/newsletter/archive' }]` |
-| `privacy/page.tsx` | `[{ label: 'Privacy Policy', href: '/privacy' }]` |
-| `rankings/page.tsx` | `[{ label: 'Rankings', href: '/rankings' }]` |
-| `reports/page.tsx` | `[{ label: 'Reports', href: '/reports' }]` |
-| `topics/page.tsx` | `[{ label: 'Topics', href: '/topics' }]` |
-| `weekly/page.tsx` | `[{ label: 'Weekly trends', href: '/weekly' }]` |
-| `medical-disclaimer/page.tsx` | `[{ label: 'Medical Disclaimer', href: '/medical-disclaimer' }]` |
-| `widgets/page.tsx` | `[{ label: 'Widgets', href: '/widgets' }]` — this file already has a local `APP_URL` constant; reuse it, don't add a second one. |
+| File                            | Trail (exact)                                                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `affiliate-disclosure/page.tsx` | `[{ label: 'Affiliate Disclosure', href: '/affiliate-disclosure' }]`                                                             |
+| `claims/page.tsx`               | `[{ label: 'Claims', href: '/claims' }]`                                                                                         |
+| `contact/page.tsx`              | `[{ label: 'Contact', href: '/contact' }]`                                                                                       |
+| `creators/page.tsx`             | `[{ label: 'Creators', href: '/creators' }]`                                                                                     |
+| `editorial-process/page.tsx`    | `[{ label: 'Editorial Process', href: '/editorial-process' }]`                                                                   |
+| `how-we-rate-evidence/page.tsx` | `[{ label: 'How We Rate Evidence', href: '/how-we-rate-evidence' }]`                                                             |
+| `newsletter/page.tsx`           | `[{ label: 'Newsletter', href: '/newsletter' }]`                                                                                 |
+| `newsletter/archive/page.tsx`   | `[{ label: 'Newsletter', href: '/newsletter' }, { label: 'Archive', href: '/newsletter/archive' }]`                              |
+| `privacy/page.tsx`              | `[{ label: 'Privacy Policy', href: '/privacy' }]`                                                                                |
+| `rankings/page.tsx`             | `[{ label: 'Rankings', href: '/rankings' }]`                                                                                     |
+| `reports/page.tsx`              | `[{ label: 'Reports', href: '/reports' }]`                                                                                       |
+| `topics/page.tsx`               | `[{ label: 'Topics', href: '/topics' }]`                                                                                         |
+| `weekly/page.tsx`               | `[{ label: 'Weekly trends', href: '/weekly' }]`                                                                                  |
+| `medical-disclaimer/page.tsx`   | `[{ label: 'Medical Disclaimer', href: '/medical-disclaimer' }]`                                                                 |
+| `widgets/page.tsx`              | `[{ label: 'Widgets', href: '/widgets' }]` — this file already has a local `APP_URL` constant; reuse it, don't add a second one. |
 
 Note: `claims/page.tsx`, `creators/page.tsx`, `rankings/page.tsx`, `topics/page.tsx` currently start their `<main>` with `<JsonLd schema={itemListSchema} />` as the first child — put `<PageBreadcrumbs .../>` immediately after that `<JsonLd>` call (order between the two doesn't matter functionally, but keep `<JsonLd>` first to match this codebase's existing convention of JSON-LD before visible content in every other migrated file).
 
@@ -511,10 +508,12 @@ git commit -m "feat(menhealth): add breadcrumbs to list and static pages that ha
 `about`, `affiliate-disclosure`, `claims`, `contact`, `creators`, `editorial-process`, `how-we-rate-evidence`, `newsletter`, `newsletter/archive`, `privacy`, `rankings`, `reports`, `topics`, `weekly`, `disclaimer`, `widgets` — 16 files.
 
 **Interfaces:**
+
 - Consumes: `PageBreadcrumbs` from `@menhealth/ui` (Task 1).
 - Produces: nothing consumed by later tasks.
 
 Same transform and same trail labels as Task 4, applied to hype-check's copies, with two differences:
+
 - `APP_URL` fallback literal is `'https://www.hype-check.net'`.
 - hype-check's equivalent of `medical-disclaimer` is named `disclaimer` — trail: `[{ label: 'Disclaimer', href: '/disclaimer' }]`.
 
@@ -549,6 +548,7 @@ git commit -m "feat(hype-check): add breadcrumbs to list and static pages that h
 **Files:** none created or modified — this task only runs checks.
 
 **Interfaces:**
+
 - Consumes: everything from Tasks 1–5.
 - Produces: nothing.
 
@@ -565,6 +565,7 @@ Expected: both commands return no matches — every `buildBreadcrumbSchema` call
 - [ ] **Step 3: Manual dev-server spot check — menhealth**
 
 Run: `pnpm --filter menhealth dev` and in a browser check:
+
 - `/about` (static, single-item trail) — "Home / About"
 - `/topics` (list) — "Home / Topics"
 - `/topics/testosterone` (nested detail) — "Home / Topics / Testosterone", confirm it's a clickable link back to `/topics`

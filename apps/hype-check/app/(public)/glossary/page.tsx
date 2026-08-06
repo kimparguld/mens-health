@@ -62,7 +62,7 @@ export default function GlossaryPage() {
           <Link
             key={term.slug}
             href={`/glossary/${term.slug}`}
-            className="hover:border-ink-muted/30 rounded-xl border border-gray-200 bg-white px-5 py-4 transition hover:shadow-sm"
+            className="hover:border-muted/30 rounded-xl border border-gray-200 bg-white px-5 py-4 transition hover:shadow-sm"
           >
             <h2 className="font-semibold text-gray-900">{term.term}</h2>
             <p className="mt-1 text-sm text-gray-600">{term.shortDefinition}</p>
@@ -79,7 +79,7 @@ export default function GlossaryPage() {
             <Link
               key={topic.slug}
               href={`/topics/${topic.slug}`}
-              className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
+              className="hover:text-muted hover:border-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
             >
               {topic.name}
             </Link>

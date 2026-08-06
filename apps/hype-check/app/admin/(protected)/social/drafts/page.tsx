@@ -14,7 +14,7 @@ const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-gray-100 text-gray-700',
   PENDING_REVIEW: 'bg-yellow-100 text-yellow-800',
   APPROVED: 'bg-blue-100 text-blue-800',
-  SCHEDULED: 'bg-ink-muted/10 text-ink-muted/80',
+  SCHEDULED: 'bg-muted/10 text-muted/80',
   PUBLISHED: 'bg-green-100 text-green-800',
   REJECTED: 'bg-red-100 text-red-800',
   FAILED: 'bg-red-200 text-red-900',
@@ -204,7 +204,7 @@ export default async function SocialDraftsPage({
                   <td className="max-w-xs px-4 py-3">
                     <Link
                       href={`/admin/social/drafts/${post.id}`}
-                      className="hover:text-ink font-medium text-gray-900"
+                      className="hover:text-accent font-medium text-gray-900"
                     >
                       <span className="line-clamp-2">{post.hook}</span>
                     </Link>

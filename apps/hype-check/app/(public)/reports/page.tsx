@@ -41,7 +41,7 @@ export default async function ReportsIndexPage() {
           <li key={report.slug} className="py-4">
             <Link
               href={`/reports/${report.slug}`}
-              className="text-ink text-sm font-medium hover:underline"
+              className="text-accent text-sm font-medium hover:underline"
             >
               {report.periodStart.toLocaleDateString('en-US', {
                 month: 'long',
