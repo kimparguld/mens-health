@@ -40,15 +40,16 @@ async function fetchContext(videoId: string): Promise<VideoContext | null> {
   };
 }
 
-export const { generateSocialPost } = createSocialPostGenerator({
-  db,
-  fetchContext,
-  aiClient,
-  aiConfigured: Boolean(env.GROQ_API_KEY),
-  siteName: SITE_NAME,
-  contentTypeLabel: "men's health video summary",
-  disclaimerLine: "Educational only. Not medical advice.",
-  baseUrl: env.NEXT_PUBLIC_APP_URL,
-  forbiddenPatterns: FORBIDDEN_PATTERNS,
-  highRiskKeywords: HIGH_RISK_TOPIC_KEYWORDS,
-});
+export const { generateSocialPost, regenerateSocialPost } =
+  createSocialPostGenerator({
+    db,
+    fetchContext,
+    aiClient,
+    aiConfigured: Boolean(env.GROQ_API_KEY),
+    siteName: SITE_NAME,
+    contentTypeLabel: "men's health video summary",
+    disclaimerLine: "Educational only. Not medical advice.",
+    baseUrl: env.NEXT_PUBLIC_APP_URL,
+    forbiddenPatterns: FORBIDDEN_PATTERNS,
+    highRiskKeywords: HIGH_RISK_TOPIC_KEYWORDS,
+  });
