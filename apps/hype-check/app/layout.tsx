@@ -5,7 +5,7 @@ import {
   buildWebSiteSchema,
 } from '@menhealth/core-seo';
 import { JsonLd } from '@menhealth/ui';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
@@ -106,7 +106,8 @@ export default function RootLayout({
             <Analytics />
             <SpeedInsights />
           </Suspense>
-          <GoogleAnalytics gaId="G-30V2XS27MH" />
+
+          <GoogleTagManager gtmId="GTM-MMQQVQ" />
         </body>
       </html>
     </>
