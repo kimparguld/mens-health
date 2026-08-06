@@ -17,13 +17,13 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Next.js inline scripts, YouTube IFrame API, Vercel observability, and Google AdSense
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com",
+      // Next.js inline scripts, YouTube IFrame API, Vercel observability, Google AdSense, and Google Analytics (gtag.js)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.ytimg.com https://assets.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net",
+      "img-src 'self' data: blob: https://i.ytimg.com https://assets.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.google-analytics.com https://www.googletagmanager.com",
       // YouTube embed, Google OAuth, and AdSense ad iframes
-      "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com",
-      "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com",
+      "frame-src https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://www.googletagmanager.com",
+      "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com",
       "font-src 'self'",
       "object-src 'none'",
       "base-uri 'self'",
