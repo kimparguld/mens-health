@@ -21,32 +21,32 @@ const navLinks = [
     href: '/topics',
     label: 'Topics',
     className:
-      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-6 hover:decoration-ink',
+      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-6 hover:decoration-accent',
   },
   {
     href: '/rankings',
     label: 'Rankings',
     className:
-      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-ink',
+      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-6 hover:decoration-accent',
   },
   {
     href: '/weekly',
     label: 'Weekly',
     className:
-      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-ink',
+      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-6 hover:decoration-accent',
   },
   {
     href: '/how-we-rate-evidence',
     label: 'How It Works',
     className:
-      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-ink',
+      'font-semibold text-white underline decoration-transparent decoration-2 underline-offset-6 hover:decoration-accent',
   },
   {
     href: '/newsletter',
     label: 'Newsletter',
     className:
-      'rounded-sm bg-ink px-3 py-1.5 font-semibold text-paper hover:bg-ink/80',
-    mobileClass: 'bg-ink text-white hover:bg-ink/80 py-3 ',
+      'rounded-sm bg-accent px-3 py-1.5 font-semibold text-paper hover:bg-accent/80',
+    mobileClass: 'bg-accent text-white hover:bg-accent/80 py-3 ',
   },
 ];
 
@@ -128,11 +128,11 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="border-hairline bg-ink-muted sticky top-0 z-30 border-b backdrop-blur-sm">
+      <header className="border-hairline bg-muted sticky top-0 z-30 border-b backdrop-blur-sm">
         <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-3 lg:py-4">
           <Link
             href="/"
-            className="focus-visible:ring-ink/40 rounded-md focus-visible:ring-2 focus-visible:outline-none"
+            className="focus-visible:ring-accent/40 rounded-md focus-visible:ring-2 focus-visible:outline-none"
           >
             <BrandLogotype size="md" />
           </Link>
@@ -149,7 +149,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 {user ? (
                   <Link
                     href="/account"
-                    className="hover:decoration-ink font-semibold text-white/60 underline decoration-transparent decoration-2 underline-offset-4"
+                    className="hover:decoration-accent font-semibold text-white/60 underline decoration-transparent decoration-2 underline-offset-4"
                   >
                     {user.name ?? user.email ?? 'Account'}
                   </Link>
@@ -157,7 +157,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                   premium?.isEnabled() && (
                     <Link
                       href="/signin"
-                      className="text-ink-muted hover:text-ink"
+                      className="text-muted hover:text-accent"
                     >
                       Sign in
                     </Link>
@@ -166,7 +166,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 {!user?.isPremium && (
                   <Link
                     href="/upgrade"
-                    className="bg-ink text-paper hover:bg-ink-muted rounded-sm px-3 py-1.5 font-semibold"
+                    className="bg-accent text-paper hover:bg-muted rounded-sm px-3 py-1.5 font-semibold"
                   >
                     Go premium
                   </Link>
@@ -179,7 +179,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           <button
             type="button"
             onClick={openDrawer}
-            className="hover:bg-surface hover:text-ink flex items-center justify-center rounded-md p-2 text-white md:hidden"
+            className="hover:bg-surface hover:text-accent flex items-center justify-center rounded-md p-2 text-white md:hidden"
             aria-label="Open menu"
           >
             <HamburgerIcon />
@@ -217,21 +217,21 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               <Link
                 href="/"
                 onClick={closeDrawer}
-                className="focus-visible:ring-ink/40 flex rounded-md focus-visible:ring-2 focus-visible:outline-none"
+                className="focus-visible:ring-accent/40 flex rounded-md focus-visible:ring-2 focus-visible:outline-none"
               >
                 <BrandLogotype size="md" />
               </Link>
               <button
                 type="button"
                 onClick={closeDrawer}
-                className="text-ink-muted hover:bg-surface hover:text-ink rounded-sm p-2"
+                className="text-muted hover:bg-surface hover:text-accent rounded-sm p-2"
                 aria-label="Close menu"
               >
                 <CloseIcon />
               </button>
             </div>
 
-            <div className="border-hairline mx-6 border-t" />
+            <div className="border-hairline border-t" />
 
             {/* Nav links */}
             <nav className="flex flex-1 flex-col overflow-y-auto bg-white px-4 py-4">
@@ -245,7 +245,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     href={link.href}
                     onClick={closeDrawer}
                     className={twMerge(
-                      'group text-ink-muted hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors',
+                      'group text-muted hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors',
                       link.mobileClass
                     )}
                   >
@@ -274,12 +274,12 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     <Link
                       href="/account"
                       onClick={closeDrawer}
-                      className="group text-ink-muted/80 hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
+                      className="group text-muted/80 hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
                     >
                       {user.name ?? user.email ?? 'Account'}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="text-ink-muted/80 group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        className="text-muted/80 group-hover:text-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -296,12 +296,12 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     <Link
                       href="/signin"
                       onClick={closeDrawer}
-                      className="group text-ink hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
+                      className="group text-accent hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors"
                     >
                       Sign in
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="text-hairline group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        className="text-hairline group-hover:text-muted h-4 w-4 transition-transform group-hover:translate-x-0.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -325,7 +325,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 <Link
                   href="/upgrade"
                   onClick={closeDrawer}
-                  className="bg-ink text-paper hover:bg-ink-muted active:bg-ink-muted flex w-full items-center justify-center gap-2 rounded-md px-5 py-4 text-base font-semibold transition-colors"
+                  className="bg-accent text-paper hover:bg-muted active:bg-muted flex w-full items-center justify-center gap-2 rounded-md px-5 py-4 text-base font-semibold transition-colors"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -40,7 +40,7 @@ export function ProcessNowButton() {
       <button
         onClick={handleClick}
         disabled={loading}
-        className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+        className="bg-muted/70 hover:bg-muted/80 rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
       >
         {loading ? 'Processing…' : 'Process next batch now'}
       </button>

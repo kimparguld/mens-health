@@ -129,8 +129,8 @@ export default async function AdminClaimsPage({
             href={`/admin/claims?status=${tab.value}`}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               status === tab.value
-                ? 'bg-ink-muted/60 text-white'
-                : 'hover:border-ink-muted/30 border border-gray-200 bg-white text-gray-600'
+                ? 'bg-muted/60 text-white'
+                : 'hover:border-muted/30 border border-gray-200 bg-white text-gray-600'
             }`}
           >
             {tab.label}
@@ -204,7 +204,7 @@ export default async function AdminClaimsPage({
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/videos/${claim.subject.slug}`}
-                      className="text-ink line-clamp-1 text-xs hover:underline"
+                      className="text-accent line-clamp-1 text-xs hover:underline"
                     >
                       {claim.subject.editorialTitle ?? claim.subject.name}
                     </Link>
@@ -213,7 +213,7 @@ export default async function AdminClaimsPage({
                     <div className="flex flex-col gap-1">
                       <Link
                         href={`/admin/claims/${claim.id}`}
-                        className="text-ink-muted text-xs font-medium hover:underline"
+                        className="text-muted text-xs font-medium hover:underline"
                       >
                         Review →
                       </Link>
@@ -221,7 +221,7 @@ export default async function AdminClaimsPage({
                         <Link
                           href={`/claims/${claim.slug}`}
                           target="_blank"
-                          className="hover:text-ink text-xs text-gray-400"
+                          className="hover:text-accent text-xs text-gray-400"
                         >
                           View live →
                         </Link>

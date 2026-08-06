@@ -104,7 +104,7 @@ export default async function WeeklyRankingPage({
                 { label: seed.name, href: `/rankings/${topic}` },
               ]}
             />
-            <p className="text-ink-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
+            <p className="text-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
               Weekly ranking
             </p>
             <h1 className="heading">Best {seed.name} Videos This Week</h1>
@@ -174,7 +174,7 @@ export default async function WeeklyRankingPage({
               <div className="rounded-xl border border-dashed border-gray-200 py-16 text-center">
                 <p className="text-gray-500">
                   No videos indexed yet for this topic.{' '}
-                  <Link href="/" className="text-ink-muted/60 hover:underline">
+                  <Link href="/" className="text-muted/60 hover:underline">
                     Browse all topics →
                   </Link>
                 </p>
@@ -186,7 +186,7 @@ export default async function WeeklyRankingPage({
                     key={video.id}
                     className="relative flex items-start gap-4"
                   >
-                    <div className="bg-ink-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
+                    <div className="bg-muted/70 absolute -top-3 -left-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white text-lg font-bold text-white">
                       {index + 1}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -224,13 +224,13 @@ export default async function WeeklyRankingPage({
           <div className="mx-auto flex max-w-4xl flex-wrap gap-4 px-4">
             <Link
               href={`/topics/${topic}`}
-              className="text-ink-muted hover:bg-ink-muted/10 border-ink-muted/20 rounded-lg border bg-indigo-50 px-4 py-2 text-sm font-medium"
+              className="text-muted hover:bg-muted/10 border-muted/20 rounded-lg border bg-indigo-50 px-4 py-2 text-sm font-medium"
             >
               ← {seed.name} topic hub
             </Link>
             <Link
               href={`/weekly/${topic}`}
-              className="hover:border-ink-muted/30 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
+              className="hover:border-muted/30 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
             >
               Weekly {seed.name} picks →
             </Link>
@@ -250,7 +250,7 @@ export default async function WeeklyRankingPage({
                   <Link
                     key={t.slug}
                     href={`/rankings/${t.slug}`}
-                    className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
+                    className="hover:text-muted hover:border-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
                   >
                     {t.name}
                   </Link>

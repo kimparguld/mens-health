@@ -3,11 +3,12 @@
 :root {
   --paper: #f5f1e8;
   --surface: #fbf9f4;
-  --ink: #a95923;
-  --ink-muted: #180b02;
+  --accent: #a95923;
+  --muted: #101828;
   --hairline: #d9d2c3;
   --brand-red: #c1272d;
   --verdict-legit: #1e7a46;
+  --verdict-moderate: #1e6b7a;
   --verdict-misleading: #a6791f;
   --verdict-overpriced: #c1652b;
   --verdict-risky: #b8452b;
@@ -16,23 +17,24 @@
 
 @theme inline {
   --color-paper: var(--paper);
-  --color-surface: var(--color-gray-900);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--color-gray-900);
+  --color-surface: var(--muted);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
   --color-hairline: var(--hairline);
   --color-brand-red: var(--brand-red);
   --color-verdict-legit: var(--verdict-legit);
+  --color-verdict-moderate: var(--verdict-moderate);
   --color-verdict-misleading: var(--verdict-misleading);
   --color-verdict-overpriced: var(--verdict-overpriced);
   --color-verdict-risky: var(--verdict-risky);
   --color-verdict-scam: var(--verdict-scam);
   --font-sans: var(--font-inter);
-  --font-slab: var(--font-slab);
+  --font-serif: var(--font-serif);
 }
 
 body {
   background: var(--paper);
-  color: var(--ink-muted);
+  color: var(--muted);
   font-family:
     var(--font-sans),
     system-ui,
@@ -42,7 +44,7 @@ body {
 
 input,
 textarea {
-  color: var(--ink-muted);
+  color: var(--muted);
 }
 
 button,
@@ -52,11 +54,11 @@ a {
 }
 
 .link {
-  @apply decoration-hairline hover:decoration-ink-muted text-sm font-medium underline underline-offset-4;
+  @apply decoration-hairline hover:decoration-muted text-sm font-medium underline underline-offset-4;
 }
 
 .heading {
-  @apply font-slab text-ink-muted mb-3 text-3xl font-bold;
+  @apply text-muted mb-3 font-serif text-3xl font-bold;
 }
 
 .sr-only {
@@ -75,7 +77,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--ink);
+  color: var(--accent);
 }
 
 .mh-logotype-mark {
@@ -91,7 +93,7 @@ a {
 }
 
 .mh-logotype-mark-burst {
-  fill: var(--ink);
+  fill: var(--accent);
 }
 
 .mh-logotype-mark-check {
@@ -100,11 +102,11 @@ a {
 }
 
 .mh-logotype-wordmark {
-  font-family: var(--font-slab), Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-weight: 700;
   font-size: var(--mh-logo-wordmark-size);
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: var(--accent);
   white-space: nowrap;
 }
 

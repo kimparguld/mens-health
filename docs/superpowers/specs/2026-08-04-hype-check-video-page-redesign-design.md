@@ -4,7 +4,7 @@
 
 The public video detail page (`app/(public)/videos/[slug]/page.tsx`) has three issues:
 
-1. **Off-brand colors.** The page hardcodes raw Tailwind colors (`gray-900/700/500/400`, `amber-50/200/500/900`, `indigo-50`) instead of this site's theme tokens (`--paper`, `--ink`, `--ink-muted`, `--hairline`, `--verdict-*`) defined in `app/globals.css`.
+1. **Off-brand colors.** The page hardcodes raw Tailwind colors (`gray-900/700/500/400`, `amber-50/200/500/900`, `indigo-50`) instead of this site's theme tokens (`--paper`, `--accent`, `--muted`, `--hairline`, `--verdict-*`) defined in `app/globals.css`.
 2. **Shared badges don't fit the brand.** `EvidenceBadge` and `RiskBadge` from `@menhealth/ui` are hardcoded to generic Tailwind colors (`emerald`, `teal`, `amber`, `orange`, `red`, `gray`) with no awareness of this site's palette — the same problem this app already solved for verdicts with a site-local `VerdictStamp` component.
 3. **The page doesn't state its own verdict.** `getVideoBySlug` already fetches `video.verdict` (with `verdict` + `rationale`, set via the admin `VerdictPanel`), but the video page never renders it — it shows claim-level risk/evidence badges instead of the actual Legit/Misleading/Overpriced/Risky/Scam call that is this site's core value proposition.
 
@@ -23,26 +23,26 @@ Investigation also found `WarningSign`, `CostItem`, and `Disclosure` are fetched
 
 No new CSS tokens. All raw Tailwind grays/ambers/indigos on the video page become theme tokens:
 
-- `text-gray-900` → `text-ink-muted`
-- `text-gray-500`/`gray-400` → `text-ink-muted/60` (or `/50`, matched to existing usage patterns in `HypeVideoCard`/frontpage)
+- `text-gray-900` → `text-muted`
+- `text-gray-500`/`gray-400` → `text-muted/60` (or `/50`, matched to existing usage patterns in `HypeVideoCard`/frontpage)
 - `border-gray-200` → `border-hairline`
 - `bg-amber-50`/`border-amber-200`/`text-amber-900` (warnings box) → `verdict-risky`-tinted (border/text `verdict-risky`, background a low-opacity tint)
 - `bg-indigo-50` (target-audience box) → `surface` or `paper` background with `hairline` border, consistent with other info boxes on the site
 
 ### 2. `EvidenceStamp` / `RiskStamp` components
 
-New files: `components/ui/EvidenceStamp.tsx`, `components/ui/RiskStamp.tsx`. Same shape as `VerdictStamp` (bordered, uppercase, `font-slab`, tied to `--verdict-*` tokens) but **not rotated** — they appear in inline lists/rows where repeated rotation would look noisy, whereas `VerdictStamp` stays rotated because it appears once as a hero element.
+New files: `components/ui/EvidenceStamp.tsx`, `components/ui/RiskStamp.tsx`. Same shape as `VerdictStamp` (bordered, uppercase, `font-serif`, tied to `--verdict-*` tokens) but **not rotated** — they appear in inline lists/rows where repeated rotation would look noisy, whereas `VerdictStamp` stays rotated because it appears once as a hero element.
 
 Color mapping (reusing existing 5 verdict tokens, no new colors):
 
-| Evidence status | Token | | Risk level | Token |
-|---|---|---|---|---|
-| SUPPORTED | `verdict-legit` | | LOW | `ink-muted/40` (neutral) |
-| MODERATE | `verdict-legit` | | MEDIUM | `verdict-misleading` |
-| MIXED | `verdict-misleading` | | HIGH | `verdict-risky` |
-| WEAK | `verdict-overpriced` | | | |
-| UNSUPPORTED | `verdict-scam` | | | |
-| NOT_CHECKED | `ink-muted/40` (neutral) | | | |
+| Evidence status | Token                    |     | Risk level | Token                    |
+| --------------- | ------------------------ | --- | ---------- | ------------------------ |
+| SUPPORTED       | `verdict-legit`          |     | LOW        | `ink-muted/40` (neutral) |
+| MODERATE        | `verdict-legit`          |     | MEDIUM     | `verdict-misleading`     |
+| MIXED           | `verdict-misleading`     |     | HIGH       | `verdict-risky`          |
+| WEAK            | `verdict-overpriced`     |     |            |                          |
+| UNSUPPORTED     | `verdict-scam`           |     |            |                          |
+| NOT_CHECKED     | `ink-muted/40` (neutral) |     |            |                          |
 
 Both components preserve the existing prop shape (`status`/`level` + label text) of the components they replace, so callers don't need to change beyond the import path.
 

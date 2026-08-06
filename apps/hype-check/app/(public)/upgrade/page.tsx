@@ -53,7 +53,7 @@ export default function UpgradePage() {
               key={feature}
               className="flex items-start gap-3 text-sm text-gray-700"
             >
-              <span className="text-ink mt-0.5 flex-shrink-0">✓</span>
+              <span className="text-accent mt-0.5 flex-shrink-0">✓</span>
               {feature}
             </li>
           ))}

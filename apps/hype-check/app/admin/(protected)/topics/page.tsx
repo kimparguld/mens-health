@@ -87,7 +87,7 @@ export default async function AdminTopicsPage() {
                   <td className="px-4 py-3 text-gray-600">{count}</td>
                   <td className="px-4 py-3">
                     {record?.faqIntro ? (
-                      <span className="text-ink-muted/60 text-xs">✓ Yes</span>
+                      <span className="text-muted/60 text-xs">✓ Yes</span>
                     ) : (
                       <span className="text-xs text-gray-400">—</span>
                     )}
@@ -96,7 +96,7 @@ export default async function AdminTopicsPage() {
                     <Link
                       href={`/topics/${t.slug}`}
                       target="_blank"
-                      className="text-ink text-xs hover:underline"
+                      className="text-accent text-xs hover:underline"
                     >
                       View hub →
                     </Link>

@@ -141,7 +141,7 @@ export default async function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/claims?status=reviewed"
-          className="hover:border-ink-muted/30 rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
+          className="hover:border-muted/30 rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">
             Claims reviewed by a human

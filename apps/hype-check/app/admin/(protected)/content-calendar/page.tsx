@@ -74,7 +74,7 @@ export default async function ContentCalendarPage() {
           </h2>
           <Link
             href="/admin/social/calendar"
-            className="text-ink-muted text-xs underline"
+            className="text-muted text-xs underline"
           >
             View social schedule →
           </Link>
@@ -111,10 +111,7 @@ export default async function ContentCalendarPage() {
           <h2 className="text-base font-semibold text-gray-900">
             Videos ready to publish
           </h2>
-          <Link
-            href="/admin/videos"
-            className="text-ink-muted text-xs underline"
-          >
+          <Link href="/admin/videos" className="text-muted text-xs underline">
             Review queue →
           </Link>
         </div>
@@ -136,7 +133,7 @@ export default async function ContentCalendarPage() {
                 </span>
                 <Link
                   href={`/admin/videos/${video.id}`}
-                  className="text-ink-muted flex-shrink-0 text-xs underline"
+                  className="text-muted flex-shrink-0 text-xs underline"
                 >
                   Review
                 </Link>
@@ -147,11 +144,11 @@ export default async function ContentCalendarPage() {
       </section>
 
       {/* Weekly goal reminder */}
-      <section className="border-ink-muted/20 rounded-xl border bg-indigo-50 px-5 py-5">
-        <h2 className="text-ink-muted/90 mb-2 text-sm font-semibold">
+      <section className="border-muted/20 rounded-xl border bg-indigo-50 px-5 py-5">
+        <h2 className="text-muted/90 mb-2 text-sm font-semibold">
           Weekly publishing goal
         </h2>
-        <ul className="text-ink-muted/80 grid grid-cols-2 gap-1 text-sm">
+        <ul className="text-muted/80 grid grid-cols-2 gap-1 text-sm">
           <li>10 video summaries</li>
           <li>5 claim pages</li>
           <li>2 topic-page updates</li>
@@ -160,13 +157,10 @@ export default async function ContentCalendarPage() {
           <li>1 newsletter issue</li>
         </ul>
         <div className="mt-3 flex gap-3 text-xs">
-          <Link
-            href="/admin/weekly-growth"
-            className="text-ink-muted underline"
-          >
+          <Link href="/admin/weekly-growth" className="text-muted underline">
             Weekly workflow →
           </Link>
-          <Link href="/admin/growth-plan" className="text-ink-muted underline">
+          <Link href="/admin/growth-plan" className="text-muted underline">
             90-day plan →
           </Link>
         </div>

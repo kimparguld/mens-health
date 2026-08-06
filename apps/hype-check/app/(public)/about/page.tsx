@@ -81,7 +81,7 @@ export default function AboutPage() {
           Want to know more about how our evidence labels work?{' '}
           <a
             href="/how-we-rate-evidence"
-            className="text-ink-muted/60 hover:underline"
+            className="text-muted/60 hover:underline"
           >
             Read our evidence rating guide →
           </a>

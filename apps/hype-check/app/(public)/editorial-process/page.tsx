@@ -96,7 +96,7 @@ export default function EditorialProcessPage() {
           <p>
             If you find a factual error in a summary or an incorrect evidence
             rating,{' '}
-            <a href="/contact" className="text-ink-muted/60 hover:underline">
+            <a href="/contact" className="text-muted/60 hover:underline">
               please contact us
             </a>
             . We will review and correct the content as quickly as possible. We

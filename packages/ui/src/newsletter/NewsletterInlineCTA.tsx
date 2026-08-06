@@ -14,8 +14,8 @@ export function NewsletterInlineCTA({ headline, description, site = 'menhealth' 
   let descriptionClass = 'text-emerald-700';
 
   if (site === 'hype-check') {
-    wrapperClass = 'border-hairline bg-ink-muted rounded-xl border px-6 py-8';
-    titleClass = 'text-ink';
+    wrapperClass = 'border-hairline bg-muted rounded-xl border px-6 py-8';
+    titleClass = 'text-accent';
     descriptionClass = 'text-white/60';
   }
 

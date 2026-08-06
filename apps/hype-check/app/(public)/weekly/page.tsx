@@ -30,7 +30,7 @@ export default function WeeklyIndexPage() {
           <li key={topic.slug}>
             <Link
               href={`/weekly/${topic.slug}`}
-              className="group border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
+              className="group border-hairline hover:border-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
             >
               <span className="text-base font-semibold text-gray-900">
                 Best {topic.name} videos this week
@@ -38,7 +38,7 @@ export default function WeeklyIndexPage() {
               <span className="mt-1 text-sm text-gray-500">
                 {topic.description}
               </span>
-              <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-sm font-medium underline underline-offset-4">
+              <p className="text-accent decoration-hairline group-hover:decoration-accent mt-3 text-sm font-medium underline underline-offset-4">
                 Read more →
               </p>
             </Link>

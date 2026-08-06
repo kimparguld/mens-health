@@ -180,7 +180,7 @@ export default async function VideoPage({ params }: { params: Params }) {
           <Link
             key={vt.topicId}
             href={`/topics/${vt.topic.slug}`}
-            className="bg-ink-muted/10 hover:bg-ink-muted/20 text-ink-muted/80 rounded-full px-2.5 py-0.5 text-sm font-medium"
+            className="bg-muted/10 hover:bg-muted/20 text-muted/80 rounded-full px-2.5 py-0.5 text-sm font-medium"
           >
             {vt.topic.name}
           </Link>
@@ -196,19 +196,19 @@ export default async function VideoPage({ params }: { params: Params }) {
       {video.editorialTitle &&
         sourceVideo?.title &&
         video.editorialTitle !== sourceVideo.title && (
-          <p className="text-ink-muted/50 mb-2 text-sm">
+          <p className="text-muted/50 mb-2 text-sm">
             Originally titled: &ldquo;{sourceVideo.title}&rdquo;
           </p>
         )}
 
       {/* Meta */}
-      <p className="text-ink-muted/60 mb-1 text-sm">
+      <p className="text-muted/60 mb-1 text-sm">
         Channel:{' '}
         <a
           href={`https://www.youtube.com/channel/${video.channel?.youtubeId ?? ''}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink hover:underline"
+          className="text-accent hover:underline"
         >
           {video.channel?.title ?? ''}
         </a>
@@ -217,20 +217,20 @@ export default async function VideoPage({ params }: { params: Params }) {
           href={`https://www.youtube.com/watch?v=${youtubeVideoId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink hover:underline"
+          className="text-accent hover:underline"
         >
           Watch on YouTube ↗
         </a>
       </p>
       {summary?.reviewerName && (
-        <p className="text-ink-muted/60 mb-1 text-sm">
+        <p className="text-muted/60 mb-1 text-sm">
           Reviewed by {summary.reviewerName}
           {summary.reviewerCredentials
             ? `, ${summary.reviewerCredentials}`
             : ''}
         </p>
       )}
-      <p className="text-ink-muted/50 mb-6 text-sm">
+      <p className="text-muted/50 mb-6 text-sm">
         Published {new Date(publishedAt).toLocaleDateString()}
         {new Date(video.updatedAt).getTime() !==
           new Date(publishedAt).getTime() &&
@@ -268,13 +268,13 @@ export default async function VideoPage({ params }: { params: Params }) {
       {summary && (
         <div className="mb-8 space-y-3">
           {summary.targetAudience && (
-            <div className="border-hairline text-ink-muted/90 bg-paper rounded-lg border px-4 py-3 text-sm">
+            <div className="border-hairline text-muted/90 bg-paper rounded-lg border px-4 py-3 text-sm">
               <span className="font-semibold">Best for: </span>
               {summary.targetAudience}
             </div>
           )}
           {warnings.length > 0 && (
-            <div className="border-verdict-risky/30 bg-verdict-risky/10 text-ink-muted rounded-lg border px-4 py-3 text-sm">
+            <div className="border-verdict-risky/30 bg-verdict-risky/10 text-muted rounded-lg border px-4 py-3 text-sm">
               <span className="text-verdict-risky font-semibold">
                 Be careful:{' '}
               </span>
@@ -288,21 +288,19 @@ export default async function VideoPage({ params }: { params: Params }) {
       {summary && (
         <>
           <section className="mb-8">
-            <h2 className="text-ink-muted mb-3 text-xl font-semibold">
-              Summary
-            </h2>
-            <p className="text-ink-muted/90">{summary.longSummary}</p>
+            <h2 className="text-muted mb-3 text-xl font-semibold">Summary</h2>
+            <p className="text-muted/90">{summary.longSummary}</p>
           </section>
 
           {takeaways.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+              <h2 className="text-muted mb-3 text-xl font-semibold">
                 Key Takeaways
               </h2>
               <ul className="space-y-2">
                 {takeaways.map((item, index) => (
-                  <li key={index} className="text-ink-muted/90 flex gap-2">
-                    <span className="text-ink">✓</span>
+                  <li key={index} className="text-muted/90 flex gap-2">
+                    <span className="text-accent">✓</span>
                     {item}
                   </li>
                 ))}
@@ -312,12 +310,12 @@ export default async function VideoPage({ params }: { params: Params }) {
 
           {warnings.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+              <h2 className="text-muted mb-3 text-xl font-semibold">
                 What to Be Careful About
               </h2>
               <ul className="space-y-2">
                 {warnings.map((item, index) => (
-                  <li key={index} className="text-ink-muted/90 flex gap-2">
+                  <li key={index} className="text-muted/90 flex gap-2">
                     <span className="text-verdict-risky">⚠</span>
                     {item}
                   </li>
@@ -330,7 +328,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {video.warningSigns.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+          <h2 className="text-muted mb-3 text-xl font-semibold">
             Warning Signs
           </h2>
           <ul className="space-y-2">
@@ -338,7 +336,7 @@ export default async function VideoPage({ params }: { params: Params }) {
               (w: (typeof video.warningSigns)[number]) => (
                 <li key={w.id} className="flex items-start gap-2">
                   <RiskStamp level={w.severity} />
-                  <span className="text-ink-muted/90 text-sm">{w.text}</span>
+                  <span className="text-muted/90 text-sm">{w.text}</span>
                 </li>
               )
             )}
@@ -348,7 +346,7 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {video.costItems.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+          <h2 className="text-muted mb-3 text-xl font-semibold">
             Costs to Know About
           </h2>
           <ul className="space-y-2">
@@ -361,7 +359,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                     : 'border-hairline bg-paper'
                 }`}
               >
-                <span className="text-ink-muted/90">
+                <span className="text-muted/90">
                   {c.label}
                   {c.isHidden && (
                     <span className="text-verdict-risky ml-2 text-sm font-semibold uppercase">
@@ -369,7 +367,7 @@ export default async function VideoPage({ params }: { params: Params }) {
                     </span>
                   )}
                 </span>
-                <span className="text-ink-muted font-medium">{c.amount}</span>
+                <span className="text-muted font-medium">{c.amount}</span>
               </li>
             ))}
           </ul>
@@ -381,7 +379,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       {/* Claims */}
       {video.claims.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+          <h2 className="text-muted mb-3 text-xl font-semibold">
             Claims in This Video
           </h2>
           <div className="space-y-4">
@@ -391,21 +389,19 @@ export default async function VideoPage({ params }: { params: Params }) {
                 <Link
                   key={claim.id}
                   href={`/claims/${claim.slug ?? claim.id}`}
-                  className="hover:border-ink-muted/30 border-hairline block rounded-lg border p-4 transition-colors"
+                  className="hover:border-muted/30 border-hairline block rounded-lg border p-4 transition-colors"
                 >
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <RiskStamp level={claim.riskLevel} />
                     <EvidenceStamp status={claim.evidenceStatus} />
                   </div>
-                  <p className="text-ink-muted text-sm font-medium">
-                    {claim.text}
-                  </p>
+                  <p className="text-muted text-sm font-medium">{claim.text}</p>
                   {claim.explanation && (
-                    <p className="text-ink-muted/60 mt-1 text-sm">
+                    <p className="text-muted/60 mt-1 text-sm">
                       {claim.explanation}
                     </p>
                   )}
-                  <p className="text-ink-muted/60 mt-2 text-sm font-medium">
+                  <p className="text-muted/60 mt-2 text-sm font-medium">
                     View evidence review →
                   </p>
                 </Link>
@@ -432,13 +428,13 @@ export default async function VideoPage({ params }: { params: Params }) {
       {/* Topics */}
       {video.topics.length > 0 && (
         <section className="mt-8 mb-8">
-          <h2 className="text-ink-muted mb-3 text-xl font-semibold">Topics</h2>
+          <h2 className="text-muted mb-3 text-xl font-semibold">Topics</h2>
           <div className="flex flex-wrap gap-2">
             {video.topics.map((vt: (typeof video.topics)[number]) => (
               <Link
                 key={vt.topicId}
                 href={`/topics/${vt.topic.slug}`}
-                className="bg-ink-muted/10 hover:bg-ink-muted/20 text-ink-muted/80 rounded-full px-3 py-1 text-sm font-medium"
+                className="bg-muted/10 hover:bg-muted/20 text-muted/80 rounded-full px-3 py-1 text-sm font-medium"
               >
                 {vt.topic.name}
               </Link>
@@ -450,7 +446,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       {/* Key terms */}
       {glossaryTerms.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+          <h2 className="text-muted mb-3 text-lg font-semibold">
             Key terms in this video
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -458,7 +454,7 @@ export default async function VideoPage({ params }: { params: Params }) {
               <Link
                 key={term.slug}
                 href={`/glossary/${term.slug}`}
-                className="hover:text-ink-muted hover:border-ink-muted/30 border-hairline text-ink-muted/90 rounded-full border bg-white px-3 py-1.5 text-sm"
+                className="hover:text-muted hover:border-muted/30 border-hairline text-muted/90 rounded-full border bg-white px-3 py-1.5 text-sm"
                 title={term.shortDefinition}
               >
                 {term.term}
@@ -471,7 +467,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       {/* Related reviews */}
       {relatedVideos.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+          <h2 className="text-muted mb-3 text-lg font-semibold">
             Related reviews
           </h2>
           <ul className="space-y-2">
@@ -479,11 +475,11 @@ export default async function VideoPage({ params }: { params: Params }) {
               <li key={rv.id}>
                 <Link
                   href={`/videos/${rv.slug}`}
-                  className="text-ink text-sm font-medium hover:underline"
+                  className="text-accent text-sm font-medium hover:underline"
                 >
                   {rv.editorialTitle ?? rv.name}
                 </Link>
-                <span className="text-ink-muted/50 ml-2 text-sm">
+                <span className="text-muted/50 ml-2 text-sm">
                   {rv.channel?.title ?? ''}
                 </span>
               </li>
@@ -496,10 +492,10 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Embeddable badge */}
       <section className="border-hairline mb-8 rounded-lg border p-4">
-        <h2 className="text-ink-muted mb-2 text-sm font-semibold">
+        <h2 className="text-muted mb-2 text-sm font-semibold">
           Are you the creator of this video?
         </h2>
-        <p className="text-ink-muted/60 mb-3 text-sm">
+        <p className="text-muted/60 mb-3 text-sm">
           Embed this badge on your site or in your video description to link
           back to our review.
         </p>
@@ -513,7 +509,7 @@ export default async function VideoPage({ params }: { params: Params }) {
         <textarea
           readOnly
           rows={2}
-          className="border-hairline bg-paper text-ink-muted/60 w-full rounded border p-2 font-mono text-sm"
+          className="border-hairline bg-paper text-muted/60 w-full rounded border p-2 font-mono text-sm"
           defaultValue={`<a href="${APP_URL}/videos/${video.slug}"><img src="${APP_URL}/badge/${video.slug}" alt="Reviewed by Hype Check" width="210" height="50" /></a>`}
         />
       </section>
@@ -531,12 +527,12 @@ export default async function VideoPage({ params }: { params: Params }) {
           <>
             {disclosedItems.length > 0 && (
               <section className="mb-8">
-                <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+                <h2 className="text-muted mb-3 text-lg font-semibold">
                   Disclosures
                 </h2>
                 <ul className="space-y-1">
                   {disclosedItems.map((d) => (
-                    <li key={d.id} className="text-ink-muted/80 text-sm">
+                    <li key={d.id} className="text-muted/80 text-sm">
                       {d.text}
                     </li>
                   ))}
@@ -546,14 +542,14 @@ export default async function VideoPage({ params }: { params: Params }) {
 
             {undisclosedItems.length > 0 && (
               <section className="mb-8">
-                <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+                <h2 className="text-muted mb-3 text-lg font-semibold">
                   Possible Undisclosed Sponsorship
                 </h2>
                 <ul className="space-y-2">
                   {undisclosedItems.map((d) => (
                     <li
                       key={d.id}
-                      className="border-verdict-risky/30 bg-verdict-risky/10 text-ink-muted/90 rounded-lg border px-4 py-3 text-sm"
+                      className="border-verdict-risky/30 bg-verdict-risky/10 text-muted/90 rounded-lg border px-4 py-3 text-sm"
                     >
                       {d.text}
                     </li>
@@ -568,7 +564,7 @@ export default async function VideoPage({ params }: { params: Params }) {
       {/* Affiliate links */}
       {affiliateLinks.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+          <h2 className="text-muted mb-3 text-lg font-semibold">
             Recommended products
           </h2>
           <ul className="mb-3 space-y-2">
@@ -578,12 +574,12 @@ export default async function VideoPage({ params }: { params: Params }) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="text-ink text-sm font-medium hover:underline"
+                  className="text-accent text-sm font-medium hover:underline"
                 >
                   {link.label}
                 </a>
                 {link.commission && (
-                  <span className="text-ink-muted/50 ml-2 text-sm">
+                  <span className="text-muted/50 ml-2 text-sm">
                     ({link.commission} commission)
                   </span>
                 )}
@@ -596,9 +592,9 @@ export default async function VideoPage({ params }: { params: Params }) {
 
       {/* Newsletter CTA */}
 
-      <section className="border-hairline bg-ink-muted mb-8 rounded-xl border px-6 py-8 text-center">
+      <section className="border-hairline bg-muted mb-8 rounded-xl border px-6 py-8 text-center">
         <div className="mx-auto max-w-xl px-4 text-center">
-          <p className="text-ink mb-1 text-sm font-semibold tracking-wide uppercase">
+          <p className="text-accent mb-1 text-sm font-semibold tracking-wide uppercase">
             Free newsletter
           </p>
           <h2 className="mb-2 text-2xl font-bold text-white">

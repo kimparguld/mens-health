@@ -40,7 +40,7 @@ export default async function AdminClaimEditPage({
         <p className="mb-3 text-gray-900">{claim.text}</p>
         <Link
           href={`/admin/videos/${claim.subject.id}`}
-          className="text-ink text-xs hover:underline"
+          className="text-accent text-xs hover:underline"
         >
           From video: {claim.subject.editorialTitle ?? claim.subject.name} →
         </Link>
@@ -48,7 +48,7 @@ export default async function AdminClaimEditPage({
           <Link
             href={`/claims/${claim.slug}`}
             target="_blank"
-            className="hover:text-ink ml-4 text-xs text-gray-400"
+            className="hover:text-accent ml-4 text-xs text-gray-400"
           >
             View live →
           </Link>

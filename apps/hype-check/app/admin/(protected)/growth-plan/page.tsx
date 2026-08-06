@@ -44,7 +44,7 @@ export default async function GrowthPlanPage() {
             Track your 90-day traffic foundation. Each phase builds on the last.
           </p>
         </div>
-        <div className="text-ink-muted flex gap-3 text-sm">
+        <div className="text-muted flex gap-3 text-sm">
           <Link href="/admin/content-calendar" className="hover:underline">
             Calendar
           </Link>

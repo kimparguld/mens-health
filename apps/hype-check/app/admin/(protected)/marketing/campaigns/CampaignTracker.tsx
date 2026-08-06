@@ -94,7 +94,7 @@ export function CampaignTracker({
       <div className="mb-4 flex flex-wrap gap-3">
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white"
+          className="bg-muted/70 hover:bg-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white"
         >
           {showForm ? 'Cancel' : '+ New campaign'}
         </button>
@@ -125,7 +125,7 @@ export function CampaignTracker({
                 onChange={set('name')}
                 required
                 placeholder="Men's health digest — Reddit"
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -138,7 +138,7 @@ export function CampaignTracker({
                 onChange={set('platform')}
                 required
                 placeholder="Google, Reddit, TikTok, Newsletter…"
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -152,7 +152,7 @@ export function CampaignTracker({
                 placeholder="50"
                 min="0"
                 step="0.01"
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -164,7 +164,7 @@ export function CampaignTracker({
                 value={form.landingPage}
                 onChange={set('landingPage')}
                 placeholder="https://hype-check.net/newsletter"
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div className="sm:col-span-2">
@@ -176,7 +176,7 @@ export function CampaignTracker({
                 value={form.utmUrl}
                 onChange={set('utmUrl')}
                 placeholder="https://hype-check.net/newsletter?utm_source=..."
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div className="sm:col-span-2">
@@ -187,7 +187,7 @@ export function CampaignTracker({
                 rows={2}
                 value={form.notes}
                 onChange={set('notes')}
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ export function CampaignTracker({
             <button
               type="submit"
               disabled={saving}
-              className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="bg-muted/70 hover:bg-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Create campaign'}
             </button>
@@ -266,7 +266,7 @@ function CampaignList({
                         href={c.utmUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-ink-muted/60 text-xs underline"
+                        className="text-muted/60 text-xs underline"
                       >
                         UTM link
                       </a>

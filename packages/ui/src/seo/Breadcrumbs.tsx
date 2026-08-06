@@ -15,7 +15,7 @@ export function Breadcrumbs({ items, baseUrl }: Props) {
   let labelClass = 'text-emerald-600';
 
   if (baseUrl?.includes('hype-check')) {
-    labelClass = 'text-ink';
+    labelClass = 'text-accent';
   }
 
   return (

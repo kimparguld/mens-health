@@ -97,7 +97,7 @@ export default function HowWeRateEvidencePage() {
           </p>
           <p>
             If you believe a rating is wrong, please{' '}
-            <a href="/contact" className="text-ink-muted/60 hover:underline">
+            <a href="/contact" className="text-muted/60 hover:underline">
               contact us
             </a>
             .
