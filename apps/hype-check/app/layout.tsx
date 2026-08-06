@@ -1,59 +1,62 @@
-import type { Metadata } from "next";
-import { Inter, Zilla_Slab } from "next/font/google";
-import { Suspense } from "react";
-import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { JsonLd } from "@menhealth/ui";
-import { buildWebSiteSchema, buildOrganizationSchema } from "@menhealth/core-seo";
-import { env } from "@/env";
-import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site-brand";
-import "./globals.css";
+import { env } from '@/env';
+import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/site-brand';
+import {
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+} from '@menhealth/core-seo';
+import { JsonLd } from '@menhealth/ui';
+import { GoogleAnalytics } from '@next/third-parties/google';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import type { Metadata } from 'next';
+import { Inter, Zilla_Slab } from 'next/font/google';
+import Script from 'next/script';
+import { Suspense } from 'react';
+import './globals.css';
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-inter',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const zillaSlab = Zilla_Slab({
-  variable: "--font-slab",
-  subsets: ["latin"],
-  weight: "700",
-  display: "swap",
+  variable: '--font-slab',
+  subsets: ['latin'],
+  weight: '700',
+  display: 'swap',
 });
 
-const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://www.hype-check.net";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Hype Check — Legit, or Just Hype?",
-    template: "%s — Hype Check",
+    default: 'Hype Check — Legit, or Just Hype?',
+    template: '%s — Hype Check',
   },
   description:
-    "Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.",
+    'Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.',
   alternates: {
     canonical: APP_URL,
     types: {
-      "application/rss+xml": `${APP_URL}/feed.xml`,
+      'application/rss+xml': `${APP_URL}/feed.xml`,
     },
   },
   openGraph: {
-    siteName: "Hype Check",
-    type: "website",
-    locale: "en_US",
+    siteName: 'Hype Check',
+    type: 'website',
+    locale: 'en_US',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
   },
   verification: {
     ...(env.GOOGLE_SITE_VERIFICATION
       ? { google: env.GOOGLE_SITE_VERIFICATION }
       : {}),
     ...(env.BING_SITE_VERIFICATION
-      ? { other: { "msvalidate.01": env.BING_SITE_VERIFICATION } }
+      ? { other: { 'msvalidate.01': env.BING_SITE_VERIFICATION } }
       : {}),
   },
   robots: {
@@ -62,15 +65,15 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-snippet": -1,
-      "max-image-preview": "large",
-      "max-video-preview": -1,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
     },
   },
 };
 
 const adsEnabled =
-  env.NEXT_PUBLIC_ADS_ENABLED === "true" && !!env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  env.NEXT_PUBLIC_ADS_ENABLED === 'true' && !!env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 export default function RootLayout({
   children,
@@ -102,6 +105,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <Analytics />
             <SpeedInsights />
+            <GoogleAnalytics gaId="G-30V2XS27MH" />
           </Suspense>
         </body>
       </html>
