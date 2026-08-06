@@ -60,7 +60,6 @@ export default function NewsletterPage() {
         <div className="mx-auto">
           <NewsletterSignupForm
             className="flex-col items-stretch"
-            site="hype-check"
           />
           <p className="mt-2 text-sm text-gray-400">
             Free forever. Unsubscribe any time.
@@ -174,7 +173,7 @@ export default function NewsletterPage() {
           Join readers who want clear, evidence-aware verdicts on trending hype.
         </p>
         <div className="mx-auto max-w-sm">
-          <NewsletterSignupForm site="hype-check" />
+          <NewsletterSignupForm />
         </div>
       </section>
 

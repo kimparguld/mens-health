@@ -8,10 +8,9 @@ type Props = {
   /** Compact layout: single-row with smaller input for sticky banners */
   compact?: boolean;
   className?: string;
-  site?: string;
 };
 
-export function NewsletterSignupForm({ compact = false, className, site = 'menhealth' }: Props) {
+export function NewsletterSignupForm({ compact = false, className }: Props) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
@@ -45,23 +44,8 @@ export function NewsletterSignupForm({ compact = false, className, site = 'menhe
     setEmail('');
   }
 
-  let successClass = 'bg-green-50 text-green-800';
-
-  let inputClass =
-    'flex-1 rounded-lg border bg-white border-gray-800 px-4 py-2.5 text-sm text-black focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none disabled:opacity-50';
-
-  let btnClass =
-    'rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50';
-
-  if (site === 'hype-check') {
-    successClass = 'bg-white text-ink';
-    inputClass =
-      'flex-1 rounded-lg border bg-white border-gray-800 px-4 py-2.5 text-sm text-black focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none disabled:opacity-50';
-    btnClass = 'rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-ink/80 disabled:opacity-50';
-  }
-
   if (status === 'success') {
-    return <p className={twMerge('rounded-lg px-4 py-3 text-base', successClass)}>{message}</p>;
+    return <p className="bg-success-bg text-success-text rounded-lg px-4 py-3 text-base">{message}</p>;
   }
 
   return (
@@ -77,16 +61,22 @@ export function NewsletterSignupForm({ compact = false, className, site = 'menhe
         placeholder="your@email.com"
         required
         disabled={status === 'loading'}
-        className={twMerge(inputClass, compact ? 'rounded px-2 py-1.5 text-xs' : '')}
+        className={twMerge(
+          'bg-bg-surface border-text-primary text-text-primary focus:border-text-primary focus:ring-text-primary flex-1 rounded-lg border px-4 py-2.5 text-sm focus:ring-1 focus:outline-none disabled:opacity-50',
+          compact ? 'rounded px-2 py-1.5 text-xs' : '',
+        )}
       />
       <button
         type="submit"
         disabled={status === 'loading'}
-        className={twMerge(btnClass, compact ? 'rounded px-3 py-1.5 text-xs' : '')}
+        className={twMerge(
+          'bg-accent rounded-lg px-5 py-2.5 text-sm font-semibold text-white hover:opacity-80 disabled:opacity-50',
+          compact ? 'rounded px-3 py-1.5 text-xs' : '',
+        )}
       >
         {status === 'loading' ? '…' : 'Subscribe'}
       </button>
-      {status === 'error' && <p className="w-full text-xs text-red-600">{message}</p>}
+      {status === 'error' && <p className="w-full text-xs text-error-text">{message}</p>}
     </form>
   );
 }

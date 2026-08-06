@@ -23,7 +23,7 @@ export function NewsletterInlineCTA({ headline, description, site = 'menhealth' 
     <section className={`my-8 rounded-xl border px-6 py-6 ${wrapperClass}`}>
       <h3 className={`mb-1 text-lg font-semibold ${titleClass}`}>{headline}</h3>
       <p className={`mb-4 text-sm ${descriptionClass}`}>{description}</p>
-      <NewsletterSignupForm site={site} />
+      <NewsletterSignupForm />
     </section>
   );
 }

@@ -608,7 +608,7 @@ export default async function VideoPage({ params }: { params: Params }) {
             Join readers who want clear, evidence-aware verdicts on trending
             hype.
           </p>
-          <NewsletterSignupForm site="hype-check" />
+          <NewsletterSignupForm />
           <p className="mt-3 text-sm text-white/40">
             Unsubscribe any time. No spam.
           </p>

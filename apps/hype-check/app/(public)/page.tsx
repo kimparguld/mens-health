@@ -303,7 +303,7 @@ export default async function HomePage() {
             <li>No get-rich-quick nonsense</li>
           </ul>
           <div className="mt-6">
-            <NewsletterSignupForm site="hype-check" />
+            <NewsletterSignupForm />
           </div>
         </div>
       </section>

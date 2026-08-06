@@ -26,7 +26,7 @@ export function NewsletterFooterCTA({ headline, description, site = 'menhealth' 
         <p className={twMerge('mb-1 text-xs font-semibold tracking-wide uppercase', titleClass)}>Free newsletter</p>
         <h2 className={twMerge('mb-2  font-bold ', headlineClass)}>{headline}</h2>
         <p className={twMerge('mb-6 ', descriptionClass)}>{description}</p>
-        <NewsletterSignupForm site={site} />
+        <NewsletterSignupForm />
         <p className="mt-3 text-sm text-gray-600">Unsubscribe any time. No spam.</p>
       </div>
     </section>
