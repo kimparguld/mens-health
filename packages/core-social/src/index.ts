@@ -27,7 +27,11 @@ export {
 } from "./prompts";
 export type { PromptConfig } from "./prompts";
 
-export { createSocialPostGenerator } from "./generate-social-post";
+export {
+  createSocialPostGenerator,
+  isNotFoundError,
+  isConflictError,
+} from "./generate-social-post";
 export type {
   Result,
   GenerateSocialPostInput,

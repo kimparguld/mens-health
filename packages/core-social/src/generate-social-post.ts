@@ -83,6 +83,20 @@ type GeneratedContent = {
 const REGENERATABLE_STATUSES = new Set(["DRAFT", "PENDING_REVIEW"]);
 
 /**
+ * Classifies errors produced by this module so callers (route handlers) can
+ * derive HTTP status codes without substring-matching English prose inline —
+ * keep these in sync with the "not found" / "Cannot " messages actually
+ * thrown below.
+ */
+export function isNotFoundError(error: Error): boolean {
+  return error.message.includes("not found");
+}
+
+export function isConflictError(error: Error): boolean {
+  return error.message.startsWith("Cannot ");
+}
+
+/**
  * Binds the social-post generator to this site's DB, AI client, brand name,
  * canonical URL, and compliance data, so callers keep calling
  * `generateSocialPost(input)` exactly as before (see

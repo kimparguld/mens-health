@@ -3,6 +3,8 @@ import { aiClient } from "@/lib/ai/client";
 import { db } from "@/lib/db/prisma";
 import {
   createSocialPostGenerator,
+  isNotFoundError,
+  isConflictError,
   type VideoContext,
 } from "@menhealth/core-social";
 import { FORBIDDEN_PATTERNS, HIGH_RISK_TOPIC_KEYWORDS } from "./platform-rules";
@@ -12,6 +14,8 @@ export type {
   Result,
   GenerateSocialPostInput,
 } from "@menhealth/core-social";
+
+export { isNotFoundError, isConflictError };
 
 async function fetchContext(videoId: string): Promise<VideoContext | null> {
   const video = await db.video.findUnique({
