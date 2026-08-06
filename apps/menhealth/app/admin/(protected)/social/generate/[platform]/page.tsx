@@ -99,6 +99,7 @@ export default async function GenerateSocialDraftPage({
                 Edit draft
               </h2>
               <EditDraftForm
+                key={post.updatedAt.toISOString()}
                 postId={post.id}
                 initialHook={hook}
                 initialScript={script}
