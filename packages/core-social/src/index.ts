@@ -13,6 +13,15 @@ export {
 } from "./validation";
 export type { SocialPostAiOutput, GeneratePostInput } from "./validation";
 
+export {
+  buildXPrompt,
+  buildRedditPrompt,
+  buildYouTubeCommunityPrompt,
+  buildTikTokPrompt,
+  buildSocialPrompt,
+} from "./prompts";
+export type { PromptConfig } from "./prompts";
+
 export { createSocialPostGenerator } from "./generate-social-post";
 export type {
   Result,
