@@ -44,7 +44,7 @@ export default async function NewsletterArchivePage() {
           <li key={issue.slug} className="py-4">
             <Link
               href={`/newsletter/${issue.slug}`}
-              className="text-ink text-sm font-medium hover:underline"
+              className="text-accent text-sm font-medium hover:underline"
             >
               {issue.subject}
             </Link>

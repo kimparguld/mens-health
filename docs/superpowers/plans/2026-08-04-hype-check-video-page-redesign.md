@@ -12,7 +12,7 @@
 
 - Do not modify `packages/ui`'s `EvidenceBadge`/`RiskBadge` — they're shared with other sites in the monorepo.
 - Do not touch admin pages/routes (`app/admin/**`) — admin keeps its existing utilitarian styling.
-- No new CSS custom properties — reuse the 5 existing `--verdict-*` tokens plus `--ink-muted`, `--hairline`, `--surface`, `--paper` already defined in `app/globals.css`.
+- No new CSS custom properties — reuse the 5 existing `--verdict-*` tokens plus `--muted`, `--hairline`, `--surface`, `--paper` already defined in `app/globals.css`.
 - No DB/schema changes.
 - `EvidenceStamp`/`RiskStamp` must accept the same prop shapes as the components they replace (`status: string` / `level: string`, plus `showNotChecked?: boolean` on `EvidenceStamp`) so call sites need only an import-path change plus a rename of the JSX tag.
 - All new components live in `apps/hype-check/components/ui/`, follow the existing `VerdictStamp.tsx` file pattern (no "use client" needed — pure presentational, no hooks).
@@ -22,10 +22,12 @@
 ### Task 1: Add a `size` prop to `VerdictStamp`
 
 **Files:**
+
 - Modify: `apps/hype-check/components/ui/VerdictStamp.tsx`
 - Test: `apps/hype-check/__tests__/VerdictStamp.test.tsx`
 
 **Interfaces:**
+
 - Consumes: nothing new.
 - Produces: `VerdictStamp({ verdict, size? }: { verdict: VerdictType | null | undefined; size?: 'sm' | 'lg' })`. Default `size` is `'sm'` (unchanged visual output for all existing callers that don't pass it).
 
@@ -34,15 +36,15 @@
 Add to `apps/hype-check/__tests__/VerdictStamp.test.tsx`, inside the existing `describe("VerdictStamp", ...)` block:
 
 ```tsx
-  it("applies larger text size when size='lg' is passed", () => {
-    render(<VerdictStamp verdict="LEGIT" size="lg" />);
-    expect(screen.getByText("LEGIT")).toHaveClass("text-base");
-  });
+it("applies larger text size when size='lg' is passed", () => {
+  render(<VerdictStamp verdict="LEGIT" size="lg" />);
+  expect(screen.getByText('LEGIT')).toHaveClass('text-base');
+});
 
-  it("defaults to the small text size when size is omitted", () => {
-    render(<VerdictStamp verdict="LEGIT" />);
-    expect(screen.getByText("LEGIT")).toHaveClass("text-xs");
-  });
+it('defaults to the small text size when size is omitted', () => {
+  render(<VerdictStamp verdict="LEGIT" />);
+  expect(screen.getByText('LEGIT')).toHaveClass('text-xs');
+});
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -55,12 +57,7 @@ Expected: FAIL — `text-base` class not present (component doesn't support `siz
 Replace the full contents of `apps/hype-check/components/ui/VerdictStamp.tsx` with:
 
 ```tsx
-export type VerdictType =
-  | 'LEGIT'
-  | 'MISLEADING'
-  | 'OVERPRICED'
-  | 'RISKY'
-  | 'SCAM';
+export type VerdictType = 'LEGIT' | 'MISLEADING' | 'OVERPRICED' | 'RISKY' | 'SCAM';
 
 const VERDICT_STYLES: Record<VerdictType, string> = {
   LEGIT: 'border-verdict-legit text-verdict-legit -rotate-2',
@@ -85,7 +82,7 @@ export function VerdictStamp({ verdict, size = 'sm' }: VerdictStampProps) {
 
   return (
     <span
-      className={`inline-block rounded-sm border-[2.5px] font-slab font-black tracking-widest uppercase ${SIZE_STYLES[size]} ${VERDICT_STYLES[verdict]}`}
+      className={`inline-block rounded-sm border-[2.5px] font-serif font-black tracking-widest uppercase ${SIZE_STYLES[size]} ${VERDICT_STYLES[verdict]}`}
     >
       {verdict}
     </span>
@@ -110,10 +107,12 @@ git commit -m "Add size prop to VerdictStamp for hero-sized display"
 ### Task 2: Create `EvidenceStamp` component
 
 **Files:**
+
 - Create: `apps/hype-check/components/ui/EvidenceStamp.tsx`
 - Test: `apps/hype-check/__tests__/EvidenceStamp.test.tsx`
 
 **Interfaces:**
+
 - Consumes: nothing (pure presentational, no dependency on other new components).
 - Produces: `EvidenceStamp({ status, showNotChecked?: boolean }: { status: string; showNotChecked?: boolean })`. Same prop shape as `@menhealth/ui`'s `EvidenceBadge` it replaces — callers change only the import path and tag name.
 
@@ -122,49 +121,37 @@ git commit -m "Add size prop to VerdictStamp for hero-sized display"
 Create `apps/hype-check/__tests__/EvidenceStamp.test.tsx`:
 
 ```tsx
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { EvidenceStamp } from "@/components/ui/EvidenceStamp";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
 
-describe("EvidenceStamp", () => {
-  it("renders nothing for NOT_CHECKED by default", () => {
+describe('EvidenceStamp', () => {
+  it('renders nothing for NOT_CHECKED by default', () => {
     const { container } = render(<EvidenceStamp status="NOT_CHECKED" />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders NOT_CHECKED when showNotChecked is true", () => {
+  it('renders NOT_CHECKED when showNotChecked is true', () => {
     render(<EvidenceStamp status="NOT_CHECKED" showNotChecked />);
-    expect(
-      screen.getByText("Claim extracted — not yet reviewed")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Claim extracted — not yet reviewed')).toBeInTheDocument();
   });
 
-  it("renders every known evidence status without throwing", () => {
-    const statuses = [
-      "SUPPORTED",
-      "MODERATE",
-      "MIXED",
-      "WEAK",
-      "UNSUPPORTED",
-    ];
+  it('renders every known evidence status without throwing', () => {
+    const statuses = ['SUPPORTED', 'MODERATE', 'MIXED', 'WEAK', 'UNSUPPORTED'];
     for (const status of statuses) {
       const { unmount } = render(<EvidenceStamp status={status} />);
       unmount();
     }
   });
 
-  it("falls back to NOT_CHECKED styling for an unknown status", () => {
+  it('falls back to NOT_CHECKED styling for an unknown status', () => {
     render(<EvidenceStamp status="something-unexpected" showNotChecked />);
-    expect(
-      screen.getByText("Claim extracted — not yet reviewed")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Claim extracted — not yet reviewed')).toBeInTheDocument();
   });
 
-  it("uses the verdict-legit token for SUPPORTED", () => {
+  it('uses the verdict-legit token for SUPPORTED', () => {
     render(<EvidenceStamp status="SUPPORTED" />);
-    expect(screen.getByText(/strong evidence/)).toHaveClass(
-      "border-verdict-legit"
-    );
+    expect(screen.getByText(/strong evidence/)).toHaveClass('border-verdict-legit');
   });
 });
 ```
@@ -202,23 +189,17 @@ const EVIDENCE_CONFIG: Record<string, { label: string; className: string }> = {
   },
   NOT_CHECKED: {
     label: 'Claim extracted — not yet reviewed',
-    className: 'border-ink-muted/40 text-ink-muted/60',
+    className: 'border-muted/40 text-muted/60',
   },
 };
 
-export function EvidenceStamp({
-  status,
-  showNotChecked = false,
-}: {
-  status: string;
-  showNotChecked?: boolean;
-}) {
+export function EvidenceStamp({ status, showNotChecked = false }: { status: string; showNotChecked?: boolean }) {
   if (status === 'NOT_CHECKED' && !showNotChecked) return null;
   const config = EVIDENCE_CONFIG[status] ?? EVIDENCE_CONFIG['NOT_CHECKED'];
 
   return (
     <span
-      className={`inline-block rounded-sm border-[1.5px] px-2 py-0.5 font-slab text-[0.65rem] font-bold tracking-wide uppercase ${config?.className}`}
+      className={`inline-block rounded-sm border-[1.5px] px-2 py-0.5 font-serif text-[0.65rem] font-bold tracking-wide uppercase ${config?.className}`}
     >
       {config?.label}
     </span>
@@ -243,10 +224,12 @@ git commit -m "Add EvidenceStamp: brand-toned replacement for shared EvidenceBad
 ### Task 3: Create `RiskStamp` component
 
 **Files:**
+
 - Create: `apps/hype-check/components/ui/RiskStamp.tsx`
 - Test: `apps/hype-check/__tests__/RiskStamp.test.tsx`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: `RiskStamp({ level }: { level: string })`. Same prop shape as `@menhealth/ui`'s `RiskBadge` it replaces.
 
@@ -255,33 +238,31 @@ git commit -m "Add EvidenceStamp: brand-toned replacement for shared EvidenceBad
 Create `apps/hype-check/__tests__/RiskStamp.test.tsx`:
 
 ```tsx
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { RiskStamp } from "@/components/ui/RiskStamp";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 
-describe("RiskStamp", () => {
-  it("renders every known risk level without throwing", () => {
-    for (const level of ["LOW", "MEDIUM", "HIGH"]) {
+describe('RiskStamp', () => {
+  it('renders every known risk level without throwing', () => {
+    for (const level of ['LOW', 'MEDIUM', 'HIGH']) {
       const { unmount } = render(<RiskStamp level={level} />);
       unmount();
     }
   });
 
-  it("falls back to LOW styling for an unknown level", () => {
+  it('falls back to LOW styling for an unknown level', () => {
     render(<RiskStamp level="something-unexpected" />);
-    expect(screen.getByText("Low risk")).toBeInTheDocument();
+    expect(screen.getByText('Low risk')).toBeInTheDocument();
   });
 
-  it("uses the verdict-risky token for HIGH", () => {
+  it('uses the verdict-risky token for HIGH', () => {
     render(<RiskStamp level="HIGH" />);
-    expect(screen.getByText("High risk")).toHaveClass("border-verdict-risky");
+    expect(screen.getByText('High risk')).toHaveClass('border-verdict-risky');
   });
 
-  it("uses the verdict-misleading token for MEDIUM", () => {
+  it('uses the verdict-misleading token for MEDIUM', () => {
     render(<RiskStamp level="MEDIUM" />);
-    expect(screen.getByText("Medium risk")).toHaveClass(
-      "border-verdict-misleading"
-    );
+    expect(screen.getByText('Medium risk')).toHaveClass('border-verdict-misleading');
   });
 });
 ```
@@ -299,7 +280,7 @@ Create `apps/hype-check/components/ui/RiskStamp.tsx`:
 const RISK_CONFIG: Record<string, { label: string; className: string }> = {
   LOW: {
     label: 'Low risk',
-    className: 'border-ink-muted/40 text-ink-muted/60',
+    className: 'border-muted/40 text-muted/60',
   },
   MEDIUM: {
     label: 'Medium risk',
@@ -316,7 +297,7 @@ export function RiskStamp({ level }: { level: string }) {
 
   return (
     <span
-      className={`inline-block rounded-sm border-[1.5px] px-2 py-0.5 font-slab text-[0.65rem] font-bold tracking-wide uppercase ${config?.className}`}
+      className={`inline-block rounded-sm border-[1.5px] px-2 py-0.5 font-serif text-[0.65rem] font-bold tracking-wide uppercase ${config?.className}`}
     >
       {config?.label}
     </span>
@@ -341,10 +322,12 @@ git commit -m "Add RiskStamp: brand-toned replacement for shared RiskBadge"
 ### Task 4: Create `VerdictHero` component
 
 **Files:**
+
 - Create: `apps/hype-check/components/ui/VerdictHero.tsx`
 - Test: `apps/hype-check/__tests__/VerdictHero.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `VerdictStamp` from `@/components/ui/VerdictStamp` (Task 1's `size` prop, used with `size="lg"`).
 - Produces: `VerdictHero({ verdict, rationale }: { verdict: VerdictType | null | undefined; rationale?: string | null })`. Renders a bordered hero block: the verdict stamp + rationale text when a verdict exists, or a neutral "Not yet verdicted" message when it doesn't (never renders nothing/null — the block should always be visible on the video page).
 
@@ -353,33 +336,26 @@ git commit -m "Add RiskStamp: brand-toned replacement for shared RiskBadge"
 Create `apps/hype-check/__tests__/VerdictHero.test.tsx`:
 
 ```tsx
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { VerdictHero } from "@/components/ui/VerdictHero";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { VerdictHero } from '@/components/ui/VerdictHero';
 
-describe("VerdictHero", () => {
-  it("shows a neutral message when there is no verdict", () => {
+describe('VerdictHero', () => {
+  it('shows a neutral message when there is no verdict', () => {
     render(<VerdictHero verdict={null} rationale={null} />);
-    expect(screen.getByText("Not yet verdicted")).toBeInTheDocument();
+    expect(screen.getByText('Not yet verdicted')).toBeInTheDocument();
   });
 
-  it("renders the verdict stamp and rationale when both are present", () => {
-    render(
-      <VerdictHero
-        verdict="MISLEADING"
-        rationale="The claim overstates results seen in the video."
-      />
-    );
-    expect(screen.getByText("MISLEADING")).toBeInTheDocument();
-    expect(
-      screen.getByText("The claim overstates results seen in the video.")
-    ).toBeInTheDocument();
+  it('renders the verdict stamp and rationale when both are present', () => {
+    render(<VerdictHero verdict="MISLEADING" rationale="The claim overstates results seen in the video." />);
+    expect(screen.getByText('MISLEADING')).toBeInTheDocument();
+    expect(screen.getByText('The claim overstates results seen in the video.')).toBeInTheDocument();
   });
 
-  it("renders the verdict stamp without a rationale paragraph when rationale is missing", () => {
+  it('renders the verdict stamp without a rationale paragraph when rationale is missing', () => {
     render(<VerdictHero verdict="LEGIT" rationale={null} />);
-    expect(screen.getByText("LEGIT")).toBeInTheDocument();
-    expect(screen.queryByText("Not yet verdicted")).not.toBeInTheDocument();
+    expect(screen.getByText('LEGIT')).toBeInTheDocument();
+    expect(screen.queryByText('Not yet verdicted')).not.toBeInTheDocument();
   });
 });
 ```
@@ -407,16 +383,10 @@ export function VerdictHero({ verdict, rationale }: VerdictHeroProps) {
       {verdict ? (
         <>
           <VerdictStamp verdict={verdict} size="lg" />
-          {rationale && (
-            <p className="text-ink-muted mt-3 text-sm leading-relaxed">
-              {rationale}
-            </p>
-          )}
+          {rationale && <p className="text-muted mt-3 text-sm leading-relaxed">{rationale}</p>}
         </>
       ) : (
-        <p className="text-ink-muted/60 text-sm font-semibold tracking-wide uppercase">
-          Not yet verdicted
-        </p>
+        <p className="text-muted/60 text-sm font-semibold tracking-wide uppercase">Not yet verdicted</p>
       )}
     </div>
   );
@@ -435,13 +405,14 @@ git add apps/hype-check/components/ui/VerdictHero.tsx apps/hype-check/__tests__/
 git commit -m "Add VerdictHero component for the video page verdict block"
 ```
 
-**Note on `bg-paper` vs `bg-surface`:** use `bg-paper`, not `bg-surface`, for this block's background. `app/globals.css`'s `@theme inline` block has a pre-existing bug — `--color-surface` and `--color-ink-muted` are both mapped to Tailwind's built-in `--color-gray-900` instead of this site's own `--surface`/`--ink-muted` root variables, so `bg-surface` currently renders near-black. `bg-paper` is correctly wired (`--color-paper: var(--paper)`) and renders the intended pale cream. Fixing the token bug itself is out of scope here — other pages (the frontpage's `FeaturedInsight` and newsletter sections) compensate for it with hardcoded `text-white`, so fixing it blind would break those.
+**Note on `bg-paper` vs `bg-surface`:** use `bg-paper`, not `bg-surface`, for this block's background. `app/globals.css`'s `@theme inline` block has a pre-existing bug — `--color-surface` and `--color-muted` are both mapped to Tailwind's built-in `--color-gray-900` instead of this site's own `--surface`/`--muted` root variables, so `bg-surface` currently renders near-black. `bg-paper` is correctly wired (`--color-paper: var(--paper)`) and renders the intended pale cream. Fixing the token bug itself is out of scope here — other pages (the frontpage's `FeaturedInsight` and newsletter sections) compensate for it with hardcoded `text-white`, so fixing it blind would break those.
 
 ---
 
 ### Task 5: Swap `EvidenceBadge`/`RiskBadge` for `EvidenceStamp`/`RiskStamp` across public pages
 
 **Files:**
+
 - Modify: `apps/hype-check/app/(public)/page.tsx`
 - Modify: `apps/hype-check/app/(public)/videos/[slug]/PremiumSection.tsx`
 - Modify: `apps/hype-check/app/(public)/videos/[slug]/page.tsx` (badge swap only — content restructure is Task 6)
@@ -455,6 +426,7 @@ git commit -m "Add VerdictHero component for the video page verdict block"
 - Modify: `apps/hype-check/components/ui/HypeVideoCard.tsx`
 
 **Interfaces:**
+
 - Consumes: `EvidenceStamp` from `@/components/ui/EvidenceStamp` (Task 2), `RiskStamp` from `@/components/ui/RiskStamp` (Task 3).
 - Produces: nothing new — this is a mechanical rename with no behavior change. `@menhealth/ui`'s `EvidenceBadge`/`RiskBadge` remain untouched and still exported for other apps/sites.
 
@@ -476,15 +448,15 @@ Rename `<EvidenceBadge status={featuredClaim.evidenceStatus} />` → `<EvidenceS
 Change line 3 from:
 
 ```tsx
-import { PremiumGate, EvidenceBadge, RiskBadge } from "@menhealth/ui";
+import { PremiumGate, EvidenceBadge, RiskBadge } from '@menhealth/ui';
 ```
 
 to:
 
 ```tsx
-import { PremiumGate } from "@menhealth/ui";
-import { EvidenceStamp } from "@/components/ui/EvidenceStamp";
-import { RiskStamp } from "@/components/ui/RiskStamp";
+import { PremiumGate } from '@menhealth/ui';
+import { EvidenceStamp } from '@/components/ui/EvidenceStamp';
+import { RiskStamp } from '@/components/ui/RiskStamp';
 ```
 
 Rename the `<RiskBadge` (line 23) and `<EvidenceBadge` (line 24) JSX tags to `<RiskStamp` / `<EvidenceStamp`.
@@ -632,9 +604,11 @@ git commit -m "Swap shared EvidenceBadge/RiskBadge for brand-toned EvidenceStamp
 ### Task 6: Restructure the video page — tokenize colors and add the verdict hero
 
 **Files:**
+
 - Modify: `apps/hype-check/app/(public)/videos/[slug]/page.tsx`
 
 **Interfaces:**
+
 - Consumes: `VerdictHero` from `@/components/ui/VerdictHero` (Task 4). `video.verdict` is already returned by `getVideoBySlug` (`lib/db/queries.ts:75`) as `{ verdict: VerdictType; rationale: string | null; ... } | null`.
 - Produces: nothing new for other tasks to consume — this is the final content/visual change to the page.
 
@@ -659,19 +633,19 @@ Replace:
 with:
 
 ```tsx
-      <nav className="mb-6 text-sm text-ink-muted/60">
+      <nav className="mb-6 text-sm text-muted/60">
 ```
 
 Replace:
 
 ```tsx
-        <span className="text-gray-900">{displayTitle}</span>
+<span className="text-gray-900">{displayTitle}</span>
 ```
 
 with:
 
 ```tsx
-        <span className="text-ink-muted">{displayTitle}</span>
+<span className="text-muted">{displayTitle}</span>
 ```
 
 Replace:
@@ -683,7 +657,7 @@ Replace:
 with:
 
 ```tsx
-      <h1 className="mb-2 text-3xl leading-tight font-bold text-ink-muted">
+      <h1 className="mb-2 text-3xl leading-tight font-bold text-muted">
 ```
 
 Replace:
@@ -695,7 +669,7 @@ Replace:
 with:
 
 ```tsx
-          <p className="mb-2 text-sm text-ink-muted/50">
+          <p className="mb-2 text-sm text-muted/50">
 ```
 
 Replace both occurrences of:
@@ -707,7 +681,7 @@ Replace both occurrences of:
 with:
 
 ```tsx
-      <p className="mb-1 text-sm text-ink-muted/60">
+      <p className="mb-1 text-sm text-muted/60">
 ```
 
 Replace:
@@ -719,7 +693,7 @@ Replace:
 with:
 
 ```tsx
-      <p className="mb-6 text-xs text-ink-muted/50">
+      <p className="mb-6 text-xs text-muted/50">
 ```
 
 - [ ] **Step 3: Insert the `VerdictHero` block before the YouTube embed**
@@ -749,13 +723,13 @@ Replace with:
 Replace:
 
 ```tsx
-            <div className="border-ink-muted/20 text-ink-muted/90 rounded-lg border bg-indigo-50 px-4 py-3 text-sm">
+            <div className="border-muted/20 text-muted/90 rounded-lg border bg-indigo-50 px-4 py-3 text-sm">
 ```
 
 with:
 
 ```tsx
-            <div className="border-hairline text-ink-muted/90 bg-paper rounded-lg border px-4 py-3 text-sm">
+            <div className="border-hairline text-muted/90 bg-paper rounded-lg border px-4 py-3 text-sm">
 ```
 
 (`bg-paper`, not `bg-surface` — see the note under Task 4 on the `--color-surface` token bug.)
@@ -776,17 +750,17 @@ with:
 
 Replace every remaining occurrence of these raw classes in the file with their token equivalents (same find/replace across the rest of the file — each maps 1:1, do a project-wide find-and-replace within this file only):
 
-| Find | Replace |
-|---|---|
-| `text-gray-900` | `text-ink-muted` |
-| `text-gray-700` | `text-ink-muted/90` |
-| `text-gray-500` | `text-ink-muted/60` |
-| `text-gray-400` | `text-ink-muted/50` |
-| `border-gray-200` | `border-hairline` |
-| `bg-gray-50` | `bg-paper` |
-| `text-amber-500` | `text-verdict-risky` |
+| Find              | Replace              |
+| ----------------- | -------------------- |
+| `text-gray-900`   | `text-muted`         |
+| `text-gray-700`   | `text-muted/90`      |
+| `text-gray-500`   | `text-muted/60`      |
+| `text-gray-400`   | `text-muted/50`      |
+| `border-gray-200` | `border-hairline`    |
+| `bg-gray-50`      | `bg-paper`           |
+| `text-amber-500`  | `text-verdict-risky` |
 
-(`bg-paper`, not `bg-surface` — same `--color-surface` token bug noted under Task 4. The embeddable-badge `<textarea>` uses `bg-gray-50` with `text-gray-600` today; keep it on a token pairing that stays legible, e.g. `bg-paper` with `text-ink-muted/60` — not `text-ink-muted/70` on `bg-surface`, which resolves to identical colors and renders invisible text.)
+(`bg-paper`, not `bg-surface` — same `--color-surface` token bug noted under Task 4. The embeddable-badge `<textarea>` uses `bg-gray-50` with `text-gray-600` today; keep it on a token pairing that stays legible, e.g. `bg-paper` with `text-muted/60` — not `text-muted/70` on `bg-surface`, which resolves to identical colors and renders invisible text.)
 
 This covers: the "Summary" / "Key Takeaways" / "What to Be Careful About" headings and body text, the claims card border/text, the "Topics" / "Key terms" / "Related reviews" headings, the embeddable-badge section, and the affiliate links section. The `⚠` warning icon (`text-amber-500` → `text-verdict-risky`) is the one non-heading, non-border replacement in this pass.
 
@@ -795,6 +769,7 @@ This covers: the "Summary" / "Key Takeaways" / "What to Be Careful About" headin
 Run: `cd apps/hype-check && pnpm dev`
 
 Open `http://localhost:3000/videos/<any-published-slug>` (use a slug from `pnpm exec prisma studio` or the trending list on `/`) and confirm:
+
 - No `gray-*`/`amber-*`/`indigo-*` colors are visible anywhere on the page (everything reads in the paper/ink/verdict palette).
 - The verdict block appears above the YouTube embed, showing the large verdict stamp and rationale (or "Not yet verdicted" if the video has none).
 - Claims further down show the new bordered evidence/risk stamps, not pill-shaped colored badges.
@@ -811,9 +786,11 @@ git commit -m "Restructure video page: tokenize colors and lead with the verdict
 ### Task 7: Note the unpopulated warning-signs/costs/disclosures data as a follow-up
 
 **Files:**
+
 - Modify: `apps/hype-check/lib/db/queries.ts:71-76`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: nothing — comment-only change.
 

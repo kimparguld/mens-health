@@ -78,7 +78,7 @@ export default function UtmBuilderPage() {
             <button
               key={p.label}
               onClick={() => applyPreset(p)}
-              className="hover:border-ink-muted/40 hover:text-ink-muted/80 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 transition-colors"
+              className="hover:border-muted/40 hover:text-muted/80 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 transition-colors"
             >
               {p.label}
             </button>
@@ -130,7 +130,7 @@ export default function UtmBuilderPage() {
               value={fields[key]}
               onChange={set(key)}
               placeholder={placeholder}
-              className="focus:border-ink-muted/50 focus:ring-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:ring-1 focus:outline-none"
+              className="focus:border-muted/50 focus:ring-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:ring-1 focus:outline-none"
             />
           </div>
         ))}
@@ -141,13 +141,13 @@ export default function UtmBuilderPage() {
           <p className="mb-1 text-xs font-semibold text-gray-700">
             Generated UTM URL
           </p>
-          <div className="border-ink-muted/20 flex items-center gap-2 rounded-lg border bg-indigo-50 p-3">
-            <code className="text-ink-muted/90 min-w-0 flex-1 text-xs break-all">
+          <div className="border-muted/20 flex items-center gap-2 rounded-lg border bg-indigo-50 p-3">
+            <code className="text-muted/90 min-w-0 flex-1 text-xs break-all">
               {utmUrl}
             </code>
             <button
               onClick={copyUrl}
-              className="bg-ink-muted/70 hover:bg-ink-muted/80 flex-shrink-0 rounded px-3 py-1.5 text-xs font-semibold text-white"
+              className="bg-muted/70 hover:bg-muted/80 flex-shrink-0 rounded px-3 py-1.5 text-xs font-semibold text-white"
             >
               {copied ? 'Copied!' : 'Copy'}
             </button>

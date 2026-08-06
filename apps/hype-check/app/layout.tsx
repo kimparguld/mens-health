@@ -21,7 +21,7 @@ const inter = Inter({
 });
 
 const zillaSlab = Zilla_Slab({
-  variable: '--font-slab',
+  variable: '--font-serif',
   subsets: ['latin'],
   weight: '700',
   display: 'swap',

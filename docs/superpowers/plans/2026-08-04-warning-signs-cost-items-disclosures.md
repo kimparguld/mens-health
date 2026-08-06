@@ -23,10 +23,12 @@ All file paths below are relative to `apps/hype-check/` unless stated otherwise.
 ### Task 1: AI extraction function for warning signs, cost items, disclosures
 
 **Files:**
+
 - Create: `lib/ai/extract-warnings-costs-disclosures.ts`
 - Test: `__tests__/extract-warnings-costs-disclosures.test.ts`
 
 **Interfaces:**
+
 - Produces: `extractWarningsCostsDisclosures(input: WarningsCostsDisclosuresInput): Promise<Result<WarningsCostsDisclosuresOutput>>`, `validateExtractionResponse(raw: unknown): Result<WarningsCostsDisclosuresOutput>`, and the types `WarningSignOutput`, `CostItemOutput`, `DisclosureOutput`, `WarningsCostsDisclosuresOutput`, `WarningsCostsDisclosuresInput` — all consumed by Task 2.
 
 - [ ] **Step 1: Write the failing test**
@@ -34,26 +36,22 @@ All file paths below are relative to `apps/hype-check/` unless stated otherwise.
 Create `__tests__/extract-warnings-costs-disclosures.test.ts`:
 
 ```ts
-import { describe, it, expect } from "vitest";
-import { validateExtractionResponse } from "@/lib/ai/extract-warnings-costs-disclosures";
+import { describe, it, expect } from 'vitest';
+import { validateExtractionResponse } from '@/lib/ai/extract-warnings-costs-disclosures';
 
-describe("validateExtractionResponse", () => {
-  it("accepts a well-formed response with all three arrays populated", () => {
+describe('validateExtractionResponse', () => {
+  it('accepts a well-formed response with all three arrays populated', () => {
     const result = validateExtractionResponse({
-      warningSigns: [
-        { text: "Pressures viewers to buy before a countdown ends", severity: "HIGH" },
-      ],
+      warningSigns: [{ text: 'Pressures viewers to buy before a countdown ends', severity: 'HIGH' }],
       costItems: [
         {
-          label: "Monthly subscription",
-          amount: "$49/mo",
+          label: 'Monthly subscription',
+          amount: '$49/mo',
           isHidden: true,
-          notes: "Only mentioned in fine print",
+          notes: 'Only mentioned in fine print',
         },
       ],
-      disclosures: [
-        { text: "Sponsored by the product's own manufacturer", detected: true },
-      ],
+      disclosures: [{ text: "Sponsored by the product's own manufacturer", detected: true }],
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -62,7 +60,7 @@ describe("validateExtractionResponse", () => {
     }
   });
 
-  it("accepts empty arrays for all three categories", () => {
+  it('accepts empty arrays for all three categories', () => {
     const result = validateExtractionResponse({
       warningSigns: [],
       costItems: [],
@@ -71,26 +69,26 @@ describe("validateExtractionResponse", () => {
     expect(result.ok).toBe(true);
   });
 
-  it("rejects a response with an invalid severity value", () => {
+  it('rejects a response with an invalid severity value', () => {
     const result = validateExtractionResponse({
-      warningSigns: [{ text: "Something", severity: "EXTREME" }],
+      warningSigns: [{ text: 'Something', severity: 'EXTREME' }],
       costItems: [],
       disclosures: [],
     });
     expect(result.ok).toBe(false);
   });
 
-  it("rejects a response missing a required field", () => {
+  it('rejects a response missing a required field', () => {
     const result = validateExtractionResponse({
       warningSigns: [],
-      costItems: [{ label: "Course fee", isHidden: false }],
+      costItems: [{ label: 'Course fee', isHidden: false }],
       disclosures: [],
     });
     expect(result.ok).toBe(false);
   });
 
-  it("rejects a non-object response", () => {
-    const result = validateExtractionResponse("not an object");
+  it('rejects a non-object response', () => {
+    const result = validateExtractionResponse('not an object');
     expect(result.ok).toBe(false);
   });
 });
@@ -106,14 +104,14 @@ Expected: FAIL — `lib/ai/extract-warnings-costs-disclosures.ts` does not exist
 Create `lib/ai/extract-warnings-costs-disclosures.ts`:
 
 ```ts
-import { z } from "zod";
-import { aiClient } from "./client";
-import { SITE_NAME } from "@/lib/site-brand";
-import type { Result } from "@menhealth/core-ai";
+import { z } from 'zod';
+import { aiClient } from './client';
+import { SITE_NAME } from '@/lib/site-brand';
+import type { Result } from '@menhealth/core-ai';
 
 const WarningSignSchema = z.object({
   text: z.string().min(1).max(500),
-  severity: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  severity: z.enum(['LOW', 'MEDIUM', 'HIGH']),
 });
 
 const CostItemSchema = z.object({
@@ -137,9 +135,7 @@ const WarningsCostsDisclosuresSchema = z.object({
 export type WarningSignOutput = z.infer<typeof WarningSignSchema>;
 export type CostItemOutput = z.infer<typeof CostItemSchema>;
 export type DisclosureOutput = z.infer<typeof DisclosureSchema>;
-export type WarningsCostsDisclosuresOutput = z.infer<
-  typeof WarningsCostsDisclosuresSchema
->;
+export type WarningsCostsDisclosuresOutput = z.infer<typeof WarningsCostsDisclosuresSchema>;
 
 export type WarningsCostsDisclosuresInput = {
   title: string;
@@ -149,16 +145,12 @@ export type WarningsCostsDisclosuresInput = {
 
 // Pulled out from extractWarningsCostsDisclosures so the parsing/validation
 // step can be unit tested without a live AI call.
-export function validateExtractionResponse(
-  raw: unknown,
-): Result<WarningsCostsDisclosuresOutput> {
+export function validateExtractionResponse(raw: unknown): Result<WarningsCostsDisclosuresOutput> {
   const validated = WarningsCostsDisclosuresSchema.safeParse(raw);
   if (!validated.success) {
     return {
       ok: false,
-      error: new Error(
-        `AI output failed validation: ${validated.error.message}`,
-      ),
+      error: new Error(`AI output failed validation: ${validated.error.message}`),
     };
   }
   return { ok: true, value: validated.data };
@@ -194,12 +186,12 @@ Respond ONLY with the JSON object. No markdown, no explanation.`;
     const message = await aiClient.anthropic.messages.create({
       model: aiClient.defaultModel,
       max_tokens: 1200,
-      messages: [{ role: "user", content: prompt }],
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    const textBlock = message.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      return { ok: false, error: new Error("No text content in AI response") };
+    const textBlock = message.content.find((block) => block.type === 'text');
+    if (!textBlock || textBlock.type !== 'text') {
+      return { ok: false, error: new Error('No text content in AI response') };
     }
 
     let parsed: unknown;
@@ -208,9 +200,7 @@ Respond ONLY with the JSON object. No markdown, no explanation.`;
     } catch {
       return {
         ok: false,
-        error: new Error(
-          `AI response was not valid JSON: ${textBlock.text.slice(0, 200)}`,
-        ),
+        error: new Error(`AI response was not valid JSON: ${textBlock.text.slice(0, 200)}`),
       };
     }
 
@@ -241,10 +231,12 @@ git commit -m "feat: add AI extraction for warning signs, cost items, disclosure
 ### Task 2: Wire extraction into the video-processing pipeline with risk escalation
 
 **Files:**
+
 - Modify: `lib/videos/process-video-pipeline.ts`
 - Test: `__tests__/warning-signs-risk-escalation.test.ts`
 
 **Interfaces:**
+
 - Consumes: `extractWarningsCostsDisclosures`, `WarningSignOutput`, `CostItemOutput`, `DisclosureOutput` from Task 1 (`@/lib/ai/extract-warnings-costs-disclosures`).
 - Produces: exported `highestRiskLevel(levels: RiskLevel[]): RiskLevel` from `lib/videos/process-video-pipeline.ts`; `GenerateSummaryAndClaimsResult` gains `warningSigns: WarningSignOutput[]`, `costItems: CostItemOutput[]`, `disclosures: DisclosureOutput[]` alongside the existing `summary`/`claims` fields. Both existing callers (`jobs/process-pending-videos.ts` and `app/api/admin/videos/[id]/summarize/route.ts`) destructure only the fields they need, so this is additive and doesn't break them.
 
@@ -253,28 +245,28 @@ git commit -m "feat: add AI extraction for warning signs, cost items, disclosure
 Create `__tests__/warning-signs-risk-escalation.test.ts`:
 
 ```ts
-import { describe, it, expect } from "vitest";
-import { highestRiskLevel } from "@/lib/videos/process-video-pipeline";
+import { describe, it, expect } from 'vitest';
+import { highestRiskLevel } from '@/lib/videos/process-video-pipeline';
 
-describe("highestRiskLevel", () => {
-  it("returns HIGH when any level in the list is HIGH", () => {
-    expect(highestRiskLevel(["LOW", "MEDIUM", "HIGH"])).toBe("HIGH");
+describe('highestRiskLevel', () => {
+  it('returns HIGH when any level in the list is HIGH', () => {
+    expect(highestRiskLevel(['LOW', 'MEDIUM', 'HIGH'])).toBe('HIGH');
   });
 
-  it("returns MEDIUM when the highest level present is MEDIUM", () => {
-    expect(highestRiskLevel(["LOW", "MEDIUM"])).toBe("MEDIUM");
+  it('returns MEDIUM when the highest level present is MEDIUM', () => {
+    expect(highestRiskLevel(['LOW', 'MEDIUM'])).toBe('MEDIUM');
   });
 
-  it("returns LOW when every level is LOW", () => {
-    expect(highestRiskLevel(["LOW", "LOW"])).toBe("LOW");
+  it('returns LOW when every level is LOW', () => {
+    expect(highestRiskLevel(['LOW', 'LOW'])).toBe('LOW');
   });
 
-  it("defaults to LOW for an empty list", () => {
-    expect(highestRiskLevel([])).toBe("LOW");
+  it('defaults to LOW for an empty list', () => {
+    expect(highestRiskLevel([])).toBe('LOW');
   });
 
-  it("never lets a later lower value override an earlier higher one", () => {
-    expect(highestRiskLevel(["HIGH", "LOW"])).toBe("HIGH");
+  it('never lets a later lower value override an earlier higher one', () => {
+    expect(highestRiskLevel(['HIGH', 'LOW'])).toBe('HIGH');
   });
 });
 ```
@@ -289,12 +281,8 @@ Expected: FAIL — `highestRiskLevel` is not exported from `process-video-pipeli
 In `lib/videos/process-video-pipeline.ts`, add to the import block at the top (alongside the existing `summarizeVideo`/`extractClaims` imports):
 
 ```ts
-import { extractWarningsCostsDisclosures } from "@/lib/ai/extract-warnings-costs-disclosures";
-import type {
-  WarningSignOutput,
-  CostItemOutput,
-  DisclosureOutput,
-} from "@/lib/ai/extract-warnings-costs-disclosures";
+import { extractWarningsCostsDisclosures } from '@/lib/ai/extract-warnings-costs-disclosures';
+import type { WarningSignOutput, CostItemOutput, DisclosureOutput } from '@/lib/ai/extract-warnings-costs-disclosures';
 ```
 
 Replace the existing `GenerateSummaryAndClaimsResult` type:
@@ -322,10 +310,7 @@ Immediately after the existing `const RISK_RANK: Record<RiskLevel, number> = { L
 
 ```ts
 export function highestRiskLevel(levels: RiskLevel[]): RiskLevel {
-  return levels.reduce<RiskLevel>(
-    (max, level) => (RISK_RANK[level] > RISK_RANK[max] ? level : max),
-    "LOW",
-  );
+  return levels.reduce<RiskLevel>((max, level) => (RISK_RANK[level] > RISK_RANK[max] ? level : max), 'LOW');
 }
 ```
 
@@ -443,6 +428,7 @@ git commit -m "feat: persist warning signs, cost items, disclosures in the video
 ### Task 3: Admin CRUD API routes
 
 **Files:**
+
 - Create: `app/api/admin/warning-signs/route.ts`
 - Create: `app/api/admin/warning-signs/[id]/route.ts`
 - Create: `app/api/admin/cost-items/route.ts`
@@ -451,6 +437,7 @@ git commit -m "feat: persist warning signs, cost items, disclosures in the video
 - Create: `app/api/admin/disclosures/[id]/route.ts`
 
 **Interfaces:**
+
 - Produces: `POST /api/admin/warning-signs` (body `{ subjectId, text, severity, source? }` → `{ ok, warningSign }`), `PATCH /api/admin/warning-signs/:id` (body `{ text, severity, source? }`), `DELETE /api/admin/warning-signs/:id`; the analogous three verbs for `cost-items` (fields `label, amount, isHidden, notes?`) and `disclosures` (fields `text, detected, source?`). Consumed by Task 5's editor components.
 
 No dedicated tests for these routes: the existing `/api/admin/claims/[id]/route.ts` this pattern mirrors has no test coverage either, and this codebase has no `next/server`/`auth()` mocking infrastructure in `__tests__/__mocks__` to build on — route behavior here is verified manually in Task 5's manual check instead, consistent with how the claims routes are verified today.
@@ -460,38 +447,35 @@ No dedicated tests for these routes: the existing `/api/admin/claims/[id]/route.
 Create `app/api/admin/warning-signs/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { z } from "zod";
-import type { NextRequest } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const WarningSignCreateSchema = z.object({
   subjectId: z.string().min(1),
   text: z.string().min(1).max(500),
-  severity: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  severity: z.enum(['LOW', 'MEDIUM', 'HIGH']),
   source: z.string().max(200).nullable().optional(),
 });
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null);
   const parsed = WarningSignCreateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json(
-      { error: "Invalid request", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
   const { subjectId, text, severity, source } = parsed.data;
 
   const subject = await db.subject.findUnique({ where: { id: subjectId } });
   if (!subject) {
-    return Response.json({ error: "Subject not found" }, { status: 404 });
+    return Response.json({ error: 'Subject not found' }, { status: 404 });
   }
 
   const warningSign = await db.warningSign.create({
@@ -505,24 +489,21 @@ export async function POST(request: NextRequest) {
 Create `app/api/admin/warning-signs/[id]/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { z } from "zod";
-import type { NextRequest } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const WarningSignUpdateSchema = z.object({
   text: z.string().min(1).max(500),
-  severity: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  severity: z.enum(['LOW', 'MEDIUM', 'HIGH']),
   source: z.string().max(200).nullable().optional(),
 });
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -530,15 +511,12 @@ export async function PATCH(
   const body = await request.json().catch(() => null);
   const parsed = WarningSignUpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json(
-      { error: "Invalid request", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
   const existing = await db.warningSign.findUnique({ where: { id } });
   if (!existing) {
-    return Response.json({ error: "Warning sign not found" }, { status: 404 });
+    return Response.json({ error: 'Warning sign not found' }, { status: 404 });
   }
 
   const { text, severity, source } = parsed.data;
@@ -550,20 +528,17 @@ export async function PATCH(
   return Response.json({ ok: true, warningSign });
 }
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
 
   const existing = await db.warningSign.findUnique({ where: { id } });
   if (!existing) {
-    return Response.json({ error: "Warning sign not found" }, { status: 404 });
+    return Response.json({ error: 'Warning sign not found' }, { status: 404 });
   }
 
   await db.warningSign.delete({ where: { id } });
@@ -577,10 +552,10 @@ export async function DELETE(
 Create `app/api/admin/cost-items/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { z } from "zod";
-import type { NextRequest } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const CostItemCreateSchema = z.object({
   subjectId: z.string().min(1),
@@ -593,23 +568,20 @@ const CostItemCreateSchema = z.object({
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null);
   const parsed = CostItemCreateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json(
-      { error: "Invalid request", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
   const { subjectId, label, amount, isHidden, notes } = parsed.data;
 
   const subject = await db.subject.findUnique({ where: { id: subjectId } });
   if (!subject) {
-    return Response.json({ error: "Subject not found" }, { status: 404 });
+    return Response.json({ error: 'Subject not found' }, { status: 404 });
   }
 
   const costItem = await db.costItem.create({
@@ -623,10 +595,10 @@ export async function POST(request: NextRequest) {
 Create `app/api/admin/cost-items/[id]/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { z } from "zod";
-import type { NextRequest } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const CostItemUpdateSchema = z.object({
   label: z.string().min(1).max(200),
@@ -635,13 +607,10 @@ const CostItemUpdateSchema = z.object({
   notes: z.string().max(1000).nullable().optional(),
 });
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -649,15 +618,12 @@ export async function PATCH(
   const body = await request.json().catch(() => null);
   const parsed = CostItemUpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json(
-      { error: "Invalid request", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
   const existing = await db.costItem.findUnique({ where: { id } });
   if (!existing) {
-    return Response.json({ error: "Cost item not found" }, { status: 404 });
+    return Response.json({ error: 'Cost item not found' }, { status: 404 });
   }
 
   const { label, amount, isHidden, notes } = parsed.data;
@@ -669,20 +635,17 @@ export async function PATCH(
   return Response.json({ ok: true, costItem });
 }
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
 
   const existing = await db.costItem.findUnique({ where: { id } });
   if (!existing) {
-    return Response.json({ error: "Cost item not found" }, { status: 404 });
+    return Response.json({ error: 'Cost item not found' }, { status: 404 });
   }
 
   await db.costItem.delete({ where: { id } });
@@ -696,10 +659,10 @@ export async function DELETE(
 Create `app/api/admin/disclosures/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { z } from "zod";
-import type { NextRequest } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const DisclosureCreateSchema = z.object({
   subjectId: z.string().min(1),
@@ -711,23 +674,20 @@ const DisclosureCreateSchema = z.object({
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const body = await request.json().catch(() => null);
   const parsed = DisclosureCreateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json(
-      { error: "Invalid request", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
   const { subjectId, text, detected, source } = parsed.data;
 
   const subject = await db.subject.findUnique({ where: { id: subjectId } });
   if (!subject) {
-    return Response.json({ error: "Subject not found" }, { status: 404 });
+    return Response.json({ error: 'Subject not found' }, { status: 404 });
   }
 
   const disclosure = await db.disclosure.create({
@@ -741,10 +701,10 @@ export async function POST(request: NextRequest) {
 Create `app/api/admin/disclosures/[id]/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { z } from "zod";
-import type { NextRequest } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const DisclosureUpdateSchema = z.object({
   text: z.string().min(1).max(500),
@@ -752,13 +712,10 @@ const DisclosureUpdateSchema = z.object({
   source: z.string().max(200).nullable().optional(),
 });
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -766,15 +723,12 @@ export async function PATCH(
   const body = await request.json().catch(() => null);
   const parsed = DisclosureUpdateSchema.safeParse(body);
   if (!parsed.success) {
-    return Response.json(
-      { error: "Invalid request", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
   const existing = await db.disclosure.findUnique({ where: { id } });
   if (!existing) {
-    return Response.json({ error: "Disclosure not found" }, { status: 404 });
+    return Response.json({ error: 'Disclosure not found' }, { status: 404 });
   }
 
   const { text, detected, source } = parsed.data;
@@ -786,20 +740,17 @@ export async function PATCH(
   return Response.json({ ok: true, disclosure });
 }
 
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
 
   const existing = await db.disclosure.findUnique({ where: { id } });
   if (!existing) {
-    return Response.json({ error: "Disclosure not found" }, { status: 404 });
+    return Response.json({ error: 'Disclosure not found' }, { status: 404 });
   }
 
   await db.disclosure.delete({ where: { id } });
@@ -825,11 +776,13 @@ git commit -m "feat: add admin CRUD routes for warning signs, cost items, disclo
 ### Task 4: Admin video page — generate button and summary view
 
 **Files:**
+
 - Create: `app/admin/(protected)/videos/[id]/GenerateWarningsButton.tsx`
 - Create: `app/api/admin/videos/[id]/extract-warnings/route.ts`
 - Modify: `app/admin/(protected)/videos/[id]/page.tsx`
 
 **Interfaces:**
+
 - Consumes: `extractWarningsCostsDisclosures` from Task 1.
 - Produces: `POST /api/admin/videos/:id/extract-warnings` (backfill trigger for already-published videos); `<GenerateWarningsButton videoId={string} />` client component. Task 5 replaces the summary-count rendering this task adds with full editor components, reusing the button and route unchanged.
 
@@ -838,20 +791,17 @@ git commit -m "feat: add admin CRUD routes for warning signs, cost items, disclo
 Create `app/api/admin/videos/[id]/extract-warnings/route.ts`:
 
 ```ts
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db/prisma";
-import { extractWarningsCostsDisclosures } from "@/lib/ai/extract-warnings-costs-disclosures";
-import { revalidateTag } from "next/cache";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db/prisma';
+import { extractWarningsCostsDisclosures } from '@/lib/ai/extract-warnings-costs-disclosures';
+import { revalidateTag } from 'next/cache';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!(session?.user as { isAdmin?: boolean } | null)?.isAdmin) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -861,28 +811,25 @@ export async function POST(
     include: {
       sourceVideos: {
         take: 1,
-        orderBy: { createdAt: "desc" },
-        include: { summaries: { take: 1, orderBy: { createdAt: "desc" } } },
+        orderBy: { createdAt: 'desc' },
+        include: { summaries: { take: 1, orderBy: { createdAt: 'desc' } } },
       },
     },
   });
 
   if (!subject) {
-    return NextResponse.json({ error: "Video not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Video not found' }, { status: 404 });
   }
 
   const sourceVideo = subject.sourceVideos[0];
   const summary = sourceVideo?.summaries[0];
   if (!sourceVideo || !summary) {
-    return NextResponse.json(
-      { error: "Generate a summary for this video first" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Generate a summary for this video first' }, { status: 400 });
   }
 
   const result = await extractWarningsCostsDisclosures({
     title: sourceVideo.title,
-    description: sourceVideo.description ?? "",
+    description: sourceVideo.description ?? '',
     shortSummary: summary.shortSummary,
   });
 
@@ -898,7 +845,7 @@ export async function POST(
         subjectId: subject.id,
         text: w.text,
         severity: w.severity,
-        source: "ai-extraction",
+        source: 'ai-extraction',
       })),
     });
   }
@@ -919,13 +866,13 @@ export async function POST(
         subjectId: subject.id,
         text: d.text,
         detected: d.detected,
-        source: "ai-extraction",
+        source: 'ai-extraction',
       })),
     });
   }
 
-  revalidateTag("videos", "max");
-  revalidateTag(`video:${subject.slug}`, "max");
+  revalidateTag('videos', 'max');
+  revalidateTag(`video:${subject.slug}`, 'max');
 
   return NextResponse.json({ ok: true });
 }
@@ -936,54 +883,46 @@ export async function POST(
 Create `app/admin/(protected)/videos/[id]/GenerateWarningsButton.tsx`:
 
 ```tsx
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function GenerateWarningsButton({
-  videoId,
-}: {
-  videoId: string;
-}) {
+export default function GenerateWarningsButton({ videoId }: { videoId: string }) {
   const router = useRouter();
-  const [state, setState] = useState<"idle" | "loading" | "done" | "error">(
-    "idle",
-  );
-  const [errorMsg, setErrorMsg] = useState("");
+  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
 
   async function generate() {
-    setState("loading");
-    setErrorMsg("");
+    setState('loading');
+    setErrorMsg('');
     const res = await fetch(`/api/admin/videos/${videoId}/extract-warnings`, {
-      method: "POST",
+      method: 'POST',
     });
     if (res.ok) {
-      setState("done");
+      setState('done');
       router.refresh();
     } else {
       const data = (await res.json().catch(() => null)) as {
         error?: string;
       } | null;
-      setErrorMsg(data?.error ?? "Failed to generate");
-      setState("error");
+      setErrorMsg(data?.error ?? 'Failed to generate');
+      setState('error');
     }
   }
 
-  if (state === "done") return null;
+  if (state === 'done') return null;
 
   return (
     <div className="space-y-1">
       <button
         onClick={generate}
-        disabled={state === "loading"}
+        disabled={state === 'loading'}
         className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
       >
-        {state === "loading"
-          ? "Generating…"
-          : "Generate warning signs, costs & disclosures"}
+        {state === 'loading' ? 'Generating…' : 'Generate warning signs, costs & disclosures'}
       </button>
-      {state === "error" && <p className="text-xs text-red-600">{errorMsg}</p>}
+      {state === 'error' && <p className="text-xs text-red-600">{errorMsg}</p>}
     </div>
   );
 }
@@ -1002,31 +941,25 @@ Add `warningSigns: true, costItems: true, disclosures: true,` to the `db.subject
 Add a new section right after the closing `)}` of the existing "Claims" section (which ends with `</section>\n          )}` before the `</div>` that closes `{/* Main content — left 2 cols */}`):
 
 ```tsx
-          {/* Warning signs, costs & disclosures */}
-          <section className="rounded-lg border bg-white p-5">
-            <h2 className="mb-4 font-semibold text-gray-900">
-              Warning signs, costs &amp; disclosures
-            </h2>
-            {subject.warningSigns.length === 0 &&
-            subject.costItems.length === 0 &&
-            subject.disclosures.length === 0 ? (
-              <div>
-                <p className="mb-3 text-sm text-gray-500">
-                  Nothing generated yet for this video.
-                </p>
-                <GenerateWarningsButton videoId={subject.id} />
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">
-                {subject.warningSigns.length} warning sign
-                {subject.warningSigns.length === 1 ? '' : 's'},{' '}
-                {subject.costItems.length} cost item
-                {subject.costItems.length === 1 ? '' : 's'},{' '}
-                {subject.disclosures.length} disclosure
-                {subject.disclosures.length === 1 ? '' : 's'} generated.
-              </p>
-            )}
-          </section>
+{
+  /* Warning signs, costs & disclosures */
+}
+<section className="rounded-lg border bg-white p-5">
+  <h2 className="mb-4 font-semibold text-gray-900">Warning signs, costs &amp; disclosures</h2>
+  {subject.warningSigns.length === 0 && subject.costItems.length === 0 && subject.disclosures.length === 0 ? (
+    <div>
+      <p className="mb-3 text-sm text-gray-500">Nothing generated yet for this video.</p>
+      <GenerateWarningsButton videoId={subject.id} />
+    </div>
+  ) : (
+    <p className="text-sm text-gray-600">
+      {subject.warningSigns.length} warning sign
+      {subject.warningSigns.length === 1 ? '' : 's'}, {subject.costItems.length} cost item
+      {subject.costItems.length === 1 ? '' : 's'}, {subject.disclosures.length} disclosure
+      {subject.disclosures.length === 1 ? '' : 's'} generated.
+    </p>
+  )}
+</section>;
 ```
 
 - [ ] **Step 4: Type-check**
@@ -1050,12 +983,14 @@ git commit -m "feat: admin backfill button for warning signs, costs, disclosures
 ### Task 5: Admin inline editors (add/edit/delete)
 
 **Files:**
+
 - Create: `app/admin/(protected)/videos/[id]/WarningSignsEditor.tsx`
 - Create: `app/admin/(protected)/videos/[id]/CostItemsEditor.tsx`
 - Create: `app/admin/(protected)/videos/[id]/DisclosuresEditor.tsx`
 - Modify: `app/admin/(protected)/videos/[id]/page.tsx`
 
 **Interfaces:**
+
 - Consumes: the 6 CRUD routes from Task 3; `subject.warningSigns`, `subject.costItems`, `subject.disclosures` from the query Task 4 already added to `page.tsx`.
 
 - [ ] **Step 1: Create the warning signs editor**
@@ -1083,13 +1018,7 @@ function emptyDraft(): { text: string; severity: Severity } {
   return { text: '', severity: 'LOW' };
 }
 
-export function WarningSignsEditor({
-  subjectId,
-  initialItems,
-}: {
-  subjectId: string;
-  initialItems: WarningSign[];
-}) {
+export function WarningSignsEditor({ subjectId, initialItems }: { subjectId: string; initialItems: WarningSign[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [draft, setDraft] = useState(emptyDraft());
@@ -1179,18 +1108,14 @@ export function WarningSignsEditor({
 
   return (
     <div>
-      <h3 className="mb-2 text-sm font-semibold text-gray-700">
-        Warning signs
-      </h3>
+      <h3 className="mb-2 text-sm font-semibold text-gray-700">Warning signs</h3>
       {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
       <div className="space-y-2">
         {items.map((item) => (
           <div key={item.id} className="flex items-start gap-2 text-sm">
             <select
               value={item.severity}
-              onChange={(e) =>
-                handleUpdate(item.id, { severity: e.target.value as Severity })
-              }
+              onChange={(e) => handleUpdate(item.id, { severity: e.target.value as Severity })}
               className="rounded border border-gray-300 px-1.5 py-1 text-xs"
             >
               {SEVERITY_OPTIONS.map((opt) => (
@@ -1203,19 +1128,12 @@ export function WarningSignsEditor({
               type="text"
               value={item.text}
               onChange={(e) =>
-                setItems((prev) =>
-                  prev.map((i) =>
-                    i.id === item.id ? { ...i, text: e.target.value } : i,
-                  ),
-                )
+                setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, text: e.target.value } : i)))
               }
               onBlur={(e) => handleUpdate(item.id, { text: e.target.value })}
               className="flex-1 rounded border border-gray-300 px-2 py-1"
             />
-            <button
-              onClick={() => handleDelete(item.id)}
-              className="text-xs text-red-600 hover:underline"
-            >
+            <button onClick={() => handleDelete(item.id)} className="text-xs text-red-600 hover:underline">
               Remove
             </button>
           </div>
@@ -1224,9 +1142,7 @@ export function WarningSignsEditor({
       <div className="mt-2 flex items-center gap-2">
         <select
           value={draft.severity}
-          onChange={(e) =>
-            setDraft((d) => ({ ...d, severity: e.target.value as Severity }))
-          }
+          onChange={(e) => setDraft((d) => ({ ...d, severity: e.target.value as Severity }))}
           className="rounded border border-gray-300 px-1.5 py-1 text-xs"
         >
           {SEVERITY_OPTIONS.map((opt) => (
@@ -1277,13 +1193,7 @@ function emptyDraft(): { label: string; amount: string; isHidden: boolean } {
   return { label: '', amount: '', isHidden: false };
 }
 
-export function CostItemsEditor({
-  subjectId,
-  initialItems,
-}: {
-  subjectId: string;
-  initialItems: CostItem[];
-}) {
+export function CostItemsEditor({ subjectId, initialItems }: { subjectId: string; initialItems: CostItem[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [draft, setDraft] = useState(emptyDraft());
@@ -1384,11 +1294,7 @@ export function CostItemsEditor({
               type="text"
               value={item.label}
               onChange={(e) =>
-                setItems((prev) =>
-                  prev.map((i) =>
-                    i.id === item.id ? { ...i, label: e.target.value } : i,
-                  ),
-                )
+                setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, label: e.target.value } : i)))
               }
               onBlur={(e) => handleUpdate(item.id, { label: e.target.value })}
               className="flex-1 rounded border border-gray-300 px-2 py-1"
@@ -1398,11 +1304,7 @@ export function CostItemsEditor({
               type="text"
               value={item.amount}
               onChange={(e) =>
-                setItems((prev) =>
-                  prev.map((i) =>
-                    i.id === item.id ? { ...i, amount: e.target.value } : i,
-                  ),
-                )
+                setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, amount: e.target.value } : i)))
               }
               onBlur={(e) => handleUpdate(item.id, { amount: e.target.value })}
               className="w-28 rounded border border-gray-300 px-2 py-1"
@@ -1412,16 +1314,11 @@ export function CostItemsEditor({
               <input
                 type="checkbox"
                 checked={item.isHidden}
-                onChange={(e) =>
-                  handleUpdate(item.id, { isHidden: e.target.checked })
-                }
+                onChange={(e) => handleUpdate(item.id, { isHidden: e.target.checked })}
               />
               Hidden
             </label>
-            <button
-              onClick={() => handleDelete(item.id)}
-              className="text-xs text-red-600 hover:underline"
-            >
+            <button onClick={() => handleDelete(item.id)} className="text-xs text-red-600 hover:underline">
               Remove
             </button>
           </div>
@@ -1446,9 +1343,7 @@ export function CostItemsEditor({
           <input
             type="checkbox"
             checked={draft.isHidden}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, isHidden: e.target.checked }))
-            }
+            onChange={(e) => setDraft((d) => ({ ...d, isHidden: e.target.checked }))}
           />
           Hidden
         </label>
@@ -1486,13 +1381,7 @@ function emptyDraft(): { text: string; detected: boolean } {
   return { text: '', detected: true };
 }
 
-export function DisclosuresEditor({
-  subjectId,
-  initialItems,
-}: {
-  subjectId: string;
-  initialItems: Disclosure[];
-}) {
+export function DisclosuresEditor({ subjectId, initialItems }: { subjectId: string; initialItems: Disclosure[] }) {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [draft, setDraft] = useState(emptyDraft());
@@ -1591,11 +1480,7 @@ export function DisclosuresEditor({
               type="text"
               value={item.text}
               onChange={(e) =>
-                setItems((prev) =>
-                  prev.map((i) =>
-                    i.id === item.id ? { ...i, text: e.target.value } : i,
-                  ),
-                )
+                setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, text: e.target.value } : i)))
               }
               onBlur={(e) => handleUpdate(item.id, { text: e.target.value })}
               className="flex-1 rounded border border-gray-300 px-2 py-1"
@@ -1604,16 +1489,11 @@ export function DisclosuresEditor({
               <input
                 type="checkbox"
                 checked={item.detected}
-                onChange={(e) =>
-                  handleUpdate(item.id, { detected: e.target.checked })
-                }
+                onChange={(e) => handleUpdate(item.id, { detected: e.target.checked })}
               />
               Detected
             </label>
-            <button
-              onClick={() => handleDelete(item.id)}
-              className="text-xs text-red-600 hover:underline"
-            >
+            <button onClick={() => handleDelete(item.id)} className="text-xs text-red-600 hover:underline">
               Remove
             </button>
           </div>
@@ -1631,9 +1511,7 @@ export function DisclosuresEditor({
           <input
             type="checkbox"
             checked={draft.detected}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, detected: e.target.checked }))
-            }
+            onChange={(e) => setDraft((d) => ({ ...d, detected: e.target.checked }))}
           />
           Detected
         </label>
@@ -1663,54 +1541,39 @@ import { DisclosuresEditor } from './DisclosuresEditor';
 Replace the section Task 4 added:
 
 ```tsx
-            {subject.warningSigns.length === 0 &&
-            subject.costItems.length === 0 &&
-            subject.disclosures.length === 0 ? (
-              <div>
-                <p className="mb-3 text-sm text-gray-500">
-                  Nothing generated yet for this video.
-                </p>
-                <GenerateWarningsButton videoId={subject.id} />
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">
-                {subject.warningSigns.length} warning sign
-                {subject.warningSigns.length === 1 ? '' : 's'},{' '}
-                {subject.costItems.length} cost item
-                {subject.costItems.length === 1 ? '' : 's'},{' '}
-                {subject.disclosures.length} disclosure
-                {subject.disclosures.length === 1 ? '' : 's'} generated.
-              </p>
-            )}
+{
+  subject.warningSigns.length === 0 && subject.costItems.length === 0 && subject.disclosures.length === 0 ? (
+    <div>
+      <p className="mb-3 text-sm text-gray-500">Nothing generated yet for this video.</p>
+      <GenerateWarningsButton videoId={subject.id} />
+    </div>
+  ) : (
+    <p className="text-sm text-gray-600">
+      {subject.warningSigns.length} warning sign
+      {subject.warningSigns.length === 1 ? '' : 's'}, {subject.costItems.length} cost item
+      {subject.costItems.length === 1 ? '' : 's'}, {subject.disclosures.length} disclosure
+      {subject.disclosures.length === 1 ? '' : 's'} generated.
+    </p>
+  );
+}
 ```
 
 with:
 
 ```tsx
-            {subject.warningSigns.length === 0 &&
-              subject.costItems.length === 0 &&
-              subject.disclosures.length === 0 && (
-                <div className="mb-4">
-                  <p className="mb-3 text-sm text-gray-500">
-                    Nothing generated yet for this video.
-                  </p>
-                  <GenerateWarningsButton videoId={subject.id} />
-                </div>
-              )}
-            <div className="space-y-6">
-              <WarningSignsEditor
-                subjectId={subject.id}
-                initialItems={subject.warningSigns}
-              />
-              <CostItemsEditor
-                subjectId={subject.id}
-                initialItems={subject.costItems}
-              />
-              <DisclosuresEditor
-                subjectId={subject.id}
-                initialItems={subject.disclosures}
-              />
-            </div>
+{
+  subject.warningSigns.length === 0 && subject.costItems.length === 0 && subject.disclosures.length === 0 && (
+    <div className="mb-4">
+      <p className="mb-3 text-sm text-gray-500">Nothing generated yet for this video.</p>
+      <GenerateWarningsButton videoId={subject.id} />
+    </div>
+  );
+}
+<div className="space-y-6">
+  <WarningSignsEditor subjectId={subject.id} initialItems={subject.warningSigns} />
+  <CostItemsEditor subjectId={subject.id} initialItems={subject.costItems} />
+  <DisclosuresEditor subjectId={subject.id} initialItems={subject.disclosures} />
+</div>;
 ```
 
 - [ ] **Step 5: Type-check**
@@ -1734,10 +1597,12 @@ git commit -m "feat: inline admin editors for warning signs, costs, disclosures"
 ### Task 6: Public video page rendering + gap-comment cleanup
 
 **Files:**
+
 - Modify: `app/(public)/videos/[slug]/page.tsx`
 - Modify: `lib/db/queries.ts`
 
 **Interfaces:**
+
 - Consumes: `video.warningSigns`, `video.costItems`, `video.disclosures` (already fetched by `getVideoBySlug`); `RiskStamp` from `@/components/ui/RiskStamp` (already imported in this file).
 
 - [ ] **Step 1: Remove the gap comment in the query**
@@ -1768,12 +1633,12 @@ In `app/(public)/videos/[slug]/page.tsx`, the existing block:
 ```tsx
           {warnings.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+              <h2 className="text-muted mb-3 text-xl font-semibold">
                 What to Be Careful About
               </h2>
               <ul className="space-y-2">
                 {warnings.map((item, index) => (
-                  <li key={index} className="text-ink-muted/90 flex gap-2">
+                  <li key={index} className="text-muted/90 flex gap-2">
                     <span className="text-verdict-risky">⚠</span>
                     {item}
                   </li>
@@ -1792,12 +1657,12 @@ becomes:
 ```tsx
           {warnings.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+              <h2 className="text-muted mb-3 text-xl font-semibold">
                 What to Be Careful About
               </h2>
               <ul className="space-y-2">
                 {warnings.map((item, index) => (
-                  <li key={index} className="text-ink-muted/90 flex gap-2">
+                  <li key={index} className="text-muted/90 flex gap-2">
                     <span className="text-verdict-risky">⚠</span>
                     {item}
                   </li>
@@ -1810,14 +1675,14 @@ becomes:
 
       {video.warningSigns.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+          <h2 className="text-muted mb-3 text-xl font-semibold">
             Warning Signs
           </h2>
           <ul className="space-y-2">
             {video.warningSigns.map((w: (typeof video.warningSigns)[number]) => (
               <li key={w.id} className="flex items-start gap-2">
                 <RiskStamp level={w.severity} />
-                <span className="text-ink-muted/90 text-sm">{w.text}</span>
+                <span className="text-muted/90 text-sm">{w.text}</span>
               </li>
             ))}
           </ul>
@@ -1826,7 +1691,7 @@ becomes:
 
       {video.costItems.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-xl font-semibold">
+          <h2 className="text-muted mb-3 text-xl font-semibold">
             Costs to Know About
           </h2>
           <ul className="space-y-2">
@@ -1839,7 +1704,7 @@ becomes:
                     : 'border-hairline bg-paper'
                 }`}
               >
-                <span className="text-ink-muted/90">
+                <span className="text-muted/90">
                   {c.label}
                   {c.isHidden && (
                     <span className="text-verdict-risky ml-2 text-xs font-semibold uppercase">
@@ -1847,7 +1712,7 @@ becomes:
                     </span>
                   )}
                 </span>
-                <span className="text-ink-muted font-medium">{c.amount}</span>
+                <span className="text-muted font-medium">{c.amount}</span>
               </li>
             ))}
           </ul>
@@ -1872,12 +1737,12 @@ becomes:
       {/* Disclosures */}
       {video.disclosures.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-ink-muted mb-3 text-lg font-semibold">
+          <h2 className="text-muted mb-3 text-lg font-semibold">
             Disclosures
           </h2>
           <ul className="space-y-1">
             {video.disclosures.map((d: (typeof video.disclosures)[number]) => (
-              <li key={d.id} className="text-ink-muted/80 text-sm">
+              <li key={d.id} className="text-muted/80 text-sm">
                 {d.text}
               </li>
             ))}

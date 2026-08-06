@@ -20,32 +20,32 @@ remains the domain in `site.config.ts`.
 **Concept:** the site's whole premise is "we stamp a verdict on trending
 claims," so the design leans into a literal ink-stamp/newsprint editorial
 look rather than a SaaS dashboard look. Cream paper, near-black ink, and one
-red reserved *only* for verdicts/stamps — buttons and links stay monochrome
+red reserved _only_ for verdicts/stamps — buttons and links stay monochrome
 so red doesn't get diluted into a generic accent color.
 
 ### Color tokens
 
-| Token | Light | Dark | Usage |
-|---|---|---|---|
-| `--paper` | `#F5F1E8` | `#14110F` | page background |
-| `--surface` | `#FBF9F4` | `#1C1815` | card backgrounds |
-| `--ink` | `#14110F` | `#F5F1E8` | primary text, buttons, borders |
-| `--ink-muted` | `#6B6459` | `#B5AEA0` | secondary text |
-| `--hairline` | `#D9D2C3` | `#3A342C` | borders/rules |
-| `--brand-red` | `#C1272D` | `#E2555A` | stamp mark accent only |
-| `--verdict-legit` | `#1E7A46` | `#34A868` | VerdictType.LEGIT |
-| `--verdict-misleading` | `#A6791F` | `#D9A83B` | VerdictType.MISLEADING |
-| `--verdict-overpriced` | `#C1652B` | `#E08A4C` | VerdictType.OVERPRICED |
-| `--verdict-risky` | `#B8452B` | `#E0684C` | VerdictType.RISKY |
-| `--verdict-scam` | `#C1272D` | `#E2555A` | VerdictType.SCAM |
+| Token                  | Light     | Dark      | Usage                          |
+| ---------------------- | --------- | --------- | ------------------------------ |
+| `--paper`              | `#F5F1E8` | `#14110F` | page background                |
+| `--surface`            | `#FBF9F4` | `#1C1815` | card backgrounds               |
+| `--accent`             | `#14110F` | `#F5F1E8` | primary text, buttons, borders |
+| `--muted`              | `#6B6459` | `#B5AEA0` | secondary text                 |
+| `--hairline`           | `#D9D2C3` | `#3A342C` | borders/rules                  |
+| `--brand-red`          | `#C1272D` | `#E2555A` | stamp mark accent only         |
+| `--verdict-legit`      | `#1E7A46` | `#34A868` | VerdictType.LEGIT              |
+| `--verdict-misleading` | `#A6791F` | `#D9A83B` | VerdictType.MISLEADING         |
+| `--verdict-overpriced` | `#C1652B` | `#E08A4C` | VerdictType.OVERPRICED         |
+| `--verdict-risky`      | `#B8452B` | `#E0684C` | VerdictType.RISKY              |
+| `--verdict-scam`       | `#C1272D` | `#E2555A` | VerdictType.SCAM               |
 
 Dark mode is a deliberately designed variant (not an auto-invert of the
 light palette), applied via `prefers-color-scheme: dark`, matching the
 existing pattern in `globals.css`.
 
-Buttons: solid `--ink` background, `--paper` text, no rounding beyond a
+Buttons: solid `--accent` background, `--paper` text, no rounding beyond a
 small `3px` radius (avoids the current pill/rounded-full SaaS look). Links:
-`--ink` text with an underline in `--hairline`, not a color change on hover
+`--accent` text with an underline in `--hairline`, not a color change on hover
 — hover instead is a color shift on the underline only.
 
 ### Typography
@@ -54,7 +54,7 @@ small `3px` radius (avoids the current pill/rounded-full SaaS look). Links:
   reason to change a working, readable UI font.
 - Headings (h1 hero, h2 section titles) and the logotype wordmark switch to
   a bold upright slab serif: **Zilla Slab**, weight 700, loaded via
-  `next/font/google` as `--font-slab`. This replaces `EB Garamond` italic,
+  `next/font/google` as `--font-serif`. This replaces `EB Garamond` italic,
   which is dropped entirely (it's also the same typeface MenHealth Digest's
   wordmark uses — dropping it fully differentiates the two brands, not just
   the weight/style).
@@ -67,7 +67,7 @@ small `3px` radius (avoids the current pill/rounded-full SaaS look). Links:
 ### Logotype
 
 **Mark:** a comic-style "burst" badge (8-point spiky/pow shape, like a
-starburst) rendered solid in `--ink`, with a checkmark cut out of it in
+starburst) rendered solid in `--accent`, with a checkmark cut out of it in
 reverse (i.e. the checkmark is drawn in `--paper`/background color, not a
 separate stroke on top) — approved in the visual companion mockup as
 concept #4 ("Burst Badge"). Slight counter-rotation (`-4deg`) so it reads as

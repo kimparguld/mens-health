@@ -30,7 +30,7 @@ function formatTime(date: Date) {
 
 const LOG_COLORS: Record<LogLevel, string> = {
   info: 'text-gray-500',
-  success: 'text-ink-muted/60',
+  success: 'text-muted/60',
   error: 'text-red-600',
 };
 
@@ -99,7 +99,7 @@ export default function AdminBulkActions() {
         <button
           onClick={() => runAction('generate-all-summaries')}
           disabled={loading !== null}
-          className="text-ink rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-50 disabled:opacity-50"
+          className="text-accent rounded-lg border border-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-50 disabled:opacity-50"
         >
           {loading === 'generate-all-summaries'
             ? 'Generating…'
@@ -115,7 +115,7 @@ export default function AdminBulkActions() {
         <button
           onClick={() => runAction('auto-publish-low-risk')}
           disabled={loading !== null}
-          className="bg-ink-muted/60 hover:bg-ink-muted/70 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="bg-muted/60 hover:bg-muted/70 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           {loading === 'auto-publish-low-risk'
             ? 'Publishing…'

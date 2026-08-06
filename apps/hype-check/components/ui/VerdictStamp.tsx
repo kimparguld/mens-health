@@ -1,9 +1,5 @@
 export type VerdictType =
-  | 'LEGIT'
-  | 'MISLEADING'
-  | 'OVERPRICED'
-  | 'RISKY'
-  | 'SCAM';
+  'LEGIT' | 'MISLEADING' | 'OVERPRICED' | 'RISKY' | 'SCAM';
 
 const VERDICT_STYLES: Record<VerdictType, string> = {
   LEGIT: 'border-verdict-legit text-verdict-legit -rotate-2',
@@ -28,7 +24,7 @@ export function VerdictStamp({ verdict, size = 'sm' }: VerdictStampProps) {
 
   return (
     <span
-      className={`inline-block rounded-sm border-[2.5px] font-slab font-black tracking-widest uppercase ${SIZE_STYLES[size]} ${VERDICT_STYLES[verdict]}`}
+      className={`inline-block rounded-sm border-[2.5px] font-serif font-black tracking-widest uppercase ${SIZE_STYLES[size]} ${VERDICT_STYLES[verdict]}`}
     >
       {verdict}
     </span>

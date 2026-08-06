@@ -8,7 +8,7 @@ const EVIDENCE_CONFIG: Record<string, { label: string; className: string }> = {
   },
   MODERATE: {
     label: 'Claim checked — moderate evidence',
-    className: 'border-verdict-legit text-verdict-legit rotate-1',
+    className: 'border-verdict-moderate text-verdict-moderate rotate-1',
   },
   MIXED: {
     label: 'Claim checked — mixed / early',
@@ -24,7 +24,7 @@ const EVIDENCE_CONFIG: Record<string, { label: string; className: string }> = {
   },
   NOT_CHECKED: {
     label: 'Claim extracted — not yet reviewed',
-    className: 'border-ink-muted/40 text-ink-muted/60',
+    className: 'border-muted/40 text-muted/60',
   },
 };
 

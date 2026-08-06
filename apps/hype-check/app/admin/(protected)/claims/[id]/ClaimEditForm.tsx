@@ -346,7 +346,7 @@ export function ClaimEditForm({
       <button
         onClick={handleSave}
         disabled={saving}
-        className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+        className="bg-muted/70 hover:bg-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
       >
         {saving ? 'Saving…' : 'Save review'}
       </button>

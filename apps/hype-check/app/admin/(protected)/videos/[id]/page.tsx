@@ -1,6 +1,8 @@
 import { db } from '@/lib/db/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { CostItemsEditor } from './CostItemsEditor';
+import { DisclosuresEditor } from './DisclosuresEditor';
 import GenerateSocialButton from './GenerateSocialButton';
 import GenerateSummaryButton from './GenerateSummaryButton';
 import GenerateWarningsButton from './GenerateWarningsButton';
@@ -8,8 +10,6 @@ import ReviewActions from './ReviewActions';
 import ReviewerForm from './ReviewerForm';
 import VerdictPanel from './VerdictPanel';
 import { WarningSignsEditor } from './WarningSignsEditor';
-import { CostItemsEditor } from './CostItemsEditor';
-import { DisclosuresEditor } from './DisclosuresEditor';
 
 const riskColors: Record<string, string> = {
   LOW: 'bg-green-100 text-green-700',
@@ -67,7 +67,7 @@ export default async function AdminVideoDetailPage({
         <div>
           <Link
             href="/admin/videos"
-            className="text-ink mb-2 inline-block text-sm hover:underline"
+            className="text-accent mb-2 inline-block text-sm hover:underline"
           >
             &larr; Back to queue
           </Link>
@@ -344,7 +344,7 @@ export default async function AdminVideoDetailPage({
               href={`https://www.youtube.com/watch?v=${sourceVideo.youtubeVideoId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-ink block rounded-lg border bg-white p-4 text-sm hover:underline"
+              className="text-accent block rounded-lg border bg-white p-4 text-sm hover:underline"
             >
               Open on YouTube &rarr;
             </a>

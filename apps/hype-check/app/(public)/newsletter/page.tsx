@@ -49,7 +49,7 @@ export default function NewsletterPage() {
       />
       {/* Hero */}
       <header className="mb-12 text-center">
-        <p className="text-ink-muted mb-2 text-sm font-semibold tracking-widest uppercase">
+        <p className="text-muted mb-2 text-sm font-semibold tracking-widest uppercase">
           Free newsletter
         </p>
         <h1 className="heading">The 5-Minute Hype Check Digest</h1>
@@ -127,7 +127,7 @@ export default function NewsletterPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="group border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
+              className="group border-hairline hover:border-muted flex flex-col rounded-md border bg-white p-4 px-5 py-4 transition-colors"
             >
               <p className="font-semibold text-gray-900">{item.title} →</p>
               <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
@@ -166,7 +166,7 @@ export default function NewsletterPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="border-hairline bg-ink-muted rounded-xl border px-6 py-8 text-center">
+      <section className="border-hairline bg-muted rounded-xl border px-6 py-8 text-center">
         <h2 className="mb-2 text-xl font-bold text-white">
           Ready to get the digest?
         </h2>

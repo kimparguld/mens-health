@@ -61,7 +61,7 @@ Three new sections in `app/(public)/videos/[slug]/page.tsx`, each rendered only 
 - **Hidden costs** — a small label/amount list; rows with `isHidden: true` get a `verdict-risky` tint to call them out.
 - **Disclosures** — a short list near the existing `AffiliateDisclosure` component.
 
-All three use the theme tokens (`--paper`, `--ink`, `--verdict-*`, etc.) established in the redesign that just shipped — no raw Tailwind colors.
+All three use the theme tokens (`--paper`, `--accent`, `--verdict-*`, etc.) established in the redesign that just shipped — no raw Tailwind colors.
 
 ### 5. Query cleanup
 

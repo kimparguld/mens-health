@@ -54,7 +54,7 @@ export default function FaqPage() {
           evidence — see{' '}
           <Link
             href="/how-we-rate-evidence"
-            className="text-ink-muted hover:underline"
+            className="text-muted hover:underline"
           >
             how we rate evidence
           </Link>
@@ -67,7 +67,7 @@ export default function FaqPage() {
           <a
             key={topic.slug}
             href={`#${topic.slug}`}
-            className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
+            className="hover:text-muted hover:border-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
           >
             {topic.name}
           </a>
@@ -83,7 +83,7 @@ export default function FaqPage() {
           <h2 className="mb-4 text-xl font-semibold text-gray-900">
             <Link
               href={`/topics/${topic.slug}`}
-              className="hover:text-ink-muted hover:underline"
+              className="hover:text-muted hover:underline"
             >
               {topic.name}
             </Link>
@@ -91,7 +91,7 @@ export default function FaqPage() {
           <div className="divide-y rounded-xl border bg-white">
             {faq.map((item, i) => (
               <details key={i} className="group px-5 py-4">
-                <summary className="group-open:text-ink-muted cursor-pointer list-none text-base font-medium text-gray-900">
+                <summary className="group-open:text-muted cursor-pointer list-none text-base font-medium text-gray-900">
                   <span className="mr-2 inline-block transition-transform group-open:rotate-90">
                     ›
                   </span>

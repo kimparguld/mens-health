@@ -71,10 +71,10 @@ async function FeaturedInsight() {
         <div className="border-hairline rounded-md border bg-white p-6 sm:p-8">
           {featuredClaim && (
             <div className="mb-4">
-              <p className="text-ink-muted text-sm font-semibold tracking-wide uppercase">
+              <p className="text-muted text-sm font-semibold tracking-wide uppercase">
                 The claim
               </p>
-              <p className="text-ink mt-1 text-lg font-semibold">
+              <p className="text-accent mt-1 text-lg font-semibold">
                 &ldquo;{featuredClaim.text}&rdquo;
               </p>
             </div>
@@ -83,7 +83,7 @@ async function FeaturedInsight() {
             <p className="text-sm font-semibold tracking-wide text-black uppercase">
               Our take
             </p>
-            <p className="text-ink-muted mt-1 leading-relaxed">
+            <p className="text-muted mt-1 leading-relaxed">
               {featuredSummary.shortSummary}
             </p>
           </div>
@@ -99,15 +99,15 @@ async function FeaturedInsight() {
               </>
             )}
             {featuredWatchMin && (
-              <span className="text-ink-muted text-sm">
+              <span className="text-muted text-sm">
                 {featuredWatchMin} min watch
               </span>
             )}
-            <span className="text-ink-muted text-sm">~ 2 min read</span>
+            <span className="text-muted text-sm">~ 2 min read</span>
           </div>
           <Link
             href={`/videos/${featuredVideo.slug}`}
-            className="text-ink decoration-hairline hover:decoration-ink inline-flex items-center gap-1 text-sm font-semibold underline underline-offset-4"
+            className="text-accent decoration-hairline hover:decoration-accent inline-flex items-center gap-1 text-sm font-semibold underline underline-offset-4"
           >
             Read the breakdown &rarr;
           </Link>
@@ -127,11 +127,11 @@ async function TrendingVideos() {
   return (
     <section id="trending" className="py-14">
       <div className="mx-auto max-w-[1120px] px-4">
-        <h2 className="font-slab text-ink-muted mb-6 text-3xl font-bold">
+        <h2 className="text-muted mb-6 font-serif text-3xl font-bold">
           Trending summaries
         </h2>
         {videos.length === 0 ? (
-          <p className="text-ink-muted">
+          <p className="text-muted">
             No published summaries yet. Check back soon.
           </p>
         ) : (
@@ -179,13 +179,13 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="border-hairline border-b bg-white py-16">
         <div className="mx-auto max-w-[1120px] px-4">
-          <h1 className="font-slab text-ink-muted max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="text-muted max-w-2xl font-serif text-4xl font-bold tracking-tight sm:text-5xl">
             Trending products and side hustles,{' '}
-            <span className="decoration-ink underline decoration-4 underline-offset-4">
+            <span className="decoration-accent underline decoration-4 underline-offset-4">
               explained without the hype.
             </span>
           </h1>
-          <p className="text-ink-muted mt-4 max-w-xl text-lg leading-relaxed">
+          <p className="text-muted mt-4 max-w-xl text-lg leading-relaxed">
             We scan trending YouTube videos about products, courses, side
             hustles, and investment apps — then summarise the key claims and
             check them against available evidence.
@@ -193,18 +193,18 @@ export default async function HomePage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/digest"
-              className="bg-ink-muted rounded-sm px-5 py-2.5 text-sm font-semibold text-white hover:bg-black"
+              className="bg-muted rounded-sm px-5 py-2.5 text-sm font-semibold text-white hover:bg-black"
             >
               Get the free digest
             </Link>
             <Link
               href="#trending"
-              className="border-hairline text-ink hover:border-surface rounded-sm border px-5 py-2.5 text-sm font-semibold"
+              className="border-hairline text-accent hover:border-surface rounded-sm border px-5 py-2.5 text-sm font-semibold"
             >
               Explore trending videos
             </Link>
           </div>
-          <ul className="text-ink-muted mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+          <ul className="text-muted mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm">
             <li>✓ Official YouTube embeds</li>
             <li>✓ AI-assisted summaries</li>
             <li>✓ Evidence-aware claim checks</li>
@@ -223,7 +223,7 @@ export default async function HomePage() {
       {/* Topic cards */}
       <section id="topics" className="py-14">
         <div className="mx-auto min-h-[652px] max-w-[1120px] px-4 lg:min-h-[354px]">
-          <h2 className="font-slab text-ink-muted mb-6 text-3xl font-bold">
+          <h2 className="text-muted mb-6 font-serif text-3xl font-bold">
             Browse by topic
           </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -231,26 +231,26 @@ export default async function HomePage() {
               <Link
                 key={topic.slug}
                 href={`/topics/${topic.slug}`}
-                className="group border-hairline hover:border-ink-muted rounded-md border bg-white p-4 transition-colors"
+                className="group border-hairline hover:border-muted rounded-md border bg-white p-4 transition-colors"
               >
-                <p className="text-ink-muted font-semibold">{topic.name}</p>
+                <p className="text-muted font-semibold">{topic.name}</p>
                 <p className="mt-1 line-clamp-2 text-sm leading-snug text-gray-600">
                   {topic.description}
                 </p>
-                <p className="text-ink decoration-hairline group-hover:decoration-ink mt-3 text-sm font-medium underline underline-offset-2">
+                <p className="text-accent decoration-hairline group-hover:decoration-accent mt-3 text-sm font-medium underline underline-offset-2">
                   Explore →
                 </p>
               </Link>
             ))}
           </div>
           {remainingTopics.length > 0 && (
-            <p className="text-ink-muted mt-4 text-sm">
+            <p className="text-muted mt-4 text-sm">
               More topics:{' '}
               {remainingTopics.map((t, i) => (
                 <span key={t.slug}>
                   <Link
                     href={`/topics/${t.slug}`}
-                    className="text-ink decoration-hairline hover:decoration-ink underline"
+                    className="text-accent decoration-hairline hover:decoration-accent underline"
                   >
                     {t.name}
                   </Link>
@@ -285,20 +285,21 @@ export default async function HomePage() {
       {/* Newsletter */}
       <section className="bg-surface py-16">
         <div className="mx-auto max-w-lg px-4 text-center">
-          <h2 className="font-slab text-ink text-3xl font-bold">
+          <h2 className="text-accent font-serif text-3xl font-bold">
             Get the 5-minute Hype Check Digest
           </h2>
           <p className="mt-2 text-sm text-white/80">Every week:</p>
           <ul className="mt-2 space-y-0.5 text-sm text-white/80">
             <li>
-              <span className="text-ink font-bold">5</span> trending videos
+              <span className="text-accent font-bold">5</span> trending videos
               summarised
             </li>
             <li>
-              <span className="text-ink font-bold">3</span> claims checked
+              <span className="text-accent font-bold">3</span> claims checked
             </li>
             <li>
-              <span className="text-ink font-bold">1</span> practical takeaway
+              <span className="text-accent font-bold">1</span> practical
+              takeaway
             </li>
             <li>No get-rich-quick nonsense</li>
           </ul>

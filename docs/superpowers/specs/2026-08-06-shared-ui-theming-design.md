@@ -9,7 +9,7 @@ layout patterns, same page structure, same component shapes) but almost
 nothing is actually shared between them. Markup that is functionally
 identical has been copy-pasted per app and then hand-tuned with each site's
 raw Tailwind palette classes (`bg-emerald-600` vs `bg-indigo-600`,
-`text-gray-900` vs `text-ink-muted`, etc.) instead of theme variables. This
+`text-gray-900` vs `text-muted`, etc.) instead of theme variables. This
 has three costs:
 
 1. **Duplication**: `SiteHeader.tsx`, `BrandLogotype.tsx`, `GrowthPlanBoard.tsx`,
@@ -21,12 +21,12 @@ has three costs:
    `bg-emerald-100`/`text-emerald-800` directly. `NewsletterSignupForm.tsx`
    and `HowWeRateClaims.tsx` take a `site?: string` prop and internally
    branch (`if (site === 'hype-check') { ...hardcoded hype colors... } else
-   { ...hardcoded menhealth colors... }`) — this is the exact anti-pattern
+{ ...hardcoded menhealth colors... }`) — this is the exact anti-pattern
    this design eliminates, already present in the "shared" package.
 3. **Silent bugs**: hype-check's `app/globals.css` has two tokens mis-mapped
    to the wrong value: `--color-surface: var(--color-gray-900)` and
-   `--color-ink-muted: var(--color-gray-900)` (both should reference the
-   app's own `--surface`/`--ink-muted` custom properties, not Tailwind's
+   `--color-muted: var(--color-gray-900)` (both should reference the
+   app's own `--surface`/`--muted` custom properties, not Tailwind's
    gray-900 scale). This kind of error is easy to introduce and easy to miss
    precisely because there's no single contract both sites are checked
    against.
@@ -50,12 +50,12 @@ again.
 
 - Not rebuilding either app's visual design — the goal is that both sites
   look **exactly as they do today** after migration; this is a refactor of
-  *how* the styling is expressed, not a redesign.
+  _how_ the styling is expressed, not a redesign.
 - Not introducing a component library / design system product, Storybook,
   or visual regression tooling as part of this effort (neither exists in
   the repo today; out of scope here).
 - Not touching admin-only or genuinely site-specific components (e.g.
-  hype-check's `VerdictHero`, `VerdictStamp`) beyond making their *color*
+  hype-check's `VerdictHero`, `VerdictStamp`) beyond making their _color_
   usage token-based where they already parallel a menhealth equivalent.
 
 ## Design
@@ -70,24 +70,24 @@ new mechanism, just a shared vocabulary for it.
 
 Token names describe **role**, never a color or a site:
 
-| Token | Role | Menhealth value today | Hype-check value today |
-|---|---|---|---|
-| `--color-bg-page` | page/body background | `--background` | `--paper` |
-| `--color-bg-surface` | raised surfaces (cards, panels) | hardcoded `white` | hardcoded `white` |
-| `--color-bg-muted` | subtle section background | `--surface-alt` | `--surface` *(currently mis-mapped)* |
-| `--color-bg-emphasis` | inverted/dark bands (e.g. header) | *(none — new)* | `--ink-muted` *(currently mis-mapped)* |
-| `--color-text-primary` | primary body text | `--foreground` | `--ink-muted` |
-| `--color-text-muted` | secondary/muted text | `--text-muted` / `--text-subtle` | `--ink-muted` at reduced opacity |
-| `--color-text-on-emphasis` | text on inverted/dark surfaces | *(none — new)* | `white` |
-| `--color-border` | hairline borders | `--hairline` | `--hairline` |
-| `--color-accent` / `--color-accent-strong` | brand CTA color, hover state | `--accent` / `--accent-strong` (emerald) | `--ink` |
-| `--color-status-strong` … `--color-status-none` | 5-step evidence/verdict scale | emerald/teal/amber/orange/red/gray | `--verdict-legit` … `--verdict-scam` |
+| Token                                           | Role                              | Menhealth value today                    | Hype-check value today               |
+| ----------------------------------------------- | --------------------------------- | ---------------------------------------- | ------------------------------------ |
+| `--color-bg-page`                               | page/body background              | `--background`                           | `--paper`                            |
+| `--color-bg-surface`                            | raised surfaces (cards, panels)   | hardcoded `white`                        | hardcoded `white`                    |
+| `--color-bg-muted`                              | subtle section background         | `--surface-alt`                          | `--surface` _(currently mis-mapped)_ |
+| `--color-bg-emphasis`                           | inverted/dark bands (e.g. header) | _(none — new)_                           | `--muted` _(currently mis-mapped)_   |
+| `--color-text-primary`                          | primary body text                 | `--foreground`                           | `--muted`                            |
+| `--color-text-muted`                            | secondary/muted text              | `--text-muted` / `--text-subtle`         | `--muted` at reduced opacity         |
+| `--color-text-on-emphasis`                      | text on inverted/dark surfaces    | _(none — new)_                           | `white`                              |
+| `--color-border`                                | hairline borders                  | `--hairline`                             | `--hairline`                         |
+| `--color-accent` / `--color-accent-strong`      | brand CTA color, hover state      | `--accent` / `--accent-strong` (emerald) | `--accent`                           |
+| `--color-status-strong` … `--color-status-none` | 5-step evidence/verdict scale     | emerald/teal/amber/orange/red/gray       | `--verdict-legit` … `--verdict-scam` |
 
 This table is a starting inventory, not exhaustive — the full set of tokens
 needed gets finalized during Phase 0 as real components are migrated and
 new color usages are discovered. Fixing hype-check's two mis-mapped tokens
 falls out of doing this properly (its `--color-surface` and
-`--color-ink-muted` start pointing at the right custom property).
+`--color-muted` start pointing at the right custom property).
 
 Components in `packages/ui` reference only `--color-*` token classes
 (`bg-surface`, `text-primary`, …). They never reference a raw Tailwind
@@ -106,7 +106,7 @@ copy/data/tokens. Concretely:
   stay as props — the ban is on styling forks, not on all per-site
   variation.
 - **Keep local** if interaction, layout, or conditional structure genuinely
-  differs. Where only *part* of a component differs this way (e.g.
+  differs. Where only _part_ of a component differs this way (e.g.
   hype-check's `VerdictStamp` branch inside `FeaturedInsight`, which
   menhealth doesn't have), the shared component takes a slot
   (`statusSlot?: ReactNode` or a render prop) for that piece rather than
@@ -122,7 +122,7 @@ string literals against a denylist of raw Tailwind color-palette prefixes —
 `bg-emerald-`, `text-gray-`, `bg-indigo-`, `border-amber-`, etc.) is added
 scoped to `packages/ui/src/**`, referenced from both apps' existing
 per-app `eslint.config.mjs` (there is no shared root ESLint config today).
-Token-backed classes (`bg-surface`, `text-ink`, arbitrary values) remain
+Token-backed classes (`bg-surface`, `text-accent`, arbitrary values) remain
 allowed everywhere. This directly prevents a repeat of the
 `NewsletterSignupForm`/`HowWeRateClaims`/`VideoCard` drift found during this
 audit.
@@ -151,8 +151,8 @@ audit.
     `featuredVideo.sourceVideos[0].summaries[0]`) into the shared props.
   - `<TopicsGridSection>`, `<TrendingVideosSection>` (list wrapper; card
     itself already covered in Phase 1), `<NewsletterCtaSection>`.
-  Each `page.tsx` becomes a thin composition + data-fetching layer over
-  these.
+    Each `page.tsx` becomes a thin composition + data-fetching layer over
+    these.
 - **Phase 3 — Remaining public pages.** `topics/[slug]`, `creators/[slug]`,
   `rankings/[topic]`, `weekly/[slug]`, video detail pages — audited with the
   same classification rule from Phase 0/2. Not pre-planned line-by-line here

@@ -53,7 +53,7 @@ export default async function MonetizationPage() {
                         href={s.ctaUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-ink hover:underline"
+                        className="text-accent hover:underline"
                       >
                         {s.ctaText}
                       </a>
@@ -136,7 +136,7 @@ export default async function MonetizationPage() {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-ink hover:underline"
+                        className="text-accent hover:underline"
                       >
                         {link.label}
                       </a>

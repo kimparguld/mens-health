@@ -114,7 +114,7 @@ export default async function SocialCalendarPage({
               className={`min-h-32 rounded-lg border bg-white p-2 ${isToday ? 'ring-2 ring-blue-400' : ''}`}
             >
               <p
-                className={`mb-2 text-xs font-medium ${isToday ? 'text-ink' : 'text-gray-500'}`}
+                className={`mb-2 text-xs font-medium ${isToday ? 'text-accent' : 'text-gray-500'}`}
               >
                 {DAY_NAMES[(day.getDay() + 1) % 7]} {day.getDate()}
               </p>
@@ -150,7 +150,7 @@ export default async function SocialCalendarPage({
       <div className="mt-4 text-right">
         <Link
           href="/admin/social/drafts"
-          className="text-ink text-sm hover:underline"
+          className="text-accent text-sm hover:underline"
         >
           View all drafts →
         </Link>

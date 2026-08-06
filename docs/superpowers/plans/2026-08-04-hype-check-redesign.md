@@ -21,23 +21,25 @@
 ### Task 1: Color tokens, dark mode, and the slab-serif font
 
 **Files:**
+
 - Modify: `apps/hype-check/app/globals.css` (full file replacement)
 - Modify: `apps/hype-check/app/layout.tsx:1-2,19-25,85` (font import/loader/className)
 
 **Interfaces:**
-- Produces: Tailwind utility classes `bg-paper`, `bg-surface`, `text-ink`, `text-ink-muted`, `border-hairline`, `bg-brand-red`/`text-brand-red`/`border-brand-red`, `bg-verdict-legit`/`text-verdict-legit`/`border-verdict-legit` (and the same `-misleading`/`-overpriced`/`-risky`/`-scam` variants), and `font-slab`. Every later task consumes these class names — spelling must match exactly.
-- Produces: CSS variable `--font-slab` (set by the `Zilla_Slab` font loader in `layout.tsx`), consumed by the `.mh-logotype-wordmark` rule in this same file and by the `font-slab` Tailwind utility.
+
+- Produces: Tailwind utility classes `bg-paper`, `bg-surface`, `text-accent`, `text-muted`, `border-hairline`, `bg-brand-red`/`text-brand-red`/`border-brand-red`, `bg-verdict-legit`/`text-verdict-legit`/`border-verdict-legit` (and the same `-misleading`/`-overpriced`/`-risky`/`-scam` variants), and `font-serif`. Every later task consumes these class names — spelling must match exactly.
+- Produces: CSS variable `--font-serif` (set by the `Zilla_Slab` font loader in `layout.tsx`), consumed by the `.mh-logotype-wordmark` rule in this same file and by the `font-serif` Tailwind utility.
 
 - [ ] **Step 1: Replace `apps/hype-check/app/globals.css` with the following**
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --paper: #f5f1e8;
   --surface: #fbf9f4;
-  --ink: #14110f;
-  --ink-muted: #6b6459;
+  --accent: #14110f;
+  --muted: #6b6459;
   --hairline: #d9d2c3;
   --brand-red: #c1272d;
   --verdict-legit: #1e7a46;
@@ -50,8 +52,8 @@
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
   --color-hairline: var(--hairline);
   --color-brand-red: var(--brand-red);
   --color-verdict-legit: var(--verdict-legit);
@@ -60,15 +62,15 @@
   --color-verdict-risky: var(--verdict-risky);
   --color-verdict-scam: var(--verdict-scam);
   --font-sans: var(--font-inter);
-  --font-slab: var(--font-slab);
+  --font-serif: var(--font-serif);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --paper: #14110f;
     --surface: #1c1815;
-    --ink: #f5f1e8;
-    --ink-muted: #b5aea0;
+    --accent: #f5f1e8;
+    --muted: #b5aea0;
     --hairline: #3a342c;
     --brand-red: #e2555a;
     --verdict-legit: #34a868;
@@ -81,7 +83,7 @@
 
 body {
   background: var(--paper);
-  color: var(--ink);
+  color: var(--accent);
   font-family:
     var(--font-sans),
     system-ui,
@@ -116,7 +118,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--ink);
+  color: var(--accent);
 }
 
 .mh-logotype-mark {
@@ -132,7 +134,7 @@ a {
 }
 
 .mh-logotype-mark-burst {
-  fill: var(--ink);
+  fill: var(--accent);
 }
 
 .mh-logotype-mark-check {
@@ -141,11 +143,11 @@ a {
 }
 
 .mh-logotype-wordmark {
-  font-family: var(--font-slab), Georgia, "Times New Roman", serif;
+  font-family: var(--font-serif), Georgia, 'Times New Roman', serif;
   font-weight: 700;
   font-size: var(--mh-logo-wordmark-size);
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: var(--accent);
   white-space: nowrap;
 }
 
@@ -181,24 +183,24 @@ a {
 Change the import on line 2 from:
 
 ```ts
-import { Inter, EB_Garamond } from "next/font/google";
+import { Inter, EB_Garamond } from 'next/font/google';
 ```
 
 to:
 
 ```ts
-import { Inter, Zilla_Slab } from "next/font/google";
+import { Inter, Zilla_Slab } from 'next/font/google';
 ```
 
 Change the `ebGaramond` loader (lines 19-25) from:
 
 ```ts
 const ebGaramond = EB_Garamond({
-  variable: "--font-logotype",
-  subsets: ["latin"],
-  weight: "600",
-  style: "italic",
-  display: "swap",
+  variable: '--font-logotype',
+  subsets: ['latin'],
+  weight: '600',
+  style: 'italic',
+  display: 'swap',
 });
 ```
 
@@ -206,10 +208,10 @@ to:
 
 ```ts
 const zillaSlab = Zilla_Slab({
-  variable: "--font-slab",
-  subsets: ["latin"],
-  weight: "700",
-  display: "swap",
+  variable: '--font-serif',
+  subsets: ['latin'],
+  weight: '700',
+  display: 'swap',
 });
 ```
 
@@ -242,10 +244,12 @@ git commit -m "Add Verdict Stamp Editorial color tokens and slab-serif font"
 ### Task 2: Rebuild the BrandLogotype component
 
 **Files:**
+
 - Modify: `apps/hype-check/components/ui/BrandLogotype.tsx` (full file replacement)
 
 **Interfaces:**
-- Consumes: CSS classes/tokens from Task 1 (`.mh-logotype`, `.mh-logotype-mark`, `.mh-logotype-mark-burst`, `.mh-logotype-mark-check`, `.mh-logotype-wordmark`, `--font-slab`).
+
+- Consumes: CSS classes/tokens from Task 1 (`.mh-logotype`, `.mh-logotype-mark`, `.mh-logotype-mark-burst`, `.mh-logotype-mark-check`, `.mh-logotype-wordmark`, `--font-serif`).
 - Produces: `BrandLogotype({ className?: string; size?: 'sm' | 'md' })` — same public API as before, so `SiteHeader.tsx` and `(public)/layout.tsx` need no prop-shape changes (only className tweaks around their usages, done in Tasks 7-8).
 
 - [ ] **Step 1: Replace `apps/hype-check/components/ui/BrandLogotype.tsx` with the following**
@@ -273,11 +277,7 @@ const SIZE_STYLES: Record<BrandLogotypeSize, CSSProperties> = {
 
 export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProps) {
   return (
-    <span
-      className={`mh-logotype ${className}`.trim()}
-      style={SIZE_STYLES[size]}
-      aria-label="Hype Check"
-    >
+    <span className={`mh-logotype ${className}`.trim()} style={SIZE_STYLES[size]} aria-label="Hype Check">
       <span className="mh-logotype-mark" aria-hidden="true">
         <svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -319,11 +319,13 @@ git commit -m "Rebuild Hype Check logotype as a burst-badge stamp mark"
 ### Task 3: VerdictStamp component
 
 **Files:**
+
 - Create: `apps/hype-check/components/ui/VerdictStamp.tsx`
 - Test: `apps/hype-check/__tests__/VerdictStamp.test.tsx`
 
 **Interfaces:**
-- Consumes: CSS tokens from Task 1 (`border-verdict-*`, `text-verdict-*`, `font-slab`).
+
+- Consumes: CSS tokens from Task 1 (`border-verdict-*`, `text-verdict-*`, `font-serif`).
 - Produces: `export type VerdictType = 'LEGIT' | 'MISLEADING' | 'OVERPRICED' | 'RISKY' | 'SCAM'` and `VerdictStamp({ verdict: VerdictType | null | undefined })` — a component that renders `null` when `verdict` is falsy. Task 5 (`HypeVideoCard`) imports both the component and the type from this file.
 
 - [ ] **Step 1: Write the failing test**
@@ -331,34 +333,28 @@ git commit -m "Rebuild Hype Check logotype as a burst-badge stamp mark"
 Create `apps/hype-check/__tests__/VerdictStamp.test.tsx`:
 
 ```tsx
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { VerdictStamp } from "@/components/ui/VerdictStamp";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { VerdictStamp } from '@/components/ui/VerdictStamp';
 
-describe("VerdictStamp", () => {
-  it("renders nothing when there is no verdict", () => {
+describe('VerdictStamp', () => {
+  it('renders nothing when there is no verdict', () => {
     const { container } = render(<VerdictStamp verdict={null} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders nothing when verdict is undefined", () => {
+  it('renders nothing when verdict is undefined', () => {
     const { container } = render(<VerdictStamp verdict={undefined} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders the verdict label when a verdict is present", () => {
+  it('renders the verdict label when a verdict is present', () => {
     render(<VerdictStamp verdict="LEGIT" />);
-    expect(screen.getByText("LEGIT")).toBeInTheDocument();
+    expect(screen.getByText('LEGIT')).toBeInTheDocument();
   });
 
-  it("renders every verdict type without throwing", () => {
-    const verdicts = [
-      "LEGIT",
-      "MISLEADING",
-      "OVERPRICED",
-      "RISKY",
-      "SCAM",
-    ] as const;
+  it('renders every verdict type without throwing', () => {
+    const verdicts = ['LEGIT', 'MISLEADING', 'OVERPRICED', 'RISKY', 'SCAM'] as const;
     for (const verdict of verdicts) {
       const { unmount } = render(<VerdictStamp verdict={verdict} />);
       expect(screen.getByText(verdict)).toBeInTheDocument();
@@ -376,12 +372,7 @@ Expected: FAIL — `apps/hype-check/components/ui/VerdictStamp.tsx` doesn't exis
 - [ ] **Step 3: Create `apps/hype-check/components/ui/VerdictStamp.tsx`**
 
 ```tsx
-export type VerdictType =
-  | 'LEGIT'
-  | 'MISLEADING'
-  | 'OVERPRICED'
-  | 'RISKY'
-  | 'SCAM';
+export type VerdictType = 'LEGIT' | 'MISLEADING' | 'OVERPRICED' | 'RISKY' | 'SCAM';
 
 const VERDICT_STYLES: Record<VerdictType, string> = {
   LEGIT: 'border-verdict-legit text-verdict-legit -rotate-2',
@@ -400,7 +391,7 @@ export function VerdictStamp({ verdict }: VerdictStampProps) {
 
   return (
     <span
-      className={`inline-block rounded-sm border-[2.5px] px-2.5 py-0.5 font-slab text-xs font-black tracking-widest uppercase ${VERDICT_STYLES[verdict]}`}
+      className={`inline-block rounded-sm border-[2.5px] px-2.5 py-0.5 font-serif text-xs font-black tracking-widest uppercase ${VERDICT_STYLES[verdict]}`}
     >
       {verdict}
     </span>
@@ -430,9 +421,11 @@ git commit -m "Add VerdictStamp component with fallback-to-null behavior"
 ### Task 4: Include the real verdict in the home page queries
 
 **Files:**
+
 - Modify: `apps/hype-check/lib/db/queries.ts:8-25` (`getFeaturedVideo`), `apps/hype-check/lib/db/queries.ts:29-50` (`_getTrendingVideosCached`)
 
 **Interfaces:**
+
 - Produces: `getFeaturedVideo()` and `getTrendingVideos()` results now include `verdict: Verdict | null` (Prisma's generated type, where `Verdict.verdict` is the 5-value `VerdictType`). Task 6 reads `result.verdict?.verdict` and passes it to `HypeVideoCard`/`VerdictStamp`.
 
 - [ ] **Step 1: Add `verdict: true` to `getFeaturedVideo`'s include**
@@ -514,9 +507,11 @@ git commit -m "Include verdict in featured/trending video queries"
 ### Task 5: HypeVideoCard component
 
 **Files:**
+
 - Create: `apps/hype-check/components/ui/HypeVideoCard.tsx`
 
 **Interfaces:**
+
 - Consumes: `VerdictStamp` and `VerdictType` from `./VerdictStamp` (Task 3), `EvidenceBadge`/`RiskBadge` from `@menhealth/ui` (unchanged, shared).
 - Produces: `HypeVideoCard(props)` with the same prop shape as the shared `VideoCard` plus an added `verdict?: VerdictType | null`. Task 6 imports this to replace `VideoCard` on the home page.
 
@@ -560,33 +555,22 @@ export function HypeVideoCard({
 }: HypeVideoCardProps) {
   const watchTimeMin = durationSeconds ? Math.ceil(durationSeconds / 60) : null;
 
-  const sizes =
-    customSizes ?? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
+  const sizes = customSizes ?? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
 
   return (
     <Link
       href={`/videos/${slug}`}
-      className="group flex flex-col overflow-hidden rounded-md border border-hairline bg-surface transition-colors hover:border-ink"
+      className="group flex flex-col overflow-hidden rounded-md border border-hairline bg-surface transition-colors hover:border-accent"
     >
       {thumbnailUrl && (
         <div className="relative aspect-video w-full bg-hairline/40">
-          <Image
-            src={thumbnailUrl}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes={sizes}
-            priority={priority}
-          />
+          <Image src={thumbnailUrl} alt={title} fill className="object-cover" sizes={sizes} priority={priority} />
         </div>
       )}
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex flex-wrap items-center gap-1.5">
           {topicNames.slice(0, 2).map((name) => (
-            <span
-              key={name}
-              className="rounded-full border border-hairline px-2 py-0.5 text-xs font-medium text-ink-muted"
-            >
+            <span key={name} className="rounded-full border border-hairline px-2 py-0.5 text-xs font-medium text-muted">
               {name}
             </span>
           ))}
@@ -595,23 +579,13 @@ export function HypeVideoCard({
         {(verdict || evidenceLabel || watchTimeMin) && (
           <div className="flex flex-wrap items-center gap-1.5">
             <VerdictStamp verdict={verdict} />
-            {!verdict && evidenceLabel && (
-              <EvidenceBadge status={evidenceLabel} />
-            )}
-            {watchTimeMin && (
-              <span className="text-xs text-ink-muted">
-                {watchTimeMin} min watch
-              </span>
-            )}
+            {!verdict && evidenceLabel && <EvidenceBadge status={evidenceLabel} />}
+            {watchTimeMin && <span className="text-xs text-muted">{watchTimeMin} min watch</span>}
           </div>
         )}
-        <h3 className="line-clamp-2 font-slab text-base font-bold text-ink">
-          {title}
-        </h3>
-        {shortSummary && (
-          <p className="line-clamp-2 text-xs text-ink-muted">{shortSummary}</p>
-        )}
-        <p className="mt-auto text-xs text-ink-muted">{channelTitle}</p>
+        <h3 className="line-clamp-2 font-serif text-base font-bold text-accent">{title}</h3>
+        {shortSummary && <p className="line-clamp-2 text-xs text-muted">{shortSummary}</p>}
+        <p className="mt-auto text-xs text-muted">{channelTitle}</p>
       </div>
     </Link>
   );
@@ -635,15 +609,17 @@ git commit -m "Add hype-check-local HypeVideoCard (shared VideoCard stays untouc
 ### Task 6: Restyle the home page and wire in verdict stamps
 
 **Files:**
+
 - Modify: `apps/hype-check/app/(public)/page.tsx` (full file replacement)
 
 **Interfaces:**
-- Consumes: `HypeVideoCard` (Task 5), tokens/`font-slab` (Task 1), `verdict` field on query results (Task 4).
+
+- Consumes: `HypeVideoCard` (Task 5), tokens/`font-serif` (Task 1), `verdict` field on query results (Task 4).
 
 - [ ] **Step 1: Replace `apps/hype-check/app/(public)/page.tsx` with the following**
 
 ```tsx
-import { EvidenceBadge, HowWeRateClaims, NewsletterSignupForm, RiskBadge } from "@menhealth/ui";
+import { EvidenceBadge, HowWeRateClaims, NewsletterSignupForm, RiskBadge } from '@menhealth/ui';
 import { HypeVideoCard } from '@/components/ui/HypeVideoCard';
 import { VerdictStamp } from '@/components/ui/VerdictStamp';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
@@ -654,27 +630,23 @@ import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Hype Check — Legit, or Just Hype?",
+    absolute: 'Hype Check — Legit, or Just Hype?',
   },
   description:
-    "Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.",
+    'Evidence-based verdicts on trending products, courses, side hustles, and investment apps — legit, misleading, overpriced, risky, or scam.',
   openGraph: {
-    title: "Hype Check — Legit, or Just Hype?",
-    description:
-      "Evidence-based verdicts on trending products, courses, side hustles, and investment apps.",
+    title: 'Hype Check — Legit, or Just Hype?',
+    description: 'Evidence-based verdicts on trending products, courses, side hustles, and investment apps.',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hype Check',
-    description:
-      "Evidence-based verdicts on trending products, courses, and side hustles — without the hype.",
+    description: 'Evidence-based verdicts on trending products, courses, and side hustles — without the hype.',
   },
 };
 
-function deriveEvidenceLabel(
-  score: number | null | undefined
-): string | undefined {
+function deriveEvidenceLabel(score: number | null | undefined): string | undefined {
   if (score == null) return undefined;
   if (score < 0.35) return 'WEAK';
   if (score < 0.6) return 'MIXED';
@@ -699,58 +671,40 @@ async function FeaturedInsight() {
 
   const featuredSummary = featuredVideo.sourceVideos[0]?.summaries[0] ?? null;
   const featuredClaim = featuredVideo.claims[0] ?? null;
-  const featuredWatchMin = featuredVideo.durationSeconds
-    ? Math.ceil(featuredVideo.durationSeconds / 60)
-    : null;
+  const featuredWatchMin = featuredVideo.durationSeconds ? Math.ceil(featuredVideo.durationSeconds / 60) : null;
 
   if (!featuredSummary) return null;
 
   return (
     <section className="bg-surface py-12">
       <div className="mx-auto max-w-[1120px] px-4">
-        <p className="mb-5 text-sm font-semibold tracking-widest text-ink-muted uppercase">
-          Today&apos;s top insight
-        </p>
+        <p className="mb-5 text-sm font-semibold tracking-widest text-muted uppercase">Today&apos;s top insight</p>
         <div className="rounded-md border border-hairline bg-paper p-6 sm:p-8">
           {featuredClaim && (
             <div className="mb-4">
-              <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                The claim
-              </p>
-              <p className="mt-1 text-lg font-semibold text-ink">
-                &ldquo;{featuredClaim.text}&rdquo;
-              </p>
+              <p className="text-xs font-semibold tracking-wide text-muted uppercase">The claim</p>
+              <p className="mt-1 text-lg font-semibold text-accent">&ldquo;{featuredClaim.text}&rdquo;</p>
             </div>
           )}
           <div className="mb-5">
-            <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">
-              Our take
-            </p>
-            <p className="mt-1 leading-relaxed text-ink">
-              {featuredSummary.shortSummary}
-            </p>
+            <p className="text-xs font-semibold tracking-wide text-muted uppercase">Our take</p>
+            <p className="mt-1 leading-relaxed text-accent">{featuredSummary.shortSummary}</p>
           </div>
           <div className="mb-5 flex flex-wrap items-center gap-2">
             {featuredVideo.verdict?.verdict ? (
               <VerdictStamp verdict={featuredVideo.verdict.verdict} />
             ) : (
               <>
-                {featuredClaim && (
-                  <EvidenceBadge status={featuredClaim.evidenceStatus} />
-                )}
+                {featuredClaim && <EvidenceBadge status={featuredClaim.evidenceStatus} />}
                 <RiskBadge level={featuredVideo.riskLevel} />
               </>
             )}
-            {featuredWatchMin && (
-              <span className="text-xs text-ink-muted">
-                {featuredWatchMin} min watch
-              </span>
-            )}
-            <span className="text-xs text-ink-muted">~ 2 min read</span>
+            {featuredWatchMin && <span className="text-xs text-muted">{featuredWatchMin} min watch</span>}
+            <span className="text-xs text-muted">~ 2 min read</span>
           </div>
           <Link
             href={`/videos/${featuredVideo.slug}`}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-ink underline decoration-hairline underline-offset-4 hover:decoration-ink"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-accent underline decoration-hairline underline-offset-4 hover:decoration-accent"
           >
             Read the breakdown &rarr;
           </Link>
@@ -761,22 +715,15 @@ async function FeaturedInsight() {
 }
 
 async function TrendingVideos() {
-  const [featuredVideo, allVideos] = await Promise.all([
-    getFeaturedVideo(),
-    getTrendingVideos(),
-  ]);
+  const [featuredVideo, allVideos] = await Promise.all([getFeaturedVideo(), getTrendingVideos()]);
   const videos = allVideos.filter((v) => v.id !== featuredVideo?.id);
 
   return (
     <section id="trending" className="py-14">
       <div className="mx-auto max-w-[1120px] px-4">
-        <h2 className="mb-6 font-slab text-2xl font-bold text-ink">
-          Trending summaries
-        </h2>
+        <h2 className="mb-6 font-serif text-2xl font-bold text-accent">Trending summaries</h2>
         {videos.length === 0 ? (
-          <p className="text-ink-muted">
-            No published summaries yet. Check back soon.
-          </p>
+          <p className="text-muted">No published summaries yet. Check back soon.</p>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {videos.map((video, index) => (
@@ -804,44 +751,39 @@ async function TrendingVideos() {
 }
 
 export default async function HomePage() {
-  const featuredTopics = TOPIC_SEEDS.filter((t) =>
-    FEATURED_TOPIC_SLUGS.includes(t.slug)
-  );
-  const remainingTopics = TOPIC_SEEDS.filter(
-    (t) => !FEATURED_TOPIC_SLUGS.includes(t.slug)
-  );
+  const featuredTopics = TOPIC_SEEDS.filter((t) => FEATURED_TOPIC_SLUGS.includes(t.slug));
+  const remainingTopics = TOPIC_SEEDS.filter((t) => !FEATURED_TOPIC_SLUGS.includes(t.slug));
 
   return (
     <main>
       {/* Hero */}
       <section className="border-b border-hairline bg-paper py-16">
         <div className="mx-auto max-w-[1120px] px-4">
-          <h1 className="max-w-2xl font-slab text-4xl font-bold tracking-tight text-ink sm:text-5xl">
+          <h1 className="max-w-2xl font-serif text-4xl font-bold tracking-tight text-accent sm:text-5xl">
             Trending products and side hustles,{' '}
-            <span className="underline decoration-ink decoration-4 underline-offset-4">
+            <span className="underline decoration-accent decoration-4 underline-offset-4">
               explained without the hype.
             </span>
           </h1>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-muted">
-            We scan trending YouTube videos about products, courses, side
-            hustles, and investment apps — then summarise the key claims and
-            check them against available evidence.
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted">
+            We scan trending YouTube videos about products, courses, side hustles, and investment apps — then summarise
+            the key claims and check them against available evidence.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/digest"
-              className="rounded-sm bg-ink px-5 py-2.5 text-sm font-semibold text-paper hover:bg-ink-muted"
+              className="rounded-sm bg-accent px-5 py-2.5 text-sm font-semibold text-paper hover:bg-muted"
             >
               Get the free digest
             </Link>
             <Link
               href="#trending"
-              className="rounded-sm border border-hairline px-5 py-2.5 text-sm font-semibold text-ink hover:bg-surface"
+              className="rounded-sm border border-hairline px-5 py-2.5 text-sm font-semibold text-accent hover:bg-surface"
             >
               Explore trending videos
             </Link>
           </div>
-          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink-muted">
+          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted">
             <li>✓ Official YouTube embeds</li>
             <li>✓ AI-assisted summaries</li>
             <li>✓ Evidence-aware claim checks</li>
@@ -849,50 +791,37 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Suspense
-        fallback={
-          <div
-            className="min-h-[420px] bg-surface py-12 lg:min-h-[358px]"
-            aria-hidden
-          />
-        }
-      >
+      <Suspense fallback={<div className="min-h-[420px] bg-surface py-12 lg:min-h-[358px]" aria-hidden />}>
         <FeaturedInsight />
       </Suspense>
 
       {/* Topic cards */}
       <section id="topics" className="py-14">
         <div className="mx-auto min-h-[652px] max-w-[1120px] px-4 lg:min-h-[354px]">
-          <h2 className="mb-6 font-slab text-2xl font-bold text-ink">
-            Browse by topic
-          </h2>
+          <h2 className="mb-6 font-serif text-2xl font-bold text-accent">Browse by topic</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {featuredTopics.map((topic) => (
               <Link
                 key={topic.slug}
                 href={`/topics/${topic.slug}`}
-                className="group rounded-md border border-hairline bg-surface p-4 transition-colors hover:border-ink"
+                className="group rounded-md border border-hairline bg-surface p-4 transition-colors hover:border-accent"
               >
-                <p className="font-semibold text-ink">
-                  {topic.name}
-                </p>
-                <p className="mt-1 line-clamp-2 text-xs leading-snug text-ink-muted">
-                  {topic.description}
-                </p>
-                <p className="mt-3 text-xs font-medium text-ink underline decoration-hairline underline-offset-2 group-hover:decoration-ink">
+                <p className="font-semibold text-accent">{topic.name}</p>
+                <p className="mt-1 line-clamp-2 text-xs leading-snug text-muted">{topic.description}</p>
+                <p className="mt-3 text-xs font-medium text-accent underline decoration-hairline underline-offset-2 group-hover:decoration-accent">
                   Explore →
                 </p>
               </Link>
             ))}
           </div>
           {remainingTopics.length > 0 && (
-            <p className="mt-4 text-sm text-ink-muted">
+            <p className="mt-4 text-sm text-muted">
               More topics:{' '}
               {remainingTopics.map((t, i) => (
                 <span key={t.slug}>
                   <Link
                     href={`/topics/${t.slug}`}
-                    className="text-ink underline decoration-hairline hover:decoration-ink"
+                    className="text-accent underline decoration-hairline hover:decoration-accent"
                   >
                     {t.name}
                   </Link>
@@ -911,10 +840,7 @@ export default async function HomePage() {
               <div className="mb-6 h-8 w-48 animate-pulse rounded bg-hairline/40" />
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-64 animate-pulse rounded-md bg-hairline/20"
-                  />
+                  <div key={i} className="h-64 animate-pulse rounded-md bg-hairline/20" />
                 ))}
               </div>
             </div>
@@ -927,11 +853,9 @@ export default async function HomePage() {
       {/* Newsletter */}
       <section className="bg-surface py-16">
         <div className="mx-auto max-w-lg px-4 text-center">
-          <h2 className="font-slab text-2xl font-bold text-ink">
-            Get the 5-minute Hype Check Digest
-          </h2>
-          <p className="mt-2 text-sm text-ink-muted">Every week:</p>
-          <ul className="mt-2 space-y-0.5 text-sm text-ink-muted">
+          <h2 className="font-serif text-2xl font-bold text-accent">Get the 5-minute Hype Check Digest</h2>
+          <p className="mt-2 text-sm text-muted">Every week:</p>
+          <ul className="mt-2 space-y-0.5 text-sm text-muted">
             <li>5 trending videos summarised</li>
             <li>3 claims checked</li>
             <li>1 practical takeaway</li>
@@ -967,6 +891,7 @@ Expected: all existing tests plus `VerdictStamp.test.tsx` pass.
 
 Run: `pnpm --filter hype-check dev`
 Visit `http://localhost:3000` and confirm:
+
 - Hero, featured insight, topic cards, trending grid, and newsletter section all use the cream/ink palette (no leftover indigo/gray-50/slate-50 classes visible)
 - Cards in the trending grid show either a colored verdict stamp or the existing evidence/risk badges (verdict stamps require a subject that's been through admin review — check `/admin/videos` to confirm at least one subject has a verdict to see this rendered)
 - Dark mode: toggle your OS to dark mode (or use browser devtools' "prefers-color-scheme: dark" emulation) and confirm the page switches to the dark ink/cream-text variant, not left inverted oddly
@@ -983,9 +908,11 @@ git commit -m "Restyle home page to Verdict Stamp Editorial and surface real ver
 ### Task 7: Restyle SiteHeader
 
 **Files:**
+
 - Modify: `apps/hype-check/components/ui/SiteHeader.tsx` (full file replacement)
 
 **Interfaces:**
+
 - Consumes: tokens from Task 1, rebuilt `BrandLogotype` from Task 2 (no prop changes needed — same `size="sm" | "md"` API).
 
 - [ ] **Step 1: Replace `apps/hype-check/components/ui/SiteHeader.tsx` with the following**
@@ -1013,36 +940,36 @@ const navLinks = [
     href: '/topics',
     label: 'Topics',
     className:
-      'font-semibold text-ink underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
+      'font-semibold text-accent underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
   },
   {
     href: '/rankings',
     label: 'Rankings',
     className:
-      'font-semibold text-ink underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
+      'font-semibold text-accent underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
   },
   {
     href: '/creators',
     label: 'Creators',
     className:
-      'font-semibold text-ink underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
+      'font-semibold text-accent underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
   },
   {
     href: '/weekly',
     label: 'Weekly',
     className:
-      'font-semibold text-ink underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
+      'font-semibold text-accent underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
   },
   {
     href: '/how-we-rate-evidence',
     label: 'How It Works',
     className:
-      'font-semibold text-ink underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
+      'font-semibold text-accent underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-hairline',
   },
   {
     href: '/newsletter',
     label: 'Newsletter',
-    className: 'rounded-sm bg-ink px-3 py-1.5 font-semibold text-paper hover:bg-ink-muted',
+    className: 'rounded-sm bg-accent px-3 py-1.5 font-semibold text-paper hover:bg-muted',
   },
 ];
 
@@ -1056,11 +983,7 @@ function HamburgerIcon() {
       stroke="currentColor"
       strokeWidth={2}
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4 6h16M4 12h16M4 18h16"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
     </svg>
   );
 }
@@ -1075,11 +998,7 @@ function CloseIcon() {
       stroke="currentColor"
       strokeWidth={2}
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 18L18 6M6 6l12 12"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
   );
 }
@@ -1128,7 +1047,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
         <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-2 lg:py-4">
           <Link
             href="/"
-            className="rounded-md focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
+            className="rounded-md focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:outline-none"
           >
             <BrandLogotype size="md" />
           </Link>
@@ -1143,22 +1062,19 @@ export function SiteHeader({ user }: SiteHeaderProps) {
             {user ? (
               <Link
                 href="/account"
-                className="rounded-sm border border-hairline px-3 py-1.5 text-ink hover:bg-surface"
+                className="rounded-sm border border-hairline px-3 py-1.5 text-accent hover:bg-surface"
               >
                 {user.name ?? user.email ?? 'Account'}
               </Link>
             ) : (
-              <Link
-                href="/signin"
-                className="text-ink-muted hover:text-ink"
-              >
+              <Link href="/signin" className="text-muted hover:text-accent">
                 Sign in
               </Link>
             )}
             {!user?.isPremium && premium?.isEnabled() && (
               <Link
                 href="/upgrade"
-                className="rounded-sm bg-ink px-3 py-1.5 font-semibold text-paper hover:bg-ink-muted"
+                className="rounded-sm bg-accent px-3 py-1.5 font-semibold text-paper hover:bg-muted"
               >
                 Go premium
               </Link>
@@ -1169,7 +1085,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           <button
             type="button"
             onClick={openDrawer}
-            className="flex items-center justify-center rounded-md p-2 text-ink-muted hover:bg-surface hover:text-ink md:hidden"
+            className="flex items-center justify-center rounded-md p-2 text-muted hover:bg-surface hover:text-accent md:hidden"
             aria-label="Open menu"
           >
             <HamburgerIcon />
@@ -1207,14 +1123,14 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               <Link
                 href="/"
                 onClick={closeDrawer}
-                className="rounded-md focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
+                className="rounded-md focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:outline-none"
               >
                 <BrandLogotype size="sm" />
               </Link>
               <button
                 type="button"
                 onClick={closeDrawer}
-                className="rounded-sm p-2 text-ink-muted hover:bg-surface hover:text-ink"
+                className="rounded-sm p-2 text-muted hover:bg-surface hover:text-accent"
                 aria-label="Close menu"
               >
                 <CloseIcon />
@@ -1230,22 +1146,18 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                   key={link.href}
                   href={link.href}
                   onClick={closeDrawer}
-                  className="group flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium text-ink transition-colors hover:bg-surface active:bg-hairline/40"
+                  className="group flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium text-accent transition-colors hover:bg-surface active:bg-hairline/40"
                 >
                   {link.label}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-hairline transition-transform group-hover:translate-x-0.5 group-hover:text-ink-muted"
+                    className="h-4 w-4 text-hairline transition-transform group-hover:translate-x-0.5 group-hover:text-muted"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                     strokeWidth={2.5}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
               ))}
@@ -1256,44 +1168,36 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 <Link
                   href="/account"
                   onClick={closeDrawer}
-                  className="group flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium text-ink transition-colors hover:bg-surface active:bg-hairline/40"
+                  className="group flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium text-accent transition-colors hover:bg-surface active:bg-hairline/40"
                 >
                   {user.name ?? user.email ?? 'Account'}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-hairline transition-transform group-hover:translate-x-0.5 group-hover:text-ink-muted"
+                    className="h-4 w-4 text-hairline transition-transform group-hover:translate-x-0.5 group-hover:text-muted"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                     strokeWidth={2.5}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
               ) : (
                 <Link
                   href="/signin"
                   onClick={closeDrawer}
-                  className="group flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium text-ink transition-colors hover:bg-surface active:bg-hairline/40"
+                  className="group flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium text-accent transition-colors hover:bg-surface active:bg-hairline/40"
                 >
                   Sign in
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-hairline transition-transform group-hover:translate-x-0.5 group-hover:text-ink-muted"
+                    className="h-4 w-4 text-hairline transition-transform group-hover:translate-x-0.5 group-hover:text-muted"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                     strokeWidth={2.5}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
               )}
@@ -1305,7 +1209,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                 <Link
                   href="/upgrade"
                   onClick={closeDrawer}
-                  className="flex w-full items-center justify-center gap-2 rounded-md bg-ink px-5 py-4 text-base font-semibold text-paper transition-colors hover:bg-ink-muted active:bg-ink-muted"
+                  className="flex w-full items-center justify-center gap-2 rounded-md bg-accent px-5 py-4 text-base font-semibold text-paper transition-colors hover:bg-muted active:bg-muted"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1315,11 +1219,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     stroke="currentColor"
                     strokeWidth={2.5}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 3l14 9-14 9V3z"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3l14 9-14 9V3z" />
                   </svg>
                   Go premium
                 </Link>
@@ -1354,9 +1254,11 @@ git commit -m "Restyle SiteHeader to Verdict Stamp Editorial palette"
 ### Task 8: Restyle the public footer
 
 **Files:**
+
 - Modify: `apps/hype-check/app/(public)/layout.tsx` (full file replacement)
 
 **Interfaces:**
+
 - Consumes: tokens from Task 1, rebuilt `BrandLogotype` from Task 2, restyled `SiteHeader` from Task 7.
 
 - [ ] **Step 1: Replace `apps/hype-check/app/(public)/layout.tsx` with the following**
@@ -1393,11 +1295,7 @@ function HeaderShell() {
   return <SiteHeader user={undefined} />;
 }
 
-export default async function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-paper">
       <Suspense fallback={<HeaderShell />}>
@@ -1413,15 +1311,14 @@ export default async function PublicLayout({
             <div className="col-span-2 sm:col-span-1">
               <Link
                 href="/"
-                className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:outline-none"
+                className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:outline-none"
               >
                 <BrandLogotype size="md" />
               </Link>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                Evidence-based verdicts on trending products, courses, and
-                side hustles — without the hype.
+              <p className="mt-2 text-sm leading-relaxed text-muted">
+                Evidence-based verdicts on trending products, courses, and side hustles — without the hype.
               </p>
-              <ul className="mt-4 space-y-1 text-xs text-ink-muted">
+              <ul className="mt-4 space-y-1 text-xs text-muted">
                 <li>✓ Educational content only. Not financial advice.</li>
                 <li>✓ We do not host or restream YouTube videos.</li>
                 <li>✓ Affiliate links are clearly disclosed.</li>
@@ -1430,62 +1327,50 @@ export default async function PublicLayout({
 
             {/* About links */}
             <div>
-              <h3 className="text-sm font-semibold text-ink">About</h3>
-              <ul className="mt-3 space-y-2 text-sm text-ink-muted">
+              <h3 className="text-sm font-semibold text-accent">About</h3>
+              <ul className="mt-3 space-y-2 text-sm text-muted">
                 <li>
-                  <Link href="/about" className="hover:text-ink">
+                  <Link href="/about" className="hover:text-accent">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/how-we-rate-evidence"
-                    className="hover:text-ink"
-                  >
+                  <Link href="/how-we-rate-evidence" className="hover:text-accent">
                     How We Rate Evidence
                   </Link>
                 </li>
                 <li>
-                  <Link href="/glossary" className="hover:text-ink">
+                  <Link href="/glossary" className="hover:text-accent">
                     Glossary
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" className="hover:text-ink">
+                  <Link href="/faq" className="hover:text-accent">
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/editorial-process"
-                    className="hover:text-ink"
-                  >
+                  <Link href="/editorial-process" className="hover:text-accent">
                     Editorial Process
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/disclaimer"
-                    className="hover:text-ink"
-                  >
+                  <Link href="/disclaimer" className="hover:text-accent">
                     Disclaimer
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/affiliate-disclosure"
-                    className="hover:text-ink"
-                  >
+                  <Link href="/affiliate-disclosure" className="hover:text-accent">
                     Affiliate Disclosure
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy" className="hover:text-ink">
+                  <Link href="/privacy" className="hover:text-accent">
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:text-ink">
+                  <Link href="/contact" className="hover:text-accent">
                     Contact
                   </Link>
                 </li>
@@ -1494,18 +1379,15 @@ export default async function PublicLayout({
 
             {/* Top topics */}
             <div>
-              <h3 className="text-sm font-semibold text-ink">
-                <Link href="/topics" className="hover:text-ink-muted">
+              <h3 className="text-sm font-semibold text-accent">
+                <Link href="/topics" className="hover:text-muted">
                   Top Topics
                 </Link>
               </h3>
-              <ul className="mt-3 space-y-2 text-sm text-ink-muted">
+              <ul className="mt-3 space-y-2 text-sm text-muted">
                 {FOOTER_TOPICS.map((topic) => (
                   <li key={topic.slug}>
-                    <Link
-                      href={`/topics/${topic.slug}`}
-                      className="hover:text-ink"
-                    >
+                    <Link href={`/topics/${topic.slug}`} className="hover:text-accent">
                       {topic.name}
                     </Link>
                   </li>
@@ -1513,7 +1395,7 @@ export default async function PublicLayout({
                 <li>
                   <Link
                     href="/topics"
-                    className="font-medium text-ink underline decoration-hairline hover:decoration-ink"
+                    className="font-medium text-accent underline decoration-hairline hover:decoration-accent"
                   >
                     View all topics →
                   </Link>
@@ -1522,16 +1404,13 @@ export default async function PublicLayout({
             </div>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-6 text-xs text-ink-muted">
-            <p>
-              © {new Date().getFullYear()} Hype Check. All rights
-              reserved.
-            </p>
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-6 text-xs text-muted">
+            <p>© {new Date().getFullYear()} Hype Check. All rights reserved.</p>
             <div className="flex gap-4">
-              <Link href="/privacy" className="hover:text-ink">
+              <Link href="/privacy" className="hover:text-accent">
                 Privacy
               </Link>
-              <Link href="/contact" className="hover:text-ink">
+              <Link href="/contact" className="hover:text-accent">
                 Contact
               </Link>
             </div>

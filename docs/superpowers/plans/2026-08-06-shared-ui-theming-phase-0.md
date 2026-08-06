@@ -4,7 +4,7 @@
 
 **Goal:** Prove the shared-UI/token pattern end-to-end on a small slice of already-duplicated code — `BrandLogotype`, `SiteHeader`, `NewsletterSignupForm`, `HowWeRateClaims` — before committing to the full migration described in the design doc.
 
-**Architecture:** Both apps already map their brand values onto CSS custom properties via Tailwind v4's `@theme inline` in `app/globals.css`. This phase adds a small set of new *role*-named tokens (`--color-bg-surface`, `--color-text-primary`, `--color-status-strong`, …) to both apps' `globals.css`, each app pointing the role at its own existing value (or a Tailwind-generated palette variable, never a hand-typed hex). Components in `packages/ui` are rewritten to reference only these token classes — never a raw Tailwind palette class, never a `site` prop. Per-app differences that are genuinely structural (nav link lists, drawer chrome, logo artwork) become props/slots, not forks.
+**Architecture:** Both apps already map their brand values onto CSS custom properties via Tailwind v4's `@theme inline` in `app/globals.css`. This phase adds a small set of new _role_-named tokens (`--color-bg-surface`, `--color-text-primary`, `--color-status-strong`, …) to both apps' `globals.css`, each app pointing the role at its own existing value (or a Tailwind-generated palette variable, never a hand-typed hex). Components in `packages/ui` are rewritten to reference only these token classes — never a raw Tailwind palette class, never a `site` prop. Per-app differences that are genuinely structural (nav link lists, drawer chrome, logo artwork) become props/slots, not forks.
 
 **Tech Stack:** Next.js App Router, Tailwind v4 (`@theme inline`), `tailwind-merge`, ESLint 9 flat config, pnpm/Turborepo workspace (`apps/menhealth`, `apps/hype-check`, `packages/ui`).
 
@@ -12,14 +12,14 @@
 
 - Both apps must look **exactly as they do today** after this phase, with the specific, disclosed exceptions listed in "Known Visual Deltas" below — these are the only intentional pixel changes in this plan.
 - No raw Tailwind palette color class (`bg-emerald-600`, `text-gray-900`, `border-amber-100`, etc. — any utility of the form `{prefix}-{colorname}-{shade}` where colorname is a default Tailwind hue) may appear inside `packages/ui/src/**` after this phase, for the four files this phase touches. `white`, `black`, and existing app-specific custom-property classes (`ink`, `paper`, `hairline`, `surface`, `verdict-*`) are not raw palette classes and remain allowed anywhere.
-- Every new CSS custom property value must alias an *existing* app custom property or a Tailwind-generated default-palette variable (`var(--color-emerald-100)`, etc.) — never a hand-typed hex. This guarantees pixel parity without visual verification of the hex math.
+- Every new CSS custom property value must alias an _existing_ app custom property or a Tailwind-generated default-palette variable (`var(--color-emerald-100)`, etc.) — never a hand-typed hex. This guarantees pixel parity without visual verification of the hex math.
 - No `site?: string` (or similar) prop may exist on a `packages/ui` component after this phase for the four components touched.
 - Never download/rehost YouTube videos, never expose server env vars to client components, never bypass the health-content disclaimer — none of this phase's work touches those areas, but the rule stands per `AGENTS.md`.
 - This repo has no visual regression tooling (confirmed absent: no Playwright/Storybook/Chromatic). Verification per task is `pnpm typecheck` + `pnpm lint` (scoped as described in Task 6) + running both dev servers and comparing the touched page(s) against current `main` in a browser. Task 7 is a full-repo pass of this.
 
 ## Known Visual Deltas (disclosed up front — confirm these are acceptable during Task 7's visual QA, not a bug to silently "fix" back)
 
-1. **hype-check: `bg-surface` and `text-ink-muted` classes sitewide** currently render as near-black (mis-mapped to `--color-gray-900`) instead of the intended cream/dark-brown values. Task 1 fixes the mapping. This is a pre-existing bug fix (already tracked as known behavior), not a regression — it will visibly change the hype-check homepage's two `bg-surface` band sections and footer from near-black to cream, and sitewide `text-ink-muted` text from cool near-black to warm near-black-brown (subtle).
+1. **hype-check: `bg-surface` and `text-muted` classes sitewide** currently render as near-black (mis-mapped to `--color-gray-900`) instead of the intended cream/dark-brown values. Task 1 fixes the mapping. This is a pre-existing bug fix (already tracked as known behavior), not a regression — it will visibly change the hype-check homepage's two `bg-surface` band sections and footer from near-black to cream, and sitewide `text-muted` text from cool near-black to warm near-black-brown (subtle).
 2. **menhealth: the newsletter "Subscribe" button** (`NewsletterSignupForm`) changes from literal `bg-gray-900 hover:bg-gray-700` (dark neutral gray, inconsistent with the rest of the site) to `bg-accent hover:opacity-80` (the site's emerald accent, consistent with every other CTA button on menhealth, e.g. `SiteHeader`'s "Newsletter" and "Go premium" buttons). This is a one-button color change, disclosed here for reviewer sign-off.
 3. **menhealth: `HowWeRateClaims`' section background** shifts from `bg-gray-50` (`#f9fafb`, cool light gray) to `bg-bg-muted` → `var(--surface-alt)` (`#eef2f1`, very close, imperceptible in practice). **hype-check:** same section shifts from `bg-gray-50` to `bg-bg-muted` → `var(--surface)` (`#fbf9f4`, warm cream — a bit more visible, brings this section in line with the rest of hype-check's palette instead of an off-brand cool gray).
 4. **menhealth: the mobile drawer's "Go premium" button `:active` state** goes from a distinct darker shade (`active:bg-emerald-800`) to the same shade as `:hover` (`active:bg-accent-strong`, ≈ `emerald-700`) — there's no existing token for a third, darker accent shade, and this state is only visible for the instant a touch/click is held down. Not expected to be noticeable; flagged for completeness. (This button is unreachable in practice today since `premium.isEnabled()` returns `false` in both apps — see Task 7 Step 4.)
@@ -31,10 +31,12 @@ If any of these are unacceptable, stop after Task 1/3/4 respectively and get sig
 ## Task 1: Establish the shared token vocabulary in both apps' `globals.css`
 
 **Files:**
+
 - Modify: `apps/menhealth/app/globals.css`
 - Modify: `apps/hype-check/app/globals.css`
 
 **Interfaces:**
+
 - Produces: the `--color-*` custom properties every later task consumes: `--color-bg-page`, `--color-bg-surface`, `--color-bg-muted`, `--color-bg-emphasis` (hype-check only), `--color-text-primary`, `--color-text-muted`, `--color-text-on-emphasis` (hype-check only), `--color-accent`, `--color-success-bg`, `--color-success-text`, `--color-status-strong`, `--color-status-strong-soft` (menhealth only), `--color-status-moderate`(-soft), `--color-status-mixed`(-soft), `--color-status-weak`(-soft), `--color-status-unsupported`(-soft), `--color-status-none`(-soft). Existing tokens (`--color-hairline`, `--color-accent-strong` on menhealth) are unchanged and reused as-is.
 
 - [ ] **Step 1: Add the new tokens to menhealth's `@theme inline` block**
@@ -85,8 +87,8 @@ Edit `apps/hype-check/app/globals.css`. Replace the `@theme inline { ... }` bloc
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
   --color-hairline: var(--hairline);
   --color-brand-red: var(--brand-red);
   --color-verdict-legit: var(--verdict-legit);
@@ -95,29 +97,29 @@ Edit `apps/hype-check/app/globals.css`. Replace the `@theme inline { ... }` bloc
   --color-verdict-risky: var(--verdict-risky);
   --color-verdict-scam: var(--verdict-scam);
   --font-sans: var(--font-inter);
-  --font-slab: var(--font-slab);
+  --font-serif: var(--font-serif);
 
   /* Shared UI token contract — see docs/superpowers/specs/2026-08-06-shared-ui-theming-design.md */
   --color-bg-page: var(--paper);
   --color-bg-surface: white;
   --color-bg-muted: var(--surface);
-  --color-bg-emphasis: var(--ink-muted);
-  --color-text-primary: var(--ink-muted);
-  --color-text-muted: var(--ink-muted);
+  --color-bg-emphasis: var(--muted);
+  --color-text-primary: var(--muted);
+  --color-text-muted: var(--muted);
   --color-text-on-emphasis: white;
-  --color-accent: var(--ink);
+  --color-accent: var(--accent);
   --color-success-bg: white;
-  --color-success-text: var(--ink);
+  --color-success-text: var(--accent);
   --color-status-strong: var(--verdict-legit);
   --color-status-moderate: var(--verdict-legit);
   --color-status-mixed: var(--verdict-misleading);
   --color-status-weak: var(--verdict-overpriced);
   --color-status-unsupported: var(--verdict-scam);
-  --color-status-none: var(--ink-muted);
+  --color-status-none: var(--muted);
 }
 ```
 
-Note the two bug fixes: `--color-surface: var(--surface)` (was `var(--color-gray-900)`) and `--color-ink-muted: var(--ink-muted)` (was `var(--color-gray-900)`) — see "Known Visual Deltas" #1 above.
+Note the two bug fixes: `--color-surface: var(--surface)` (was `var(--color-gray-900)`) and `--color-muted: var(--muted)` (was `var(--color-gray-900)`) — see "Known Visual Deltas" #1 above.
 
 - [ ] **Step 3: Verify both apps still typecheck and the CSS is valid**
 
@@ -142,12 +144,14 @@ git commit -m "Add shared UI token vocabulary; fix hype-check's mis-mapped surfa
 The two apps' `BrandLogotype` components have completely different SVG artwork and wordmark markup (menhealth: gradient-filled shield mark + two-line stacked wordmark; hype-check: starburst-and-checkmark mark + single-line wordmark) — per the design doc's classification rule, this is genuine structural difference, not a styling fork. The shared piece is the outer wrapper (span structure, `aria-label` wiring, className/style plumbing); the artwork stays app-owned via `mark`/`wordmark` slot props.
 
 **Files:**
+
 - Create: `packages/ui/src/ui/BrandLogotype.tsx`
 - Modify: `packages/ui/src/index.ts`
 - Modify: `apps/menhealth/components/ui/BrandLogotype.tsx`
 - Modify: `apps/hype-check/components/ui/BrandLogotype.tsx`
 
 **Interfaces:**
+
 - Produces: `BrandLogotype({ className?, style?, ariaLabel, mark, wordmark }): JSX.Element` exported from `@menhealth/ui`, where `mark: ReactNode`, `wordmark: ReactNode`.
 
 - [ ] **Step 1: Create the shared shell**
@@ -345,6 +349,7 @@ git commit -m "Migrate BrandLogotype into packages/ui as a slot-based shared she
 ## Task 3: Rewrite `NewsletterSignupForm` to drop the `site` prop and consume tokens
 
 **Files:**
+
 - Modify: `packages/ui/src/ui/NewsletterSignupForm.tsx`
 - Modify: `apps/menhealth/app/(public)/newsletter/page.tsx` (no `site` prop to remove — already prop-less; only affected by the token-driven color change, no code edit needed)
 - Modify: `apps/hype-check/app/(public)/page.tsx`
@@ -353,6 +358,7 @@ git commit -m "Migrate BrandLogotype into packages/ui as a slot-based shared she
 - Modify: `apps/hype-check/app/(public)/newsletter/[slug]/page.tsx`
 
 **Interfaces:**
+
 - Consumes: `--color-bg-surface`, `--color-text-primary`, `--color-accent`, `--color-success-bg`, `--color-success-text` from Task 1.
 - Produces: `NewsletterSignupForm({ compact?, className? })` — same as before minus the `site` prop.
 
@@ -450,10 +456,13 @@ export function NewsletterSignupForm({ compact = false, className }: Props) {
 - [ ] **Step 2: Remove the `site="hype-check"` prop at all 5 hype-check call sites**
 
 Edit `apps/hype-check/app/(public)/page.tsx` line 306:
+
 ```tsx
 <NewsletterSignupForm site="hype-check" />
 ```
+
 →
+
 ```tsx
 <NewsletterSignupForm />
 ```
@@ -475,7 +484,7 @@ Expected: all pass. If `site` is still referenced anywhere, TypeScript will erro
 
 In the browser, check every page listed in Step 2 plus menhealth's `/newsletter` and `/newsletter/[slug]` pages (unchanged call sites, but new token-driven styling).
 Expected on menhealth: the Subscribe button is now emerald instead of dark gray (Known Visual Delta #2) — everything else identical.
-Expected on hype-check: input border/focus ring same near-black-brown tone as before (via `--color-text-primary` = `var(--ink-muted)`), Subscribe button same rust-brown `--ink` color, success message unchanged (`bg-white text-ink` → now `bg-success-bg text-success-text`, same values).
+Expected on hype-check: input border/focus ring same near-black-brown tone as before (via `--color-text-primary` = `var(--muted)`), Subscribe button same rust-brown `--accent` color, success message unchanged (`bg-white text-accent` → now `bg-success-bg text-success-text`, same values).
 
 - [ ] **Step 5: Commit**
 
@@ -489,6 +498,7 @@ git commit -m "Remove site prop from NewsletterSignupForm; consume shared tokens
 ## Task 4: Rewrite `HowWeRateClaims` to drop the `site` prop and consume status tokens
 
 **Files:**
+
 - Modify: `packages/ui/src/ui/HowWeRateClaims.tsx`
 - Modify: `packages/ui/src/index.ts`
 - Create: `apps/menhealth/lib/ui/evidenceRatingBadgeClassName.ts`
@@ -499,6 +509,7 @@ git commit -m "Remove site prop from NewsletterSignupForm; consume shared tokens
 - Modify: `apps/hype-check/app/(public)/how-we-rate-evidence/page.tsx`
 
 **Interfaces:**
+
 - Consumes: `--color-bg-muted`, `--color-bg-surface`, `--color-text-primary`, `--color-text-muted`, `--color-status-*` (and `-soft` variants where defined) from Task 1.
 - Produces: `type EvidenceRatingKey = 'strong' | 'moderate' | 'mixed' | 'weak' | 'unsupported' | 'none'` and `HowWeRateClaims({ badgeClassName: (key: EvidenceRatingKey) => string })`, both exported from `@menhealth/ui`. Each app's `evidenceRatingBadgeClassName(key: EvidenceRatingKey): string` (from its new `lib/ui/evidenceRatingBadgeClassName.ts`) is the function passed in.
 
@@ -569,6 +580,7 @@ export function HowWeRateClaims({ badgeClassName }: Props) {
 - [ ] **Step 2: Export the new type from the package index**
 
 Edit `packages/ui/src/index.ts`:
+
 ```ts
 export { HowWeRateClaims } from './ui/HowWeRateClaims';
 export type { EvidenceRatingKey } from './ui/HowWeRateClaims';
@@ -607,7 +619,7 @@ import type { EvidenceRatingKey } from '@menhealth/ui';
 import { twMerge } from 'tailwind-merge';
 
 const BASE =
-  'inline-block rounded-sm border-[1.5px] px-2.5 py-0.5 font-slab text-sm font-bold tracking-wide uppercase';
+  'inline-block rounded-sm border-[1.5px] px-2.5 py-0.5 font-serif text-sm font-bold tracking-wide uppercase';
 
 const COLOR_CLASS: Record<EvidenceRatingKey, string> = {
   strong: 'border-status-strong text-status-strong rotate-1',
@@ -615,7 +627,7 @@ const COLOR_CLASS: Record<EvidenceRatingKey, string> = {
   mixed: 'border-status-mixed text-status-mixed rotate-1',
   weak: 'border-status-weak text-status-weak -rotate-1',
   unsupported: 'border-status-unsupported text-status-unsupported -rotate-1',
-  none: 'border-ink-muted/40 text-ink-muted/60',
+  none: 'border-muted/40 text-muted/60',
 };
 
 export function evidenceRatingBadgeClassName(key: EvidenceRatingKey): string {
@@ -628,20 +640,24 @@ export function evidenceRatingBadgeClassName(key: EvidenceRatingKey): string {
 - [ ] **Step 5: Update menhealth's two call sites**
 
 Edit `apps/menhealth/app/(public)/page.tsx`:
+
 - Line 1: add `evidenceRatingBadgeClassName` is a local import, not from `@menhealth/ui` — add a new import line: `import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';`
 - Line 293: `<HowWeRateClaims />` → `<HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />`
 
 Edit `apps/menhealth/app/(public)/how-we-rate-evidence/page.tsx`:
+
 - Add import: `import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';`
 - Line 107: `<HowWeRateClaims />` → `<HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />`
 
 - [ ] **Step 6: Update hype-check's two call sites**
 
 Edit `apps/hype-check/app/(public)/page.tsx`:
+
 - Add import: `import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';`
 - Line 312: `<HowWeRateClaims site="hype-check" />` → `<HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />`
 
 Edit `apps/hype-check/app/(public)/how-we-rate-evidence/page.tsx`:
+
 - Add import: `import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';`
 - Line 107: `<HowWeRateClaims site="hype-check" />` → `<HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />`
 
@@ -669,6 +685,7 @@ git commit -m "Remove site prop from HowWeRateClaims; drive badge styling via pe
 This is the largest task. The two `SiteHeader`s share ~90% of their logic (drawer open/close state machine, transition timing, body-scroll lock, SVG icons, ARIA wiring) but differ in nav link lists, several className strings (some driven by tokens, a few — header opacity, drawer shadow-vs-border — by genuine per-site chrome choices), and how the `premium` feature flag is read (each app currently imports its own `@/lib/flags/feature-flags`, a path alias `packages/ui` cannot resolve). The shared component takes `premiumEnabled: boolean` as a prop instead.
 
 **Files:**
+
 - Create: `packages/ui/src/ui/SiteHeader.tsx`
 - Modify: `packages/ui/src/index.ts`
 - Modify: `apps/menhealth/components/ui/SiteHeader.tsx`
@@ -677,6 +694,7 @@ This is the largest task. The two `SiteHeader`s share ~90% of their logic (drawe
 - Modify: `apps/hype-check/app/(public)/layout.tsx`
 
 **Interfaces:**
+
 - Consumes: `--color-bg-surface`, `--color-bg-page`, `--color-bg-emphasis`, `--color-text-on-emphasis`, `--color-accent` from Task 1; `BrandLogotype` from Task 2 (each app's own wrapper, passed in as `desktopLogo`/`drawerLogo`).
 - Produces (exported from `@menhealth/ui`): `SiteHeader`, `SiteHeaderProps`, `SiteHeaderNavLink`, `SiteHeaderClassNames`, `SiteHeaderUser`.
 
@@ -764,7 +782,14 @@ function CloseIcon() {
 
 function ChevronIcon({ className }: { className: string }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2.5}
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
     </svg>
   );
@@ -937,6 +962,7 @@ export function SiteHeader({ user, premiumEnabled, navLinks, desktopLogo, drawer
 - [ ] **Step 2: Export from the package index**
 
 Edit `packages/ui/src/index.ts`:
+
 ```ts
 export { SiteHeader } from './ui/SiteHeader';
 export type { SiteHeaderClassNames, SiteHeaderNavLink, SiteHeaderProps, SiteHeaderUser } from './ui/SiteHeader';
@@ -1037,7 +1063,7 @@ interface SiteHeaderProps {
 }
 
 const NAV_LINK_CLASS =
-  'font-semibold text-text-on-emphasis underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-ink';
+  'font-semibold text-text-on-emphasis underline decoration-transparent decoration-2 underline-offset-4 hover:decoration-accent';
 const MOBILE_LINK_CLASS =
   'group text-text-muted hover:bg-surface active:bg-hairline/40 flex items-center justify-between rounded-md px-4 py-4 text-lg font-medium transition-colors';
 
@@ -1070,20 +1096,23 @@ const NAV_LINKS: SiteHeaderNavLink[] = [
 const CLASS_NAMES: SiteHeaderClassNames = {
   header: 'border-hairline bg-bg-emphasis sticky top-0 z-30 border-b backdrop-blur-sm',
   logoLink: 'focus-visible:ring-accent/40 rounded-md focus-visible:ring-2 focus-visible:outline-none',
-  hamburgerButton: 'hover:bg-surface hover:text-ink flex items-center justify-center rounded-md p-2 text-text-on-emphasis md:hidden',
-  drawerPanel: 'border-hairline bg-bg-page fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col border-l md:hidden',
+  hamburgerButton:
+    'hover:bg-surface hover:text-accent flex items-center justify-center rounded-md p-2 text-text-on-emphasis md:hidden',
+  drawerPanel:
+    'border-hairline bg-bg-page fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col border-l md:hidden',
   drawerNav: 'flex flex-1 flex-col overflow-y-auto bg-white px-4 py-4',
-  closeButton: 'text-text-muted hover:bg-surface hover:text-ink rounded-sm p-2',
-  accountLink: 'hover:decoration-ink font-semibold text-white/60 underline decoration-transparent decoration-2 underline-offset-4',
-  signInLink: 'text-text-muted hover:text-ink',
-  premiumCta: 'bg-accent text-paper hover:bg-ink-muted rounded-sm px-3 py-1.5 font-semibold',
+  closeButton: 'text-text-muted hover:bg-surface hover:text-accent rounded-sm p-2',
+  accountLink:
+    'hover:decoration-accent font-semibold text-white/60 underline decoration-transparent decoration-2 underline-offset-4',
+  signInLink: 'text-text-muted hover:text-accent',
+  premiumCta: 'bg-accent text-paper hover:bg-muted rounded-sm px-3 py-1.5 font-semibold',
   mobileAccountLink: MOBILE_LINK_CLASS.replace('text-text-muted', 'text-text-muted/80'),
-  mobileSignInLink: MOBILE_LINK_CLASS.replace('text-text-muted', 'text-ink'),
+  mobileSignInLink: MOBILE_LINK_CLASS.replace('text-text-muted', 'text-accent'),
   mobilePremiumCta:
-    'bg-accent text-paper hover:bg-ink-muted active:bg-ink-muted flex w-full items-center justify-center gap-2 rounded-md px-5 py-4 text-base font-semibold transition-colors',
+    'bg-accent text-paper hover:bg-muted active:bg-muted flex w-full items-center justify-center gap-2 rounded-md px-5 py-4 text-base font-semibold transition-colors',
   navLinkChevron: 'h-4 w-4 transition-transform group-hover:translate-x-0.5',
-  accountChevron: 'text-ink-muted/80 group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5',
-  signInChevron: 'text-hairline group-hover:text-ink-muted h-4 w-4 transition-transform group-hover:translate-x-0.5',
+  accountChevron: 'text-muted/80 group-hover:text-muted h-4 w-4 transition-transform group-hover:translate-x-0.5',
+  signInChevron: 'text-hairline group-hover:text-muted h-4 w-4 transition-transform group-hover:translate-x-0.5',
 };
 
 export function SiteHeader({ user }: SiteHeaderProps) {
@@ -1112,9 +1141,10 @@ Expected: all pass.
 - [ ] **Step 7: Visually verify — this is the highest-risk task in Phase 0, check thoroughly**
 
 On both apps, in the browser:
+
 - Desktop header: logo, nav links (including hover states), sign-in/account/premium CTA area (currently invisible on both since `premium.isEnabled()` returns `false` in both apps' `lib/flags/feature-flags.ts` today — confirm this is still the case, i.e. no premium UI renders, matching current behavior).
 - Mobile (resize below `md` breakpoint): hamburger button + hover state, open the drawer, confirm the backdrop, slide-in transition, logo, close button, all nav links including hover/active states, the divider before "Newsletter" on hype-check (not present on menhealth), footer premium CTA area (should not render, same as desktop).
-- hype-check specifically: confirm the header is no longer near-black-on-black-text (the old `bg-ink-muted` was already correct pre-fix since it used the literal token name, not `bg-surface` — the bug fix from Task 1 affects the *hamburger hover* (`hover:bg-surface`) and *drawer/close-button hover* states, which should now show a visible cream highlight instead of appearing invisible against the near-black bug value).
+- hype-check specifically: confirm the header is no longer near-black-on-black-text (the old `bg-muted` was already correct pre-fix since it used the literal token name, not `bg-surface` — the bug fix from Task 1 affects the _hamburger hover_ (`hover:bg-surface`) and _drawer/close-button hover_ states, which should now show a visible cream highlight instead of appearing invisible against the near-black bug value).
 
 If anything doesn't match, this is where to iterate on the `CLASS_NAMES` objects in Step 3/4 before moving on — don't proceed to Task 6 with a known visual mismatch.
 
@@ -1132,12 +1162,14 @@ git commit -m "Migrate SiteHeader into packages/ui as a prop-driven shared shell
 **Design note (deviation from the spec doc):** the design doc says the rule should be "referenced from both apps' existing per-app `eslint.config.mjs`." During planning this was tested directly: ESLint 9's flat config refuses to lint any file outside the invoking process's cwd ("File ignored because outside of base path"), and running an app's full Next-aware config against `packages/ui/src` from a shifted cwd surfaces ~2,400 pre-existing, unrelated lint errors across files this phase never touches (that package has never been linted before). Both make "reference it from the apps' configs" impractical as literally worded. Instead, `packages/ui` gets its own minimal `eslint.config.mjs` + `lint` script — picked up automatically by `turbo run lint` like any other workspace package — scoped by an explicit file allowlist (not a wildcard over all of `packages/ui/src`, since most files there still have pre-existing raw-palette violations out of this phase's scope; see Task 6 Step 1's comment for the list of what Phase 1+ needs to add as it migrates more files). Both apps' configs get a one-line comment pointing here.
 
 **Files:**
+
 - Create: `packages/ui/eslint.config.mjs`
 - Modify: `packages/ui/package.json`
 - Modify: `apps/menhealth/eslint.config.mjs`
 - Modify: `apps/hype-check/eslint.config.mjs`
 
 **Interfaces:**
+
 - Produces: a `no-restricted-syntax` ESLint rule flagging any `Literal` or `TemplateElement` matching `-(colorname)-\d{2,3}\b` for a default-Tailwind-hue `colorname`, scoped to the four files this phase migrated.
 
 - [ ] **Step 1: Create the packages/ui ESLint config**
@@ -1199,12 +1231,12 @@ export default defineConfig([
         {
           selector: `Literal[value=/${RAW_PALETTE_PATTERN}/]`,
           message:
-            'Raw Tailwind palette color classes are banned in this file. Use a --color-* token class (see the shared UI token contract in both apps\' globals.css) instead.',
+            "Raw Tailwind palette color classes are banned in this file. Use a --color-* token class (see the shared UI token contract in both apps' globals.css) instead.",
         },
         {
           selector: `TemplateElement[value.raw=/${RAW_PALETTE_PATTERN}/]`,
           message:
-            'Raw Tailwind palette color classes are banned in this file. Use a --color-* token class (see the shared UI token contract in both apps\' globals.css) instead.',
+            "Raw Tailwind palette color classes are banned in this file. Use a --color-* token class (see the shared UI token contract in both apps' globals.css) instead.",
         },
       ],
     },
@@ -1286,6 +1318,7 @@ Expected: no output (no `site` prop remains in any of the four migrated componen
 - [ ] **Step 3: Manual visual QA pass on both dev servers**
 
 Run `pnpm --filter menhealth dev` and `pnpm --filter hype-check dev` side by side. For each app, check every page that renders one of the four migrated components at both a desktop and mobile viewport width:
+
 - `/` (homepage — header, footer logo, newsletter section, how-we-rate-evidence section)
 - `/how-we-rate-evidence`
 - `/newsletter` and `/newsletter/[slug]` (any published slug)
