@@ -25,6 +25,8 @@ export type { EvidenceRatingKey } from './ui/HowWeRateClaims';
 export { NewsletterSignupForm } from './ui/NewsletterSignupForm';
 export { PremiumGate } from './ui/PremiumGate';
 export { RiskBadge } from './ui/RiskBadge';
+export { SiteHeader } from './ui/SiteHeader';
+export type { SiteHeaderClassNames, SiteHeaderNavLink, SiteHeaderProps, SiteHeaderUser } from './ui/SiteHeader';
 
 export { VideoCard } from './video/VideoCard';
 export { YouTubePlayer } from './video/YouTubePlayer';
