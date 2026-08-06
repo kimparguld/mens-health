@@ -36,7 +36,14 @@ export async function PATCH(
 
   const result = await updateSocialPostDraft(id, parsed.data);
   if (!result.ok) {
-    return NextResponse.json({ error: result.error.message }, { status: 500 });
+    const message = result.error.message;
+    if (message.includes("not found")) {
+      return NextResponse.json({ error: message }, { status: 404 });
+    }
+    if (message.startsWith("Cannot ")) {
+      return NextResponse.json({ error: message }, { status: 409 });
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 
   return NextResponse.json(result.value);
