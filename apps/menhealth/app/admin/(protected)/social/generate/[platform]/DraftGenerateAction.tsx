@@ -15,28 +15,33 @@ export default function DraftGenerateAction(props: Props) {
   async function handleClick() {
     setLoading(true);
     setError(null);
-    const res =
-      props.mode === "generate"
-        ? await fetch("/api/social/generate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              videoId: props.videoId,
-              platform: props.platform,
-            }),
-          })
-        : await fetch(`/api/social/drafts/${props.postId}/regenerate`, {
-            method: "POST",
-          });
-    setLoading(false);
-    if (!res.ok) {
-      const data = (await res.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-      setError(data?.error ?? "Request failed");
-      return;
+    try {
+      const res =
+        props.mode === "generate"
+          ? await fetch("/api/social/generate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                videoId: props.videoId,
+                platform: props.platform,
+              }),
+            })
+          : await fetch(`/api/social/drafts/${props.postId}/regenerate`, {
+              method: "POST",
+            });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(data?.error ?? "Request failed");
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError("Network error");
+    } finally {
+      setLoading(false);
     }
-    router.refresh();
   }
 
   return (

@@ -33,25 +33,30 @@ export default function EditDraftForm({
     setSaving(true);
     setError(null);
     setSaved(false);
-    const hashtags = hashtagsText
-      .split(/\s+/)
-      .map((h) => h.trim())
-      .filter(Boolean);
-    const res = await fetch(`/api/social/drafts/${postId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ hook, script, caption, hashtags }),
-    });
-    setSaving(false);
-    if (!res.ok) {
-      const data = (await res.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-      setError(data?.error ?? "Save failed");
-      return;
+    try {
+      const hashtags = hashtagsText
+        .split(/\s+/)
+        .map((h) => h.trim())
+        .filter(Boolean);
+      const res = await fetch(`/api/social/drafts/${postId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hook, script, caption, hashtags }),
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(data?.error ?? "Save failed");
+        return;
+      }
+      setSaved(true);
+      router.refresh();
+    } catch {
+      setError("Network error");
+    } finally {
+      setSaving(false);
     }
-    setSaved(true);
-    router.refresh();
   }
 
   return (
