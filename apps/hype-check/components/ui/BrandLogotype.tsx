@@ -1,3 +1,4 @@
+import { BrandLogotype as SharedBrandLogotype } from '@menhealth/ui';
 import type { CSSProperties } from 'react';
 
 type BrandLogotypeSize = 'sm' | 'md' | 'lg';
@@ -22,17 +23,13 @@ const SIZE_STYLES: Record<BrandLogotypeSize, CSSProperties> = {
   } as CSSProperties,
 };
 
-export function BrandLogotype({
-  className = '',
-  size = 'md',
-}: BrandLogotypeProps) {
+export function BrandLogotype({ className, size = 'md' }: BrandLogotypeProps) {
   return (
-    <span
-      className={`mh-logotype ${className}`.trim()}
+    <SharedBrandLogotype
+      className={className}
       style={SIZE_STYLES[size]}
-      aria-label="Hype Check"
-    >
-      <span className="mh-logotype-mark" aria-hidden="true">
+      ariaLabel="Hype Check"
+      mark={
         <svg viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M21 2l3.2 6.6 6.7-3.3-1.6 7.2 7.4 1-5.2 5.4 5.2 5.4-7.4 1 1.6 7.2-6.7-3.3L21 36l-3.2-6.8-6.7 3.3 1.6-7.2-7.4-1 5.2-5.4-5.2-5.4 7.4-1-1.6-7.2 6.7 3.3z"
@@ -46,11 +43,8 @@ export function BrandLogotype({
             strokeLinejoin="round"
           />
         </svg>
-      </span>
-
-      <span className="mh-logotype-wordmark" aria-hidden="true">
-        Hype Check
-      </span>
-    </span>
+      }
+      wordmark="Hype Check"
+    />
   );
 }

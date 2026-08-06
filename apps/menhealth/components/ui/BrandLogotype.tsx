@@ -1,3 +1,4 @@
+import { BrandLogotype as SharedBrandLogotype } from '@menhealth/ui';
 import { useId, type CSSProperties } from 'react';
 
 type BrandLogotypeSize = 'sm' | 'md';
@@ -22,16 +23,15 @@ const SIZE_STYLES: Record<BrandLogotypeSize, CSSProperties> = {
   } as CSSProperties,
 };
 
-export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProps) {
+export function BrandLogotype({ className, size = 'md' }: BrandLogotypeProps) {
   const gradientId = useId();
 
   return (
-    <span
-      className={`mh-logotype ${className}`.trim()}
+    <SharedBrandLogotype
+      className={className}
       style={SIZE_STYLES[size]}
-      aria-label="MenHealth Digest"
-    >
-      <span className="mh-logotype-mark" aria-hidden="true">
+      ariaLabel="MenHealth Digest"
+      mark={
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id={gradientId} x1="6" y1="8" x2="58" y2="60" gradientUnits="userSpaceOnUse">
@@ -59,12 +59,13 @@ export function BrandLogotype({ className = '', size = 'md' }: BrandLogotypeProp
             className="mh-logotype-mark-shield"
           />
         </svg>
-      </span>
-
-      <span className="mh-logotype-wordmark" aria-hidden="true">
-        <span className="mh-logotype-top">MENHEALTH</span>
-        <span className="mh-logotype-bottom">Digest</span>
-      </span>
-    </span>
+      }
+      wordmark={
+        <>
+          <span className="mh-logotype-top">MENHEALTH</span>
+          <span className="mh-logotype-bottom">Digest</span>
+        </>
+      }
+    />
   );
 }

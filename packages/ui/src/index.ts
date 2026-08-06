@@ -16,6 +16,8 @@ export { RelatedTopics } from './seo/RelatedTopics';
 export { RelatedVideos } from './seo/RelatedVideos';
 
 export { AffiliateDisclosure } from './ui/AffiliateDisclosure';
+export { BrandLogotype } from './ui/BrandLogotype';
+export type { BrandLogotypeProps } from './ui/BrandLogotype';
 export { Disclaimer } from './ui/Disclaimer';
 export { EvidenceBadge, isClaimChecked } from './ui/EvidenceBadge';
 export { HowWeRateClaims } from './ui/HowWeRateClaims';
