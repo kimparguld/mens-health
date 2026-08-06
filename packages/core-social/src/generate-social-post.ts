@@ -1,10 +1,8 @@
 import { z } from "zod";
 import type { Platform, RiskLevel } from "@prisma/client";
 import { buildUtmUrl } from "./utm";
-import {
-  validatePlatformConstraints,
-  PLATFORM_CONSTRAINTS,
-} from "./platform-constraints";
+import { validatePlatformConstraints } from "./platform-constraints";
+import { buildSocialPrompt, type PromptConfig } from "./prompts";
 import { SocialPostAiOutputSchema } from "./validation";
 import {
   checkForbiddenPatterns,
@@ -47,13 +45,14 @@ export type SocialAiClient = {
   };
 };
 
-export type SocialPostGeneratorConfig = {
+export type SocialPostGeneratorConfig = PromptConfig & {
   /**
    * Prisma's generated types carry generic branding tied to their own
    * generation, so a `Pick<PrismaClient, ...>` from one site's generated
    * client isn't satisfied by another site's — even for identical models.
    * `any` here is intentional; this package only ever calls
-   * `db.socialPost.create(...)` with a fixed, internally-controlled shape.
+   * `db.socialPost.create(...)` / `.update(...)` / `.findUnique(...)` with a
+   * fixed, internally-controlled shape.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: any;
@@ -67,30 +66,21 @@ export type SocialPostGeneratorConfig = {
   aiClient: SocialAiClient;
   /** Whether the AI client is actually configured — same guard as the old GROQ_API_KEY check. */
   aiConfigured: boolean;
-  siteName: string;
-  /** What kind of content this is, substituted into the prompt in place of the old hardcoded "men's health video summary", e.g. "product/course review". */
-  contentTypeLabel: string;
-  /** Appended to every caption, substituted into the prompt in place of the old hardcoded "Educational only. Not medical advice.". */
-  disclaimerLine: string;
   /** This site's own canonical URL, used to build the UTM link. */
   baseUrl: string;
   /** Site-specific forbidden caption/script phrasing, on top of core-compliance's engine. */
   forbiddenPatterns: Array<{ pattern: RegExp; reason: string }>;
-  /** Site-specific high-risk topic keywords. */
-  highRiskKeywords: string[];
 };
 
-function evidenceLabel(score: number | null): string {
-  if (score === null) return "Not checked";
-  if (score >= 0.75) return "Strong";
-  if (score >= 0.5) return "Moderate";
-  if (score >= 0.25) return "Mixed";
-  return "Weak";
-}
+type GeneratedContent = {
+  hook: string;
+  script: string;
+  caption: string;
+  hashtags: string[];
+  isHighRisk: boolean;
+};
 
-function riskLabel(level: RiskLevel): string {
-  return level.charAt(0) + level.slice(1).toLowerCase();
-}
+const REGENERATABLE_STATUSES = new Set(["DRAFT", "PENDING_REVIEW"]);
 
 /**
  * Binds the social-post generator to this site's DB, AI client, brand name,
@@ -99,76 +89,16 @@ function riskLabel(level: RiskLevel): string {
  * apps/menhealth/lib/social/generate-social-post.ts).
  */
 export function createSocialPostGenerator(config: SocialPostGeneratorConfig) {
-  function buildPrompt(
+  /**
+   * Calls the AI, validates the output against SocialPostAiOutputSchema, and
+   * runs the same forbidden-pattern / platform-constraint safety checks used
+   * by both generation and regeneration. Does not touch the DB.
+   */
+  async function generateContent(
     ctx: VideoContext,
     platform: Platform,
     utmUrl: string,
-  ): string {
-    const constraints = PLATFORM_CONSTRAINTS[platform];
-    return `You are the social content writer for ${config.siteName}.
-
-Generate a social media post for the following ${config.contentTypeLabel}.
-
-Platform: ${platform}
-Video title: ${ctx.title}
-Summary: ${ctx.shortSummary}
-Key takeaways: ${ctx.takeaways.slice(0, 3).join(" | ")}
-Notable claims: ${ctx.claimTexts.slice(0, 2).join(" | ")}
-Evidence: ${evidenceLabel(ctx.evidenceScore)}
-Risk level: ${riskLabel(ctx.riskLevel)}
-Topics: ${ctx.topicNames.join(", ")}
-UTM link: ${utmUrl}
-
-Platform limits (HARD — do not exceed):
-- Caption: ${constraints.maxCaptionChars} characters max
-- Hook: ${constraints.maxHookChars} characters max
-- Hashtags: ${constraints.maxHashtags} max
-- Script: ${constraints.maxScriptWords} words max
-
-Rules:
-- Do NOT write fear-based or manipulative copy — no unsubstantiated guarantees, no implying the reader is at risk, no fake urgency.
-- End caption with: "${config.disclaimerLine}"
-- Include the UTM link in the caption.
-- Include evidence label and risk level in the caption.
-- Keep hook under ${constraints.maxHookChars} characters.
-- For text-only platforms (X, REDDIT), set "script" to an empty string "".
-- Set requiresReview to true if the content involves any of: ${config.highRiskKeywords.slice(0, 6).join(", ")}.
-
-Respond ONLY with a JSON object:
-{
-  "hook": "string",
-  "script": "string",
-  "caption": "string",
-  "hashtags": ["string"],
-  "requiresReview": boolean
-}`;
-  }
-
-  /**
-   * Generate a social post draft from a published video summary.
-   * Returns a Result — never throws.
-   */
-  async function generateSocialPost(
-    input: GenerateSocialPostInput,
-  ): Promise<Result<{ postId: string }>> {
-    const ctx = await config.fetchContext(input.videoId);
-    if (!ctx) {
-      return {
-        ok: false,
-        error: new Error(
-          `Video ${input.videoId} not found or not in PUBLISHED status`,
-        ),
-      };
-    }
-
-    const campaign = input.campaign ?? "social";
-    const utmUrl = buildUtmUrl({
-      platform: input.platform,
-      path: `/videos/${ctx.slug}`,
-      campaign,
-      baseUrl: config.baseUrl,
-    });
-
+  ): Promise<Result<GeneratedContent>> {
     if (!config.aiConfigured) {
       return {
         ok: false,
@@ -184,7 +114,10 @@ Respond ONLY with a JSON object:
         model: config.aiClient.defaultModel,
         max_tokens: 1000,
         messages: [
-          { role: "user", content: buildPrompt(ctx, input.platform, utmUrl) },
+          {
+            role: "user",
+            content: buildSocialPrompt(platform, ctx, utmUrl, config),
+          },
         ],
       });
 
@@ -235,14 +168,12 @@ Respond ONLY with a JSON object:
     // doesn't account for the UTM link XAdapter appends, so it under-counts.
     // XAdapter.validate() re-checks caption + link length correctly during
     // admin review and again before publish.
-    const constraintErrors = validatePlatformConstraints(input.platform, {
+    const constraintErrors = validatePlatformConstraints(platform, {
       caption: aiOutput.caption,
       hashtags: aiOutput.hashtags,
       script: aiOutput.script,
       hook: aiOutput.hook,
-    }).filter(
-      (e) => !(input.platform === "X" && e.startsWith("Caption exceeds")),
-    );
+    }).filter((e) => !(platform === "X" && e.startsWith("Caption exceeds")));
     if (constraintErrors.length > 0) {
       return {
         ok: false,
@@ -263,19 +194,59 @@ Respond ONLY with a JSON object:
       h.startsWith("#") ? h : `#${h}`,
     );
 
-    const post = await config.db.socialPost.create({
-      data: {
-        platform: input.platform,
-        status: isHighRisk ? "PENDING_REVIEW" : "DRAFT",
-        sourceType: "VIDEO_SUMMARY",
-        sourceId: input.videoId,
+    return {
+      ok: true,
+      value: {
         hook: aiOutput.hook,
         script: aiOutput.script,
         caption: aiOutput.caption,
         hashtags,
+        isHighRisk,
+      },
+    };
+  }
+
+  /**
+   * Generate a social post draft from a published video summary.
+   * Returns a Result — never throws.
+   */
+  async function generateSocialPost(
+    input: GenerateSocialPostInput,
+  ): Promise<Result<{ postId: string }>> {
+    const ctx = await config.fetchContext(input.videoId);
+    if (!ctx) {
+      return {
+        ok: false,
+        error: new Error(
+          `Video ${input.videoId} not found or not in PUBLISHED status`,
+        ),
+      };
+    }
+
+    const campaign = input.campaign ?? "social";
+    const utmUrl = buildUtmUrl({
+      platform: input.platform,
+      path: `/videos/${ctx.slug}`,
+      campaign,
+      baseUrl: config.baseUrl,
+    });
+
+    const generated = await generateContent(ctx, input.platform, utmUrl);
+    if (!generated.ok) return generated;
+
+    const post = await config.db.socialPost.create({
+      data: {
+        platform: input.platform,
+        status: generated.value.isHighRisk ? "PENDING_REVIEW" : "DRAFT",
+        sourceType: "VIDEO_SUMMARY",
+        sourceId: input.videoId,
+        hook: generated.value.hook,
+        script: generated.value.script,
+        caption: generated.value.caption,
+        hashtags: generated.value.hashtags,
         utmUrl,
         riskLevel: ctx.riskLevel,
-        requiresReview: isHighRisk,
+        requiresReview: generated.value.isHighRisk,
         templateId: input.templateId ?? null,
       },
     });
@@ -283,5 +254,61 @@ Respond ONLY with a JSON object:
     return { ok: true, value: { postId: post.id } };
   }
 
-  return { generateSocialPost };
+  /**
+   * Regenerate an existing draft in place — rebuilds the prompt from the
+   * source video and overwrites hook/script/caption/hashtags/requiresReview/
+   * status on the same row. Refuses to touch anything past DRAFT/
+   * PENDING_REVIEW so an already-approved post is never silently replaced.
+   */
+  async function regenerateSocialPost(
+    postId: string,
+  ): Promise<Result<{ postId: string }>> {
+    const post = await config.db.socialPost.findUnique({ where: { id: postId } });
+    if (!post) {
+      return { ok: false, error: new Error(`Social post ${postId} not found`) };
+    }
+    if (!REGENERATABLE_STATUSES.has(post.status)) {
+      return {
+        ok: false,
+        error: new Error(`Cannot regenerate a post with status ${post.status}`),
+      };
+    }
+
+    const ctx = await config.fetchContext(post.sourceId);
+    if (!ctx) {
+      return {
+        ok: false,
+        error: new Error(
+          `Video ${post.sourceId} not found or not in PUBLISHED status`,
+        ),
+      };
+    }
+
+    const utmUrl = buildUtmUrl({
+      platform: post.platform,
+      path: `/videos/${ctx.slug}`,
+      campaign: "social",
+      baseUrl: config.baseUrl,
+    });
+
+    const generated = await generateContent(ctx, post.platform, utmUrl);
+    if (!generated.ok) return generated;
+
+    const updated = await config.db.socialPost.update({
+      where: { id: postId },
+      data: {
+        hook: generated.value.hook,
+        script: generated.value.script,
+        caption: generated.value.caption,
+        hashtags: generated.value.hashtags,
+        utmUrl,
+        requiresReview: generated.value.isHighRisk,
+        status: generated.value.isHighRisk ? "PENDING_REVIEW" : "DRAFT",
+      },
+    });
+
+    return { ok: true, value: { postId: updated.id } };
+  }
+
+  return { generateSocialPost, regenerateSocialPost };
 }
