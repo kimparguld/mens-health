@@ -1,5 +1,6 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
 import { HowWeRateClaims, PageBreadcrumbs } from '@menhealth/ui';
+import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';
 import type { Metadata } from 'next';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.hype-check.net';
@@ -104,7 +105,7 @@ export default function HowWeRateEvidencePage() {
           </p>
         </section>
       </div>
-      <HowWeRateClaims site="hype-check" />
+      <HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />
     </main>
   );
 }

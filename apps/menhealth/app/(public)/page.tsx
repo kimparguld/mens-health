@@ -1,4 +1,5 @@
 import { EvidenceBadge, HowWeRateClaims, NewsletterSignupForm, RiskBadge, VideoCard } from "@menhealth/ui";
+import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { Metadata } from 'next';
@@ -290,7 +291,7 @@ export default async function HomePage() {
       </section>
 
       {/* How we rate claims */}
-      <HowWeRateClaims />
+      <HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />
     </main>
   );
 }

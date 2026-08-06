@@ -1,5 +1,6 @@
 import { createMetadata } from '@/lib/seo/site-metadata';
 import { HowWeRateClaims, PageBreadcrumbs } from '@menhealth/ui';
+import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';
 import type { Metadata } from 'next';
 
 const APP_URL =
@@ -104,7 +105,7 @@ export default function HowWeRateEvidencePage() {
       </div>
 
       {/* Evidence label grid */}
-      <HowWeRateClaims />
+      <HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />
     </main>
   );
 }

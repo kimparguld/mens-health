@@ -21,6 +21,7 @@ export type { BrandLogotypeProps } from './ui/BrandLogotype';
 export { Disclaimer } from './ui/Disclaimer';
 export { EvidenceBadge, isClaimChecked } from './ui/EvidenceBadge';
 export { HowWeRateClaims } from './ui/HowWeRateClaims';
+export type { EvidenceRatingKey } from './ui/HowWeRateClaims';
 export { NewsletterSignupForm } from './ui/NewsletterSignupForm';
 export { PremiumGate } from './ui/PremiumGate';
 export { RiskBadge } from './ui/RiskBadge';

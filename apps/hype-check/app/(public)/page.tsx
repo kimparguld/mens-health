@@ -5,6 +5,7 @@ import { VerdictStamp } from '@/components/ui/VerdictStamp';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import { HowWeRateClaims, NewsletterSignupForm } from '@menhealth/ui';
+import { evidenceRatingBadgeClassName } from '@/lib/ui/evidenceRatingBadgeClassName';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -309,7 +310,7 @@ export default async function HomePage() {
       </section>
 
       {/* How we rate claims */}
-      <HowWeRateClaims site="hype-check" />
+      <HowWeRateClaims badgeClassName={evidenceRatingBadgeClassName} />
     </main>
   );
 }
