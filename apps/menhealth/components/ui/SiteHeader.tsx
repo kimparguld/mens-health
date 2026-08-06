@@ -36,6 +36,7 @@ const NAV_LINKS: SiteHeaderNavLink[] = [
 
 const CLASS_NAMES: SiteHeaderClassNames = {
   header: 'border-hairline sticky top-0 z-30 border-b bg-bg-surface/80 backdrop-blur-sm',
+  headerInner: 'py-2 lg:py-4',
   logoLink: 'rounded-md focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:outline-none',
   hamburgerButton:
     'flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 md:hidden',
@@ -63,6 +64,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
       desktopLogo={<BrandLogotype size="md" />}
       drawerLogo={<BrandLogotype size="sm" />}
       classNames={CLASS_NAMES}
+      trailingDivider
     />
   );
 }

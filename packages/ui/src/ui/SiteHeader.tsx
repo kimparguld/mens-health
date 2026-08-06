@@ -20,6 +20,7 @@ export interface SiteHeaderNavLink {
 
 export interface SiteHeaderClassNames {
   header: string;
+  headerInner: string;
   logoLink: string;
   hamburgerButton: string;
   drawerPanel: string;
@@ -43,6 +44,7 @@ export interface SiteHeaderProps {
   desktopLogo: ReactNode;
   drawerLogo: ReactNode;
   classNames: SiteHeaderClassNames;
+  trailingDivider?: boolean;
 }
 
 function HamburgerIcon() {
@@ -104,7 +106,7 @@ function useDrawer() {
   return { mounted, visible, open, close };
 }
 
-export function SiteHeader({ user, premiumEnabled, navLinks, desktopLogo, drawerLogo, classNames }: SiteHeaderProps) {
+export function SiteHeader({ user, premiumEnabled, navLinks, desktopLogo, drawerLogo, classNames, trailingDivider }: SiteHeaderProps) {
   const nav = useDrawer();
   const mounted = nav.mounted;
   const visible = nav.visible;
@@ -121,7 +123,7 @@ export function SiteHeader({ user, premiumEnabled, navLinks, desktopLogo, drawer
   return (
     <>
       <header className={classNames.header}>
-        <div className="mx-auto flex max-w-280 items-center justify-between px-4 py-2 lg:py-4">
+        <div className={`mx-auto flex max-w-280 items-center justify-between px-4 ${classNames.headerInner}`}>
           <Link href="/" className={classNames.logoLink}>
             {desktopLogo}
           </Link>
@@ -204,6 +206,8 @@ export function SiteHeader({ user, premiumEnabled, navLinks, desktopLogo, drawer
                   </Link>
                 </Fragment>
               ))}
+
+              {trailingDivider && <div className="mx-2 my-3 border-hairline border-t" />}
 
               {premiumEnabled && (
                 <>

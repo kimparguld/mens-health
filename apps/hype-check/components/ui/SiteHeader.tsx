@@ -45,6 +45,7 @@ const NAV_LINKS: SiteHeaderNavLink[] = [
 
 const CLASS_NAMES: SiteHeaderClassNames = {
   header: 'border-hairline bg-bg-emphasis sticky top-0 z-30 border-b backdrop-blur-sm',
+  headerInner: 'py-3 lg:py-4',
   logoLink: 'focus-visible:ring-accent/40 rounded-md focus-visible:ring-2 focus-visible:outline-none',
   hamburgerButton: 'hover:bg-surface hover:text-ink flex items-center justify-center rounded-md p-2 text-text-on-emphasis md:hidden',
   drawerPanel: 'border-hairline bg-bg-page fixed inset-y-0 right-0 z-50 flex w-[85vw] max-w-90 flex-col border-l md:hidden',
