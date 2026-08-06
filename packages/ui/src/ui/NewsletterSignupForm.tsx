@@ -54,10 +54,11 @@ export function NewsletterSignupForm({ compact = false, className, site = 'menhe
     'rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 disabled:opacity-50';
 
   if (site === 'hype-check') {
-    successClass = 'bg-white text-ink';
+    successClass = 'bg-white text-accent';
     inputClass =
       'flex-1 rounded-lg border bg-white border-gray-800 px-4 py-2.5 text-sm text-black focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none disabled:opacity-50';
-    btnClass = 'rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-ink/80 disabled:opacity-50';
+    btnClass =
+      'rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent/80 disabled:opacity-50';
   }
 
   if (status === 'success') {

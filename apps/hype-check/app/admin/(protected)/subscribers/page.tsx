@@ -64,7 +64,7 @@ export default async function AdminSubscribersPage({
         <h1 className="text-2xl font-bold text-gray-900">
           Newsletter Subscribers
         </h1>
-        <Link href="/admin" className="text-ink text-sm hover:underline">
+        <Link href="/admin" className="text-accent text-sm hover:underline">
           &larr; Dashboard
         </Link>
       </div>

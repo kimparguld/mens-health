@@ -108,7 +108,7 @@ export default function AdminGrowthPage() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="hover:border-ink-muted/30 flex flex-col rounded-xl border border-gray-200 bg-white px-4 py-4 transition-all hover:shadow-sm"
+                    className="hover:border-muted/30 flex flex-col rounded-xl border border-gray-200 bg-white px-4 py-4 transition-all hover:shadow-sm"
                   >
                     <span className="text-sm font-semibold text-gray-900">
                       {link.label}

@@ -11,7 +11,7 @@ const RATINGS = ({ site }: { site?: string }) => {
     },
     {
       label: 'Moderate evidence',
-      className: isHypeCheck ? 'border-verdict-legit text-verdict-legit rotate-1' : 'bg-teal-100 text-teal-800',
+      className: isHypeCheck ? 'border-verdict-moderate text-verdict-moderate rotate-1' : 'bg-teal-100 text-teal-800',
       description: 'Supported, but still context-dependent or limited to certain populations.',
     },
     {
@@ -35,7 +35,7 @@ const RATINGS = ({ site }: { site?: string }) => {
     },
     {
       label: 'Not reviewed',
-      className: isHypeCheck ? 'border-ink-muted/40 text-ink-muted/60' : 'bg-gray-100 text-gray-600',
+      className: isHypeCheck ? 'border-muted/40 text-muted/60' : 'bg-gray-100 text-gray-600',
       description: 'We have not yet reviewed the claims in this video.',
     },
   ];
@@ -49,7 +49,7 @@ export function HowWeRateClaims({ site }: Props) {
   const isHypeCheck = site === 'hype-check';
   const baseClass = !isHypeCheck
     ? 'inline-block rounded-full px-2.5 py-0.5 text-sm font-medium'
-    : 'inline-block rounded-sm border-[1.5px] px-2.5 py-0.5 font-slab text-sm font-bold tracking-wide uppercase';
+    : 'inline-block rounded-sm border-[1.5px] px-2.5 py-0.5 font-serif text-sm font-bold tracking-wide uppercase';
 
   return (
     <section className="border-hairline border-t bg-gray-50 py-14">

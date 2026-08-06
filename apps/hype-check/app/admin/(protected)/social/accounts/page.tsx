@@ -114,7 +114,7 @@ export default async function SocialAccountsPage({
                 href={X_CONFIG.setupDocs}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-ink-muted/60 mt-1 inline-block text-xs hover:underline"
+                className="text-muted/60 mt-1 inline-block text-xs hover:underline"
               >
                 Create app →
               </a>

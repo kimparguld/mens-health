@@ -194,7 +194,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
             ]}
           />
           <div className="mx-auto max-w-4xl px-4">
-            <p className="text-ink-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
+            <p className="text-muted/60 mb-2 text-sm font-semibold tracking-widest uppercase">
               Creator profile
             </p>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -312,7 +312,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 </p>
                 <Link
                   href="/"
-                  className="text-ink-muted/60 mt-4 inline-block text-sm font-semibold hover:underline"
+                  className="text-muted/60 mt-4 inline-block text-sm font-semibold hover:underline"
                 >
                   Browse all videos →
                 </Link>
@@ -360,7 +360,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     <Link
                       key={t.slug}
                       href={`/topics/${t.slug}`}
-                      className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
+                      className="hover:text-muted hover:border-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
                     >
                       {t.name}{' '}
                       <span className="text-gray-400">({t.count})</span>
@@ -392,7 +392,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                       {claim.slug && (
                         <Link
                           href={`/claims/${claim.slug}`}
-                          className="text-ink-muted text-sm hover:underline"
+                          className="text-muted text-sm hover:underline"
                         >
                           See evidence →
                         </Link>
@@ -420,7 +420,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                 <Link
                   key={c.slug}
                   href={`/creators/${c.slug}`}
-                  className="hover:text-ink-muted hover:border-ink-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
+                  className="hover:text-muted hover:border-muted/30 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700"
                 >
                   {c.name}
                 </Link>

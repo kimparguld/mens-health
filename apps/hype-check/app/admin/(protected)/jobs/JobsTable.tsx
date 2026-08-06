@@ -172,7 +172,7 @@ export function JobsTable({
                       {job.sourceVideo ? (
                         <Link
                           href={`/admin/videos/${job.sourceVideo.subjectId}`}
-                          className="text-ink hover:underline"
+                          className="text-accent hover:underline"
                           title={job.sourceVideo.title ?? undefined}
                         >
                           {job.sourceVideo.title ??

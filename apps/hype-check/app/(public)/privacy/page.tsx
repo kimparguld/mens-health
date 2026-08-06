@@ -101,7 +101,7 @@ export default function PrivacyPage() {
           You can unsubscribe from the newsletter at any time using the
           unsubscribe link in any digest email. To request deletion of your
           account or personal data,{' '}
-          <a href="/contact" className="text-ink-muted/60 hover:underline">
+          <a href="/contact" className="text-muted/60 hover:underline">
             contact us
           </a>
           .
@@ -112,7 +112,7 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-semibold text-gray-900">Contact</h2>
         <p>
           If you have questions about how we handle your data, please{' '}
-          <a href="/contact" className="text-ink-muted/60 hover:underline">
+          <a href="/contact" className="text-muted/60 hover:underline">
             get in touch
           </a>
           .

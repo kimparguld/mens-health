@@ -42,13 +42,13 @@ export default function CreatorsIndexPage() {
           <li key={creator.slug}>
             <Link
               href={`/creators/${creator.slug}`}
-              className="border-hairline hover:border-ink-muted flex flex-col rounded-md border bg-white px-5 py-4 transition-all"
+              className="border-hairline hover:border-muted flex flex-col rounded-md border bg-white px-5 py-4 transition-all"
             >
               <span className="text-base font-semibold text-gray-900">
                 {creator.name}
               </span>
               {creator.credentials && (
-                <span className="text-ink mt-0.5 text-sm font-medium">
+                <span className="text-accent mt-0.5 text-sm font-medium">
                   {creator.credentials}
                 </span>
               )}

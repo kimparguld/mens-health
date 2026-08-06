@@ -41,7 +41,7 @@ const STATUSES = [
   {
     value: 'REPLIED',
     label: 'Replied',
-    color: 'bg-ink-muted/10 text-ink-muted',
+    color: 'bg-muted/10 text-muted',
   },
   {
     value: 'MEETING_BOOKED',
@@ -187,7 +187,7 @@ export function OutreachTable({
       <div className="mb-4 flex flex-wrap gap-3">
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white"
+          className="bg-muted/70 hover:bg-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white"
         >
           {showForm ? 'Cancel' : '+ Add contact'}
         </button>
@@ -209,8 +209,8 @@ export function OutreachTable({
                 onClick={() => setTemplateIdx(i)}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   templateIdx === i
-                    ? 'bg-ink-muted/70 text-white'
-                    : 'hover:border-ink-muted/40 border border-gray-200 text-gray-600'
+                    ? 'bg-muted/70 text-white'
+                    : 'hover:border-muted/40 border border-gray-200 text-gray-600'
                 }`}
               >
                 {t.name}
@@ -224,7 +224,7 @@ export function OutreachTable({
             onClick={() =>
               navigator.clipboard.writeText(TEMPLATES[templateIdx]?.body || '')
             }
-            className="text-ink-muted mt-2 text-xs underline"
+            className="text-muted mt-2 text-xs underline"
           >
             Copy template
           </button>
@@ -250,7 +250,7 @@ export function OutreachTable({
                 value={form.name}
                 onChange={set('name')}
                 required
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -260,7 +260,7 @@ export function OutreachTable({
               <select
                 value={form.contactType}
                 onChange={set('contactType')}
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               >
                 {CONTACT_TYPES.map((ct) => (
                   <option key={ct.value} value={ct.value}>
@@ -277,7 +277,7 @@ export function OutreachTable({
                 type="email"
                 value={form.email}
                 onChange={set('email')}
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
@@ -289,7 +289,7 @@ export function OutreachTable({
                 value={form.socialUrl}
                 onChange={set('socialUrl')}
                 placeholder="https://youtube.com/@..."
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div className="sm:col-span-2">
@@ -301,7 +301,7 @@ export function OutreachTable({
                 value={form.relatedContentUrl}
                 onChange={set('relatedContentUrl')}
                 placeholder="https://hype-check.net/videos/..."
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div className="sm:col-span-2">
@@ -312,7 +312,7 @@ export function OutreachTable({
                 rows={2}
                 value={form.notes}
                 onChange={set('notes')}
-                className="focus:border-ink-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
+                className="focus:border-muted/50 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none"
               />
             </div>
           </div>
@@ -320,7 +320,7 @@ export function OutreachTable({
             <button
               type="submit"
               disabled={saving}
-              className="bg-ink-muted/70 hover:bg-ink-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="bg-muted/70 hover:bg-muted/80 rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Add contact'}
             </button>
@@ -365,7 +365,7 @@ export function OutreachTable({
                           href={c.socialUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-ink-muted/60 text-xs underline"
+                          className="text-muted/60 text-xs underline"
                         >
                           Profile
                         </a>

@@ -98,7 +98,7 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
               <Link
                 key={topic.slug}
                 href={`/topics/${topic.slug}`}
-                className="text-ink-muted border-ink-muted/20 hover:border-ink-muted/60 rounded-full border bg-white px-3 py-1.5 text-sm font-medium"
+                className="text-muted border-muted/20 hover:border-muted/60 rounded-full border bg-white px-3 py-1.5 text-sm font-medium"
               >
                 {topic.name} →
               </Link>
@@ -116,7 +116,7 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
             <Link
               key={t.slug}
               href={`/glossary/${t.slug}`}
-              className="hover:text-ink-muted hover:border-ink-muted/30 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800"
+              className="hover:text-muted hover:border-muted/30 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-800"
             >
               {t.term}
             </Link>
@@ -124,7 +124,7 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
         </div>
         <Link
           href="/glossary"
-          className="link text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
+          className="link text-muted mt-3 inline-block text-sm font-medium hover:underline"
         >
           Browse the full glossary →
         </Link>

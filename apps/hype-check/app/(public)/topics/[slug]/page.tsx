@@ -213,7 +213,7 @@ export default async function TopicPage({
           {topicSeed.isHighRisk && <RiskStamp level="HIGH" />}
         </div>
 
-        <h1 className="font-slab text-ink-muted mb-3 text-4xl font-bold">
+        <h1 className="text-muted mb-3 font-serif text-4xl font-bold">
           {topicSeed.name}
         </h1>
 
@@ -228,14 +228,14 @@ export default async function TopicPage({
 
       {/* Beginner Guide */}
       {staticContent?.beginnerGuide && (
-        <section className="border-ink-muted/20 mb-10 rounded-xl border bg-indigo-50 px-6 py-6">
+        <section className="border-muted/20 mb-10 rounded-xl border bg-indigo-50 px-6 py-6">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
             {staticContent.beginnerGuide.heading}
           </h2>
           <ol className="space-y-2">
             {staticContent.beginnerGuide.steps.map((step, i) => (
               <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="bg-ink-muted/60 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                <span className="bg-muted/60 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
                   {i + 1}
                 </span>
                 {step}
@@ -309,7 +309,7 @@ export default async function TopicPage({
                     {claim.slug && (
                       <Link
                         href={`/claims/${claim.slug}`}
-                        className="link text-ink-muted text-sm font-medium hover:underline"
+                        className="link text-muted text-sm font-medium hover:underline"
                       >
                         See evidence →
                       </Link>
@@ -330,7 +330,7 @@ export default async function TopicPage({
           </ul>
           <Link
             href={`/rankings/${slug}`}
-            className="link text-ink-muted mt-3 inline-block text-sm font-medium hover:underline"
+            className="link text-muted mt-3 inline-block text-sm font-medium hover:underline"
           >
             See top-ranked videos for {topicSeed.name} →
           </Link>
@@ -350,7 +350,7 @@ export default async function TopicPage({
                   Myth: &ldquo;{item.myth}&rdquo;
                 </p>
                 <p className="mt-1 text-sm text-gray-600">
-                  <span className="text-ink-muted font-medium">Reality:</span>{' '}
+                  <span className="text-muted font-medium">Reality:</span>{' '}
                   {item.reality}
                 </p>
               </div>
@@ -368,7 +368,7 @@ export default async function TopicPage({
           <ul className="space-y-2">
             {staticContent.takeaways.map((takeaway, i) => (
               <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="text-ink-muted/60 mt-0.5">✓</span>
+                <span className="text-muted/60 mt-0.5">✓</span>
                 {takeaway}
               </li>
             ))}
@@ -478,13 +478,13 @@ export default async function TopicPage({
 
       {seo && seo.faq.length > 0 && (
         <section className="mb-12">
-          <h2 className="font-slab text-ink-muted mb-6 text-3xl font-bold">
+          <h2 className="text-muted mb-6 font-serif text-3xl font-bold">
             Frequently Asked Questions
           </h2>
           <div className="divide-y rounded-xl border bg-white">
             {seo.faq.map((item, i) => (
               <details key={i} className="group px-5 py-4">
-                <summary className="group-open:text-ink-muted cursor-pointer list-none text-base font-medium text-gray-900">
+                <summary className="group-open:text-muted cursor-pointer list-none text-base font-medium text-gray-900">
                   <span className="mr-2 inline-block transition-transform group-open:rotate-90">
                     ›
                   </span>
@@ -526,7 +526,7 @@ export default async function TopicPage({
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer sponsored"
-                  className="text-ink text-sm font-medium hover:underline"
+                  className="text-accent text-sm font-medium hover:underline"
                 >
                   {link.label}
                 </a>

@@ -5,7 +5,7 @@ import {
   buildWebSiteSchema,
 } from '@menhealth/core-seo';
 import { JsonLd } from '@menhealth/ui';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
@@ -21,7 +21,7 @@ const inter = Inter({
 });
 
 const zillaSlab = Zilla_Slab({
-  variable: '--font-slab',
+  variable: '--font-serif',
   subsets: ['latin'],
   weight: '700',
   display: 'swap',
@@ -86,6 +86,7 @@ export default function RootLayout({
         lang="en"
         className={`${inter.variable} ${zillaSlab.variable} h-full antialiased`}
       >
+        <GoogleTagManager gtmId="G-30V2XS27MH" />
         <body className="flex min-h-full flex-col">
           {adsEnabled && (
             <Script
@@ -106,7 +107,6 @@ export default function RootLayout({
             <Analytics />
             <SpeedInsights />
           </Suspense>
-          <GoogleAnalytics gaId="G-30V2XS27MH" />
         </body>
       </html>
     </>

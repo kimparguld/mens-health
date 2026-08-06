@@ -63,7 +63,7 @@ export default async function NewsletterIssuePage({
         />
       </div>
 
-      <div className="border-ink-muted/20 mt-8 rounded-xl border bg-indigo-50 p-6 text-center">
+      <div className="border-muted/20 mt-8 rounded-xl border bg-indigo-50 p-6 text-center">
         <h2 className="text-lg font-bold text-gray-900">
           Get next week&apos;s issue
         </h2>

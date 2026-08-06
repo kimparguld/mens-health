@@ -55,7 +55,7 @@ export default async function ReportPage({ params }: { params: Params }) {
         {stats.videosPublished} videos reviewed, {stats.claimsAssessed} claims
         assessed. Methodology: every video published on Hype Check in this
         period, with claims extracted and evidence-checked as described on our{' '}
-        <Link href="/editorial-process" className="text-ink hover:underline">
+        <Link href="/editorial-process" className="text-accent hover:underline">
           editorial process page
         </Link>
         .
@@ -63,7 +63,7 @@ export default async function ReportPage({ params }: { params: Params }) {
 
       <a
         href={`/reports/${slug}/csv`}
-        className="hover:border-ink-muted/30 mb-8 inline-block rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
+        className="hover:border-muted/30 mb-8 inline-block rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
       >
         Download CSV ↓
       </a>

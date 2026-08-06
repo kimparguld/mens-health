@@ -49,7 +49,7 @@ export default async function PublicLayout({
             <div className="col-span-2 sm:col-span-1">
               <Link
                 href="/"
-                className="focus-visible:ring-ink-muted/40 inline-flex rounded-md focus-visible:ring-2 focus-visible:outline-none"
+                className="focus-visible:ring-muted/40 inline-flex rounded-md focus-visible:ring-2 focus-visible:outline-none"
               >
                 <BrandLogotype size="md" />
               </Link>
@@ -66,7 +66,7 @@ export default async function PublicLayout({
 
             {/* About links */}
             <div>
-              <h3 className="text-ink text- mb-2 font-semibold">About</h3>
+              <h3 className="text-accent text- mb-2 font-semibold">About</h3>
               <ul className="mt-3 space-y-2 text-sm text-white/80">
                 <li>
                   <Link
@@ -142,8 +142,11 @@ export default async function PublicLayout({
 
             {/* Top topics */}
             <div>
-              <h3 className="text-ink text-md mb-2 font-semibold">
-                <Link href="/topics" className="hover:text-ink/80 text-ink">
+              <h3 className="text-accent text-md mb-2 font-semibold">
+                <Link
+                  href="/topics"
+                  className="hover:text-accent/80 text-accent"
+                >
                   Top Topics
                 </Link>
               </h3>
@@ -161,7 +164,7 @@ export default async function PublicLayout({
                 <li>
                   <Link
                     href="/topics"
-                    className="text-ink hover:text-ink/80 font-medium"
+                    className="text-accent hover:text-accent/80 font-medium"
                   >
                     View all topics →
                   </Link>
