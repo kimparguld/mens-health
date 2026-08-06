@@ -1,5 +1,7 @@
 type Props = { hook: string; script: string; caption: string; hashtags: string[] };
 
+const X_CAPTION_LIMIT = 280;
+
 export default function XPreview({ caption, hashtags }: Props) {
   return (
     <div className="max-w-md rounded-2xl border bg-white p-4">
@@ -13,10 +15,10 @@ export default function XPreview({ caption, hashtags }: Props) {
       <p className="whitespace-pre-wrap text-sm text-gray-900">{caption}</p>
       <p
         className={`mt-2 text-right text-xs ${
-          caption.length > 280 ? "text-red-600" : "text-gray-400"
+          caption.length > X_CAPTION_LIMIT ? "text-red-600" : "text-gray-400"
         }`}
       >
-        {caption.length} / 280
+        {caption.length} / {X_CAPTION_LIMIT}
       </p>
       {hashtags.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
