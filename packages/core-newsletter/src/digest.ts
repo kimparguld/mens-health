@@ -133,7 +133,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Intro -->
           <tr>
             <td style="padding:0 0 24px;">
-              <p style="margin:0;font-size:16px;color:#374151;line-height:1.7;">
+              <p style="margin:0;font-size:18px;color:#374151;line-height:1.7;">
                 ${brand.introCopy}
               </p>
             </td>
@@ -145,7 +145,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Top video -->
           <tr>
             <td style="padding:0 0 24px;border-bottom:1px solid #f0f0f0;">
-              <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
+              <h2 style="margin:0 0 12px;font-size:15px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
                 🎬 Top Video This Week
               </h2>
               ${
@@ -158,14 +158,14 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
                  style="font-size:20px;font-weight:700;color:#111827;text-decoration:none;line-height:1.4;">
                 ${escapeHtml(topVideo.title)}
               </a>
-              <p style="margin:4px 0 0;font-size:14px;color:#6b7280;">${escapeHtml(topVideo.channelTitle)}</p>
+              <p style="margin:4px 0 0;font-size:15px;color:#6b7280;">${escapeHtml(topVideo.channelTitle)}</p>
               ${
                 topVideo.shortSummary
-                  ? `<p style="margin:8px 0 0;font-size:16px;color:#374151;line-height:1.6;">${escapeHtml(topVideo.shortSummary)}</p>`
+                  ? `<p style="margin:8px 0 0;font-size:18px;color:#374151;line-height:1.6;">${escapeHtml(topVideo.shortSummary)}</p>`
                   : ""
               }
               <a href="${u(`/videos/${topVideo.slug}`)}"
-                 style="display:inline-block;margin-top:10px;font-size:15px;color:#2563eb;">
+                 style="display:inline-block;margin-top:10px;font-size:16px;color:#2563eb;">
                 Read the full summary →
               </a>
             </td>
@@ -174,10 +174,10 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Top video (fallback) -->
           <tr>
             <td style="padding:0 0 24px;border-bottom:1px solid #f0f0f0;">
-              <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
+              <h2 style="margin:0 0 12px;font-size:15px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
                 🎬 Top Video This Week
               </h2>
-              <p style="margin:0;font-size:16px;color:#374151;">
+              <p style="margin:0;font-size:18px;color:#374151;">
                 No video was featured this week. Browse the latest on the
                 <a href="${u(weeklyPath)}" style="color:#2563eb;">weekly digest</a>.
               </p>
@@ -189,7 +189,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
 
     let claimsBody: string;
     if (allClaims.length === 0) {
-      claimsBody = `<p style="margin:0;font-size:16px;color:#374151;">
+      claimsBody = `<p style="margin:0;font-size:18px;color:#374151;">
         No claims were fully checked this week. Browse the latest
         <a href="${u("/rankings")}" style="color:#2563eb;">rankings</a> and
         <a href="${u("#topics")}" style="color:#2563eb;">topic pages</a> for new summaries.
@@ -200,18 +200,18 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           (c) => `
               <tr>
                 <td style="padding:10px 0;border-bottom:1px solid #f9fafb;">
-                  <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:700;
+                  <span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:13px;font-weight:700;
                                background:${verdictColor(c.verdict)};color:#fff;margin-bottom:4px;">
                     ${escapeHtml(c.verdict)}
                   </span>
-                  <p style="margin:4px 0 0;font-size:16px;font-weight:600;color:#111827;">
+                  <p style="margin:4px 0 0;font-size:18px;font-weight:600;color:#111827;">
                     &ldquo;${escapeHtml(c.claim)}&rdquo;
                   </p>
-                  <p style="margin:4px 0 0;font-size:15px;color:#374151;line-height:1.6;">
+                  <p style="margin:4px 0 0;font-size:16px;color:#374151;line-height:1.6;">
                     ${escapeHtml(c.summary)}
                   </p>
                   <a href="${u(`/claims/${c.slug}`)}"
-                     style="font-size:14px;color:#2563eb;">
+                     style="font-size:15px;color:#2563eb;">
                     Read the claim breakdown →
                   </a>
                 </td>
@@ -221,7 +221,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
 
       const shortfallRow =
         allClaims.length < 3
-          ? `<tr><td style="padding:8px 0;font-size:14px;color:#6b7280;">${allClaims.length} of 3 claims checked this week.</td></tr>`
+          ? `<tr><td style="padding:8px 0;font-size:15px;color:#6b7280;">${allClaims.length} of 3 claims checked this week.</td></tr>`
           : "";
 
       claimsBody = `<table width="100%" cellpadding="0" cellspacing="0">${claimRows}${shortfallRow}</table>`;
@@ -231,7 +231,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Claims checked -->
           <tr>
             <td style="padding:24px 0;border-bottom:1px solid #f0f0f0;">
-              <h2 style="margin:0 0 14px;font-size:14px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
+              <h2 style="margin:0 0 14px;font-size:15px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
                 🔍 3 Claims Checked
               </h2>
               ${claimsBody}
@@ -244,16 +244,16 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Practical takeaway -->
           <tr>
             <td style="padding:20px 24px;border-bottom:1px solid #f0f0f0;background:#f0fdf4;border-radius:6px;">
-              <h2 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.05em;">
+              <h2 style="margin:0 0 8px;font-size:15px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.05em;">
                 ✅ Practical Takeaway
               </h2>
               ${
                 takeaway
-                  ? `<p style="margin:0 0 8px;font-size:16px;color:#166534;line-height:1.6;">${escapeHtml(takeaway)}</p>
-              <a href="${u(weeklyPath)}" style="font-size:14px;color:#166534;">
+                  ? `<p style="margin:0 0 8px;font-size:18px;color:#166534;line-height:1.6;">${escapeHtml(takeaway)}</p>
+              <a href="${u(weeklyPath)}" style="font-size:15px;color:#166534;">
                 Explore this week's digest →
               </a>`
-                  : `<p style="margin:0;font-size:16px;color:#166534;line-height:1.6;">
+                  : `<p style="margin:0;font-size:18px;color:#166534;line-height:1.6;">
                 No practical takeaway was selected this week.
                 <a href="${u("/weekly")}" style="color:#166534;">Read the latest weekly digest for more summaries</a>.
               </p>`
@@ -267,16 +267,16 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Overhyped claim -->
           <tr>
             <td style="padding:20px 24px;border-bottom:1px solid #f0f0f0;background:#fff7ed;border-radius:6px;">
-              <h2 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:.05em;">
+              <h2 style="margin:0 0 8px;font-size:15px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:.05em;">
                 🚨 Most Overhyped Claim This Week
               </h2>
               ${
                 overhyped
-                  ? `<p style="margin:0 0 8px;font-size:16px;color:#9a3412;line-height:1.6;">${escapeHtml(overhyped)}</p>
-              <a href="${u("/claims")}" style="font-size:14px;color:#9a3412;">
+                  ? `<p style="margin:0 0 8px;font-size:18px;color:#9a3412;line-height:1.6;">${escapeHtml(overhyped)}</p>
+              <a href="${u("/claims")}" style="font-size:15px;color:#9a3412;">
                 See more overhyped claims →
               </a>`
-                  : `<p style="margin:0;font-size:16px;color:#9a3412;line-height:1.6;">No overhyped claim was selected this week.</p>`
+                  : `<p style="margin:0;font-size:18px;color:#9a3412;line-height:1.6;">No overhyped claim was selected this week.</p>`
               }
             </td>
           </tr>`;
@@ -286,27 +286,27 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Explore More -->
           <tr>
             <td style="padding:24px 0;text-align:center;">
-              <h2 style="margin:0 0 14px;font-size:14px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
+              <h2 style="margin:0 0 14px;font-size:15px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">
                 📚 Explore More
               </h2>
               <a href="${u("/topics")}"
                  style="display:inline-block;margin:4px 6px;padding:10px 18px;background:#111827;color:#fff;
-                        font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+                        font-size:16px;font-weight:600;text-decoration:none;border-radius:6px;">
                 Topics
               </a>
               <a href="${u("/rankings")}"
                  style="display:inline-block;margin:4px 6px;padding:10px 18px;background:#f3f4f6;color:#111827;
-                        font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+                        font-size:16px;font-weight:600;text-decoration:none;border-radius:6px;">
                 Rankings
               </a>
               <a href="${u("/creators")}"
                  style="display:inline-block;margin:4px 6px;padding:10px 18px;background:#f3f4f6;color:#111827;
-                        font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+                        font-size:16px;font-weight:600;text-decoration:none;border-radius:6px;">
                 Creators
               </a>
               <a href="${u("/weekly")}"
                  style="display:inline-block;margin:4px 6px;padding:10px 18px;background:#f3f4f6;color:#111827;
-                        font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+                        font-size:16px;font-weight:600;text-decoration:none;border-radius:6px;">
                 Weekly
               </a>
             </td>
@@ -333,7 +333,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
                  style="font-size:22px;font-weight:700;color:#ffffff;text-decoration:none;">
                 ${escapeHtml(brand.siteName)}
               </a>
-              <p style="margin:4px 0 0;font-size:14px;color:#9ca3af;">${escapeHtml(brand.tagline)}</p>
+              <p style="margin:4px 0 0;font-size:15px;color:#9ca3af;">${escapeHtml(brand.tagline)}</p>
             </td>
           </tr>
 
@@ -354,7 +354,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Disclaimer -->
           <tr>
             <td style="padding:16px 32px;background:#fefce8;border-top:1px solid #fef08a;">
-              <p style="margin:0;font-size:13px;color:#854d0e;line-height:1.6;">
+              <p style="margin:0;font-size:15px;color:#854d0e;line-height:1.6;">
                 ⚠️ <strong>Disclaimer:</strong> ${escapeHtml(brand.healthDisclaimer)}
               </p>
             </td>
@@ -363,7 +363,7 @@ export function createDigestBuilder(brand: DigestBrandConfig) {
           <!-- Footer -->
           <tr>
             <td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;">
-              <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+              <p style="margin:0;font-size:14px;color:#9ca3af;text-align:center;">
                 You're receiving this because you subscribed at
                 <a href="${escapeHtml(appUrl)}" style="color:#6b7280;">${escapeHtml(appUrl)}</a>.<br />
                 <a href="${escapeHtml(unsubscribeUrl)}" style="color:#6b7280;">Unsubscribe</a>
