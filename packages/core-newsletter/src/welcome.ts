@@ -45,8 +45,8 @@ export function createWelcomeEmailBuilder(brand: WelcomeEmailBrandConfig) {
       .map(
         (link) => `
               <a href="${u(link.path)}"
-                 style="display:inline-block;margin:4px 6px;padding:10px 18px;background:#f3f4f6;color:#111827;
-                        font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;">
+                 style="display:inline-block;margin:4px 6px;padding:12px 18px;background:#f3f4f6;color:#111827;
+                        font-size:16px;font-weight:600;text-decoration:none;border-radius:6px;">
                 ${escapeHtml(link.label)}
               </a>`,
       )
@@ -73,7 +73,7 @@ export function createWelcomeEmailBuilder(brand: WelcomeEmailBrandConfig) {
                  style="font-size:22px;font-weight:700;color:#ffffff;text-decoration:none;">
                 ${escapeHtml(brand.siteName)}
               </a>
-              <p style="margin:4px 0 0;font-size:14px;color:#9ca3af;">${escapeHtml(brand.tagline)}</p>
+              <p style="margin:4px 0 0;font-size:15px;color:#9ca3af;">${escapeHtml(brand.tagline)}</p>
             </td>
           </tr>
 
@@ -83,14 +83,14 @@ export function createWelcomeEmailBuilder(brand: WelcomeEmailBrandConfig) {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:0 0 20px;">
-                    <p style="margin:0;font-size:16px;color:#374151;line-height:1.7;">
+                    <p style="margin:0;font-size:18px;color:#374151;line-height:1.7;">
                       ${escapeHtml(brand.welcomeCopy)}
                     </p>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:0 0 24px;">
-                    <p style="margin:0;font-size:16px;color:#374151;line-height:1.7;">
+                    <p style="margin:0;font-size:18px;color:#374151;line-height:1.7;">
                       ${escapeHtml(brand.cadenceCopy)}
                     </p>
                   </td>
@@ -107,7 +107,7 @@ export function createWelcomeEmailBuilder(brand: WelcomeEmailBrandConfig) {
           <!-- Disclaimer -->
           <tr>
             <td style="padding:16px 32px;background:#fefce8;border-top:1px solid #fef08a;">
-              <p style="margin:0;font-size:13px;color:#854d0e;line-height:1.6;">
+              <p style="margin:0;font-size:15px;color:#854d0e;line-height:1.6;">
                 ⚠️ <strong>Disclaimer:</strong> ${escapeHtml(brand.healthDisclaimer)}
               </p>
             </td>
@@ -116,7 +116,7 @@ export function createWelcomeEmailBuilder(brand: WelcomeEmailBrandConfig) {
           <!-- Footer -->
           <tr>
             <td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;">
-              <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+              <p style="margin:0;font-size:14px;color:#9ca3af;text-align:center;">
                 You're receiving this because you subscribed at
                 <a href="${escapeHtml(appUrl)}" style="color:#6b7280;">${escapeHtml(appUrl)}</a>.<br />
                 <a href="${escapeHtml(unsubscribeUrl)}" style="color:#6b7280;">Unsubscribe</a>
