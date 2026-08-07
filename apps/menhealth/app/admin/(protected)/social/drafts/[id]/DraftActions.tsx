@@ -19,6 +19,9 @@ type Props = {
   requiresReview: boolean;
   initialScheduledAt?: string | null;
   caption: string;
+  videoUrl?: string | null;
+  videoStatus?: string | null;
+  videoError?: string | null;
 };
 
 export default function DraftActions({
@@ -29,6 +32,9 @@ export default function DraftActions({
   requiresReview,
   initialScheduledAt,
   caption,
+  videoUrl,
+  videoStatus,
+  videoError,
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
@@ -50,6 +56,7 @@ export default function DraftActions({
   const isScheduled = status === "SCHEDULED";
   const isX = platform === "X";
   const isReddit = platform === "REDDIT";
+  const supportsVideo = platform === "TIKTOK" || platform === "YOUTUBE_COMMUNITY";
   // Only X has a working auto-publisher (via the scheduled cron). Everything
   // else — YouTube Community, Reddit, and TikTok — is always manual: copy
   // the text, post it yourself, then record the link here.
@@ -266,6 +273,39 @@ export default function DraftActions({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {supportsVideo && (
+        <div className="space-y-3 rounded-lg border p-3">
+          <p className="text-xs font-semibold text-gray-600">Video</p>
+
+          {videoStatus === "FAILED" && videoError && (
+            <p className="rounded bg-red-50 px-3 py-2 text-xs text-red-700">
+              {videoError}
+            </p>
+          )}
+
+          {videoUrl && videoStatus === "READY" && (
+            // eslint-disable-next-line jsx-a11y/media-has-caption -- captions are burned into the video itself
+            <video
+              controls
+              className="w-full max-w-[240px] rounded"
+              src={videoUrl}
+            />
+          )}
+
+          <button
+            onClick={() => callJson("video")}
+            disabled={loading !== null}
+            className="rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {loading === "video"
+              ? "Generating video…"
+              : videoUrl
+                ? "Regenerate video"
+                : "Generate video"}
+          </button>
         </div>
       )}
     </div>
