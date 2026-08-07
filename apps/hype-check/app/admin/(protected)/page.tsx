@@ -101,7 +101,7 @@ export default async function AdminDashboardPage() {
           <Link
             key={key}
             href={`/admin/videos?status=${key}`}
-            className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+            className="hover:border-accent rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
           >
             <p className="text-sm font-medium text-gray-500">{label}</p>
             <p className="mt-1 text-3xl font-semibold text-gray-900">
@@ -119,7 +119,7 @@ export default async function AdminDashboardPage() {
       <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Link
           href="/admin/claims?status=needs-review"
-          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-amber-300 hover:shadow-md"
+          className="hover:border-accent rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">
             Claims needing your review
@@ -130,7 +130,7 @@ export default async function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/claims?status=auto-reviewed"
-          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+          className="hover:border-accent rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">
             Auto-reviewed, awaiting spot-check
@@ -141,7 +141,7 @@ export default async function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/claims?status=reviewed"
-          className="hover:border-muted/30 rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
+          className="hover:border-accent rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">
             Claims reviewed by a human
@@ -161,7 +161,7 @@ export default async function AdminDashboardPage() {
         </div>
         <Link
           href="/admin/jobs"
-          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+          className="hover:border-accent rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">Processing jobs</p>
           <p className="mt-1 text-3xl font-semibold text-gray-900">
@@ -170,7 +170,7 @@ export default async function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/subscribers"
-          className="rounded-lg border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+          className="hover:border-accent rounded-lg border bg-white p-5 shadow-sm transition hover:shadow-md"
         >
           <p className="text-sm font-medium text-gray-500">
             Newsletter subscribers
