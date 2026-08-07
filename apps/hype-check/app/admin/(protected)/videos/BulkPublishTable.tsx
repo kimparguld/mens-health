@@ -249,7 +249,7 @@ export default function BulkPublishTable({
           <thead className="bg-gray-50">
             <tr>
               {showBulkActions && (
-                <th className="w-10 px-4 py-3">
+                <th className="w-10 px-4 py-2">
                   <input
                     type="checkbox"
                     checked={allSelected}
@@ -258,7 +258,7 @@ export default function BulkPublishTable({
                     }}
                     onChange={toggleAll}
                     aria-label="Select all"
-                    className="rounded border-gray-300"
+                    className="mt-1 h-4 w-4 rounded border-gray-300"
                   />
                 </th>
               )}
@@ -309,16 +309,16 @@ export default function BulkPublishTable({
             {videos.map((video) => (
               <tr
                 key={video.id}
-                className={`hover:bg-gray-50 ${selected.has(video.id) ? 'bg-blue-50' : ''}`}
+                className={`hover:bg-gray-300 ${selected.has(video.id) ? 'bg-blue-50' : ''}`}
               >
                 {showBulkActions && (
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-2">
                     <input
                       type="checkbox"
                       checked={selected.has(video.id)}
                       onChange={() => toggleOne(video.id)}
                       aria-label={`Select ${video.title}`}
-                      className="rounded border-gray-300"
+                      className="mt-1 h-4 w-4 cursor-pointer rounded border-gray-300"
                     />
                   </td>
                 )}

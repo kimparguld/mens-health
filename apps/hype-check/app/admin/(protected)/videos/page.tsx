@@ -288,7 +288,7 @@ export default async function AdminVideoQueuePage({
               {page > 1 && (
                 <Link
                   href={pageHref(page - 1)}
-                  className="rounded border px-3 py-1 hover:bg-gray-50"
+                  className="rounded border px-3 py-1 hover:bg-gray-300"
                 >
                   Previous
                 </Link>
@@ -296,7 +296,7 @@ export default async function AdminVideoQueuePage({
               {page < totalPages && (
                 <Link
                   href={pageHref(page + 1)}
-                  className="rounded border px-3 py-1 hover:bg-gray-50"
+                  className="rounded border px-3 py-1 hover:bg-gray-300"
                 >
                   Next
                 </Link>

@@ -1,23 +1,23 @@
-import { db } from "@/lib/db/prisma";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import ReviewActions from "./ReviewActions";
-import GenerateSocialButton from "./GenerateSocialButton";
-import GenerateSummaryButton from "./GenerateSummaryButton";
-import ReviewerForm from "./ReviewerForm";
+import { db } from '@/lib/db/prisma';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import GenerateSocialButton from './GenerateSocialButton';
+import GenerateSummaryButton from './GenerateSummaryButton';
+import ReviewActions from './ReviewActions';
+import ReviewerForm from './ReviewerForm';
 
 const riskColors: Record<string, string> = {
-  LOW: "bg-green-100 text-green-700",
-  MEDIUM: "bg-yellow-100 text-yellow-700",
-  HIGH: "bg-red-100 text-red-700",
+  LOW: 'bg-green-100 text-green-700',
+  MEDIUM: 'bg-yellow-100 text-yellow-700',
+  HIGH: 'bg-red-100 text-red-700',
 };
 
 const evidenceColors: Record<string, string> = {
-  SUPPORTED: "text-green-700",
-  MIXED: "text-yellow-700",
-  WEAK: "text-orange-600",
-  UNSUPPORTED: "text-red-700",
-  NOT_CHECKED: "text-gray-500",
+  SUPPORTED: 'text-green-700',
+  MIXED: 'text-yellow-700',
+  WEAK: 'text-orange-600',
+  UNSUPPORTED: 'text-red-700',
+  NOT_CHECKED: 'text-gray-500',
 };
 
 export default async function AdminVideoDetailPage({
@@ -31,9 +31,9 @@ export default async function AdminVideoDetailPage({
     where: { id },
     include: {
       channel: true,
-      summaries: { orderBy: { createdAt: "desc" }, take: 1 },
-      claims: { orderBy: { riskLevel: "desc" } },
-      adminReviews: { orderBy: { createdAt: "desc" }, take: 5 },
+      summaries: { orderBy: { createdAt: 'desc' }, take: 1 },
+      claims: { orderBy: { riskLevel: 'desc' } },
+      adminReviews: { orderBy: { createdAt: 'desc' }, take: 5 },
       topics: { include: { topic: true } },
     },
   });
@@ -46,7 +46,7 @@ export default async function AdminVideoDetailPage({
   const redFlags = summary ? ((summary.redFlags as string[] | null) ?? []) : [];
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <Link
@@ -57,14 +57,14 @@ export default async function AdminVideoDetailPage({
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">{video.title}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            {video.channel.title} &bull;{" "}
-            {video.publishedAt.toLocaleDateString()} &bull;{" "}
+            {video.channel.title} &bull;{' '}
+            {video.publishedAt.toLocaleDateString()} &bull;{' '}
             <span
-              className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[video.riskLevel] ?? ""}`}
+              className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[video.riskLevel] ?? ''}`}
             >
               {video.riskLevel} risk
-            </span>{" "}
-            &bull;{" "}
+            </span>{' '}
+            &bull;{' '}
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
               {video.status}
             </span>
@@ -79,7 +79,7 @@ export default async function AdminVideoDetailPage({
             hasSummary={!!summary}
             riskLevel={video.riskLevel}
           />
-          {video.status === "PUBLISHED" && (
+          {video.status === 'PUBLISHED' && (
             <GenerateSocialButton videoId={video.id} />
           )}
         </div>
@@ -175,7 +175,7 @@ export default async function AdminVideoDetailPage({
                   <div key={claim.id} className="rounded border p-3 text-sm">
                     <div className="mb-1 flex items-center gap-2">
                       <span
-                        className={`rounded px-1.5 py-0.5 text-xs font-medium ${riskColors[claim.riskLevel] ?? ""}`}
+                        className={`rounded px-1.5 py-0.5 text-xs font-medium ${riskColors[claim.riskLevel] ?? ''}`}
                       >
                         {claim.riskLevel}
                       </span>
@@ -183,10 +183,10 @@ export default async function AdminVideoDetailPage({
                         {claim.category}
                       </span>
                       <span
-                        className={`ml-auto text-xs font-medium ${evidenceColors[claim.evidenceStatus] ?? ""}`}
+                        className={`ml-auto text-xs font-medium ${evidenceColors[claim.evidenceStatus] ?? ''}`}
                       >
-                        {claim.evidenceStatus === "NOT_CHECKED"
-                          ? "Not checked"
+                        {claim.evidenceStatus === 'NOT_CHECKED'
+                          ? 'Not checked'
                           : claim.evidenceStatus}
                       </span>
                     </div>
@@ -216,13 +216,13 @@ export default async function AdminVideoDetailPage({
                       key={topic.id}
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         topic.isHighRisk
-                          ? "bg-red-100 text-red-700"
-                          : "bg-gray-100 text-gray-700"
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-gray-100 text-gray-700'
                       }`}
                     >
                       {topic.name}
                     </span>
-                  ),
+                  )
                 )}
               </div>
             </div>
@@ -234,11 +234,11 @@ export default async function AdminVideoDetailPage({
             <dl className="space-y-1">
               <div className="flex justify-between text-gray-600">
                 <dt>Views</dt>
-                <dd>{video.viewCount?.toLocaleString() ?? "—"}</dd>
+                <dd>{video.viewCount?.toLocaleString() ?? '—'}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Likes</dt>
-                <dd>{video.likeCount?.toLocaleString() ?? "—"}</dd>
+                <dd>{video.likeCount?.toLocaleString() ?? '—'}</dd>
               </div>
               <div className="flex justify-between text-gray-600">
                 <dt>Trend score</dt>
@@ -273,7 +273,7 @@ export default async function AdminVideoDetailPage({
                         {review.createdAt.toLocaleDateString()}
                       </span>
                     </li>
-                  ),
+                  )
                 )}
               </ol>
             </div>

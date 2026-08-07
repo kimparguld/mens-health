@@ -100,7 +100,7 @@ export default async function AdminClaimsPage({
   ];
 
   return (
-    <div className="max-w-5xl">
+    <div className="max-w-full">
       <h1 className="mb-2 text-2xl font-bold text-gray-900">Claims</h1>
       <p className="mb-4 text-sm text-gray-500">
         Low-risk claims are fact-checked and reviewed automatically; medium-risk
@@ -213,7 +213,7 @@ export default async function AdminClaimsPage({
                     <div className="flex flex-col gap-1">
                       <Link
                         href={`/admin/claims/${claim.id}`}
-                        className="text-muted text-xs font-medium hover:underline"
+                        className="text-accent text-sm font-medium hover:underline"
                       >
                         Review →
                       </Link>

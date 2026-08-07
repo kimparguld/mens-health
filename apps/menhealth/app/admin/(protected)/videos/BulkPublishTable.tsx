@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 type VideoRow = {
   id: string;
@@ -14,9 +14,9 @@ type VideoRow = {
 };
 
 const riskColors: Record<string, string> = {
-  LOW: "bg-green-100 text-green-700",
-  MEDIUM: "bg-yellow-100 text-yellow-700",
-  HIGH: "bg-red-100 text-red-700",
+  LOW: 'bg-green-100 text-green-700',
+  MEDIUM: 'bg-yellow-100 text-yellow-700',
+  HIGH: 'bg-red-100 text-red-700',
 };
 
 export default function BulkPublishTable({
@@ -24,8 +24,8 @@ export default function BulkPublishTable({
   showBulkActions,
   showPublishAction,
   showSummaryColumn,
-  sortField = "updated",
-  sortDir = "desc",
+  sortField = 'updated',
+  sortDir = 'desc',
   baseQuery = {},
 }: {
   videos: VideoRow[];
@@ -33,19 +33,19 @@ export default function BulkPublishTable({
   showPublishAction: boolean;
   showSummaryColumn: boolean;
   sortField?: string;
-  sortDir?: "asc" | "desc";
+  sortDir?: 'asc' | 'desc';
   baseQuery?: Record<string, string>;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState<"publish" | "summaries" | null>(null);
+  const [loading, setLoading] = useState<'publish' | 'summaries' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [acknowledgeHighRisk, setAcknowledgeHighRisk] = useState(false);
-  const [highRiskNote, setHighRiskNote] = useState("");
+  const [highRiskNote, setHighRiskNote] = useState('');
 
   function sortHref(field: string) {
-    const newDir = sortField === field && sortDir === "asc" ? "desc" : "asc";
+    const newDir = sortField === field && sortDir === 'asc' ? 'desc' : 'asc';
     const params = new URLSearchParams({
       ...baseQuery,
       sort: field,
@@ -59,7 +59,7 @@ export default function BulkPublishTable({
       return <span className="ml-1 text-gray-300">↕</span>;
     return (
       <span className="ml-1 text-blue-600">
-        {sortDir === "asc" ? "↑" : "↓"}
+        {sortDir === 'asc' ? '↑' : '↓'}
       </span>
     );
   };
@@ -84,7 +84,7 @@ export default function BulkPublishTable({
   }
 
   const highRiskSelected = videos.filter(
-    (v) => selected.has(v.id) && v.riskLevel === "HIGH",
+    (v) => selected.has(v.id) && v.riskLevel === 'HIGH'
   );
 
   async function bulkPublish() {
@@ -98,21 +98,21 @@ export default function BulkPublishTable({
       (!acknowledgeHighRisk || !highRiskNote.trim())
     ) {
       setError(
-        "Check the high-risk acknowledgment box and add a note before publishing.",
+        'Check the high-risk acknowledgment box and add a note before publishing.'
       );
       return;
     }
 
-    setLoading("publish");
+    setLoading('publish');
     setError(null);
     setMessage(null);
 
-    const res = await fetch("/api/admin/videos/bulk-review", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/admin/videos/bulk-review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ids: Array.from(selected),
-        action: "PUBLISHED",
+        action: 'PUBLISHED',
         ...(highRiskSelected.length > 0
           ? { acknowledgeHighRisk: true, note: highRiskNote.trim() }
           : {}),
@@ -123,21 +123,21 @@ export default function BulkPublishTable({
       const data = (await res.json().catch(() => null)) as {
         error?: string;
       } | null;
-      setError(data?.error ?? "Request failed");
+      setError(data?.error ?? 'Request failed');
       setLoading(null);
       return;
     }
 
     setSelected(new Set());
     setAcknowledgeHighRisk(false);
-    setHighRiskNote("");
+    setHighRiskNote('');
     setLoading(null);
     router.refresh();
   }
 
   async function bulkGenerateSummaries() {
     if (!someSelected) return;
-    setLoading("summaries");
+    setLoading('summaries');
     setError(null);
     setMessage(null);
 
@@ -147,14 +147,14 @@ export default function BulkPublishTable({
       .map((v) => v.id);
 
     if (idsWithoutSummary.length === 0) {
-      setMessage("All selected videos already have a summary.");
+      setMessage('All selected videos already have a summary.');
       setLoading(null);
       return;
     }
 
-    const res = await fetch("/api/admin/videos/bulk-generate-summaries", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/admin/videos/bulk-generate-summaries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: idsWithoutSummary }),
     });
 
@@ -165,13 +165,13 @@ export default function BulkPublishTable({
     } | null;
 
     if (!res.ok || !data?.ok) {
-      setError(data?.error ?? "Request failed");
+      setError(data?.error ?? 'Request failed');
       setLoading(null);
       return;
     }
 
     setMessage(
-      data.message ?? `Queued ${selected.size} video(s) for summary generation`,
+      data.message ?? `Queued ${selected.size} video(s) for summary generation`
     );
     setSelected(new Set());
     setLoading(null);
@@ -186,8 +186,8 @@ export default function BulkPublishTable({
           {someSelected && showPublishAction && highRiskSelected.length > 0 && (
             <div className="flex flex-col gap-2 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
               <p>
-                ⚠️ {highRiskSelected.length} selected video(s) are HIGH risk:{" "}
-                {highRiskSelected.map((v) => v.title).join(", ")}. Publishing
+                ⚠️ {highRiskSelected.length} selected video(s) are HIGH risk:{' '}
+                {highRiskSelected.map((v) => v.title).join(', ')}. Publishing
                 requires explicit acknowledgment and a note.
               </p>
               <label className="flex items-center gap-2 font-medium">
@@ -212,7 +212,7 @@ export default function BulkPublishTable({
             <span className="text-sm text-gray-500">
               {someSelected
                 ? `${selected.size} selected`
-                : `Select rows to ${showPublishAction ? "bulk publish" : ""}${showPublishAction && showSummaryColumn ? " or " : ""}${showSummaryColumn ? "generate summaries" : ""}.`}
+                : `Select rows to ${showPublishAction ? 'bulk publish' : ''}${showPublishAction && showSummaryColumn ? ' or ' : ''}${showSummaryColumn ? 'generate summaries' : ''}.`}
             </span>
             {someSelected && (
               <>
@@ -221,8 +221,8 @@ export default function BulkPublishTable({
                   disabled={loading !== null}
                   className="rounded-lg border border-blue-600 px-4 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 disabled:opacity-50"
                 >
-                  {loading === "summaries"
-                    ? "Generating…"
+                  {loading === 'summaries'
+                    ? 'Generating…'
                     : `Generate summaries (${selected.size})`}
                 </button>
                 {showPublishAction && (
@@ -231,8 +231,8 @@ export default function BulkPublishTable({
                     disabled={loading !== null}
                     className="rounded-lg bg-green-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
                   >
-                    {loading === "publish"
-                      ? "Publishing…"
+                    {loading === 'publish'
+                      ? 'Publishing…'
                       : `Publish ${selected.size}`}
                   </button>
                 )}
@@ -251,7 +251,7 @@ export default function BulkPublishTable({
           <thead className="bg-gray-50">
             <tr>
               {showBulkActions && (
-                <th className="w-10 px-4 py-3">
+                <th className="w-10 px-4 py-1.5">
                   <input
                     type="checkbox"
                     checked={allSelected}
@@ -260,7 +260,7 @@ export default function BulkPublishTable({
                     }}
                     onChange={toggleAll}
                     aria-label="Select all"
-                    className="rounded border-gray-300"
+                    className="h-5 w-5 rounded border-gray-300"
                   />
                 </th>
               )}
@@ -272,36 +272,36 @@ export default function BulkPublishTable({
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
                 <Link
-                  href={sortHref("risk")}
+                  href={sortHref('risk')}
                   className="inline-flex items-center hover:text-gray-800"
                 >
-                  Risk {sortIcon({ field: "risk" })}
+                  Risk {sortIcon({ field: 'risk' })}
                 </Link>
               </th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">
                 <Link
-                  href={sortHref("claims")}
+                  href={sortHref('claims')}
                   className="inline-flex items-center hover:text-gray-800"
                 >
-                  Claims {sortIcon({ field: "claims" })}
+                  Claims {sortIcon({ field: 'claims' })}
                 </Link>
               </th>
               {showSummaryColumn && (
                 <th className="px-4 py-3 text-left font-medium text-gray-500">
                   <Link
-                    href={sortHref("summary")}
+                    href={sortHref('summary')}
                     className="inline-flex items-center hover:text-gray-800"
                   >
-                    Has summary {sortIcon({ field: "summary" })}
+                    Has summary {sortIcon({ field: 'summary' })}
                   </Link>
                 </th>
               )}
               <th className="px-4 py-3 text-left font-medium text-gray-500">
                 <Link
-                  href={sortHref("updated")}
+                  href={sortHref('updated')}
                   className="inline-flex items-center hover:text-gray-800"
                 >
-                  Updated {sortIcon({ field: "updated" })}
+                  Updated {sortIcon({ field: 'updated' })}
                 </Link>
               </th>
               <th className="px-4 py-3" />
@@ -311,16 +311,16 @@ export default function BulkPublishTable({
             {videos.map((video) => (
               <tr
                 key={video.id}
-                className={`hover:bg-gray-50 ${selected.has(video.id) ? "bg-blue-50" : ""}`}
+                className={`hover:bg-gray-300 ${selected.has(video.id) ? 'bg-blue-50' : ''}`}
               >
                 {showBulkActions && (
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-1.5">
                     <input
                       type="checkbox"
                       checked={selected.has(video.id)}
                       onChange={() => toggleOne(video.id)}
                       aria-label={`Select ${video.title}`}
-                      className="rounded border-gray-300"
+                      className="h-5 w-5 cursor-pointer rounded border-gray-300"
                     />
                   </td>
                 )}
@@ -334,7 +334,7 @@ export default function BulkPublishTable({
                 </td>
                 <td className="px-4 py-3">
                   <span
-                    className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[video.riskLevel] ?? ""}`}
+                    className={`rounded px-2 py-0.5 text-xs font-medium ${riskColors[video.riskLevel] ?? ''}`}
                   >
                     {video.riskLevel}
                   </span>

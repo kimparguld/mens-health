@@ -60,8 +60,8 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="flex w-56 flex-col border-r bg-white">
-        <div className="flex h-18 items-center border-b px-4">
+      <aside className="border-hairline flex w-56 flex-col border-r bg-white">
+        <div className="border-hairline flex h-18 items-center border-b px-4">
           <BrandLogotype size="md" />
         </div>
         <nav className="flex flex-1 flex-col gap-4 overflow-y-auto p-2">
@@ -77,7 +77,7 @@ export default async function AdminLayout({
                   key={href}
                   href={href}
                   className={twMerge(
-                    'rounded-md px-3 py-2 text-base text-gray-700 hover:bg-gray-100 hover:text-blue-900',
+                    'hover:bg-accent rounded-md px-3 py-2 text-base text-gray-700 hover:text-white',
                     !section && 'font-semibold'
                   )}
                 >
