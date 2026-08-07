@@ -135,6 +135,35 @@ describe("POST /api/social/drafts/[id]/video", () => {
     expect(response.status).toBe(404);
   });
 
+  it("marks the draft FAILED and returns 500 when generateSocialVideo throws unexpectedly", async () => {
+    const { POST } = await import("@/app/api/social/drafts/[id]/video/route");
+
+    mockFindUnique.mockResolvedValue({
+      id: "post_1",
+      platform: "TIKTOK",
+      hook: "hook",
+      script: "script",
+    });
+    mockGenerateSocialVideo.mockRejectedValue(new Error("process crashed"));
+
+    const response = await POST(makeRequest("post_1"), {
+      params: Promise.resolve({ id: "post_1" }),
+    });
+
+    expect(response.status).toBe(500);
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "post_1" },
+      data: { videoStatus: "GENERATING", videoError: null },
+    });
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: "post_1" },
+      data: {
+        videoStatus: "FAILED",
+        videoError: "Video generation failed unexpectedly",
+      },
+    });
+  });
+
   it("returns 401 for a non-admin session", async () => {
     mockAuth.mockResolvedValue({ user: { isAdmin: false } });
     const { POST } = await import("@/app/api/social/drafts/[id]/video/route");

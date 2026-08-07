@@ -297,10 +297,10 @@ export default function DraftActions({
 
           <button
             onClick={() => callJson("video")}
-            disabled={loading !== null || videoStatus === "GENERATING"}
+            disabled={loading !== null}
             className="rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {loading === "video" || videoStatus === "GENERATING"
+            {loading === "video"
               ? "Generating video…"
               : videoUrl
                 ? "Regenerate video"
