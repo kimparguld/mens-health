@@ -45,6 +45,38 @@ function runFfmpeg(args: string[]): Promise<void> {
   });
 }
 
+const DURATION_PATTERN = /Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/;
+
+// ffmpeg-static ships no ffprobe binary, so duration is read off ffmpeg's own
+// stderr banner. `ffmpeg -i <file>` with no output always exits non-zero —
+// that's expected here, only the Duration line in stderr is used.
+function probeDurationSeconds(filePath: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    if (!ffmpegPath) {
+      reject(new Error("ffmpeg-static did not resolve a binary path"));
+      return;
+    }
+    execFile(
+      ffmpegPath,
+      ["-i", filePath],
+      { maxBuffer: 1024 * 1024 * 32 },
+      (_error, _stdout, stderr) => {
+        const match = DURATION_PATTERN.exec(stderr);
+        if (!match) {
+          reject(
+            new Error(
+              `Could not determine duration of ${filePath} from ffmpeg output`,
+            ),
+          );
+          return;
+        }
+        const [, hours, minutes, seconds] = match;
+        resolve(Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds));
+      },
+    );
+  });
+}
+
 export async function renderVerticalVideo(
   input: RenderVerticalVideoInput,
 ): Promise<Buffer> {
@@ -57,9 +89,11 @@ export async function renderVerticalVideo(
     const sceneFilterInputs: string[] = [];
     const drawTextFilters: string[] = [];
     const sceneLabels: string[] = [];
+    let totalSceneSeconds = 0;
 
     for (const [index, chunk] of input.captionChunks.entries()) {
       const duration = sceneDurationSeconds(chunk);
+      totalSceneSeconds += duration;
       const color = SCENE_BACKGROUND_COLORS[index % SCENE_BACKGROUND_COLORS.length];
 
       sceneFilterInputs.push(
@@ -100,11 +134,21 @@ export async function renderVerticalVideo(
       scenesPath,
     ]);
 
+    // ffmpeg's `-stream_loop -1` (infinite loop) does not reliably respect
+    // `-shortest` — verified to loop indefinitely regardless of -c:v copy vs.
+    // re-encode, eventually exhausting memory. Loop a known finite number of
+    // times instead (enough to cover the narration), then hard-trim with -t.
+    const narrationDurationSeconds = await probeDurationSeconds(narrationPath);
+    const loopCount = Math.max(
+      0,
+      Math.ceil(narrationDurationSeconds / totalSceneSeconds) - 1,
+    );
+
     const outputPath = join(workDir, "output.mp4");
     await runFfmpeg([
       "-y",
       "-stream_loop",
-      "-1",
+      String(loopCount),
       "-i",
       scenesPath,
       "-i",
@@ -114,11 +158,15 @@ export async function renderVerticalVideo(
       "-map",
       "1:a:0",
       "-c:v",
-      "copy",
+      "libx264",
+      "-pix_fmt",
+      "yuv420p",
       "-c:a",
       "aac",
       "-b:a",
       "128k",
+      "-t",
+      String(narrationDurationSeconds),
       "-shortest",
       "-movflags",
       "+faststart",
