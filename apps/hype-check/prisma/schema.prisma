@@ -660,6 +660,12 @@ enum MediaType {
   IMAGE
 }
 
+enum VideoGenerationStatus {
+  GENERATING
+  READY
+  FAILED
+}
+
 model SocialPost {
   id             String                 @id @default(cuid())
   platform       Platform
@@ -677,6 +683,9 @@ model SocialPost {
   publishedAt    DateTime?
   platformPostId String?
   platformUrl    String?
+  videoUrl       String?
+  videoStatus    VideoGenerationStatus?
+  videoError     String?
   templateId     String?
   template       SocialTemplate?        @relation(fields: [templateId], references: [id])
   attempts       SocialPublishAttempt[]
