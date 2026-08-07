@@ -34,39 +34,60 @@ export async function POST(
     );
   }
 
-  await db.socialPost.update({
-    where: { id },
-    data: { videoStatus: "GENERATING", videoError: null },
-  });
-
-  const result = await generateSocialVideo({
-    hook: draft.hook,
-    script: draft.script,
-    platform: draft.platform,
-  });
-
-  if (!result.ok) {
+  try {
     await db.socialPost.update({
       where: { id },
-      data: { videoStatus: "FAILED", videoError: result.error.message },
+      data: { videoStatus: "GENERATING", videoError: null },
     });
+
+    const result = await generateSocialVideo({
+      hook: draft.hook,
+      script: draft.script,
+      platform: draft.platform,
+    });
+
+    if (!result.ok) {
+      await db.socialPost.update({
+        where: { id },
+        data: { videoStatus: "FAILED", videoError: result.error.message },
+      });
+      return NextResponse.json(
+        { error: "Video generation failed" },
+        { status: 500 },
+      );
+    }
+
+    await db.socialPost.update({
+      where: { id },
+      data: {
+        videoUrl: result.value.videoUrl,
+        videoStatus: "READY",
+        videoError: null,
+      },
+    });
+
+    return NextResponse.json({
+      videoUrl: result.value.videoUrl,
+      videoStatus: "READY",
+    });
+  } catch {
+    // Defends against the process being killed mid-render (function
+    // timeout), or an unexpected throw from generateSocialVideo/db calls —
+    // without this, the row would stay stuck at GENERATING forever.
+    try {
+      await db.socialPost.update({
+        where: { id },
+        data: {
+          videoStatus: "FAILED",
+          videoError: "Video generation failed unexpectedly",
+        },
+      });
+    } catch {
+      // Best effort only — nothing more we can do if this also fails.
+    }
     return NextResponse.json(
       { error: "Video generation failed" },
       { status: 500 },
     );
   }
-
-  await db.socialPost.update({
-    where: { id },
-    data: {
-      videoUrl: result.value.videoUrl,
-      videoStatus: "READY",
-      videoError: null,
-    },
-  });
-
-  return NextResponse.json({
-    videoUrl: result.value.videoUrl,
-    videoStatus: "READY",
-  });
 }
