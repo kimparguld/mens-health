@@ -48,7 +48,7 @@ beforeEach(() => {
 });
 
 describe("generateSocialVideo", () => {
-  it("returns the uploaded video URL on success", async () => {
+  it("returns the uploaded video URL on success, rendering silent (narration audio disabled)", async () => {
     const result = await generateSocialVideo(INPUT);
 
     expect(result.ok).toBe(true);
@@ -56,11 +56,9 @@ describe("generateSocialVideo", () => {
     expect(result.value.videoUrl).toBe(
       "https://blob.test/social-videos/1.mp4",
     );
-    expect(mockSynthesizeNarrationAudio).toHaveBeenCalledWith(
-      VALID_PLAN.narration,
-    );
+    expect(mockSynthesizeNarrationAudio).not.toHaveBeenCalled();
     expect(mockRenderVerticalVideo).toHaveBeenCalledWith({
-      narrationAudio: Buffer.from("audio"),
+      narrationAudio: undefined,
       captionChunks: VALID_PLAN.captionChunks,
     });
   });
@@ -93,15 +91,6 @@ describe("generateSocialVideo", () => {
     if (result.ok) throw new Error("expected failure result");
     expect(result.error.message).toMatch(/forbidden/i);
     expect(mockSynthesizeNarrationAudio).not.toHaveBeenCalled();
-    expect(mockRenderVerticalVideo).not.toHaveBeenCalled();
-  });
-
-  it("fails when narration synthesis throws", async () => {
-    mockSynthesizeNarrationAudio.mockRejectedValue(new Error("TTS down"));
-
-    const result = await generateSocialVideo(INPUT);
-
-    expect(result.ok).toBe(false);
     expect(mockRenderVerticalVideo).not.toHaveBeenCalled();
   });
 

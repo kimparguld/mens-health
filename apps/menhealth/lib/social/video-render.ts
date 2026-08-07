@@ -19,7 +19,7 @@ const FONT_PATH = join(
 );
 
 export type RenderVerticalVideoInput = {
-  narrationAudio: Buffer;
+  narrationAudio?: Buffer;
   captionChunks: string[];
 };
 
@@ -83,9 +83,6 @@ export async function renderVerticalVideo(
   const workDir = await mkdtemp(join(tmpdir(), "social-video-"));
 
   try {
-    const narrationPath = join(workDir, "narration.mp3");
-    await writeFile(narrationPath, input.narrationAudio);
-
     const sceneFilterInputs: string[] = [];
     const drawTextFilters: string[] = [];
     const sceneLabels: string[] = [];
@@ -131,8 +128,17 @@ export async function renderVerticalVideo(
       "yuv420p",
       "-r",
       "30",
+      "-movflags",
+      "+faststart",
       scenesPath,
     ]);
+
+    if (!input.narrationAudio) {
+      return await readFile(scenesPath);
+    }
+
+    const narrationPath = join(workDir, "narration.mp3");
+    await writeFile(narrationPath, input.narrationAudio);
 
     // ffmpeg's `-stream_loop -1` (infinite loop) does not reliably respect
     // `-shortest` — verified to loop indefinitely regardless of -c:v copy vs.

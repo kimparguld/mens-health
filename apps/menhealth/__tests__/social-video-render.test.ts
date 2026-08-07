@@ -64,6 +64,20 @@ describe("renderVerticalVideo", () => {
     expect(secondPassArgs[loopIndex + 1]).not.toBe("-1");
   });
 
+  it("returns the silent scenes video and skips probe/mux when narrationAudio is omitted", async () => {
+    const result = await renderVerticalVideo({
+      captionChunks: ["First line", "Second line"],
+    });
+
+    expect(Buffer.isBuffer(result)).toBe(true);
+    expect(result.toString()).toBe("fake-mp4-bytes");
+    expect(mockExecFile).toHaveBeenCalledTimes(1);
+
+    const scenesPassArgs = mockExecFile.mock.calls[0]![1] as string[];
+    expect(scenesPassArgs.join(" ")).toContain("1080x1920");
+    expect(scenesPassArgs).toContain("-movflags");
+  });
+
   it("throws when ffmpeg exits with an error", async () => {
     mockExecFile.mockImplementation(
       (

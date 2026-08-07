@@ -13,6 +13,10 @@ export type GenerateSocialVideoInput = {
   platform: Platform;
 };
 
+// Narration audio requires a paid OpenAI TTS tier. Disabled for now — videos
+// render as a silent caption slideshow until this is turned back on.
+const NARRATION_AUDIO_ENABLED = false;
+
 function isAiConfigured(): boolean {
   return Boolean(
     env.ANTHROPIC_API_KEY ||
@@ -33,7 +37,7 @@ export async function generateSocialVideo(
   if (!isAiConfigured()) {
     return { ok: false, error: new Error("No AI provider is configured.") };
   }
-  if (!env.OPENAI_API_KEY) {
+  if (NARRATION_AUDIO_ENABLED && !env.OPENAI_API_KEY) {
     return {
       ok: false,
       error: new Error(
@@ -67,11 +71,13 @@ export async function generateSocialVideo(
     };
   }
 
-  let narrationAudio: Buffer;
-  try {
-    narrationAudio = await synthesizeNarrationAudio(plan.narration);
-  } catch (error) {
-    return { ok: false, error: toError(error) };
+  let narrationAudio: Buffer | undefined;
+  if (NARRATION_AUDIO_ENABLED) {
+    try {
+      narrationAudio = await synthesizeNarrationAudio(plan.narration);
+    } catch (error) {
+      return { ok: false, error: toError(error) };
+    }
   }
 
   let videoBuffer: Buffer;
