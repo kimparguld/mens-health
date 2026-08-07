@@ -34,7 +34,6 @@ export default async function AdminLayout({
       items: [
         { label: 'Subscribers', href: '/admin/subscribers' },
         { label: 'Social drafts', href: '/admin/social/drafts' },
-        { label: 'Ad video packages', href: '/admin/social/video-ads' },
         { label: 'Social schedule', href: '/admin/social/calendar' },
       ],
     },

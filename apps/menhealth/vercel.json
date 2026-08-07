@@ -31,10 +31,6 @@
     {
       "path": "/api/cron/discover-topics",
       "schedule": "0 6 1 * *"
-    },
-    {
-      "path": "/api/cron/poll-ad-video-renders",
-      "schedule": "*/5 * * * *"
     }
   ]
 }

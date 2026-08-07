@@ -1,5 +1,5 @@
-import { createEnv } from '@t3-oss/env-nextjs';
-import { z } from 'zod';
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
 
 export const env = createEnv({
   server: {
@@ -19,10 +19,6 @@ export const env = createEnv({
     OPENROUTER_MODEL_4: z.string().min(1).optional(),
     GEMINI_API_KEY: z.string().min(1).optional(),
     OPENAI_API_KEY: z.string().min(1).optional(),
-    CREATOMATE_API_KEY: z.string().min(1).optional(),
-    CREATOMATE_TEMPLATE_ID: z.string().min(1).optional(),
-    ELEVENLABS_API_KEY: z.string().min(1).optional(),
-    ELEVENLABS_VOICE_ID: z.string().min(1).optional(),
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
     RESEND_FROM_EMAIL: z.string().min(1).optional(),
@@ -33,7 +29,7 @@ export const env = createEnv({
     STRIPE_PRICE_ID: z
       .string()
       .min(1)
-      .refine((v) => v.startsWith('price_'), {
+      .refine((v) => v.startsWith("price_"), {
         message:
           "STRIPE_PRICE_ID must be a Stripe price ID (starts with 'price_'), not a product ID ('prod_'). Find the price ID in your Stripe dashboard under Products → select the product → Pricing.",
       })
@@ -74,10 +70,6 @@ export const env = createEnv({
     OPENROUTER_MODEL_4: process.env.OPENROUTER_MODEL_4,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    CREATOMATE_API_KEY: process.env.CREATOMATE_API_KEY,
-    CREATOMATE_TEMPLATE_ID: process.env.CREATOMATE_TEMPLATE_ID,
-    ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY,
-    ELEVENLABS_VOICE_ID: process.env.ELEVENLABS_VOICE_ID,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
@@ -104,9 +96,8 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_FOOTER,
     NEXT_PUBLIC_ADSENSE_SLOT_BETWEEN_CONTENT:
       process.env.NEXT_PUBLIC_ADSENSE_SLOT_BETWEEN_CONTENT,
-    NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR:
-      process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
+    NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR: process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR,
   },
-  skipValidation: process.env.SKIP_ENV_VALIDATION === 'true',
+  skipValidation: process.env.SKIP_ENV_VALIDATION === "true",
   emptyStringAsUndefined: true,
 });
