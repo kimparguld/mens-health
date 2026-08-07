@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { XAdapter } from "@/lib/social/adapters/x";
 import { RedditAdapter } from "@/lib/social/adapters/reddit";
+import { TikTokAdapter } from "@/lib/social/adapters/tiktok";
 
 // ---------------------------------------------------------------------------
 // Minimal SocialPost factory
@@ -24,6 +25,8 @@ type PartialPost = Partial<{
   platformPostId: string | null;
   platformUrl: string | null;
   templateId: string | null;
+  videoUrl: string | null;
+  videoStatus: string | null;
   createdAt: Date;
   updatedAt: Date;
 }>;
@@ -48,6 +51,8 @@ function makePost(overrides: PartialPost = {}) {
     platformPostId: null,
     platformUrl: null,
     templateId: null,
+    videoUrl: null,
+    videoStatus: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -153,6 +158,198 @@ describe("XAdapter.createDraft() — not supported", () => {
     const result = await adapter.createDraft(
       makePost({ platform: "X", caption: "Short.", hashtags: [] }),
     );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errorCode).toBe("NOT_SUPPORTED");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TikTok adapter — validate()
+// ---------------------------------------------------------------------------
+
+function makeTikTokPost(overrides: PartialPost = {}) {
+  return makePost({
+    platform: "TIKTOK",
+    status: "APPROVED",
+    caption: "Legit or hype? Let's check the numbers.",
+    hashtags: ["HypeCheck"],
+    videoUrl: "https://blob.example.com/social-videos/1.mp4",
+    videoStatus: "READY",
+    ...overrides,
+  });
+}
+
+describe("TikTokAdapter.validate()", () => {
+  const adapter = new TikTokAdapter();
+
+  it("accepts an approved post with a ready video", async () => {
+    const result = await adapter.validate(makeTikTokPost());
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects a post that is not APPROVED", async () => {
+    const result = await adapter.validate(
+      makeTikTokPost({ status: "PENDING_REVIEW" }),
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/APPROVED/);
+    }
+  });
+
+  it("rejects a post with no generated video", async () => {
+    const result = await adapter.validate(
+      makeTikTokPost({ videoUrl: null, videoStatus: null }),
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/video/i);
+    }
+  });
+
+  it("rejects a post whose video is still generating", async () => {
+    const result = await adapter.validate(
+      makeTikTokPost({ videoStatus: "GENERATING" }),
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/video/i);
+    }
+  });
+
+  it("rejects an oversized caption", async () => {
+    const result = await adapter.validate(
+      makeTikTokPost({ caption: "A".repeat(2201) }),
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(" ")).toMatch(/2200/);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TikTok adapter — publish()
+// ---------------------------------------------------------------------------
+
+describe("TikTokAdapter.publish()", () => {
+  const db = {
+    socialAccount: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+  };
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockReset();
+    db.socialAccount.findUnique.mockReset();
+    db.socialAccount.update.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("fails validation before attempting any network call", async () => {
+    const adapter = new TikTokAdapter({
+      clientId: "id",
+      clientSecret: "secret",
+      db,
+    });
+    const result = await adapter.publish(
+      makeTikTokPost({ videoUrl: null, videoStatus: null }),
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errorCode).toBe("VALIDATION_FAILED");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("publishes and returns the public video URL once TikTok reports completion", async () => {
+    db.socialAccount.findUnique.mockResolvedValue({
+      accessToken: "token",
+      refreshToken: null,
+      tokenExpiry: new Date(Date.now() + 3600_000),
+      handle: "hypecheck",
+    });
+
+    fetchMock
+      // video fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        arrayBuffer: async () => new ArrayBuffer(8),
+      })
+      // init
+      .mockResolvedValueOnce({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            data: { publish_id: "pub_1", upload_url: "https://upload.example.com" },
+          }),
+      })
+      // upload
+      .mockResolvedValueOnce({ ok: true, text: async () => "" })
+      // status poll
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            status: "PUBLISH_COMPLETE",
+            publicly_available_post_id: [123],
+          },
+        }),
+      });
+
+    const adapter = new TikTokAdapter({
+      clientId: "id",
+      clientSecret: "secret",
+      db,
+    });
+    const result = await adapter.publish(makeTikTokPost());
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.platformPostId).toBe("pub_1");
+      expect(result.platformUrl).toBe(
+        "https://www.tiktok.com/@hypecheck/video/123",
+      );
+    }
+  }, 15000);
+
+  it("returns an error when the init call fails", async () => {
+    db.socialAccount.findUnique.mockResolvedValue({
+      accessToken: "token",
+      refreshToken: null,
+      tokenExpiry: new Date(Date.now() + 3600_000),
+      handle: "hypecheck",
+    });
+
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        arrayBuffer: async () => new ArrayBuffer(8),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        text: async () => "bad request",
+      });
+
+    const adapter = new TikTokAdapter({
+      clientId: "id",
+      clientSecret: "secret",
+      db,
+    });
+    const result = await adapter.publish(makeTikTokPost());
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errorCode).toBe("TIKTOK_INIT_400");
+  });
+
+  it("createDraft() returns NOT_SUPPORTED", async () => {
+    const adapter = new TikTokAdapter();
+    const result = await adapter.createDraft(makeTikTokPost());
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errorCode).toBe("NOT_SUPPORTED");
   });
