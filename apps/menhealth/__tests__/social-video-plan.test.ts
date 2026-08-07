@@ -72,4 +72,19 @@ describe("createVideoPlan", () => {
 
     expect(result.ok).toBe(false);
   });
+
+  it("returns a Result error instead of throwing when the AI call rejects", async () => {
+    mockAiCreate.mockRejectedValue(new Error("network failure"));
+
+    const result = await createVideoPlan({
+      hook: "Is creatine actually worth it?",
+      script: "Creatine is one of the most studied supplements...",
+      platform: "TIKTOK",
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected error result");
+    expect(result.error).toBeInstanceOf(Error);
+    expect(result.error.message).toContain("network failure");
+  });
 });

@@ -23,4 +23,5 @@ export const env = {
   OPENROUTER_API_KEY: "test-openrouter-key",
   OPENAI_API_KEY: "test-openai-key",
   GEMINI_API_KEY: "test-gemini-key",
+  BLOB_READ_WRITE_TOKEN: "test-blob-token",
 } as const;

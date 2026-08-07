@@ -21,6 +21,8 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://i.ytimg.com https://assets.example.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net https://*.google.com",
+      // Generated social video previews served from Vercel Blob storage
+      "media-src 'self' https://*.public.blob.vercel-storage.com",
       // YouTube embed, Google OAuth, and AdSense ad iframes
       'frame-src https://www.youtube.com https://www.youtube-nocookie.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://www.googletagmanager.com',
       "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com https://pagead2.googlesyndication.com https://www.googletagmanager.com https://*.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.g.doubleclick.net https://pagead2.googlesyndication.com",
@@ -40,6 +42,15 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   turbopack: {},
   transpilePackages: ['@menhealth/ui'],
+  outputFileTracingIncludes: {
+    // ffmpeg-static binary and bundled caption font are resolved by
+    // filesystem path at runtime, not via the module import graph, so they
+    // need to be included in the trace explicitly for this route.
+    '/api/social/drafts/\\[id\\]/video': [
+      './node_modules/ffmpeg-static/**/*',
+      './assets/fonts/**/*',
+    ],
+  },
   images: {
     remotePatterns: [
       new URL('https://assets.example.com/account123/**'),
