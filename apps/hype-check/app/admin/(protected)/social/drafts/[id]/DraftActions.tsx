@@ -19,9 +19,9 @@ type Props = {
   requiresReview: boolean;
   initialScheduledAt?: string | null;
   caption: string;
-  videoUrl?: string | null;
-  videoStatus?: string | null;
-  videoError?: string | null;
+  videoUrl: string | null;
+  videoStatus: string | null;
+  videoError: string | null;
 };
 
 export default function DraftActions({

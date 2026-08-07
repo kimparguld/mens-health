@@ -139,6 +139,9 @@ export default async function SocialDraftDetailPage({
             requiresReview={post.requiresReview}
             initialScheduledAt={post.scheduledAt?.toISOString() ?? null}
             caption={post.caption}
+            videoUrl={post.videoUrl}
+            videoStatus={post.videoStatus}
+            videoError={post.videoError}
           />
         </section>
 
