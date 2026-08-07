@@ -42,6 +42,12 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   turbopack: {},
   transpilePackages: ['@menhealth/ui'],
+  // ffmpeg-static resolves its binary path via `__dirname` at runtime;
+  // bundling it rewrites `__dirname` to a path that doesn't exist on disk
+  // (observed as `spawn .../ffmpeg-static/ffmpeg ENOENT` with a `/ROOT/`
+  // prefix). Keep it external so Node's native `require` resolves the real
+  // installed location instead.
+  serverExternalPackages: ['ffmpeg-static'],
   outputFileTracingIncludes: {
     // ffmpeg-static binary and bundled caption font are resolved by
     // filesystem path at runtime, not via the module import graph, so they
