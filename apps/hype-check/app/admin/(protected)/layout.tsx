@@ -68,7 +68,7 @@ export default async function AdminLayout({
           {navGroups.map(({ section, items }, i) => (
             <div key={section ?? `group-${i}`} className="flex flex-col gap-1">
               {section && (
-                <span className="px-3 pt-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                <span className="px-3 pt-2 text-sm font-semibold tracking-wide text-gray-400 uppercase">
                   {section}
                 </span>
               )}
@@ -77,7 +77,7 @@ export default async function AdminLayout({
                   key={href}
                   href={href}
                   className={twMerge(
-                    'rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-900',
+                    'rounded-md px-3 py-2 text-base text-gray-700 hover:bg-gray-100 hover:text-blue-900',
                     !section && 'font-semibold'
                   )}
                 >
