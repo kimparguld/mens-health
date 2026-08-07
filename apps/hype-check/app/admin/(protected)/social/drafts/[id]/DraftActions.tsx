@@ -19,6 +19,9 @@ type Props = {
   requiresReview: boolean;
   initialScheduledAt?: string | null;
   caption: string;
+  videoUrl?: string | null;
+  videoStatus?: string | null;
+  videoError?: string | null;
 };
 
 export default function DraftActions({
@@ -29,6 +32,9 @@ export default function DraftActions({
   requiresReview,
   initialScheduledAt,
   caption,
+  videoUrl,
+  videoStatus,
+  videoError,
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
@@ -50,14 +56,18 @@ export default function DraftActions({
   const isScheduled = status === 'SCHEDULED';
   const isX = platform === 'X';
   const isReddit = platform === 'REDDIT';
-  // Only X has a working auto-publisher (via the scheduled cron). Everything
-  // else — YouTube Community, Reddit, and TikTok — is always manual: copy
-  // the text, post it yourself, then record the link here.
-  const isManualPlatform =
-    platform === 'YOUTUBE_COMMUNITY' || isReddit || platform === 'TIKTOK';
+  const isTikTok = platform === 'TIKTOK';
+  const supportsVideo = isTikTok || platform === 'YOUTUBE_COMMUNITY';
+  // X auto-publishes via the scheduled cron; TikTok auto-publishes
+  // immediately via the Content Posting API once a video is ready. Everything
+  // else — YouTube Community and Reddit — is always manual: copy the text,
+  // post it yourself, then record the link here.
+  const isManualPlatform = platform === 'YOUTUBE_COMMUNITY' || isReddit;
   const canMarkManuallyPublished =
     isManualPlatform && (isApproved || isScheduled);
   const canSchedule = isX && (isApproved || isScheduled);
+  const canPublishToTikTok =
+    isTikTok && isApproved && videoStatus === 'READY' && Boolean(videoUrl);
   const allChecked = checklist.every(Boolean);
   const manualActionsBlocked = isReddit && !allChecked;
 
@@ -265,6 +275,77 @@ export default function DraftActions({
                 </button>
               </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {supportsVideo && (
+        <div className="space-y-3 rounded-lg border p-3">
+          <p className="text-xs font-semibold text-gray-600">Video</p>
+
+          {videoStatus === 'FAILED' && videoError && (
+            <p className="rounded bg-red-50 px-3 py-2 text-xs text-red-700">
+              {videoError}
+            </p>
+          )}
+
+          {videoUrl && videoStatus === 'READY' && (
+            <>
+              {}
+              <video
+                controls
+                className="w-full max-w-[240px] rounded"
+                src={videoUrl}
+              />
+              <a
+                href={videoUrl}
+                download
+                rel="noopener noreferrer"
+                className="mr-8 rounded-md border bg-gray-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Download video
+              </a>
+            </>
+          )}
+
+          <button
+            onClick={() => callJson('video')}
+            disabled={loading !== null}
+            className="rounded-md border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {loading === 'video'
+              ? 'Generating video…'
+              : videoUrl
+                ? 'Regenerate video'
+                : 'Generate video'}
+          </button>
+        </div>
+      )}
+
+      {isTikTok && (isApproved || status === 'PUBLISHED') && (
+        <div className="space-y-2 rounded-lg border p-3">
+          <p className="text-xs font-semibold text-gray-600">
+            Publish to TikTok
+          </p>
+          {status === 'PUBLISHED' ? (
+            <p className="text-xs text-gray-500">
+              Published — posted to TikTok.
+            </p>
+          ) : (
+            <>
+              <p className="text-xs text-gray-500">
+                Uploads the generated video directly to TikTok via the Content
+                Posting API and publishes it publicly.
+                {!canPublishToTikTok && ' Generate a video above first.'}
+              </p>
+              <button
+                onClick={() => callJson('publish')}
+                disabled={loading !== null || !canPublishToTikTok}
+                className="rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {loading === 'publish' ? 'Publishing…' : 'Publish to TikTok'}
+              </button>
+            </>
           )}
         </div>
       )}
