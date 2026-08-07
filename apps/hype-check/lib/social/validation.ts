@@ -1,11 +1,13 @@
 export {
-  SocialPostAiOutputSchema,
   ApprovePostSchema,
+  GeneratePostSchema,
   RejectPostSchema,
   SchedulePostSchema,
-  GeneratePostSchema,
-} from "@menhealth/core-social";
+  SocialPostAiOutputSchema,
+  UpdateDraftSchema,
+} from '@menhealth/core-social';
 export type {
-  SocialPostAiOutput,
   GeneratePostInput,
-} from "@menhealth/core-social";
+  SocialPostAiOutput,
+  UpdateDraftInput,
+} from '@menhealth/core-social';

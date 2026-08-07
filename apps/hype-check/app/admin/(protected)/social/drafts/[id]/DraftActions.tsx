@@ -51,9 +51,10 @@ export default function DraftActions({
   const isX = platform === 'X';
   const isReddit = platform === 'REDDIT';
   // Only X has a working auto-publisher (via the scheduled cron). Everything
-  // else — YouTube Community and Reddit — is always manual: copy the text,
-  // post it yourself, then record the link here.
-  const isManualPlatform = platform === 'YOUTUBE_COMMUNITY' || isReddit;
+  // else — YouTube Community, Reddit, and TikTok — is always manual: copy
+  // the text, post it yourself, then record the link here.
+  const isManualPlatform =
+    platform === 'YOUTUBE_COMMUNITY' || isReddit || platform === 'TIKTOK';
   const canMarkManuallyPublished =
     isManualPlatform && (isApproved || isScheduled);
   const canSchedule = isX && (isApproved || isScheduled);
