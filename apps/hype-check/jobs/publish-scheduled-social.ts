@@ -1,8 +1,8 @@
-import { db } from "@/lib/db/prisma";
-import { XAdapter } from "@/lib/social/adapters/x";
-import type { SocialPublisher } from "@/lib/social/adapters/publisher";
-import type { Platform } from "@/app/generated/prisma";
-import { env } from "@/env";
+import type { Platform } from '@/app/generated/prisma';
+import { env } from '@/env';
+import { db } from '@/lib/db/prisma';
+import type { SocialPublisher } from '@/lib/social/adapters/publisher';
+import { XAdapter } from '@/lib/social/adapters/x';
 
 /**
  * Processes all SCHEDULED social posts whose scheduledAt time has passed.
@@ -16,9 +16,9 @@ import { env } from "@/env";
 
 const MANUAL_ONLY_PLATFORMS: Partial<Record<Platform, string>> = {
   YOUTUBE_COMMUNITY:
-    "YouTube Community Posts must be published manually — the post has been returned to Approved.",
+    'YouTube Community Posts must be published manually — the post has been returned to Approved.',
   REDDIT:
-    "Reddit posts must be submitted manually. The post has been returned to Approved.",
+    'Reddit posts must be submitted manually. The post has been returned to Approved.',
 };
 
 const ADAPTERS: Partial<Record<Platform, SocialPublisher>> = {
@@ -37,8 +37,32 @@ export async function publishScheduledPosts(): Promise<{
 
   const posts = await db.socialPost.findMany({
     where: {
-      status: "SCHEDULED",
+      status: 'SCHEDULED',
       scheduledAt: { lte: now },
+    },
+    select: {
+      id: true,
+      platform: true,
+      status: true,
+      sourceType: true,
+      sourceId: true,
+      hook: true,
+      script: true,
+      caption: true,
+      hashtags: true,
+      videoUrl: true,
+      videoStatus: true,
+      videoError: true,
+      utmUrl: true,
+      riskLevel: true,
+      requiresReview: true,
+      templateId: true,
+      scheduledAt: true,
+      publishedAt: true,
+      platformPostId: true,
+      platformUrl: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 
@@ -55,13 +79,13 @@ export async function publishScheduledPosts(): Promise<{
           data: {
             postId: post.id,
             success: false,
-            errorCode: "MANUAL_PUBLISH_REQUIRED",
+            errorCode: 'MANUAL_PUBLISH_REQUIRED',
             errorMsg: manualReason,
           },
         }),
         db.socialPost.update({
           where: { id: post.id },
-          data: { status: "APPROVED" },
+          data: { status: 'APPROVED' },
         }),
       ]);
       processed++;
@@ -77,13 +101,13 @@ export async function publishScheduledPosts(): Promise<{
           data: {
             postId: post.id,
             success: false,
-            errorCode: "NOT_IMPLEMENTED",
+            errorCode: 'NOT_IMPLEMENTED',
             errorMsg: `Auto-publish for ${post.platform} is not yet available`,
           },
         }),
         db.socialPost.update({
           where: { id: post.id },
-          data: { status: "FAILED" },
+          data: { status: 'FAILED' },
         }),
       ]);
       failed++;
@@ -98,13 +122,13 @@ export async function publishScheduledPosts(): Promise<{
           data: {
             postId: post.id,
             success: false,
-            errorCode: "VALIDATION_FAILED",
-            errorMsg: validation.errors.join("; "),
+            errorCode: 'VALIDATION_FAILED',
+            errorMsg: validation.errors.join('; '),
           },
         }),
         db.socialPost.update({
           where: { id: post.id },
-          data: { status: "FAILED" },
+          data: { status: 'FAILED' },
         }),
       ]);
       failed++;
@@ -129,7 +153,7 @@ export async function publishScheduledPosts(): Promise<{
         db.socialPost.update({
           where: { id: post.id },
           data: {
-            status: "PUBLISHED",
+            status: 'PUBLISHED',
             publishedAt: now,
             platformPostId: result.platformPostId,
             platformUrl: result.platformUrl,
@@ -149,7 +173,7 @@ export async function publishScheduledPosts(): Promise<{
         }),
         db.socialPost.update({
           where: { id: post.id },
-          data: { status: "FAILED" },
+          data: { status: 'FAILED' },
         }),
       ]);
       failed++;
