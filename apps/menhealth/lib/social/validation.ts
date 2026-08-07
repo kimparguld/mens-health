@@ -1,19 +1,13 @@
 export {
-  AdVideoPackageAiOutputSchema,
+  SocialPostAiOutputSchema,
   ApprovePostSchema,
-  GenerateAdVideoPackageSchema,
-  GeneratePostSchema,
   RejectPostSchema,
   SchedulePostSchema,
-  SocialPostAiOutputSchema,
+  GeneratePostSchema,
   UpdateDraftSchema,
-  WordTimestampSchema,
-  WordTimestampsSchema,
-} from '@menhealth/core-social';
+} from "@menhealth/core-social";
 export type {
-  AdVideoPackageAiOutput,
-  GeneratePostInput,
   SocialPostAiOutput,
+  GeneratePostInput,
   UpdateDraftInput,
-  WordTimestamp,
-} from '@menhealth/core-social';
+} from "@menhealth/core-social";
