@@ -55,33 +55,43 @@ Return strict JSON matching this shape, with no other text:
 export async function createVideoPlan(
   input: CreateVideoPlanInput,
 ): Promise<Result<VideoPlan>> {
-  const message = await aiClient.anthropic.messages.create({
-    model: aiClient.defaultModel,
-    max_tokens: 800,
-    messages: [{ role: "user", content: buildVideoPlanPrompt(input) }],
-  });
-
-  const textBlock = message.content.find((block) => block.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    return { ok: false, error: new Error("No text block in AI response") };
-  }
-
-  let parsed: unknown;
   try {
-    parsed = JSON.parse(textBlock.text);
-  } catch {
-    return { ok: false, error: new Error("AI response was not valid JSON") };
-  }
+    const message = await aiClient.anthropic.messages.create({
+      model: aiClient.defaultModel,
+      max_tokens: 800,
+      messages: [{ role: "user", content: buildVideoPlanPrompt(input) }],
+    });
 
-  const validated = VideoPlanSchema.safeParse(parsed);
-  if (!validated.success) {
+    const textBlock = message.content.find((block) => block.type === "text");
+    if (!textBlock || textBlock.type !== "text") {
+      return { ok: false, error: new Error("No text block in AI response") };
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(textBlock.text);
+    } catch {
+      return {
+        ok: false,
+        error: new Error("AI response was not valid JSON"),
+      };
+    }
+
+    const validated = VideoPlanSchema.safeParse(parsed);
+    if (!validated.success) {
+      return {
+        ok: false,
+        error: new Error(
+          `AI output failed validation: ${validated.error.message}`,
+        ),
+      };
+    }
+
+    return { ok: true, value: validated.data };
+  } catch (err) {
     return {
       ok: false,
-      error: new Error(
-        `AI output failed validation: ${validated.error.message}`,
-      ),
+      error: err instanceof Error ? err : new Error(String(err)),
     };
   }
-
-  return { ok: true, value: validated.data };
 }
