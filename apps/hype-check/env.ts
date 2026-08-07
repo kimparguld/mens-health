@@ -34,6 +34,7 @@ export const env = createEnv({
       })
       .optional(),
     CRON_SECRET: z.string().min(32),
+    BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
     GOOGLE_SITE_VERIFICATION: z.string().min(1).optional(),
     BING_SITE_VERIFICATION: z.string().min(1).optional(),
     X_CLIENT_ID: z.string().min(1).optional(),
@@ -77,6 +78,7 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     STRIPE_PRICE_ID: process.env.STRIPE_PRICE_ID,
     CRON_SECRET: process.env.CRON_SECRET,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     GOOGLE_SITE_VERIFICATION: process.env.GOOGLE_SITE_VERIFICATION,
     BING_SITE_VERIFICATION: process.env.BING_SITE_VERIFICATION,
     X_CLIENT_ID: process.env.X_CLIENT_ID,
