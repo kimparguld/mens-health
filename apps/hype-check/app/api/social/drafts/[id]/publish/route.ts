@@ -44,6 +44,19 @@ export async function POST(
     );
   }
 
+  if (
+    post.platform === "TIKTOK" &&
+    (!env.TIKTOK_CLIENT_ID || !env.TIKTOK_CLIENT_SECRET)
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "TikTok is not configured — set TIKTOK_CLIENT_ID and TIKTOK_CLIENT_SECRET to enable publishing.",
+      },
+      { status: 422 },
+    );
+  }
+
   const validation = await adapter.validate(post);
   if (!validation.ok) {
     return NextResponse.json(
