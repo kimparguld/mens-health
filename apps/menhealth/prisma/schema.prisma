@@ -418,6 +418,15 @@ enum MediaType {
   IMAGE
 }
 
+enum AdPackageStatus {
+  DRAFT
+  RENDERING
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  FAILED
+}
+
 model SocialPost {
   id             String                 @id @default(cuid())
   platform       Platform
@@ -487,6 +496,30 @@ model SocialMetric {
   shares     Int        @default(0)
   clicks     Int        @default(0)
   recordedAt DateTime   @default(now())
+}
+
+model AdVideoPackage {
+  id                     String          @id @default(cuid())
+  status                 AdPackageStatus @default(DRAFT)
+  script                 String
+  caption                String
+  hashtags               String[]
+  disclaimerLine         String
+  utmUrl                 String
+  requiresReview         Boolean         @default(true)
+  renderProviderId       String?
+  landscapeUrl           String?
+  verticalUrl            String?
+  squareUrl              String?
+  thumbnailUrl           String?
+  subtitleUrl            String?
+  voiceoverUrl           String?
+  voiceoverWordTimestamps Json?
+  errorMessage           String?
+  approvedAt             DateTime?
+  approvedBy             String?
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 }
 
 // ---------------------------------------------------------------------------
