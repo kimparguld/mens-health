@@ -3,6 +3,7 @@ import {
   checkForbiddenPatterns,
   detectHighRiskTopic,
   validatePlatformConstraints,
+  supportsVideoGeneration,
 } from "@/lib/social/platform-rules";
 
 describe("checkForbiddenPatterns", () => {
@@ -118,5 +119,17 @@ describe("validatePlatformConstraints", () => {
       hashtags: ["#MensHealth"],
     });
     expect(errors.some((e) => e.includes("hashtags"))).toBe(true);
+  });
+});
+
+describe("supportsVideoGeneration()", () => {
+  it("returns true for TikTok and YouTube Community", () => {
+    expect(supportsVideoGeneration("TIKTOK")).toBe(true);
+    expect(supportsVideoGeneration("YOUTUBE_COMMUNITY")).toBe(true);
+  });
+
+  it("returns false for Reddit and X", () => {
+    expect(supportsVideoGeneration("REDDIT")).toBe(false);
+    expect(supportsVideoGeneration("X")).toBe(false);
   });
 });
