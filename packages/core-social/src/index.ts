@@ -47,6 +47,7 @@ export type {
 } from "./adapters/publisher";
 export { RedditAdapter } from "./adapters/reddit";
 export { TikTokAdapter } from "./adapters/tiktok";
+export type { TikTokAdapterConfig } from "./adapters/tiktok";
 export { YouTubeCommunityAdapter } from "./adapters/youtube";
 export { XAdapter } from "./adapters/x";
 export type { XAdapterConfig } from "./adapters/x";
