@@ -3,7 +3,6 @@ import Groq from 'groq-sdk';
 export type AiMessage = { role: string; content: string };
 
 export type AiClientConfig = {
-  anthropicApiKey?: string;
   groqApiKey?: string;
   /** Defaults to "openai/gpt-oss-120b" (Groq's own model catalog). */
   groqModel?: string;
@@ -18,15 +17,8 @@ export type AiClientConfig = {
   /** Defaults to "gpt-5.6-luna" (OpenAI's current budget model). */
   openAiModel?: string;
   geminiApiKey?: string;
-  /**
-   * Model ID for the Anthropic branch only. Defaults to Haiku — this
-   * pipeline is high-volume background content generation, not a place to
-   * default to Sonnet pricing.
-   */
-  defaultModel?: string;
 };
 
-const DEFAULT_ANTHROPIC_MODEL = 'claude-haiku-4-5';
 const DEFAULT_GROQ_MODEL = 'openai/gpt-oss-120b';
 const DEFAULT_OPENROUTER_MODELS = [
   'nvidia/nemotron-3-ultra-550b-a55b:free',
@@ -43,37 +35,6 @@ function describeFailure(err: unknown): string {
   const message = err instanceof Error ? err.message : String(err);
   const reason = status === 429 ? 'rate limit hit' : `request failed${status ? ` (${status})` : ''}`;
   return `${reason} — ${message}`;
-}
-
-async function callAnthropic(messages: AiMessage[], maxTokens: number, model: string, apiKey: string): Promise<string> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      messages,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    const err = Object.assign(new Error(`Anthropic ${res.status}: ${body}`), {
-      status: res.status,
-    });
-    throw err;
-  }
-  const data = (await res.json()) as {
-    content: Array<{ type: string; text?: string }>;
-  };
-  return data.content
-    .filter((block) => block.type === 'text')
-    .map((block) => block.text ?? '')
-    .join('');
 }
 
 async function callOpenRouter(
@@ -169,22 +130,30 @@ export type AiClient = {
       }): Promise<{ content: Array<{ type: 'text'; text: string }> }>;
     };
   };
-  /** This site's configured default model (Anthropic branch). */
+  /**
+   * This site's configured default model id. Threaded through to `.create()`
+   * as `model` for callers that still pass it, but no provider branch below
+   * reads it — each hardcodes its own model (`groqModel`, the OpenRouter
+   * model list, `openAiModel`, `GEMINI_MODEL`). Kept only so existing callers
+   * (e.g. `client.defaultModel` in `pipeline.ts`, `generate-social-post.ts`)
+   * don't need to change.
+   */
   defaultModel: string;
 };
 
 /**
  * Binds the provider fallback chain to this site's own API keys once, so
- * callers keep using `client.anthropic.messages.create({...})` — the same
- * `anthropic.messages.create()`-shaped wrapper used throughout the AI
- * pipeline — exactly as before (see apps/menhealth/lib/ai/client.ts).
+ * callers keep using `client.anthropic.messages.create({...})` — an
+ * `anthropic.messages.create()`-shaped wrapper kept purely for interface
+ * compatibility with existing callers (see apps/menhealth/lib/ai/client.ts).
+ * No provider below is actually Anthropic.
  *
- * Provider fallback chain: Anthropic → Groq → OpenRouter → OpenAI → Gemini.
+ * Provider fallback chain: Groq → OpenRouter → OpenAI → Gemini.
  * Each provider is skipped if its API key is not set. On a 429 rate-limit
  * error the next provider is tried automatically.
  */
 export function createAiClient(config: AiClientConfig): AiClient {
-  const defaultModel = DEFAULT_ANTHROPIC_MODEL;
+  const defaultModel = DEFAULT_GROQ_MODEL;
   const groqModel = DEFAULT_GROQ_MODEL;
   const openRouterModels = DEFAULT_OPENROUTER_MODELS;
   const openAiModel = DEFAULT_OPENAI_MODEL;
@@ -194,18 +163,8 @@ export function createAiClient(config: AiClientConfig): AiClient {
     defaultModel,
     anthropic: {
       messages: {
-        async create({ model, max_tokens, messages }) {
-          // 1️⃣ Anthropic
-          if (config.anthropicApiKey) {
-            try {
-              const text = await callAnthropic(messages, max_tokens, model ?? defaultModel, config.anthropicApiKey);
-              return { content: [{ type: 'text' as const, text }] };
-            } catch (err) {
-              console.warn(`[AI] Anthropic ${describeFailure(err)} — falling back to Groq`);
-            }
-          }
-
-          // 2️⃣ Groq
+        async create({ max_tokens, messages }) {
+          // 1️⃣ Groq
           if (config.groqApiKey) {
             try {
               const completion = await groq.chat.completions.create({
@@ -226,7 +185,7 @@ export function createAiClient(config: AiClientConfig): AiClient {
             }
           }
 
-          // 3️⃣ OpenRouter — try each model slot in order, skip on any error
+          // 2️⃣ OpenRouter — try each model slot in order, skip on any error
           if (config.openRouterApiKey) {
             for (const orModel of openRouterModels) {
               try {
@@ -239,7 +198,7 @@ export function createAiClient(config: AiClientConfig): AiClient {
             console.warn('[AI] All OpenRouter models failed — falling back to OpenAI/Gemini');
           }
 
-          // 4️⃣ OpenAI
+          // 3️⃣ OpenAI
           if (config.openAiApiKey) {
             try {
               const text = await callOpenAI(messages, max_tokens, openAiModel, config.openAiApiKey);
@@ -249,7 +208,7 @@ export function createAiClient(config: AiClientConfig): AiClient {
             }
           }
 
-          // 5️⃣ Gemini
+          // 4️⃣ Gemini
           if (config.geminiApiKey) {
             try {
               const text = await callGemini(messages, max_tokens, config.geminiApiKey);

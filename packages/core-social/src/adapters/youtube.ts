@@ -1,11 +1,6 @@
-import "server-only";
-import { validatePlatformConstraints } from "../platform-constraints";
-import type {
-  PublishResult,
-  SocialPostBase,
-  SocialPublisher,
-  ValidationResult,
-} from "./publisher";
+import 'server-only';
+import { validatePlatformConstraints } from '../platform-constraints';
+import type { PublishResult, SocialPostBase, SocialPublisher, ValidationResult } from './publisher';
 
 // ---------------------------------------------------------------------------
 // YouTube Community Posts — Draft-only adapter
@@ -20,20 +15,20 @@ import type {
 // ---------------------------------------------------------------------------
 
 export class YouTubeCommunityAdapter implements SocialPublisher {
-  readonly platform = "YOUTUBE_COMMUNITY" as const;
+  readonly platform = 'YOUTUBE_COMMUNITY' as const;
 
   async validate(post: SocialPostBase): Promise<ValidationResult> {
-    const errors = validatePlatformConstraints("YOUTUBE_COMMUNITY", {
+    const errors = validatePlatformConstraints('YOUTUBE_COMMUNITY', {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
       hook: post.hook,
     });
     if (errors.length > 0) return { ok: false, errors };
-    if (post.status !== "APPROVED") {
+    if (post.status !== 'APPROVED') {
       return {
         ok: false,
-        errors: ["Post must be APPROVED before publishing"],
+        errors: ['Post must be APPROVED before publishing'],
       };
     }
     return { ok: true };
@@ -55,19 +50,19 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
     if (!validation.ok) {
       return {
         ok: false,
-        errorCode: "VALIDATION_FAILED",
-        errorMsg: validation.errors.join("; "),
+        errorCode: 'VALIDATION_FAILED',
+        errorMsg: validation.errors.join('; '),
       };
     }
 
     return {
       ok: false,
-      errorCode: "MANUAL_PUBLISH_REQUIRED",
+      errorCode: 'MANUAL_PUBLISH_REQUIRED',
       errorMsg:
-        "YouTube Community Posts cannot be published via the public API. " +
-        "Copy the post text and publish manually via YouTube Studio " +
-        "(https://studio.youtube.com → Create → Community post), " +
-        "then mark this post as manually published.",
+        'YouTube Community Posts cannot be published via the public API. ' +
+        'Copy the post text and publish manually via YouTube Studio ' +
+        '(https://studio.youtube.com → Create → Community post), ' +
+        'then mark this post as manually published.',
     };
   }
 
@@ -81,8 +76,8 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
     if (!validation.ok) {
       return {
         ok: false,
-        errorCode: "VALIDATION_FAILED",
-        errorMsg: validation.errors.join("; "),
+        errorCode: 'VALIDATION_FAILED',
+        errorMsg: validation.errors.join('; '),
       };
     }
 
