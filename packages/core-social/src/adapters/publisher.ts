@@ -1,6 +1,5 @@
 export type PublishResult =
-  | { ok: true; platformPostId: string; platformUrl: string }
-  | { ok: false; errorCode: string; errorMsg: string };
+  { ok: true; platformPostId: string; platformUrl: string } | { ok: false; errorCode: string; errorMsg: string };
 
 export type ValidationResult = { ok: true } | { ok: false; errors: string[] };
 

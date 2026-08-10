@@ -1,13 +1,8 @@
-import "server-only";
-import { validatePlatformConstraints } from "../platform-constraints";
-import { getValidAccessToken } from "./refresh-token";
-import type {
-  PublishResult,
-  SocialPostBase,
-  SocialPublisher,
-  ValidationResult,
-} from "./publisher";
-import { z } from "zod";
+import 'server-only';
+import { z } from 'zod';
+import { validatePlatformConstraints } from '../platform-constraints';
+import type { PublishResult, SocialPostBase, SocialPublisher, ValidationResult } from './publisher';
+import { getValidAccessToken } from './refresh-token';
 
 // ---------------------------------------------------------------------------
 // X (Twitter) API v2
@@ -34,7 +29,7 @@ const X_MAX_CHARS = 280;
  * agree on what the final tweet text will actually look like.
  */
 function getUrlSuffix(post: SocialPostBase): string {
-  return post.caption.includes(post.utmUrl) ? "" : ` ${post.utmUrl}`;
+  return post.caption.includes(post.utmUrl) ? '' : ` ${post.utmUrl}`;
 }
 
 /**
@@ -56,8 +51,7 @@ function buildTweetText(post: SocialPostBase): string {
   }
 
   // Truncate caption, reserving 1 char for the ellipsis character
-  const truncated =
-    post.caption.slice(0, maxCaptionLen - 1).trimEnd() + "…";
+  const truncated = post.caption.slice(0, maxCaptionLen - 1).trimEnd() + '…';
   return truncated + suffix;
 }
 
@@ -79,20 +73,20 @@ export type XAdapterConfig = {
 };
 
 export class XAdapter implements SocialPublisher {
-  readonly platform = "X" as const;
+  readonly platform = 'X' as const;
 
   constructor(private readonly config: XAdapterConfig = {}) {}
 
   private async getToken(): Promise<string> {
     if (!this.config.db) {
-      throw new Error("XAdapter requires a `db` client to publish");
+      throw new Error('XAdapter requires a `db` client to publish');
     }
-    return getValidAccessToken(this.config.db, "X", {
-      tokenUrl: "https://api.twitter.com/2/oauth2/token",
-      clientId: this.config.clientId ?? "",
-      clientSecret: this.config.clientSecret ?? "",
+    return getValidAccessToken(this.config.db, 'X', {
+      tokenUrl: 'https://api.twitter.com/2/oauth2/token',
+      clientId: this.config.clientId ?? '',
+      clientSecret: this.config.clientSecret ?? '',
       // X requires Basic auth for token refresh
-      authStyle: "basic",
+      authStyle: 'basic',
     });
   }
 
@@ -102,18 +96,16 @@ export class XAdapter implements SocialPublisher {
     // caption *plus* the UTM link buildTweetText will append. We replace it
     // with the check below so validate() (used at admin-review time) is what
     // catches over-length posts, not a silent truncation at publish time.
-    const errors = validatePlatformConstraints("X", {
+    const errors = validatePlatformConstraints('X', {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
       hook: post.hook,
-    }).filter((e) => !e.startsWith("Caption exceeds"));
+    }).filter((e) => !e.startsWith('Caption exceeds'));
 
     const combinedLength = post.caption.length + getUrlSuffix(post).length;
     if (combinedLength > X_MAX_CHARS) {
-      errors.push(
-        `Caption + link exceeds ${X_MAX_CHARS} chars for X (got ${combinedLength})`,
-      );
+      errors.push(`Caption + link exceeds ${X_MAX_CHARS} chars for X (got ${combinedLength})`);
     }
 
     if (errors.length > 0) return { ok: false, errors };
@@ -126,24 +118,24 @@ export class XAdapter implements SocialPublisher {
     if (!validation.ok) {
       return {
         ok: false,
-        errorCode: "VALIDATION_FAILED",
-        errorMsg: validation.errors.join("; "),
+        errorCode: 'VALIDATION_FAILED',
+        errorMsg: validation.errors.join('; '),
       };
     }
 
     if (!this.config.clientId || !this.config.clientSecret) {
       return {
         ok: false,
-        errorCode: "NOT_CONFIGURED",
-        errorMsg: "X_CLIENT_ID and X_CLIENT_SECRET must be set to publish",
+        errorCode: 'NOT_CONFIGURED',
+        errorMsg: 'X_CLIENT_ID and X_CLIENT_SECRET must be set to publish',
       };
     }
 
     if (!this.config.db) {
       return {
         ok: false,
-        errorCode: "NOT_CONFIGURED",
-        errorMsg: "XAdapter requires a `db` client to publish",
+        errorCode: 'NOT_CONFIGURED',
+        errorMsg: 'XAdapter requires a `db` client to publish',
       };
     }
 
@@ -152,11 +144,11 @@ export class XAdapter implements SocialPublisher {
 
       const tweetText = buildTweetText(post);
 
-      const res = await fetch("https://api.twitter.com/2/tweets", {
-        method: "POST",
+      const res = await fetch('https://api.twitter.com/2/tweets', {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ text: tweetText }),
       });
@@ -177,7 +169,7 @@ export class XAdapter implements SocialPublisher {
       } catch {
         return {
           ok: false,
-          errorCode: "X_INVALID_RESPONSE",
+          errorCode: 'X_INVALID_RESPONSE',
           errorMsg: `X API returned non-JSON response: ${responseText}`,
         };
       }
@@ -186,7 +178,7 @@ export class XAdapter implements SocialPublisher {
       if (!parsed.success) {
         return {
           ok: false,
-          errorCode: "X_INVALID_RESPONSE",
+          errorCode: 'X_INVALID_RESPONSE',
           errorMsg: `X API returned an unexpected response shape: ${responseText}`,
         };
       }
@@ -195,15 +187,15 @@ export class XAdapter implements SocialPublisher {
 
       // Fetch the author's username from the stored handle to build the URL
       const account = await this.config.db.socialAccount.findUnique({
-        where: { platform: "X" },
+        where: { platform: 'X' },
       });
-      const username = account?.handle?.replace("@", "") ?? "i";
+      const username = account?.handle?.replace('@', '') ?? 'i';
       const platformUrl = `https://x.com/${username}/status/${tweetId}`;
 
       return { ok: true, platformPostId: tweetId, platformUrl };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      return { ok: false, errorCode: "X_ERROR", errorMsg: msg };
+      return { ok: false, errorCode: 'X_ERROR', errorMsg: msg };
     }
   }
 
@@ -211,8 +203,8 @@ export class XAdapter implements SocialPublisher {
     // X API v2 has no draft endpoint
     return {
       ok: false,
-      errorCode: "NOT_SUPPORTED",
-      errorMsg: "X does not support remote draft creation via the API",
+      errorCode: 'NOT_SUPPORTED',
+      errorMsg: 'X does not support remote draft creation via the API',
     };
   }
 }

@@ -1,12 +1,7 @@
-import "server-only";
-import { validatePlatformConstraints } from "../platform-constraints";
-import type {
-  PublishResult,
-  SocialPostBase,
-  SocialPublisher,
-  ValidationResult,
-} from "./publisher";
-import { z } from "zod";
+import 'server-only';
+import { z } from 'zod';
+import { validatePlatformConstraints } from '../platform-constraints';
+import type { PublishResult, SocialPostBase, SocialPublisher, ValidationResult } from './publisher';
 
 // ---------------------------------------------------------------------------
 // TikTok Content Posting API v2 — direct video publish
@@ -16,9 +11,9 @@ import { z } from "zod";
 // unaudited apps are restricted by TikTok to SELF_ONLY (private draft) posts.
 // ---------------------------------------------------------------------------
 
-const TOKEN_URL = "https://open.tiktokapis.com/v2/oauth/token/";
-const INIT_URL = "https://open.tiktokapis.com/v2/post/publish/video/init/";
-const STATUS_URL = "https://open.tiktokapis.com/v2/post/publish/status/fetch/";
+const TOKEN_URL = 'https://open.tiktokapis.com/v2/oauth/token/';
+const INIT_URL = 'https://open.tiktokapis.com/v2/post/publish/video/init/';
+const STATUS_URL = 'https://open.tiktokapis.com/v2/post/publish/status/fetch/';
 
 const STATUS_POLL_ATTEMPTS = 5;
 const STATUS_POLL_INTERVAL_MS = 2000;
@@ -67,7 +62,7 @@ export type TikTokAdapterConfig = {
 };
 
 export class TikTokAdapter implements SocialPublisher {
-  readonly platform = "TIKTOK" as const;
+  readonly platform = 'TIKTOK' as const;
 
   constructor(private readonly config: TikTokAdapterConfig = {}) {}
 
@@ -78,58 +73,51 @@ export class TikTokAdapter implements SocialPublisher {
    */
   private async getAccessToken(): Promise<string> {
     if (!this.config.db) {
-      throw new Error("TikTokAdapter requires a `db` client to publish");
+      throw new Error('TikTokAdapter requires a `db` client to publish');
     }
     if (!this.config.clientId || !this.config.clientSecret) {
-      throw new Error(
-        "TIKTOK_CLIENT_ID and TIKTOK_CLIENT_SECRET must be set to publish",
-      );
+      throw new Error('TIKTOK_CLIENT_ID and TIKTOK_CLIENT_SECRET must be set to publish');
     }
 
     const account = await this.config.db.socialAccount.findUnique({
-      where: { platform: "TIKTOK" },
+      where: { platform: 'TIKTOK' },
     });
     if (!account) {
-      throw new Error(
-        "No TikTok account connected. Connect via /admin/social/accounts.",
-      );
+      throw new Error('No TikTok account connected. Connect via /admin/social/accounts.');
     }
 
-    const isExpired =
-      !account.tokenExpiry || account.tokenExpiry <= new Date();
+    const isExpired = !account.tokenExpiry || account.tokenExpiry <= new Date();
     if (!isExpired) return account.accessToken;
 
     if (!account.refreshToken) {
-      throw new Error("TikTok token expired and no refresh token stored.");
+      throw new Error('TikTok token expired and no refresh token stored.');
     }
 
     const res = await fetch(TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         client_key: this.config.clientId,
         client_secret: this.config.clientSecret,
-        grant_type: "refresh_token",
+        grant_type: 'refresh_token',
         refresh_token: account.refreshToken,
       }).toString(),
     });
 
     if (!res.ok) {
-      throw new Error(
-        `TikTok token refresh failed: ${res.status} ${res.statusText}`,
-      );
+      throw new Error(`TikTok token refresh failed: ${res.status} ${res.statusText}`);
     }
 
     const parsed = TokenResponse.safeParse(await res.json());
     if (!parsed.success) {
-      throw new Error("TikTok token refresh returned an unexpected response");
+      throw new Error('TikTok token refresh returned an unexpected response');
     }
 
     const { access_token, refresh_token, expires_in } = parsed.data;
     const tokenExpiry = new Date(Date.now() + (expires_in ?? 3600) * 1000);
 
     await this.config.db.socialAccount.update({
-      where: { platform: "TIKTOK" },
+      where: { platform: 'TIKTOK' },
       data: {
         accessToken: access_token,
         tokenExpiry,
@@ -141,21 +129,19 @@ export class TikTokAdapter implements SocialPublisher {
   }
 
   async validate(post: SocialPostBase): Promise<ValidationResult> {
-    const errors = validatePlatformConstraints("TIKTOK", {
+    const errors = validatePlatformConstraints('TIKTOK', {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
       hook: post.hook,
     });
 
-    if (post.status !== "APPROVED") {
-      errors.push("Post must be APPROVED before publishing");
+    if (post.status !== 'APPROVED') {
+      errors.push('Post must be APPROVED before publishing');
     }
     const videoPost = post as PostWithVideo;
-    if (videoPost.videoStatus !== "READY" || !videoPost.videoUrl) {
-      errors.push(
-        "A generated video is required before publishing to TikTok — generate one first",
-      );
+    if (videoPost.videoStatus !== 'READY' || !videoPost.videoUrl) {
+      errors.push('A generated video is required before publishing to TikTok — generate one first');
     }
 
     if (errors.length > 0) return { ok: false, errors };
@@ -167,8 +153,8 @@ export class TikTokAdapter implements SocialPublisher {
     if (!validation.ok) {
       return {
         ok: false,
-        errorCode: "VALIDATION_FAILED",
-        errorMsg: validation.errors.join("; "),
+        errorCode: 'VALIDATION_FAILED',
+        errorMsg: validation.errors.join('; '),
       };
     }
 
@@ -179,29 +165,29 @@ export class TikTokAdapter implements SocialPublisher {
       if (!videoRes.ok) {
         return {
           ok: false,
-          errorCode: "VIDEO_FETCH_FAILED",
+          errorCode: 'VIDEO_FETCH_FAILED',
           errorMsg: `Failed to fetch generated video (${videoRes.status})`,
         };
       }
       const videoBuffer = Buffer.from(await videoRes.arrayBuffer());
 
       const initRes = await fetch(INIT_URL, {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json; charset=UTF-8",
+          'Content-Type': 'application/json; charset=UTF-8',
         },
         body: JSON.stringify({
           post_info: {
             title: post.caption,
-            privacy_level: "PUBLIC_TO_EVERYONE",
+            privacy_level: 'PUBLIC_TO_EVERYONE',
             disable_duet: false,
             disable_comment: false,
             disable_stitch: false,
             video_cover_timestamp_ms: 1000,
           },
           source_info: {
-            source: "FILE_UPLOAD",
+            source: 'FILE_UPLOAD',
             video_size: videoBuffer.byteLength,
             chunk_size: videoBuffer.byteLength,
             total_chunk_count: 1,
@@ -222,7 +208,7 @@ export class TikTokAdapter implements SocialPublisher {
       if (!initParsed.success || initParsed.data.error) {
         return {
           ok: false,
-          errorCode: "TIKTOK_INIT_INVALID_RESPONSE",
+          errorCode: 'TIKTOK_INIT_INVALID_RESPONSE',
           errorMsg: `TikTok publish init returned an unexpected response: ${initText}`,
         };
       }
@@ -230,10 +216,10 @@ export class TikTokAdapter implements SocialPublisher {
       const { publish_id, upload_url } = initParsed.data.data;
 
       const uploadRes = await fetch(upload_url, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "video/mp4",
-          "Content-Range": `bytes 0-${videoBuffer.byteLength - 1}/${videoBuffer.byteLength}`,
+          'Content-Type': 'video/mp4',
+          'Content-Range': `bytes 0-${videoBuffer.byteLength - 1}/${videoBuffer.byteLength}`,
         },
         body: videoBuffer,
       });
@@ -248,11 +234,9 @@ export class TikTokAdapter implements SocialPublisher {
       }
 
       const account = await this.config.db.socialAccount.findUnique({
-        where: { platform: "TIKTOK" },
+        where: { platform: 'TIKTOK' },
       });
-      const profileUrl = account?.handle
-        ? `https://www.tiktok.com/@${account.handle}`
-        : "https://www.tiktok.com/";
+      const profileUrl = account?.handle ? `https://www.tiktok.com/@${account.handle}` : 'https://www.tiktok.com/';
 
       // TikTok processes the upload asynchronously — poll briefly for the
       // final public video ID, but don't block indefinitely on it. If it's
@@ -262,10 +246,10 @@ export class TikTokAdapter implements SocialPublisher {
         await sleep(STATUS_POLL_INTERVAL_MS);
 
         const statusRes = await fetch(STATUS_URL, {
-          method: "POST",
+          method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json; charset=UTF-8",
+            'Content-Type': 'application/json; charset=UTF-8',
           },
           body: JSON.stringify({ publish_id }),
         });
@@ -275,18 +259,16 @@ export class TikTokAdapter implements SocialPublisher {
         if (!statusParsed.success) continue;
 
         const { status, publicly_available_post_id } = statusParsed.data.data;
-        if (status === "PUBLISH_COMPLETE") {
+        if (status === 'PUBLISH_COMPLETE') {
           const videoId = publicly_available_post_id?.[0];
           const platformUrl =
-            videoId && account?.handle
-              ? `https://www.tiktok.com/@${account.handle}/video/${videoId}`
-              : profileUrl;
+            videoId && account?.handle ? `https://www.tiktok.com/@${account.handle}/video/${videoId}` : profileUrl;
           return { ok: true, platformPostId: publish_id, platformUrl };
         }
-        if (status === "FAILED") {
+        if (status === 'FAILED') {
           return {
             ok: false,
-            errorCode: "TIKTOK_PUBLISH_FAILED",
+            errorCode: 'TIKTOK_PUBLISH_FAILED',
             errorMsg: `TikTok reported the publish as failed (publish_id: ${publish_id})`,
           };
         }
@@ -295,15 +277,15 @@ export class TikTokAdapter implements SocialPublisher {
       return { ok: true, platformPostId: publish_id, platformUrl: profileUrl };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      return { ok: false, errorCode: "TIKTOK_ERROR", errorMsg: msg };
+      return { ok: false, errorCode: 'TIKTOK_ERROR', errorMsg: msg };
     }
   }
 
   async createDraft(_post: SocialPostBase): Promise<PublishResult> {
     return {
       ok: false,
-      errorCode: "NOT_SUPPORTED",
-      errorMsg: "TikTok does not support remote draft creation via the API",
+      errorCode: 'NOT_SUPPORTED',
+      errorMsg: 'TikTok does not support remote draft creation via the API',
     };
   }
 }

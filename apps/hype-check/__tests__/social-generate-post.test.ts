@@ -6,13 +6,13 @@ import {
 } from "@/lib/social/generate-social-post";
 
 const {
-  mockVideoFindUnique,
+  mockSubjectFindUnique,
   mockSocialPostCreate,
   mockSocialPostFindUnique,
   mockSocialPostUpdate,
   mockAiCreate,
 } = vi.hoisted(() => ({
-  mockVideoFindUnique: vi.fn(),
+  mockSubjectFindUnique: vi.fn(),
   mockSocialPostCreate: vi.fn(),
   mockSocialPostFindUnique: vi.fn(),
   mockSocialPostUpdate: vi.fn(),
@@ -21,7 +21,7 @@ const {
 
 vi.mock("@/lib/db/prisma", () => ({
   db: {
-    video: { findUnique: mockVideoFindUnique },
+    subject: { findUnique: mockSubjectFindUnique },
     socialPost: {
       create: mockSocialPostCreate,
       findUnique: mockSocialPostFindUnique,
@@ -51,17 +51,21 @@ function aiJsonResponse(body: object) {
   return { content: [{ type: "text", text: JSON.stringify(body) }] };
 }
 
-const PUBLISHED_VIDEO = {
+const PUBLISHED_SUBJECT = {
   id: "video_1",
   status: "PUBLISHED",
-  title: "Does Cold Plunging Raise Testosterone?",
+  name: "Does Cold Plunging Raise Testosterone?",
   slug: "cold-plunging-testosterone",
   riskLevel: "LOW",
   evidenceScore: 0.6,
-  summaries: [
+  sourceVideos: [
     {
-      shortSummary: "A look at cold exposure and T levels.",
-      takeaways: ["Evidence is mixed"],
+      summaries: [
+        {
+          shortSummary: "A look at cold exposure and T levels.",
+          takeaways: ["Evidence is mixed"],
+        },
+      ],
     },
   ],
   topics: [{ topic: { name: "Testosterone" } }],
@@ -81,7 +85,7 @@ const VALID_AI_OUTPUT = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockVideoFindUnique.mockResolvedValue(PUBLISHED_VIDEO);
+  mockSubjectFindUnique.mockResolvedValue(PUBLISHED_SUBJECT);
   mockAiCreate.mockResolvedValue(aiJsonResponse(VALID_AI_OUTPUT));
 });
 
@@ -122,7 +126,7 @@ describe("generateSocialPost", () => {
   });
 
   it("fails when the video is not found", async () => {
-    mockVideoFindUnique.mockResolvedValue(null);
+    mockSubjectFindUnique.mockResolvedValue(null);
 
     const result = await generateSocialPost({
       videoId: "missing",

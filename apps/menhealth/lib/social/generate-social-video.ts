@@ -19,11 +19,7 @@ const NARRATION_AUDIO_ENABLED = false;
 
 function isAiConfigured(): boolean {
   return Boolean(
-    env.ANTHROPIC_API_KEY ||
-      env.GROQ_API_KEY ||
-      env.OPENROUTER_API_KEY ||
-      env.OPENAI_API_KEY ||
-      env.GEMINI_API_KEY,
+    env.GROQ_API_KEY || env.OPENROUTER_API_KEY || env.OPENAI_API_KEY || env.GEMINI_API_KEY,
   );
 }
 

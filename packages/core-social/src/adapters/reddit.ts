@@ -1,11 +1,6 @@
-import "server-only";
-import { validatePlatformConstraints } from "../platform-constraints";
-import type {
-  PublishResult,
-  SocialPostBase,
-  SocialPublisher,
-  ValidationResult,
-} from "./publisher";
+import 'server-only';
+import { validatePlatformConstraints } from '../platform-constraints';
+import type { PublishResult, SocialPostBase, SocialPublisher, ValidationResult } from './publisher';
 
 /**
  * Reddit adapter — manual-only by policy.
@@ -23,10 +18,10 @@ import type {
  * can catch content issues before manually posting.
  */
 export class RedditAdapter implements SocialPublisher {
-  readonly platform = "REDDIT" as const;
+  readonly platform = 'REDDIT' as const;
 
   async validate(post: SocialPostBase): Promise<ValidationResult> {
-    const errors = validatePlatformConstraints("REDDIT", {
+    const errors = validatePlatformConstraints('REDDIT', {
       caption: post.caption,
       hashtags: post.hashtags,
       script: post.script,
@@ -39,7 +34,7 @@ export class RedditAdapter implements SocialPublisher {
   async publish(_post: SocialPostBase): Promise<PublishResult> {
     return {
       ok: false,
-      errorCode: "REDDIT_MANUAL_ONLY",
+      errorCode: 'REDDIT_MANUAL_ONLY',
       errorMsg:
         "Reddit posts must be submitted manually. Copy the draft content, post it on Reddit, then record the URL via 'I've posted this manually'.",
     };
@@ -48,9 +43,8 @@ export class RedditAdapter implements SocialPublisher {
   async createDraft(_post: SocialPostBase): Promise<PublishResult> {
     return {
       ok: false,
-      errorCode: "REDDIT_MANUAL_ONLY",
-      errorMsg:
-        "Reddit does not support remote draft creation. Use 'I've posted this manually' after posting.",
+      errorCode: 'REDDIT_MANUAL_ONLY',
+      errorMsg: "Reddit does not support remote draft creation. Use 'I've posted this manually' after posting.",
     };
   }
 }

@@ -2,7 +2,6 @@ import { env } from '@/env';
 import { createAiClient } from '@menhealth/core-ai';
 
 export const aiClient = createAiClient({
-  anthropicApiKey: env.ANTHROPIC_API_KEY,
   groqApiKey: env.GROQ_API_KEY,
   openRouterApiKey: env.OPENROUTER_API_KEY,
   openAiApiKey: env.OPENAI_API_KEY,

@@ -1,12 +1,23 @@
 ---
-applyTo: "lib/social/**,app/admin/social/**,app/api/social/**,__tests__/social*"
+applyTo: "packages/core-social/**,apps/*/lib/social/**,apps/*/app/admin/(protected)/social/**,apps/*/app/api/social/**,apps/*/__tests__/social*"
 ---
 
 # Copilot Agent: Social Content Engine — Developer
 
 ## Role
 
-You are the Developer agent implementing the Social Content Engine for MenHealth Digest. Build in small, reviewable PRs. Follow the implementation sequence below.
+You are the Developer agent implementing the Social Content Engine for MenHealth Digest. Build in small, reviewable PRs.
+
+**This engine is largely built already, across two layers — read this whole file before assuming something is a stub.** The original "implementation sequence" this file used to describe is done; TikTok in particular is *not* a stub anymore.
+
+## Where things actually live
+
+- **`packages/core-social/src/`** — the shared surface both apps get: `adapters/{publisher,x,tiktok,reddit,youtube,refresh-token}.ts`, `platform-constraints.ts`, `prompts.ts`, `utm.ts`, `validation.ts`, `generate-social-post.ts`.
+- **`apps/<site>/lib/social/`** — the app-local layer: `platform-rules.ts` (wires the shared constraints/prompts to *this site's* `site.config.ts` forbidden-pattern/high-risk data via `packages/core-compliance`), `templates.ts` (seed templates), `generate-social-post.ts`, `utm.ts`, and adapter re-exports.
+- **`apps/menhealth/lib/social/`** additionally has an app-local AI video-generation pipeline — `generate-social-video.ts`, `video-plan.ts`, `video-render.ts` (ffmpeg), `video-narration-audio.ts` (OpenAI TTS, currently **disabled** — `NARRATION_AUDIO_ENABLED = false`, videos render as a silent caption slideshow), `blob-storage.ts` (Vercel Blob). `apps/hype-check` does not have this yet — see `docs/superpowers/specs/2026-08-07-hype-check-social-video-port-design.md` before assuming parity.
+- **Admin UI**: `app/admin/(protected)/social/{drafts,calendar,accounts,generate}`.
+- **API routes**: `app/api/social/{generate,drafts/[id]/{approve,reject,schedule,mark-published,regenerate,video,publish},tiktok/oauth[/callback],x/oauth[/callback]}`.
+- **Scheduled publish job**: `jobs/publish-scheduled-social.ts`, invoked by `app/api/cron/publish-scheduled-social`.
 
 ## Technical constraints
 
@@ -14,245 +25,77 @@ You are the Developer agent implementing the Social Content Engine for MenHealth
 - TypeScript strict mode. No `any`.
 - Server Components by default. `"use client"` only for interactive UI.
 - Route handlers in `app/api/`. Server actions for form mutations.
-- All env vars accessed through `env.ts`. No secrets in client code.
+- All env vars accessed through that app's `env.ts`. No secrets in client code.
 - All external API responses (AI, YouTube, platform APIs) Zod-validated before use.
 - AI generation functions return `Result<T, E>` — never throw from domain logic.
-- Platform OAuth tokens stored server-only (encrypted at rest, never in client bundles).
+- Platform OAuth tokens (`SocialAccount.accessToken`/`refreshToken`) are stored server-only and never sent to the client — but note they are **not actually encrypted at the app layer today**, despite the schema's `/// Encrypted access token` comment. Don't assume encryption exists elsewhere in the stack; if your PR is a natural place to add it, flag that to the reviewer rather than silently relying on the comment being true.
 
-## Implementation sequence
-
-1. **Social database models** — Prisma schema, migration, seed templates
-2. **UTM builder** — `lib/social/utm.ts`
-3. **Platform rules** — `lib/social/platform-rules.ts`
-4. **Post generation service** — `lib/social/generate-social-post.ts`
-5. **AI output validation schemas** — `lib/social/validation.ts`
-6. **Template system** — `lib/social/templates.ts`
-7. **Admin review queue** — `app/admin/social/drafts/`
-8. **Approve / reject / schedule workflow** — server actions with risk-level gate
-9. **Social calendar** — `app/admin/social/calendar/`
-10. **Publisher adapter interface** — `lib/social/adapters/publisher.ts`
-11. **YouTube adapter** — `lib/social/adapters/youtube.ts`
-12. **TikTok adapter stub** — `lib/social/adapters/tiktok.ts`
-13. **Instagram adapter stub** — `lib/social/adapters/instagram.ts`
-14. **Reddit draft generator** — `lib/social/reddit-draft.ts`
-
-## File structure
-
-```
-lib/social/
-  generate-social-post.ts   # Core generation service
-  platform-rules.ts         # Per-platform length, format, tone constraints
-  templates.ts              # Template definitions (seeded to DB)
-  utm.ts                    # UTM URL builder
-  validation.ts             # Zod schemas for AI output
-  reddit-draft.ts           # Reddit-specific draft logic
-  adapters/
-    publisher.ts            # Shared SocialPublisher interface
-    youtube.ts              # YouTube Shorts upload adapter
-    tiktok.ts               # Stub — documents TikTok requirements
-    instagram.ts            # Stub — documents Instagram requirements
-
-app/admin/social/
-  drafts/                   # Review queue
-  calendar/                 # Scheduling calendar
-
-app/api/social/
-  generate/                 # POST — trigger generation for a video
-  drafts/[id]/approve/      # POST — approve
-  drafts/[id]/reject/       # POST — reject
-  drafts/[id]/schedule/     # POST — schedule
-  drafts/[id]/publish/      # POST — trigger platform publish
-  youtube/oauth/            # OAuth connection flow (server-only)
-```
-
-## Data models (Prisma)
+## Data model (Prisma) — current shape
 
 ```prisma
-enum Platform { YOUTUBE_COMMUNITY TIKTOK INSTAGRAM_REELS REDDIT LINKEDIN X }
+enum Platform { YOUTUBE_COMMUNITY TIKTOK REDDIT X }   // no Instagram, no LinkedIn — dropped from the original plan
 enum PostStatus { DRAFT PENDING_REVIEW APPROVED SCHEDULED PUBLISHED REJECTED FAILED }
 enum SourceType { VIDEO_SUMMARY CLAIM TOPIC_PAGE WEEKLY_DIGEST }
 enum MediaType { VIDEO TEXT IMAGE }
+enum RiskLevel { LOW MEDIUM HIGH }
+enum VideoGenerationStatus { GENERATING READY FAILED }
 
 model SocialPost {
-  id            String       @id @default(cuid())
-  platform      Platform
-  status        PostStatus   @default(DRAFT)
-  sourceType    SourceType
-  sourceId      String
-  hook          String
-  script        String
-  caption       String
-  hashtags      String[]
-  utmUrl        String
-  riskLevel     String       // LOW | MEDIUM | HIGH
-  requiresReview Boolean     @default(true)
-  scheduledAt   DateTime?
-  publishedAt   DateTime?
-  platformPostId String?
-  platformUrl   String?
-  templateId    String?
-  template      SocialTemplate? @relation(fields: [templateId], references: [id])
-  attempts      SocialPublishAttempt[]
-  metrics       SocialMetric[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  platform, status, sourceType, sourceId
+  hook, script, caption, hashtags, utmUrl
+  riskLevel, requiresReview
+  scheduledAt, publishedAt, platformPostId, platformUrl
+  videoUrl, videoStatus, videoError        // populated by the app-local video pipeline (menhealth only so far)
+  templateId -> SocialTemplate
+  attempts   -> SocialPublishAttempt[]
+  metrics    -> SocialMetric[]
 }
-
-model SocialTemplate {
-  id        String    @id @default(cuid())
-  name      String
-  platform  Platform
-  hook      String
-  script    String
-  caption   String
-  hashtags  String[]
-  posts     SocialPost[]
-  createdAt DateTime  @default(now())
-}
-
-model SocialAccount {
-  id           String   @id @default(cuid())
-  platform     Platform @unique
-  handle       String?
-  accessToken  String   // encrypted
-  refreshToken String?  // encrypted
-  tokenExpiry  DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model SocialPublishAttempt {
-  id         String     @id @default(cuid())
-  postId     String
-  post       SocialPost @relation(fields: [postId], references: [id])
-  success    Boolean
-  errorCode  String?
-  errorMsg   String?
-  response   Json?
-  attemptedAt DateTime  @default(now())
-}
-
-model SocialMetric {
-  id        String     @id @default(cuid())
-  postId    String
-  post      SocialPost @relation(fields: [postId], references: [id])
-  views     Int        @default(0)
-  likes     Int        @default(0)
-  shares    Int        @default(0)
-  clicks    Int        @default(0)
-  recordedAt DateTime  @default(now())
-}
+// SocialTemplate, SocialAccount, SocialPublishAttempt, SocialMetric — see prisma/schema.prisma directly, don't
+// assume this doc's shape stays exact; the schema is the source of truth.
 ```
 
-## Seed templates
+## Seed templates (`apps/<site>/lib/social/templates.ts`)
 
-Seed the following four templates on first migration:
+Four templates seeded per site: **Claim Check**, **3 Takeaways**, **Useful but Incomplete**, **Weekly Roundup** — each with its own hook/script variable set. Check the file directly for current variable names before writing a new one; don't invent a fifth without checking whether the PM actually asked for it.
 
-### Claim Check
+## Caption shape (AI-generated, not a fixed literal template)
 
-```
-Hook: "This men's health claim is trending — here's what it actually says."
-Script: Use {{claim}}, {{plainEnglishSummary}}, {{reasonablePart}}, {{cautionPart}}, {{practicalTakeaway}} variables.
-```
+`packages/core-social/src/prompts.ts` builds the generation prompt from a `PromptConfig` that's now genuinely site-generic — `contentTypeLabel` (e.g. "product/course review" for hype-check vs. a video-summary framing for menhealth) and `disclaimerLine` (menhealth's is "Educational only. Not medical advice."; a non-health site would use something else) are passed in per-site, not hardcoded. The AI is asked to include an evidence label (Strong/Moderate/Mixed/Weak/Not checked), a risk label, the site's disclaimer line, and the UTM link — but `validation.ts`'s Zod schema only checks the caption is a non-empty string in range, it doesn't regex-enforce this exact structure. Don't assume changing the wording breaks validation; do make sure the disclaimer line still ends up in the output for high-risk content.
 
-### 3 Takeaways
+## Forbidden patterns and high-risk detection
 
-```
-Hook: "3 takeaways from today's biggest {{topic}} video."
-Script: Use {{takeaway1}}, {{takeaway2}}, {{takeaway3}}, {{cautionPart}} variables.
-```
-
-### Useful but Incomplete
-
-```
-Hook: "This advice is useful — but incomplete."
-Script: Use {{claim}}, {{supportingReason}}, {{missingContext}}, {{practicalTakeaway}} variables.
-```
-
-### Weekly Roundup
-
-```
-Hook: "5 men's health claims that were trending this week."
-Script: Use {{topic1}}, {{topic2}}, {{topic3}}, {{strongestTakeaway}}, {{weakestClaim}} variables.
-```
-
-## Caption format (enforced in validation)
-
-```
-[Hook]
-
-[1–2 sentence value summary]
-
-Evidence label: [Strong / Moderate / Mixed / Weak / Not checked]
-Risk level: [Low / Medium / High]
-
-Educational only. Not medical advice.
-
-Read the full summary:
-[UTM URL]
-
-#MensHealth #Fitness #Longevity
-```
-
-## Forbidden caption patterns (reject in platform-rules.ts)
-
-```
-/fix your .*(testosterone|energy|hormones)/i
-/this cures/i
-/doctors don.t want you to know/i
-/every man needs this/i
-/guaranteed/i
-/proven to (cure|reverse|fix)/i
-```
+These are **not** hardcoded in `platform-rules.ts`. Each site defines its own `forbiddenContentPatterns`, `highRiskTextPatterns`, and `highRiskTopicKeywords` in its `site.config.ts`; `packages/core-compliance`'s `checkForbiddenPatterns()`/`detectHighRiskTopic()` do the actual matching, and each app's `lib/social/platform-rules.ts` wires the two together. If you need to check or add a forbidden pattern, edit that site's `site.config.ts`, not a regex list in the social package. menhealth's list today includes things like "fix your testosterone/energy/hormones", "this cures", "doctors don't want you to know", "every man needs this" — read the file for the current, exact set rather than copying this list elsewhere, since it can change.
 
 ## UTM format
 
-```
-https://www.menhealth-digest.com/{path}?utm_source={platform}&utm_medium={medium}&utm_campaign={campaign}
-```
+Built by `packages/core-social`'s `buildUtmUrl()` (`apps/<site>/lib/social/utm.ts` re-exports it), keyed off `PLATFORM_UTM` in `utm.ts`:
 
-Platform mappings:
-
-- YouTube Shorts → `utm_source=youtube&utm_medium=shorts`
+- YouTube Community → `utm_source=youtube&utm_medium=community`
 - TikTok → `utm_source=tiktok&utm_medium=video`
-- Instagram Reels → `utm_source=instagram&utm_medium=reels`
 - Reddit → `utm_source=reddit&utm_medium=post`
-- LinkedIn → `utm_source=linkedin&utm_medium=post`
 - X → `utm_source=x&utm_medium=post`
 
-## Risk-level gating (server-enforced)
+`utm_campaign` is always the caller-supplied campaign string, lowercased with spaces replaced by underscores — check `PLATFORM_UTM` directly before changing any of this, since campaign is currently the same shape across all four platforms.
 
-- `HIGH` risk posts: `requiresReview = true` always; cannot be approved via bulk action; approval requires explicit single-post confirmation.
-- `MEDIUM` risk posts: `requiresReview = true` by default.
-- `LOW` risk posts: `requiresReview = true` by default in MVP (auto-approval is out of scope).
+## Publishing reality per platform — read this before touching an adapter
 
-High-risk topics include: TRT/testosterone, medications, supplements, cancer, mental health disorders, ED treatment.
-
-## YouTube Shorts publisher rules
-
-- OAuth tokens stored in `SocialAccount`, encrypted. Never in client bundles.
-- All uploads default to `privacyStatus: "private"`.
-- Uploads are of user-generated content only — never third-party YouTube footage.
-- Log every attempt in `SocialPublishAttempt` whether success or failure.
-- Store `platformPostId` and construct `platformUrl` on success.
+- **X (`adapters/x.ts`)** — real, automated publish via the X API. Runs both from an explicit admin "Publish" click and from the `SCHEDULED`-post cron (`jobs/publish-scheduled-social.ts`), which only has an adapter wired up for X.
+- **TikTok (`adapters/tiktok.ts`)** — real, automated publish via TikTok's Content Posting API v2 (Direct Post, `FILE_UPLOAD`). **Not** a stub — don't reintroduce a `NOT_IMPLEMENTED` return. Requires the post to already have `videoStatus === 'READY'` and a `videoUrl` (i.e. it must have gone through the app-local video-generation pipeline first) — `validate()` rejects posts without one. Only reachable via the admin-triggered `/api/social/drafts/[id]/publish` route today; it is **not** wired into the `SCHEDULED`-cron's adapter map, so a TikTok post that reaches `SCHEDULED` will currently fail there rather than publish — don't assume scheduling a TikTok post does anything useful until that gap is closed.
+- **YouTube Community and Reddit** — manual/copy-paste only (`isManualPlatform` in `DraftActions.tsx`). Generate the draft, admin posts it manually elsewhere, then clicks "mark published." **No auto-posting code for either, ever** — this is a hard rule, not just current scope.
+- Every publish path — automated or manual — requires the post to already be `APPROVED`, which itself requires passing the risk-level review gate. That admin approval step, not the publish call itself, is what satisfies "no AI output published without human approval," even for the platforms that publish automatically once approved.
 
 ## Reddit draft rules
 
 - Generate subreddit-specific draft with community-value framing.
 - Avoid CTA-first language; link is optional.
-- Render manual posting checklist alongside draft:
-  - Check subreddit rules before posting
-  - Avoid link-only posts — lead with value
-  - Participate in comments
-  - Disclose affiliation if linking to menhealth-digest.com
-  - Do not repost the same text across multiple subreddits
-- No auto-posting code. Admin manually posts and then marks post as published.
+- Render manual posting checklist alongside draft (check subreddit rules, avoid link-only posts, participate in comments, disclose affiliation, don't repost identical text across subreddits).
+- No auto-posting code. Admin manually posts and then marks the post as published.
 
 ## Do not implement
 
-- Auto-commenting or auto-DMs
-- Reddit auto-posting
+- Auto-commenting or auto-DMs, on any platform
+- Reddit auto-posting, at any level
 - Downloading or re-encoding third-party YouTube video footage
-- Auto-publishing without human approval
+- Auto-publishing without human approval — including for X and TikTok, which publish automatically only after that approval, never before
 - Paid ads API integration
 - Client-side access to platform OAuth tokens
