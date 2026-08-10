@@ -1,8 +1,8 @@
 import "server-only";
 import { validatePlatformConstraints } from "../platform-constraints";
-import type { SocialPost } from "@prisma/client";
 import type {
   PublishResult,
+  SocialPostBase,
   SocialPublisher,
   ValidationResult,
 } from "./publisher";
@@ -25,7 +25,7 @@ import type {
 export class RedditAdapter implements SocialPublisher {
   readonly platform = "REDDIT" as const;
 
-  async validate(post: SocialPost): Promise<ValidationResult> {
+  async validate(post: SocialPostBase): Promise<ValidationResult> {
     const errors = validatePlatformConstraints("REDDIT", {
       caption: post.caption,
       hashtags: post.hashtags,
@@ -36,7 +36,7 @@ export class RedditAdapter implements SocialPublisher {
     return { ok: true };
   }
 
-  async publish(_post: SocialPost): Promise<PublishResult> {
+  async publish(_post: SocialPostBase): Promise<PublishResult> {
     return {
       ok: false,
       errorCode: "REDDIT_MANUAL_ONLY",
@@ -45,7 +45,7 @@ export class RedditAdapter implements SocialPublisher {
     };
   }
 
-  async createDraft(_post: SocialPost): Promise<PublishResult> {
+  async createDraft(_post: SocialPostBase): Promise<PublishResult> {
     return {
       ok: false,
       errorCode: "REDDIT_MANUAL_ONLY",

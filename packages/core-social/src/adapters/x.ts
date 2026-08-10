@@ -1,9 +1,9 @@
 import "server-only";
 import { validatePlatformConstraints } from "../platform-constraints";
 import { getValidAccessToken } from "./refresh-token";
-import type { SocialPost } from "@prisma/client";
 import type {
   PublishResult,
+  SocialPostBase,
   SocialPublisher,
   ValidationResult,
 } from "./publisher";
@@ -33,7 +33,7 @@ const X_MAX_CHARS = 280;
  * already contains the link. Shared by validate() and buildTweetText so both
  * agree on what the final tweet text will actually look like.
  */
-function getUrlSuffix(post: SocialPost): string {
+function getUrlSuffix(post: SocialPostBase): string {
   return post.caption.includes(post.utmUrl) ? "" : ` ${post.utmUrl}`;
 }
 
@@ -47,7 +47,7 @@ function getUrlSuffix(post: SocialPost): string {
  * only. Not medical advice." disclaimer) from being silently cut off. Kept
  * as a defensive fallback in case publish() is ever called without validate().
  */
-function buildTweetText(post: SocialPost): string {
+function buildTweetText(post: SocialPostBase): string {
   const suffix = getUrlSuffix(post);
   const maxCaptionLen = X_MAX_CHARS - suffix.length;
 
@@ -96,7 +96,7 @@ export class XAdapter implements SocialPublisher {
     });
   }
 
-  async validate(post: SocialPost): Promise<ValidationResult> {
+  async validate(post: SocialPostBase): Promise<ValidationResult> {
     // Run all platform checks except the generic caption-length one — that
     // check only looks at the raw caption, but X's real limit applies to the
     // caption *plus* the UTM link buildTweetText will append. We replace it
@@ -121,7 +121,7 @@ export class XAdapter implements SocialPublisher {
     return { ok: true };
   }
 
-  async publish(post: SocialPost): Promise<PublishResult> {
+  async publish(post: SocialPostBase): Promise<PublishResult> {
     const validation = await this.validate(post);
     if (!validation.ok) {
       return {
@@ -207,7 +207,7 @@ export class XAdapter implements SocialPublisher {
     }
   }
 
-  async createDraft(_post: SocialPost): Promise<PublishResult> {
+  async createDraft(_post: SocialPostBase): Promise<PublishResult> {
     // X API v2 has no draft endpoint
     return {
       ok: false,

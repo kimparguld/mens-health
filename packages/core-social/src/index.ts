@@ -44,6 +44,7 @@ export type {
   PublishResult,
   ValidationResult,
   SocialPublisher,
+  SocialPostBase,
 } from "./adapters/publisher";
 export { RedditAdapter } from "./adapters/reddit";
 export { TikTokAdapter } from "./adapters/tiktok";

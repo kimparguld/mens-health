@@ -1,8 +1,8 @@
 import "server-only";
 import { validatePlatformConstraints } from "../platform-constraints";
-import type { SocialPost } from "@prisma/client";
 import type {
   PublishResult,
+  SocialPostBase,
   SocialPublisher,
   ValidationResult,
 } from "./publisher";
@@ -22,7 +22,7 @@ import type {
 export class YouTubeCommunityAdapter implements SocialPublisher {
   readonly platform = "YOUTUBE_COMMUNITY" as const;
 
-  async validate(post: SocialPost): Promise<ValidationResult> {
+  async validate(post: SocialPostBase): Promise<ValidationResult> {
     const errors = validatePlatformConstraints("YOUTUBE_COMMUNITY", {
       caption: post.caption,
       hashtags: post.hashtags,
@@ -50,7 +50,7 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
    * 3. Paste, review, and publish.
    * 4. Mark the post as manually published in the admin dashboard.
    */
-  async publish(post: SocialPost): Promise<PublishResult> {
+  async publish(post: SocialPostBase): Promise<PublishResult> {
     const validation = await this.validate(post);
     if (!validation.ok) {
       return {
@@ -76,7 +76,7 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
    * The platformPostId and platformUrl are placeholder values that the admin
    * should overwrite after manually publishing in YouTube Studio.
    */
-  async createDraft(post: SocialPost): Promise<PublishResult> {
+  async createDraft(post: SocialPostBase): Promise<PublishResult> {
     const validation = await this.validate(post);
     if (!validation.ok) {
       return {
@@ -91,7 +91,7 @@ export class YouTubeCommunityAdapter implements SocialPublisher {
     // and surface the composed text for manual copy-paste into YouTube Studio.
     return {
       ok: true,
-      platformPostId: `draft:${post.id}`,
+      platformPostId: `draft:${(post as { id?: string }).id ?? 'unknown'}`,
       platformUrl: `https://studio.youtube.com`,
     };
   }

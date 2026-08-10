@@ -1,8 +1,8 @@
 import "server-only";
 import { validatePlatformConstraints } from "../platform-constraints";
-import type { SocialPost } from "@prisma/client";
 import type {
   PublishResult,
+  SocialPostBase,
   SocialPublisher,
   ValidationResult,
 } from "./publisher";
@@ -48,13 +48,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * `videoUrl`/`videoStatus` only exist on menhealth's `SocialPost` schema
- * (other sites sharing this package don't have the video generator yet) —
- * accessed via an optional intersection so this adapter type-checks against
- * every consuming site's generated Prisma client, not just menhealth's.
- */
-type PostWithVideo = SocialPost & {
+type PostWithVideo = SocialPostBase & {
   videoUrl?: string | null;
   videoStatus?: string | null;
 };
@@ -146,7 +140,7 @@ export class TikTokAdapter implements SocialPublisher {
     return access_token;
   }
 
-  async validate(post: SocialPost): Promise<ValidationResult> {
+  async validate(post: SocialPostBase): Promise<ValidationResult> {
     const errors = validatePlatformConstraints("TIKTOK", {
       caption: post.caption,
       hashtags: post.hashtags,
@@ -168,7 +162,7 @@ export class TikTokAdapter implements SocialPublisher {
     return { ok: true };
   }
 
-  async publish(post: SocialPost): Promise<PublishResult> {
+  async publish(post: SocialPostBase): Promise<PublishResult> {
     const validation = await this.validate(post);
     if (!validation.ok) {
       return {
@@ -305,7 +299,7 @@ export class TikTokAdapter implements SocialPublisher {
     }
   }
 
-  async createDraft(_post: SocialPost): Promise<PublishResult> {
+  async createDraft(_post: SocialPostBase): Promise<PublishResult> {
     return {
       ok: false,
       errorCode: "NOT_SUPPORTED",
