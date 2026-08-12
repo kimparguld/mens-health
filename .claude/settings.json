@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); base=$(basename \"$f\" 2>/dev/null); if [[ \"$base\" == .env* && \"$base\" != .env.example && \"$base\" != .env.sample ]]; then jq -n '{hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"deny\",permissionDecisionReason:\"Blocked: direct edits to .env files are disabled by policy (AGENTS.md: secrets go through env.ts, not raw .env edits). Edit via your secrets manager or .env tooling instead.\"}}'; fi",
+            "statusMessage": "Checking env-file edit policy..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // .tool_response.filePath // empty'); if [ -n \"$f\" ]; then case \"$f\" in */apps/*) base=$(basename \"$f\"); case \"$base\" in env.ts|proxy.ts) : ;; *) case \"$f\" in *.ts|*.tsx) if grep -qE 'process\\.env\\.' \"$f\" 2>/dev/null; then jq -n --arg f \"$f\" '{systemMessage: ($f + \" uses process.env directly; route access through this apps env.ts wrapper per AGENTS.md.\")}'; fi ;; esac ;; esac ;; esac; fi 2>/dev/null || true",
+            "statusMessage": "Checking for raw process.env usage..."
+          }
+        ]
+      }
+    ]
+  }
+}
