@@ -217,6 +217,23 @@ export default async function TopicPage({
         )}
       </header>
 
+      {/* Key Takeaways */}
+      {staticContent?.takeaways && staticContent.takeaways.length > 0 && (
+        <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-6">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            Key takeaways
+          </h2>
+          <ul className="space-y-2">
+            {staticContent.takeaways.map((takeaway, i) => (
+              <li key={i} className="flex gap-3 text-sm text-gray-700">
+                <span className="mt-0.5 text-emerald-600">✓</span>
+                {takeaway}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {/* Beginner Guide */}
       {staticContent?.beginnerGuide && (
         <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-6">
@@ -347,23 +364,6 @@ export default async function TopicPage({
               </div>
             ))}
           </div>
-        </section>
-      )}
-
-      {/* Evidence-Aware Takeaways */}
-      {staticContent?.takeaways && staticContent.takeaways.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">
-            Evidence-aware takeaways
-          </h2>
-          <ul className="space-y-2">
-            {staticContent.takeaways.map((takeaway, i) => (
-              <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="mt-0.5 text-emerald-600">✓</span>
-                {takeaway}
-              </li>
-            ))}
-          </ul>
         </section>
       )}
 
