@@ -412,6 +412,12 @@ export default async function TopicPage({
                     topicNames={video.topics.map(
                       (vt: (typeof video.topics)[number]) => vt.topic.name
                     )}
+                    topics={video.topics.map(
+                      (vt: (typeof video.topics)[number]) => ({
+                        name: vt.topic.name,
+                        slug: vt.topic.slug,
+                      })
+                    )}
                     riskLevel={video.riskLevel}
                     durationSeconds={video.durationSeconds ?? undefined}
                     priority={index === 0}
@@ -441,6 +447,12 @@ export default async function TopicPage({
                 trendScore={video.trendScore}
                 topicNames={video.topics.map(
                   (vt: (typeof video.topics)[number]) => vt.topic.name
+                )}
+                topics={video.topics.map(
+                  (vt: (typeof video.topics)[number]) => ({
+                    name: vt.topic.name,
+                    slug: vt.topic.slug,
+                  })
                 )}
                 riskLevel={video.riskLevel}
                 durationSeconds={video.durationSeconds ?? undefined}
