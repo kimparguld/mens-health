@@ -6,7 +6,10 @@ import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from '@/lib/monetization/resolvers';
-import { getTopicContent, parseParagraphCitations } from '@/lib/seo/topic-content';
+import {
+  getTopicContent,
+  parseParagraphCitations,
+} from '@/lib/seo/topic-content';
 import { getTopicSeo } from '@/lib/seo/topic-faq';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
@@ -54,7 +57,7 @@ export async function generateMetadata({
   const canonical = `${APP_URL}/topics/${slug}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical },
     openGraph: {
@@ -114,7 +117,11 @@ export default async function TopicPage({
           text: true,
           evidenceStatus: true,
           slug: true,
-          sources: { select: { title: true, url: true }, take: 1 },
+          sources: {
+            select: { title: true, url: true },
+            take: 1,
+            orderBy: { id: 'asc' },
+          },
         },
       })
     : [];
@@ -252,14 +259,19 @@ export default async function TopicPage({
                 {sub.heading}
               </h2>
               {sub.paragraphs.map((p, j) => (
-                <p key={j} className="mb-3 text-sm leading-relaxed text-gray-700">
-                  {parseParagraphCitations(p).map((token, k) =>
-                    token.type === 'text' ? (
-                      <span key={k}>{token.value}</span>
-                    ) : sub.citations?.[token.index] ? (
+                <p
+                  key={j}
+                  className="mb-3 text-sm leading-relaxed text-gray-700"
+                >
+                  {parseParagraphCitations(p).map((token, k) => {
+                    if (token.type === 'text') {
+                      return <span key={k}>{token.value}</span>;
+                    }
+                    const citation = sub.citations?.[token.index];
+                    return citation ? (
                       <sup key={k}>
                         <a
-                          href={sub.citations![token.index]!.url}
+                          href={citation.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-medium text-emerald-700 hover:underline"
@@ -269,8 +281,8 @@ export default async function TopicPage({
                       </sup>
                     ) : (
                       <span key={k}>[{token.index + 1}]</span>
-                    )
-                  )}
+                    );
+                  })}
                 </p>
               ))}
               {sub.citations && sub.citations.length > 0 && (
@@ -465,9 +477,6 @@ export default async function TopicPage({
                     thumbnailUrl={video.thumbnailUrl}
                     shortSummary={video.summaries[0]?.shortSummary ?? null}
                     trendScore={video.trendScore}
-                    topicNames={video.topics.map(
-                      (vt: (typeof video.topics)[number]) => vt.topic.name
-                    )}
                     topics={video.topics.map(
                       (vt: (typeof video.topics)[number]) => ({
                         name: vt.topic.name,
@@ -501,9 +510,6 @@ export default async function TopicPage({
                 thumbnailUrl={video.thumbnailUrl}
                 shortSummary={video.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
-                topicNames={video.topics.map(
-                  (vt: (typeof video.topics)[number]) => vt.topic.name
-                )}
                 topics={video.topics.map(
                   (vt: (typeof video.topics)[number]) => ({
                     name: vt.topic.name,
