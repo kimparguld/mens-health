@@ -109,7 +109,13 @@ export default async function TopicPage({
         },
         take: 3,
         orderBy: { riskLevel: 'desc' },
-        select: { id: true, text: true, evidenceStatus: true, slug: true },
+        select: {
+          id: true,
+          text: true,
+          evidenceStatus: true,
+          slug: true,
+          sources: { select: { title: true, url: true }, take: 1 },
+        },
       })
     : [];
 
@@ -305,19 +311,34 @@ export default async function TopicPage({
               ? topicClaims.map((claim) => (
                   <li
                     key={claim.id}
-                    className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-4"
+                    className="rounded-xl border border-gray-200 bg-white px-5 py-4"
                   >
-                    <span className="flex-1 text-sm text-gray-800">
-                      &ldquo;{claim.text}&rdquo;
-                    </span>
-                    <EvidenceBadge
-                      status={claim.evidenceStatus}
-                      showNotChecked
-                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="flex-1 text-sm text-gray-800">
+                        &ldquo;{claim.text}&rdquo;
+                      </span>
+                      <EvidenceBadge
+                        status={claim.evidenceStatus}
+                        showNotChecked
+                      />
+                    </div>
+                    {claim.sources[0] && (
+                      <p className="mt-2 text-xs text-gray-600">
+                        Source:{' '}
+                        <a
+                          href={claim.sources[0].url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-emerald-700 hover:underline"
+                        >
+                          {claim.sources[0].title}
+                        </a>
+                      </p>
+                    )}
                     {claim.slug && (
                       <Link
                         href={`/claims/${claim.slug}`}
-                        className="text-xs font-medium text-emerald-700 hover:underline"
+                        className="mt-2 inline-block text-xs font-medium text-emerald-700 hover:underline"
                       >
                         See evidence →
                       </Link>
