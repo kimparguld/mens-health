@@ -1,4 +1,10 @@
-import { EvidenceBadge, HowWeRateClaims, NewsletterSignupForm, RiskBadge, VideoCard } from "@menhealth/ui";
+import {
+  EvidenceBadge,
+  HowWeRateClaims,
+  NewsletterSignupForm,
+  RiskBadge,
+  VideoCard,
+} from '@menhealth/ui';
 import { getFeaturedVideo, getTrendingVideos } from '@/lib/db/queries';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
 import type { Metadata } from 'next';
@@ -135,8 +141,10 @@ async function TrendingVideos() {
                 thumbnailUrl={video.thumbnailUrl}
                 shortSummary={video.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
-                topicNames={video.topics.map((vt) => vt.topic.name)}
-                topics={video.topics.map((vt) => ({ name: vt.topic.name, slug: vt.topic.slug }))}
+                topics={video.topics.map((vt) => ({
+                  name: vt.topic.name,
+                  slug: vt.topic.slug,
+                }))}
                 riskLevel={video.riskLevel}
                 evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
                 durationSeconds={video.durationSeconds ?? undefined}
