@@ -1,12 +1,16 @@
 import type { FaqEntry } from "@menhealth/core-seo";
 
 export type TopicSeoData = {
+  title?: string;
+  metaDescription?: string;
   intro: string;
   faq: FaqEntry[];
 };
 
 const TOPIC_SEO: Record<string, TopicSeoData> = {
   testosterone: {
+    title: "Testosterone & Aging: What the Evidence Actually Shows",
+    metaDescription: "How fast testosterone really declines with age, what actually raises it, and what current research says about TRT safety — evidence-based, not hype.",
     intro:
       "Testosterone is the primary male sex hormone governing muscle mass, libido, energy, and mood. Levels peak in early adulthood and decline gradually with age, but lifestyle factors — sleep, exercise, body composition, and stress — have a significant impact at every age.",
     faq: [
@@ -28,6 +32,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "fitness-over-40": {
+    title: "Training After 40: What Actually Works",
+    metaDescription: "How to train, recover, and build muscle after 40 — evidence-backed guidance on volume, recovery, and protein for men in their 40s and 50s.",
     intro:
       "Training after 40 requires adapting to longer recovery times, changing hormonal profiles, and accumulated wear-and-tear — but it also benefits from decades of experience and discipline. Many men are in the best shape of their lives in their 40s and 50s.",
     faq: [
@@ -49,6 +55,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "muscle-gain": {
+    title: "How Muscle Growth Actually Works",
+    metaDescription: "The evidence behind building muscle: progressive overload, protein targets, and how long real hypertrophy actually takes.",
     intro:
       "Building muscle (hypertrophy) is fundamentally driven by progressive mechanical tension, adequate protein, and recovery. The science is well established — the challenge is consistent execution over months and years.",
     faq: [
@@ -70,6 +78,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   longevity: {
+    title: "What the Longevity Evidence Actually Supports",
+    metaDescription: "VO2 max, strength, sleep, and metabolic health — the longevity interventions with real evidence, and the supplements that don't have it yet.",
     intro:
       "Longevity science focuses on the lifestyle and biological factors that slow ageing and extend healthspan — the years lived in good health. Exercise, nutrition, sleep, and stress management are the four pillars backed by the strongest evidence.",
     faq: [
@@ -91,6 +101,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   sleep: {
+    title: "Why Sleep Is the Most Underrated Men's Health Lever",
+    metaDescription: "How sleep affects testosterone, recovery, and cardiovascular risk — and what actually helps versus what's marketing noise.",
     intro:
       "Sleep is arguably the most underrated pillar of men's health. Chronic short sleep (under 7 hours) is associated with reduced testosterone, elevated cortisol, impaired muscle recovery, and higher cardiovascular risk.",
     faq: [
@@ -112,6 +124,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "mental-health": {
+    title: "Men's Mental Health: Signs, Evidence, and What Helps",
+    metaDescription: "How depression and anxiety show up differently in men, why help-seeking lags, and what the evidence says actually works.",
     intro:
       "Men are statistically less likely to seek help for mental health challenges, yet are at higher risk of suicide. Evidence-based approaches — exercise, therapy, social connection, and in some cases medication — are effective and increasingly destigmatised.",
     faq: [
@@ -133,6 +147,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   nutrition: {
+    title: "Men's Nutrition: What the Evidence Actually Says",
+    metaDescription: "Protein targets, whole-food patterns, and why no single diet wins — an evidence-based look at nutrition for men's health.",
     intro:
       "Nutrition for men's health centres on adequate protein to preserve muscle, micronutrient sufficiency, and managing calorie balance for body composition. Whole-food dietary patterns consistently outperform specific diets in long-term outcomes.",
     faq: [
@@ -154,6 +170,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "weight-loss": {
+    title: "Sustainable Fat Loss: What Actually Works",
+    metaDescription: "The evidence behind fat loss: calorie deficits, protein, and why most 'fat-burning' shortcuts don't hold up.",
     intro:
       "Sustainable fat loss requires a sustained calorie deficit combined with adequate protein to preserve lean mass. No diet, supplement, or protocol overcomes the fundamental energy balance equation.",
     faq: [
@@ -175,6 +193,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "hair-loss": {
+    title: "Male Hair Loss: What Treatments Actually Work",
+    metaDescription: "Why male pattern baldness happens, and which treatments — finasteride, minoxidil — have real clinical evidence behind them.",
     intro:
       "Male pattern baldness (androgenetic alopecia) affects around 50% of men by age 50. DHT — a testosterone metabolite — is the primary driver. Several evidence-backed treatments can slow or partially reverse hair loss.",
     faq: [
@@ -196,6 +216,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   fertility: {
+    title: "Male Fertility: What Affects It and What to Do",
+    metaDescription: "The lifestyle factors that measurably affect sperm quality, and when a semen analysis is worth getting.",
     intro:
       "Male fertility has declined significantly over recent decades, with sperm count and quality both affected by lifestyle, environment, and health conditions. Many factors influencing male fertility are modifiable.",
     faq: [
@@ -217,6 +239,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "prostate-health": {
+    title: "Prostate Health: Screening, Risk, and Evidence",
+    metaDescription: "When to start PSA screening, how BPH differs from prostate cancer, and what the evidence says about prevention.",
     intro:
       "The prostate gland affects urinary function and sexual health. Benign prostatic hyperplasia (BPH) and prostate cancer become increasingly common with age. Lifestyle interventions and regular screening are the primary tools for prevention and early detection.",
     faq: [
@@ -238,6 +262,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "erectile-dysfunction": {
+    title: "Erectile Dysfunction: Causes, Evidence, and Treatment",
+    metaDescription: "Why ED is often a cardiovascular warning sign, not just a psychological one — and what treatments actually have evidence.",
     intro:
       "Erectile dysfunction (ED) affects up to 50% of men over 40 to some degree. It is often a vascular condition — an early warning sign of cardiovascular disease — rather than purely psychological, making it medically important to investigate.",
     faq: [
@@ -259,6 +285,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   biohacking: {
+    title: "Biohacking: Separating Evidence From Noise",
+    metaDescription: "Which biohacks — cold exposure, fasting, wearables — have real evidence, and which are expensive guesswork.",
     intro:
       "Biohacking spans a wide spectrum — from well-evidenced interventions like cold water immersion and time-restricted eating to fringe self-experimentation. A critical evidence lens separates meaningful optimisation from expensive noise.",
     faq: [
@@ -280,6 +308,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   supplements: {
+    title: "Men's Supplements: What the Evidence Actually Supports",
+    metaDescription: "Which supplements have real evidence behind them — and why most testosterone boosters and proprietary blends don't.",
     intro:
       "The supplement industry generates billions in revenue, but the majority of products are poorly studied. A short list of supplements have robust human evidence; most others have weak, mixed, or no data.",
     faq: [
@@ -301,6 +331,8 @@ const TOPIC_SEO: Record<string, TopicSeoData> = {
     ],
   },
   "mens-health": {
+    title: "Men's Health Basics: What Actually Matters",
+    metaDescription: "The screenings, habits, and evidence-based fundamentals that explain why men live shorter, less healthy lives — and how to change that.",
     intro:
       "Men's health encompasses physical fitness, mental wellbeing, sexual health, disease prevention, and healthy ageing. Preventive care and regular health screening remain significantly underutilised by men compared to women.",
     faq: [

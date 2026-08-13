@@ -150,7 +150,10 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                     thumbnailUrl={topVideo.thumbnailUrl}
                     shortSummary={topVideoSummary?.shortSummary ?? null}
                     trendScore={topVideo.trendScore}
-                    topicNames={topVideo.topics.map((vt) => vt.topic.name)}
+                    topics={topVideo.topics.map((vt) => ({
+                      name: vt.topic.name,
+                      slug: vt.topic.slug,
+                    }))}
                     riskLevel={topVideo.riskLevel}
                     evidenceLabel={
                       topVideo.evidenceScore != null ? 'SUPPORTED' : undefined
@@ -236,7 +239,10 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
             <ol className="space-y-16">
               {videos.map((video, i) => {
                 const summary = video.summaries[0];
-                const topicNames = video.topics.map((vt) => vt.topic.name);
+                const topics = video.topics.map((vt) => ({
+                  name: vt.topic.name,
+                  slug: vt.topic.slug,
+                }));
 
                 return (
                   <li key={video.id} className="relative">
@@ -250,7 +256,7 @@ export default async function WeeklyTrendPage({ params }: { params: Params }) {
                       thumbnailUrl={video.thumbnailUrl}
                       shortSummary={summary?.shortSummary ?? null}
                       trendScore={video.trendScore}
-                      topicNames={topicNames}
+                      topics={topics}
                       riskLevel={video.riskLevel}
                       evidenceLabel={
                         video.evidenceScore != null

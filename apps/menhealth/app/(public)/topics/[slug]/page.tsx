@@ -6,7 +6,10 @@ import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from '@/lib/monetization/resolvers';
-import { getTopicContent } from '@/lib/seo/topic-content';
+import {
+  getTopicContent,
+  parseParagraphCitations,
+} from '@/lib/seo/topic-content';
 import { getTopicSeo } from '@/lib/seo/topic-faq';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
@@ -49,22 +52,23 @@ export async function generateMetadata({
   if (!topic) return { title: 'Topic Not Found' };
 
   const seo = getTopicSeo(slug);
-  const description = seo?.intro ?? topic.description;
+  const title = seo?.title ?? `${topic.name} — Men's Health Guide`;
+  const description = seo?.metaDescription ?? seo?.intro ?? topic.description;
   const canonical = `${APP_URL}/topics/${slug}`;
 
   return {
-    title: `${topic.name} — Men's Health Guide`,
+    title: { absolute: title },
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${topic.name} — Men's Health Guide`,
+      title,
       description,
       url: canonical,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${topic.name} — Men's Health Guide`,
+      title,
       description,
     },
     keywords: [topic.name, "men's health", 'health guide', 'evidence-based'],
@@ -108,7 +112,17 @@ export default async function TopicPage({
         },
         take: 3,
         orderBy: { riskLevel: 'desc' },
-        select: { id: true, text: true, evidenceStatus: true, slug: true },
+        select: {
+          id: true,
+          text: true,
+          evidenceStatus: true,
+          slug: true,
+          sources: {
+            select: { title: true, url: true },
+            take: 1,
+            orderBy: { id: 'asc' },
+          },
+        },
       })
     : [];
 
@@ -216,6 +230,84 @@ export default async function TopicPage({
         )}
       </header>
 
+      {/* Key Takeaways */}
+      {staticContent?.takeaways && staticContent.takeaways.length > 0 && (
+        <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-6">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            Key takeaways
+          </h2>
+          <ul className="space-y-2">
+            {staticContent.takeaways.map((takeaway, i) => (
+              <li key={i} className="flex gap-3 text-sm text-gray-700">
+                <span className="mt-0.5 text-emerald-600">✓</span>
+                {takeaway}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Long-form pillar content */}
+      {staticContent?.longForm && (
+        <section className="mb-10">
+          <p className="mb-6 text-base leading-relaxed text-gray-700">
+            {staticContent.longForm.intro}
+          </p>
+          {staticContent.longForm.sections.map((sub, i) => (
+            <div key={i} className="mb-6">
+              <h2 className="mb-3 text-xl font-semibold text-gray-900">
+                {sub.heading}
+              </h2>
+              {sub.paragraphs.map((p, j) => (
+                <p
+                  key={j}
+                  className="mb-3 text-sm leading-relaxed text-gray-700"
+                >
+                  {parseParagraphCitations(p).map((token, k) => {
+                    if (token.type === 'text') {
+                      return <span key={k}>{token.value}</span>;
+                    }
+                    const citation = sub.citations?.[token.index];
+                    return citation ? (
+                      <sup key={k}>
+                        <a
+                          href={citation.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-emerald-700 hover:underline"
+                        >
+                          [{token.index + 1}]
+                        </a>
+                      </sup>
+                    ) : (
+                      <span key={k}>[{token.index + 1}]</span>
+                    );
+                  })}
+                </p>
+              ))}
+              {sub.citations && sub.citations.length > 0 && (
+                <p className="mt-2 text-xs text-gray-600">
+                  Sources:{' '}
+                  {sub.citations.map((c, k) => (
+                    <span key={c.url}>
+                      {k > 0 && ', '}[{k + 1}]{' '}
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {c.label}
+                      </a>
+                    </span>
+                  ))}
+                </p>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
+
       {/* Beginner Guide */}
       {staticContent?.beginnerGuide && (
         <section className="mb-10 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-6">
@@ -287,19 +379,34 @@ export default async function TopicPage({
               ? topicClaims.map((claim) => (
                   <li
                     key={claim.id}
-                    className="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-4"
+                    className="rounded-xl border border-gray-200 bg-white px-5 py-4"
                   >
-                    <span className="flex-1 text-sm text-gray-800">
-                      &ldquo;{claim.text}&rdquo;
-                    </span>
-                    <EvidenceBadge
-                      status={claim.evidenceStatus}
-                      showNotChecked
-                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="flex-1 text-sm text-gray-800">
+                        &ldquo;{claim.text}&rdquo;
+                      </span>
+                      <EvidenceBadge
+                        status={claim.evidenceStatus}
+                        showNotChecked
+                      />
+                    </div>
+                    {claim.sources[0] && (
+                      <p className="mt-2 text-xs text-gray-600">
+                        Source:{' '}
+                        <a
+                          href={claim.sources[0].url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-emerald-700 hover:underline"
+                        >
+                          {claim.sources[0].title}
+                        </a>
+                      </p>
+                    )}
                     {claim.slug && (
                       <Link
                         href={`/claims/${claim.slug}`}
-                        className="text-xs font-medium text-emerald-700 hover:underline"
+                        className="mt-2 inline-block text-xs font-medium text-emerald-700 hover:underline"
                       >
                         See evidence →
                       </Link>
@@ -349,23 +456,6 @@ export default async function TopicPage({
         </section>
       )}
 
-      {/* Evidence-Aware Takeaways */}
-      {staticContent?.takeaways && staticContent.takeaways.length > 0 && (
-        <section className="mb-10">
-          <h2 className="mb-4 text-xl font-semibold text-gray-900">
-            Evidence-aware takeaways
-          </h2>
-          <ul className="space-y-2">
-            {staticContent.takeaways.map((takeaway, i) => (
-              <li key={i} className="flex gap-3 text-sm text-gray-700">
-                <span className="mt-0.5 text-emerald-600">✓</span>
-                {takeaway}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
       {/* Video grid */}
       {publishedVideos.length === 0 ? (
         <p className="text-gray-700">No published videos for this topic yet.</p>
@@ -387,8 +477,11 @@ export default async function TopicPage({
                     thumbnailUrl={video.thumbnailUrl}
                     shortSummary={video.summaries[0]?.shortSummary ?? null}
                     trendScore={video.trendScore}
-                    topicNames={video.topics.map(
-                      (vt: (typeof video.topics)[number]) => vt.topic.name
+                    topics={video.topics.map(
+                      (vt: (typeof video.topics)[number]) => ({
+                        name: vt.topic.name,
+                        slug: vt.topic.slug,
+                      })
                     )}
                     riskLevel={video.riskLevel}
                     durationSeconds={video.durationSeconds ?? undefined}
@@ -417,8 +510,11 @@ export default async function TopicPage({
                 thumbnailUrl={video.thumbnailUrl}
                 shortSummary={video.summaries[0]?.shortSummary ?? null}
                 trendScore={video.trendScore}
-                topicNames={video.topics.map(
-                  (vt: (typeof video.topics)[number]) => vt.topic.name
+                topics={video.topics.map(
+                  (vt: (typeof video.topics)[number]) => ({
+                    name: vt.topic.name,
+                    slug: vt.topic.slug,
+                  })
                 )}
                 riskLevel={video.riskLevel}
                 durationSeconds={video.durationSeconds ?? undefined}
