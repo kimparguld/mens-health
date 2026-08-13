@@ -1,6 +1,23 @@
 // Static enrichment content for topic hub pages.
 // Used when DB-generated content is not yet available.
 
+export type ParagraphToken =
+  | { type: "text"; value: string }
+  | { type: "citation"; index: number };
+
+export function parseParagraphCitations(text: string): ParagraphToken[] {
+  return text
+    .split(/(\[\d+\])/g)
+    .filter((part) => part.length > 0)
+    .map((part) => {
+      const match = part.match(/^\[(\d+)\]$/);
+      if (match) {
+        return { type: "citation", index: Number(match[1]) - 1 };
+      }
+      return { type: "text", value: part };
+    });
+}
+
 export type TopicContent = {
   beginnerGuide: {
     heading: string;
@@ -15,6 +32,14 @@ export type TopicContent = {
     reality: string;
   }>;
   takeaways: string[];
+  longForm?: {
+    intro: string;
+    sections: Array<{
+      heading: string;
+      paragraphs: string[];
+      citations?: Array<{ label: string; url: string }>;
+    }>;
+  };
 };
 
 const TOPIC_CONTENT: Record<string, TopicContent> = {
@@ -71,6 +96,91 @@ const TOPIC_CONTENT: Record<string, TopicContent> = {
       "Get blood work before assuming your testosterone is low.",
       "TRT requires medical supervision and is not a lifestyle upgrade.",
     ],
+    longForm: {
+      intro:
+        "Testosterone might be the most talked-about hormone in men's health content — and also one of the most misunderstood. Search results are dominated by supplement marketing, TRT clinic advertising, and confident claims that don't always survive contact with the primary research. This piece pulls together what long-running, peer-reviewed studies actually show about testosterone and aging: how fast levels really decline, which lifestyle factors genuinely move the needle, and what the newest clinical trial data says about the safety of testosterone replacement therapy. None of this replaces a conversation with a doctor — testosterone levels, symptoms, and treatment decisions are individual, and TRT in particular is a medical treatment with real trade-offs, not a lifestyle upgrade.",
+      sections: [
+        {
+          heading: "How fast does testosterone actually decline with age?",
+          paragraphs: [
+            'The oft-repeated number is "about 1% per year after 30," and the underlying data holds up reasonably well. The Baltimore Longitudinal Study of Aging tracked testosterone in the same men over many years rather than comparing different age groups at a single point in time, which matters — it separates the effect of aging itself from differences between generations. That study found total testosterone declining at roughly 1% per year on average, with free testosterone (the fraction not bound to proteins in the blood, and arguably more biologically relevant) declining somewhat faster [1].',
+            'To put that percentage in context: using the commonly cited reference range of roughly 300-1000 ng/dL for adult men, a 1% annual decline off a mid-range starting point works out to single-digit ng/dL per year in absolute terms for most men in their 30s and 40s — a slow drift, not a sudden drop. It\'s also why a testosterone level that looks "low" on paper needs to be interpreted against symptoms and a repeat test, not treated as an automatic red flag on its own.',
+            "Two caveats are worth keeping in mind. First, this is a population average — individual trajectories vary widely, and a fit, lean 55-year-old can easily have higher testosterone than an unfit 30-year-old. Second, some researchers have found that average testosterone levels across entire generations of men appear to be trending lower at a given age, independent of ordinary aging — a pattern not fully explained by rising obesity rates alone [2]. The honest takeaway: age-related decline is real and gradual, not a cliff, and age isn't the whole story — body composition, sleep, and general health status all move the number more than most men expect.",
+          ],
+          citations: [
+            {
+              label: "Harman et al., J Clin Endocrinol Metab (2001) — Baltimore Longitudinal Study of Aging",
+              url: "https://pubmed.ncbi.nlm.nih.gov/11158037/",
+            },
+            {
+              label: "Travison et al., J Clin Endocrinol Metab (2007) — population-level decline in serum testosterone",
+              url: "https://academic.oup.com/jcem/article-abstract/92/1/196/2598434",
+            },
+          ],
+        },
+        {
+          heading: "Symptoms often blamed on low testosterone — that usually aren't",
+          paragraphs: [
+            'Low energy, reduced libido, and irritability get attributed to "low T" constantly, partly because supplement and clinic marketing has trained men to look for a hormonal explanation first. In practice, those same symptoms overlap heavily with poor sleep, chronic stress, depression, and thyroid dysfunction — all of which are far more common than clinically low testosterone, and none of which are fixed by raising a hormone level. This is part of why a careful diagnostic approach insists on a confirmed low blood test alongside symptoms, rather than symptoms alone: guessing from how you feel produces a lot of false positives. If you\'re tired, unmotivated, and low-libido, a blood test is a reasonable starting point — but so is an honest look at how much you\'re sleeping, how stressed you are, and whether anything else in your health picture (thyroid function, mood, medications, alcohol intake) could explain it just as well.',
+          ],
+        },
+        {
+          heading: "Sleep is the single highest-leverage lever",
+          paragraphs: [
+            'If there\'s one intervention with genuinely strong, mechanistic evidence behind it, it\'s sleep. In a tightly controlled laboratory study, healthy young men who were restricted to five hours of sleep a night for one week saw daytime testosterone levels drop by 10-15% compared to their own baseline after a full night\'s sleep — a decline the researchers described as roughly equivalent to the drop you\'d expect from 10 to 15 years of aging [1]. The effect showed up within days and was independent of cortisol changes, meaning it wasn\'t just generic "stress" — the sleep loss itself appears to blunt nocturnal testosterone production directly, since testosterone secretion is tightly tied to sleep architecture, particularly the deeper stages that get compressed first when total sleep time shrinks.',
+            "The practical implication isn't subtle: for most men, fixing chronic short sleep (five to six hours a night, most nights) will do more for testosterone than any supplement on the market, and it costs nothing. It's also one of the few interventions here where the effect size, direction, and mechanism all point the same way, which is rarer in this field than marketing copy suggests.",
+          ],
+          citations: [
+            {
+              label: "Leproult & Van Cauter, JAMA (2011) — Effect of 1 Week of Sleep Restriction on Testosterone Levels in Young Healthy Men",
+              url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4445839/",
+            },
+          ],
+        },
+        {
+          heading: "What resistance training actually does — and doesn't do — for testosterone",
+          paragraphs: [
+            'Resistance training gets credited with "boosting testosterone" constantly, and the real picture is more nuanced than that framing suggests. A single training session does produce an acute, short-lived spike in circulating testosterone — that part is well documented. What\'s less settled is whether a regular resistance-training habit raises your baseline, resting testosterone level over the long run. A systematic review and meta-analysis focused on older men found that short-term exercise training, including resistance training, did not reliably shift basal testosterone levels — the pooled effect was close to zero, and results varied considerably between individual studies [1].',
+            "That doesn't mean training is pointless for testosterone-adjacent health, or for men's health generally. Resistance training builds and preserves muscle mass and helps reduce body fat — and fat tissue contains aromatase, an enzyme that converts testosterone into estrogen, so carrying less excess body fat is associated with a healthier testosterone-to-estrogen ratio even if the training itself isn't reliably raising resting testosterone on its own. Adequate vitamin D and zinc status matter for the same reason: they're supportive of normal hormone production in men who are actually deficient, without acting as boosters in men who aren't. The more accurate, if less punchy, summary: train for strength, muscle, and body composition — all of which matter for how you feel and function day to day — without expecting your next lab-drawn testosterone number to move dramatically as a direct result.",
+          ],
+          citations: [
+            {
+              label: "Frontiers in Physiology systematic review & meta-analysis (2018) — Short-Term Exercise Training Inconsistently Influences Basal Testosterone in Older Men",
+              url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6339914/",
+            },
+          ],
+        },
+        {
+          heading: "TRT — what the newest safety data actually shows",
+          paragraphs: [
+            'Testosterone Replacement Therapy is a legitimate medical treatment for men with clinically diagnosed hypogonadism — not a performance supplement, and not something to start because a single number looked low. The Endocrine Society\'s clinical practice guideline is explicit that diagnosis requires both consistent, unequivocally low testosterone on repeat morning testing and real symptoms, partly because roughly 30% of men who test in the "low" range turn out to have normal levels when retested [1].',
+            'For men who are appropriately diagnosed, the safety picture has gotten considerably clearer in recent years. The TRAVERSE trial — a large, randomized, placebo-controlled study of over 5,000 middle-aged and older men with documented hypogonadism and existing or elevated cardiovascular risk — found no increase in major adverse cardiovascular events with testosterone therapy compared with placebo, addressing a question that had lingered over TRT prescribing for years [2]. That\'s a genuinely reassuring result, but it isn\'t a blanket "TRT is safe, full stop." The same trial found a higher incidence of pulmonary embolism, abnormal heart rhythm (atrial fibrillation), and acute kidney injury in the testosterone group than in the placebo group [2].',
+            "Separately, TRT reliably raises hematocrit (red blood cell concentration), which increases clotting risk and needs periodic blood-test monitoring, and it suppresses natural sperm production — relevant for men who haven't finished building their family and may need to discuss fertility-preserving options with a doctor before starting [3]. None of this makes TRT inherently dangerous for the right patient under proper monitoring — it makes it a real medical treatment with a real risk-benefit calculation, which is exactly why it requires a diagnosis, blood work, and an ongoing relationship with a doctor rather than a self-directed decision or an online purchase.",
+          ],
+          citations: [
+            {
+              label: "Bhasin et al., Endocrine Society Clinical Practice Guideline, J Clin Endocrinol Metab (2018)",
+              url: "https://pubmed.ncbi.nlm.nih.gov/29562364/",
+            },
+            {
+              label: "Lincoff et al., NEJM (2023) — Cardiovascular Safety of Testosterone-Replacement Therapy (TRAVERSE trial)",
+              url: "https://www.nejm.org/doi/full/10.1056/NEJMoa2215025",
+            },
+            {
+              label: "Management of Adverse Effects in Testosterone Replacement Therapy, PMC (2024)",
+              url: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12052019/",
+            },
+          ],
+        },
+        {
+          heading: "What this actually means for you",
+          paragraphs: [
+            "None of the above is medical advice, and it isn't meant to replace a conversation with a doctor about your own situation — the disclaimer on this page applies to everything above. But if you're trying to separate signal from marketing noise: age-related decline is real but gradual and highly individual, so a single low reading isn't a diagnosis on its own. Plenty of the symptoms blamed on low testosterone have more mundane, more common explanations worth ruling out first. Sleep is the most evidence-backed lever most men are underusing, with an effect size that shows up in days, not months. Resistance training earns its place for body composition and overall health, even if its direct effect on your resting testosterone number is smaller than commonly claimed. And TRT, for men who are appropriately diagnosed, now has considerably better cardiovascular safety data than it did a few years ago — alongside a clearer, more specific list of risks worth discussing with a doctor before starting.",
+            "The pattern across all of it: the unglamorous fundamentals — sleep, body composition, consistent training — do more of the work than most marketing suggests, and anything promising a fast, dramatic fix on testosterone specifically is worth treating with extra skepticism.",
+          ],
+        },
+      ],
+    },
   },
   sleep: {
     beginnerGuide: {

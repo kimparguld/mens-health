@@ -6,7 +6,7 @@ import {
   getActiveSponsor,
   getAffiliateLinksForTopic,
 } from '@/lib/monetization/resolvers';
-import { getTopicContent } from '@/lib/seo/topic-content';
+import { getTopicContent, parseParagraphCitations } from '@/lib/seo/topic-content';
 import { getTopicSeo } from '@/lib/seo/topic-faq';
 import { MEDICAL_DISCLAIMER_TEXT } from '@/lib/site-brand';
 import { TOPIC_SEEDS } from '@/lib/youtube/topics';
@@ -237,6 +237,62 @@ export default async function TopicPage({
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* Long-form pillar content */}
+      {staticContent?.longForm && (
+        <section className="mb-10">
+          <p className="mb-6 text-base leading-relaxed text-gray-700">
+            {staticContent.longForm.intro}
+          </p>
+          {staticContent.longForm.sections.map((sub, i) => (
+            <div key={i} className="mb-6">
+              <h2 className="mb-3 text-xl font-semibold text-gray-900">
+                {sub.heading}
+              </h2>
+              {sub.paragraphs.map((p, j) => (
+                <p key={j} className="mb-3 text-sm leading-relaxed text-gray-700">
+                  {parseParagraphCitations(p).map((token, k) =>
+                    token.type === 'text' ? (
+                      <span key={k}>{token.value}</span>
+                    ) : sub.citations?.[token.index] ? (
+                      <sup key={k}>
+                        <a
+                          href={sub.citations![token.index]!.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-emerald-700 hover:underline"
+                        >
+                          [{token.index + 1}]
+                        </a>
+                      </sup>
+                    ) : (
+                      <span key={k}>[{token.index + 1}]</span>
+                    )
+                  )}
+                </p>
+              ))}
+              {sub.citations && sub.citations.length > 0 && (
+                <p className="mt-2 text-xs text-gray-600">
+                  Sources:{' '}
+                  {sub.citations.map((c, k) => (
+                    <span key={c.url}>
+                      {k > 0 && ', '}[{k + 1}]{' '}
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {c.label}
+                      </a>
+                    </span>
+                  ))}
+                </p>
+              )}
+            </div>
+          ))}
         </section>
       )}
 
