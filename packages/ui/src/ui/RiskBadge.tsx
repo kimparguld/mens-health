@@ -13,11 +13,11 @@ const RISK_CONFIG: Record<string, { label: string; className: string }> = {
   },
 };
 
-export function RiskBadge({ level }: { level: string }) {
+export function RiskBadge({ level, className }: { level: string; className?: string }) {
   const config = RISK_CONFIG[level] ?? RISK_CONFIG['LOW'];
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium ${config?.className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium ${config?.className} ${className ?? ''}`}
     >
       {config?.label}
     </span>
