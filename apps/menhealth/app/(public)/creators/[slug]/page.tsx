@@ -326,6 +326,7 @@ export default async function CreatorPage({ params }: { params: Params }) {
                     shortSummary={video.summaries[0]?.shortSummary ?? null}
                     trendScore={video.trendScore}
                     topicNames={video.topics.map((vt) => vt.topic.name)}
+                    topics={video.topics.map((vt) => ({ name: vt.topic.name, slug: vt.topic.slug }))}
                     riskLevel={video.riskLevel}
                     evidenceLabel={deriveEvidenceLabel(video.evidenceScore)}
                     durationSeconds={video.durationSeconds ?? undefined}
