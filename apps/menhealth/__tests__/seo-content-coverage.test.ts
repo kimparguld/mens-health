@@ -18,6 +18,14 @@ describe("topic content coverage", () => {
     const missing = TOPIC_SEEDS.filter((t) => !allSeo[t.slug]);
     expect(missing.map((t) => t.slug)).toEqual([]);
   });
+
+  it("has a rewritten title and meta description for every topic", () => {
+    const allSeo = getAllTopicSeo();
+    const missing = TOPIC_SEEDS.filter(
+      (t) => !allSeo[t.slug]?.title || !allSeo[t.slug]?.metaDescription
+    );
+    expect(missing.map((t) => t.slug)).toEqual([]);
+  });
 });
 
 describe("related topics", () => {

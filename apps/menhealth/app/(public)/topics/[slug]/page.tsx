@@ -49,22 +49,23 @@ export async function generateMetadata({
   if (!topic) return { title: 'Topic Not Found' };
 
   const seo = getTopicSeo(slug);
-  const description = seo?.intro ?? topic.description;
+  const title = seo?.title ?? `${topic.name} — Men's Health Guide`;
+  const description = seo?.metaDescription ?? seo?.intro ?? topic.description;
   const canonical = `${APP_URL}/topics/${slug}`;
 
   return {
-    title: `${topic.name} — Men's Health Guide`,
+    title,
     description,
     alternates: { canonical },
     openGraph: {
-      title: `${topic.name} — Men's Health Guide`,
+      title,
       description,
       url: canonical,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${topic.name} — Men's Health Guide`,
+      title,
       description,
     },
     keywords: [topic.name, "men's health", 'health guide', 'evidence-based'],
