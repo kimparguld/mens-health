@@ -34,6 +34,27 @@ export async function POST(
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
+  // Atomically claim the post before doing any real publish work. Two
+  // concurrent requests (a double-click, or a retried fetch) would
+  // otherwise both read the same APPROVED/SCHEDULED status and both
+  // proceed to publish — this is the fix for that race. Postgres
+  // serializes the two UPDATE statements on the same row; the second one's
+  // WHERE clause re-evaluates against the first's committed result and
+  // matches zero rows.
+  const claim = await db.socialPost.updateMany({
+    where: { id: post.id, status: { in: ["APPROVED", "SCHEDULED"] } },
+    data: { status: "PUBLISHING" },
+  });
+  if (claim.count === 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Post is not in a publishable state (already publishing, published, or not approved).",
+      },
+      { status: 409 },
+    );
+  }
+
   const adapter = ADAPTERS[post.platform];
   if (!adapter) {
     return NextResponse.json(
