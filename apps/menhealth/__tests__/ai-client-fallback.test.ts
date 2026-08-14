@@ -38,7 +38,7 @@ describe("createAiClient Groq empty-response fallback", () => {
       messages: [{ role: "user", content: "hi" }],
     });
 
-    expect(result.content[0].text).toBe("openrouter answer");
+    expect(result.content[0]?.text).toBe("openrouter answer");
     expect(fetchMock).toHaveBeenCalled();
   });
 
@@ -55,7 +55,7 @@ describe("createAiClient Groq empty-response fallback", () => {
       messages: [{ role: "user", content: "hi" }],
     });
 
-    expect(result.content[0].text).toBe("a real answer");
+    expect(result.content[0]?.text).toBe("a real answer");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
