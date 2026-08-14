@@ -25,7 +25,7 @@ export async function POST(
   }
 
   // High-risk posts require explicit single-post approval — enforce here
-  if (post.requiresReview && post.status !== "PENDING_REVIEW") {
+  if (post.requiresReview && post.status !== "PENDING_REVIEW" && post.status !== "FAILED") {
     return NextResponse.json(
       { error: "Post must be in PENDING_REVIEW status to approve" },
       { status: 409 },
