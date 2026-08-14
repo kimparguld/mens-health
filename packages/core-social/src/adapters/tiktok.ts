@@ -233,45 +233,69 @@ export class TikTokAdapter implements SocialPublisher {
         };
       }
 
-      const account = await this.config.db.socialAccount.findUnique({
-        where: { platform: 'TIKTOK' },
-      });
+      // The video is already uploaded and TikTok's async publish is already
+      // initiated at this point — irreversible. Nothing below this line may
+      // turn an unexpected error into a reported publish failure, or a
+      // retry would upload a genuine duplicate video. Everything from here
+      // down degrades to the profile-URL fallback on any lookup/poll error
+      // instead of throwing into the outer catch.
+      let account: { handle?: string | null } | null = null;
+      try {
+        account = await this.config.db.socialAccount.findUnique({
+          where: { platform: 'TIKTOK' },
+        });
+      } catch (lookupErr) {
+        console.warn(
+          `[TikTokAdapter] Video uploaded successfully (publish_id: ${publish_id}), but looking up the account handle failed: ${
+            lookupErr instanceof Error ? lookupErr.message : String(lookupErr)
+          }`,
+        );
+      }
       const profileUrl = account?.handle ? `https://www.tiktok.com/@${account.handle}` : 'https://www.tiktok.com/';
 
       // TikTok processes the upload asynchronously — poll briefly for the
       // final public video ID, but don't block indefinitely on it. If it's
-      // still processing when we give up, the post is still live/queued on
+      // still processing when we give up, or a poll request itself throws
+      // (network blip, transient 5xx), the post is still live/queued on
       // TikTok's side; we just fall back to the profile URL.
-      for (let attempt = 0; attempt < STATUS_POLL_ATTEMPTS; attempt++) {
-        await sleep(STATUS_POLL_INTERVAL_MS);
+      try {
+        for (let attempt = 0; attempt < STATUS_POLL_ATTEMPTS; attempt++) {
+          await sleep(STATUS_POLL_INTERVAL_MS);
 
-        const statusRes = await fetch(STATUS_URL, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: JSON.stringify({ publish_id }),
-        });
-        if (!statusRes.ok) continue;
+          const statusRes = await fetch(STATUS_URL, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: JSON.stringify({ publish_id }),
+          });
+          if (!statusRes.ok) continue;
 
-        const statusParsed = StatusResponse.safeParse(await statusRes.json());
-        if (!statusParsed.success) continue;
+          const statusParsed = StatusResponse.safeParse(await statusRes.json());
+          if (!statusParsed.success) continue;
 
-        const { status, publicly_available_post_id } = statusParsed.data.data;
-        if (status === 'PUBLISH_COMPLETE') {
-          const videoId = publicly_available_post_id?.[0];
-          const platformUrl =
-            videoId && account?.handle ? `https://www.tiktok.com/@${account.handle}/video/${videoId}` : profileUrl;
-          return { ok: true, platformPostId: publish_id, platformUrl };
+          const { status, publicly_available_post_id } = statusParsed.data.data;
+          if (status === 'PUBLISH_COMPLETE') {
+            const videoId = publicly_available_post_id?.[0];
+            const platformUrl =
+              videoId && account?.handle ? `https://www.tiktok.com/@${account.handle}/video/${videoId}` : profileUrl;
+            return { ok: true, platformPostId: publish_id, platformUrl };
+          }
+          if (status === 'FAILED') {
+            return {
+              ok: false,
+              errorCode: 'TIKTOK_PUBLISH_FAILED',
+              errorMsg: `TikTok reported the publish as failed (publish_id: ${publish_id})`,
+            };
+          }
         }
-        if (status === 'FAILED') {
-          return {
-            ok: false,
-            errorCode: 'TIKTOK_PUBLISH_FAILED',
-            errorMsg: `TikTok reported the publish as failed (publish_id: ${publish_id})`,
-          };
-        }
+      } catch (pollErr) {
+        console.warn(
+          `[TikTokAdapter] Video uploaded successfully (publish_id: ${publish_id}), but status polling threw: ${
+            pollErr instanceof Error ? pollErr.message : String(pollErr)
+          }`,
+        );
       }
 
       return { ok: true, platformPostId: publish_id, platformUrl: profileUrl };

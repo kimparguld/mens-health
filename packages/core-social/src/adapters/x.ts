@@ -185,12 +185,25 @@ export class XAdapter implements SocialPublisher {
 
       const tweetId = parsed.data.data.id;
 
-      // Fetch the author's username from the stored handle to build the URL
-      const account = await this.config.db.socialAccount.findUnique({
-        where: { platform: 'X' },
-      });
-      const username = account?.handle?.replace('@', '') ?? 'i';
-      const platformUrl = `https://x.com/${username}/status/${tweetId}`;
+      // The tweet has already been posted successfully at this point — a
+      // failure below (fetching the stored handle to build a pretty URL)
+      // must never turn into a reported publish failure, or a retry would
+      // post a genuine duplicate tweet. Fall back to a generic profile URL
+      // instead of letting the lookup error reach the outer catch.
+      let platformUrl = `https://x.com/i/status/${tweetId}`;
+      try {
+        const account = await this.config.db.socialAccount.findUnique({
+          where: { platform: 'X' },
+        });
+        const username = account?.handle?.replace('@', '') ?? 'i';
+        platformUrl = `https://x.com/${username}/status/${tweetId}`;
+      } catch (lookupErr) {
+        console.warn(
+          `[XAdapter] Tweet ${tweetId} posted successfully, but looking up the account handle failed: ${
+            lookupErr instanceof Error ? lookupErr.message : String(lookupErr)
+          }`,
+        );
+      }
 
       return { ok: true, platformPostId: tweetId, platformUrl };
     } catch (err) {

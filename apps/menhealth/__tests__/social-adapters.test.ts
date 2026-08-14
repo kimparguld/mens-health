@@ -164,6 +164,52 @@ describe("XAdapter.createDraft() — not supported", () => {
 });
 
 // ---------------------------------------------------------------------------
+// X adapter — publish()
+// ---------------------------------------------------------------------------
+
+describe("XAdapter.publish()", () => {
+  const db = { socialAccount: { findUnique: vi.fn() } };
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockReset();
+    db.socialAccount.findUnique.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("reports the tweet as published even when the account handle lookup fails afterward", async () => {
+    db.socialAccount.findUnique
+      .mockResolvedValueOnce({
+        accessToken: "token",
+        refreshToken: null,
+        tokenExpiry: new Date(Date.now() + 3600_000),
+        handle: "menhealthdigest",
+      })
+      .mockRejectedValueOnce(new Error("db unavailable"));
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      text: async () => JSON.stringify({ data: { id: "tweet_1", text: "hi" } }),
+    });
+
+    const adapter = new XAdapter({ clientId: "id", clientSecret: "secret", db });
+    const result = await adapter.publish(
+      makePost({ platform: "X", caption: "Short.", hashtags: [] }),
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.platformPostId).toBe("tweet_1");
+      expect(result.platformUrl).toBe("https://x.com/i/status/tweet_1");
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // TikTok adapter — validate()
 // ---------------------------------------------------------------------------
 
@@ -346,6 +392,37 @@ describe("TikTokAdapter.publish()", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errorCode).toBe("TIKTOK_INIT_400");
   });
+
+  it("reports the video as published even when the account handle lookup fails after upload", async () => {
+    db.socialAccount.findUnique
+      .mockResolvedValueOnce({
+        accessToken: "token",
+        refreshToken: null,
+        tokenExpiry: new Date(Date.now() + 3600_000),
+        handle: "menhealthdigest",
+      })
+      .mockRejectedValueOnce(new Error("db unavailable"));
+
+    fetchMock
+      .mockResolvedValueOnce({ ok: true, arrayBuffer: async () => new ArrayBuffer(8) })
+      .mockResolvedValueOnce({
+        ok: true,
+        text: async () =>
+          JSON.stringify({
+            data: { publish_id: "pub_1", upload_url: "https://upload.example.com" },
+          }),
+      })
+      .mockResolvedValueOnce({ ok: true, text: async () => "" });
+
+    const adapter = new TikTokAdapter({ clientId: "id", clientSecret: "secret", db });
+    const result = await adapter.publish(makeTikTokPost());
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.platformPostId).toBe("pub_1");
+      expect(result.platformUrl).toBe("https://www.tiktok.com/");
+    }
+  }, 15000);
 
   it("createDraft() returns NOT_SUPPORTED", async () => {
     const adapter = new TikTokAdapter();
