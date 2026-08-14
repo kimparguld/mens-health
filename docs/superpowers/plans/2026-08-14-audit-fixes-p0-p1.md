@@ -16,7 +16,7 @@
 - X and TikTok publishing are real and automated; retries must never be able to double-post to a live audience (AGENTS.md, Tasks 3–4).
 - Small, single-concern PRs. No magic strings — named constants. Early returns over deep nesting (AGENTS.md).
 - Add unit tests for scoring, parsing, and AI-output-validation functions (AGENTS.md) — every task below includes a real test, not a placeholder.
-- **Task 7 requires a Prisma migration in both apps.** `prisma migrate dev` applies immediately to whatever `DATABASE_URL` each app's `.env` points at. **Stop before running the migrate commands in Task 7 and confirm with the user which database this will hit** — do not assume it's safe to apply non-interactively.
+- **Tasks 4, 7, and 9 each apply a real schema change via `prisma db push`** (not `prisma migrate dev` — `apps/*/prisma/migrations` is gitignored repo-wide with no committed migration history, and `migrate dev` cannot reconcile that against a live DB that already has the full schema; confirmed with the user on Task 4). `db push` applies immediately to whatever `DATABASE_URL` each app's `.env` points at — already confirmed with the user for this plan. Never pass `--force-reset` or run `migrate reset`; if `db push` ever reports it needs to reset data, stop and report BLOCKED.
 
 ---
 
@@ -766,12 +766,12 @@ git commit -m "fix(core-social): never report a successful X/TikTok post as fail
 
 In `apps/menhealth/prisma/schema.prisma`, find the `enum PostStatus` block and add `PUBLISHING` as a new value (placed logically between `APPROVED`/`SCHEDULED` and `PUBLISHED` in the enum body — match the existing enum's formatting style).
 
-- [ ] **Step 2: Create the migration**
+- [ ] **Step 2: Apply the schema change**
 
-Run: `pnpm --filter menhealth exec prisma migrate dev --name add_post_status_publishing`
-Expected: Prisma generates a new migration file under `apps/menhealth/prisma/migrations/` and applies it to the database configured in `apps/menhealth/.env`'s `DATABASE_URL`.
+Run: `pnpm --filter menhealth exec prisma db push`
+Expected: Prisma diffs `schema.prisma` against the live database configured in `apps/menhealth/.env`'s `DATABASE_URL` and applies the new enum value directly — no migration file is generated (`apps/*/prisma/migrations` is gitignored repo-wide and no migration history has ever been committed; `db push` is the correct tool for this repo's actual workflow, confirmed with the user after `prisma migrate dev` hit an unresolvable drift error on Task 4's first attempt).
 
-**Before running this: confirm with the user which database `DATABASE_URL` points at.** This is a real schema migration, not a dry run.
+**This is a real schema change to a live, shared database — already confirmed with the user for this plan's migration steps.** Do not run destructive commands (`migrate reset`, `db push --force-reset`) under any circumstance; if `db push` reports it would need to reset data, stop and report BLOCKED instead of proceeding.
 
 - [ ] **Step 3: Write the failing test**
 
@@ -898,7 +898,7 @@ Expected: PASS, no type errors
 - [ ] **Step 8: Commit**
 
 ```bash
-git add apps/menhealth/prisma/schema.prisma apps/menhealth/prisma/migrations apps/menhealth/app/api/social/drafts/\[id\]/publish/route.ts apps/menhealth/__tests__/social-publish-route.test.ts
+git add apps/menhealth/prisma/schema.prisma apps/menhealth/app/api/social/drafts/\[id\]/publish/route.ts apps/menhealth/__tests__/social-publish-route.test.ts
 git commit -m "fix(menhealth): atomically claim a social post before publishing to prevent duplicate posts from concurrent requests"
 ```
 
@@ -1463,7 +1463,7 @@ git commit -m "fix(hype-check): allow re-approving a FAILED social post instead 
 **Interfaces:**
 - `AdminReview` model gains `reviewerEmail String?`, set on every create — distinct from `acknowledgedBy`, which stays reserved for the specific HIGH-risk-acknowledgment case it was designed for.
 
-> **This task requires a Prisma migration in both apps' live databases. Confirm with the user before running the `prisma migrate dev` commands in Steps 1 and 9 — do not run them non-interactively without that confirmation.**
+> **This task applies a real schema change to both apps' live databases via `prisma db push`, already confirmed with the user (see Task 4's ledger entry for why `db push` and not `migrate dev`).**
 
 - [ ] **Step 1: Add the column and create the menhealth migration**
 
@@ -1484,8 +1484,8 @@ model AdminReview {
 }
 ```
 
-**Confirm with the user which database this will hit, then run:**
-`pnpm --filter menhealth exec prisma migrate dev --name add_admin_review_reviewer_email`
+Already confirmed with the user (db push, not migrate dev). Run:
+`pnpm --filter menhealth exec prisma db push`
 
 - [ ] **Step 2: Write the failing test**
 
@@ -1608,7 +1608,7 @@ Expected: PASS, no type errors
 - [ ] **Step 8: Commit menhealth**
 
 ```bash
-git add apps/menhealth/prisma/schema.prisma apps/menhealth/prisma/migrations apps/menhealth/app/api/admin/videos/\[id\]/review/route.ts apps/menhealth/app/api/admin/videos/bulk-review/route.ts apps/menhealth/__tests__/admin-review-route.test.ts
+git add apps/menhealth/prisma/schema.prisma apps/menhealth/app/api/admin/videos/\[id\]/review/route.ts apps/menhealth/app/api/admin/videos/bulk-review/route.ts apps/menhealth/__tests__/admin-review-route.test.ts
 git commit -m "fix(menhealth): record the acting admin's email on every review action, not just HIGH-risk publish acknowledgment"
 ```
 
@@ -1631,8 +1631,8 @@ model AdminReview {
 }
 ```
 
-**Confirm with the user which database this will hit, then run:**
-`pnpm --filter hype-check exec prisma migrate dev --name add_admin_review_reviewer_email`
+Already confirmed with the user (db push, not migrate dev). Run:
+`pnpm --filter hype-check exec prisma db push`
 
 - [ ] **Step 10: Write the failing test**
 
@@ -1755,7 +1755,7 @@ Expected: PASS, no type errors
 - [ ] **Step 16: Commit hype-check**
 
 ```bash
-git add apps/hype-check/prisma/schema.prisma apps/hype-check/prisma/migrations apps/hype-check/app/api/admin/videos/\[id\]/review/route.ts apps/hype-check/app/api/admin/videos/bulk-review/route.ts apps/hype-check/__tests__/admin-review-route.test.ts
+git add apps/hype-check/prisma/schema.prisma apps/hype-check/app/api/admin/videos/\[id\]/review/route.ts apps/hype-check/app/api/admin/videos/bulk-review/route.ts apps/hype-check/__tests__/admin-review-route.test.ts
 git commit -m "fix(hype-check): record the acting admin's email on every review action, not just HIGH-risk publish acknowledgment"
 ```
 
@@ -1914,7 +1914,7 @@ git commit -m "fix(core-ai): treat Groq's empty-content 200 response as a failur
 - Consumes: `claimExtractionFailed` as computed by Task 1/2's `generateSummaryAndClaims` — already in scope in `process-pending-videos.ts` from Task 1/2's work.
 - Produces: `Video.claimExtractionFailed` / `Subject.claimExtractionFailed` — a new persisted `Boolean @default(false)` column in each app's schema.
 
-> **This task requires a Prisma migration in both apps' live databases, same as Task 7 — confirm with the user before running the `prisma migrate dev` commands in Steps 1 and 8.**
+> **This task applies a real schema change to both apps' live databases via `prisma db push`, same as Task 4 and Task 7 — already confirmed with the user.**
 
 ### menhealth
 
@@ -1922,8 +1922,8 @@ git commit -m "fix(core-ai): treat Groq's empty-content 200 response as a failur
 
 In `apps/menhealth/prisma/schema.prisma`, find `model Video` and add `claimExtractionFailed Boolean @default(false)` (placed logically near the other status/risk fields — match the model's existing formatting).
 
-**Confirm with the user which database this will hit, then run:**
-`pnpm --filter menhealth exec prisma migrate dev --name add_video_claim_extraction_failed`
+Already confirmed with the user (db push, not migrate dev). Run:
+`pnpm --filter menhealth exec prisma db push`
 
 - [ ] **Step 2: Write the failing test for persisting the flag**
 
@@ -2073,7 +2073,7 @@ Expected: PASS, no type errors
 - [ ] **Step 11: Commit menhealth**
 
 ```bash
-git add apps/menhealth/prisma/schema.prisma apps/menhealth/prisma/migrations apps/menhealth/jobs/process-pending-videos.ts apps/menhealth/app/api/admin/videos/auto-publish-low-risk/route.ts apps/menhealth/__tests__/process-pending-videos.test.ts apps/menhealth/__tests__/auto-publish-low-risk-route.test.ts
+git add apps/menhealth/prisma/schema.prisma apps/menhealth/jobs/process-pending-videos.ts apps/menhealth/app/api/admin/videos/auto-publish-low-risk/route.ts apps/menhealth/__tests__/process-pending-videos.test.ts apps/menhealth/__tests__/auto-publish-low-risk-route.test.ts
 git commit -m "fix(menhealth): persist claimExtractionFailed and exclude it from the auto-publish-low-risk sweep"
 ```
 
@@ -2083,8 +2083,8 @@ git commit -m "fix(menhealth): persist claimExtractionFailed and exclude it from
 
 In `apps/hype-check/prisma/schema.prisma`, find `model Subject` and add `claimExtractionFailed Boolean @default(false)`.
 
-**Confirm with the user which database this will hit, then run:**
-`pnpm --filter hype-check exec prisma migrate dev --name add_subject_claim_extraction_failed`
+Already confirmed with the user (db push, not migrate dev). Run:
+`pnpm --filter hype-check exec prisma db push`
 
 - [ ] **Step 13: Write the failing test for persisting the flag**
 
@@ -2245,7 +2245,7 @@ Expected: PASS, no type errors
 - [ ] **Step 22: Commit hype-check**
 
 ```bash
-git add apps/hype-check/prisma/schema.prisma apps/hype-check/prisma/migrations apps/hype-check/jobs/process-pending-videos.ts apps/hype-check/app/api/admin/videos/auto-publish-low-risk/route.ts apps/hype-check/__tests__/process-pending-videos.test.ts apps/hype-check/__tests__/auto-publish-low-risk-route.test.ts
+git add apps/hype-check/prisma/schema.prisma apps/hype-check/jobs/process-pending-videos.ts apps/hype-check/app/api/admin/videos/auto-publish-low-risk/route.ts apps/hype-check/__tests__/process-pending-videos.test.ts apps/hype-check/__tests__/auto-publish-low-risk-route.test.ts
 git commit -m "fix(hype-check): persist claimExtractionFailed and exclude it from the auto-publish-low-risk sweep"
 ```
 
