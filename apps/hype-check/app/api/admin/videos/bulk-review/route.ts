@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
           acknowledgedBy: highRiskIds.has(subjectId)
             ? session?.user?.email
             : null,
+          reviewerEmail: session?.user?.email,
         },
       }),
     ),
