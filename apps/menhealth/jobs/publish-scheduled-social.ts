@@ -1,5 +1,6 @@
 import { db } from "@/lib/db/prisma";
 import { XAdapter } from "@/lib/social/adapters/x";
+import { TikTokAdapter } from "@/lib/social/adapters/tiktok";
 import type { SocialPublisher } from "@/lib/social/adapters/publisher";
 import type { Platform } from "@prisma/client";
 import { env } from "@/env";
@@ -8,10 +9,14 @@ import { env } from "@/env";
  * Processes all SCHEDULED social posts whose scheduledAt time has passed.
  *
  * Platform behaviour:
- * - X — the only platform that actually auto-publishes, via the X adapter.
+ * - X, TIKTOK — auto-publish via their respective adapters. (In practice
+ *   the admin UI only exposes scheduling for X — TikTok publishes
+ *   immediately via the "Publish to TikTok" button — but a TikTok post
+ *   that does reach SCHEDULED status, e.g. via direct API use, now
+ *   publishes correctly instead of dead-ending with a misleading
+ *   "not yet available" error.)
  * - YOUTUBE_COMMUNITY, REDDIT — manual-only (no public API / policy);
  *   reverts to APPROVED with an attempt record explaining the manual workflow.
- * - TIKTOK — adapter not yet implemented; marked FAILED.
  */
 
 const MANUAL_ONLY_PLATFORMS: Partial<Record<Platform, string>> = {
@@ -25,6 +30,11 @@ const ADAPTERS: Partial<Record<Platform, SocialPublisher>> = {
   X: new XAdapter({
     clientId: env.X_CLIENT_ID,
     clientSecret: env.X_CLIENT_SECRET,
+    db,
+  }),
+  TIKTOK: new TikTokAdapter({
+    clientId: env.TIKTOK_CLIENT_ID,
+    clientSecret: env.TIKTOK_CLIENT_SECRET,
     db,
   }),
 };
