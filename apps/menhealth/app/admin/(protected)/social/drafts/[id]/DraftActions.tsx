@@ -50,7 +50,7 @@ export default function DraftActions({
     SUBREDDIT_CHECKLIST.map(() => false)
   );
 
-  const isApprovable = status === 'PENDING_REVIEW' || status === 'DRAFT';
+  const isApprovable = status === 'PENDING_REVIEW' || status === 'DRAFT' || status === 'FAILED';
   const isRejectable = status !== 'PUBLISHED' && status !== 'REJECTED';
   const isApproved = status === 'APPROVED';
   const isScheduled = status === 'SCHEDULED';
