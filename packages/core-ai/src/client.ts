@@ -179,6 +179,16 @@ export function createAiClient(config: AiClientConfig): AiClient {
                 messages: messages as Groq.Chat.ChatCompletionMessageParam[],
               });
               const text = completion.choices[0]?.message?.content ?? '';
+              if (text.trim().length === 0) {
+                // gpt-oss models can exhaust the whole max_tokens budget on
+                // hidden reasoning and return finish_reason "length" with no
+                // visible content — that's a 200 OK, so it must be treated
+                // as a failure here or the fallback chain never reaches a
+                // provider that can actually answer.
+                throw new Error(
+                  `Groq returned an empty response (finish_reason: ${completion.choices[0]?.finish_reason ?? 'unknown'})`,
+                );
+              }
               return { content: [{ type: 'text' as const, text }] };
             } catch (err) {
               console.warn(`[AI] Groq ${describeFailure(err)} — falling back to OpenRouter`);
