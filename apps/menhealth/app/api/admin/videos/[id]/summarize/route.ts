@@ -38,6 +38,11 @@ export async function POST(
     );
   }
 
+  await db.video.update({
+    where: { id: video.id },
+    data: { claimExtractionFailed: pipelineResult.value.claimExtractionFailed },
+  });
+
   revalidateTag("videos", "max");
   revalidateTag(`video:${video.slug}`, "max");
 

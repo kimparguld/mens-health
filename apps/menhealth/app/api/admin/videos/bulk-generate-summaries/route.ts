@@ -60,6 +60,11 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
+    await db.video.update({
+      where: { id: video.id },
+      data: { claimExtractionFailed: pipelineResult.value.claimExtractionFailed },
+    });
+
     processed++;
   }
 
