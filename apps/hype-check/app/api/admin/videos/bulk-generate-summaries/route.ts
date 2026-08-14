@@ -77,6 +77,11 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
+    await db.subject.update({
+      where: { id: subject.id },
+      data: { claimExtractionFailed: pipelineResult.value.claimExtractionFailed },
+    });
+
     processed++;
   }
 

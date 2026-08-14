@@ -56,6 +56,11 @@ export async function POST(
     );
   }
 
+  await db.subject.update({
+    where: { id: subject.id },
+    data: { claimExtractionFailed: pipelineResult.value.claimExtractionFailed },
+  });
+
   revalidateTag("videos", "max");
   revalidateTag(`video:${subject.slug}`, "max");
 
