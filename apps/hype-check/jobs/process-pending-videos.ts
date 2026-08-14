@@ -63,12 +63,19 @@ export async function processPendingVideos(options?: {
   });
 
   for (const job of jobs) {
-    try {
-      await db.processingJob.update({
-        where: { id: job.id },
-        data: { status: "RUNNING", startedAt: new Date() },
-      });
+    const claim = await db.processingJob.updateMany({
+      where: { id: job.id, status: "QUEUED" },
+      data: { status: "RUNNING", startedAt: new Date() },
+    });
+    if (claim.count === 0) {
+      // The daily cron and the admin's manual "process now" trigger both
+      // call this function — if a concurrent run already claimed this job,
+      // skip it instead of double-processing (duplicate AI spend, duplicate
+      // AdminReview rows, duplicate creator notifications).
+      continue;
+    }
 
+    try {
       const { sourceVideo } = job;
       const { subject } = sourceVideo;
 
