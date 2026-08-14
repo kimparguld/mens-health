@@ -111,6 +111,7 @@ model Subject {
   trendScore      Float         @default(0)
   relevanceScore  Float         @default(0)
   evidenceScore   Float?
+  claimExtractionFailed Boolean @default(false)
   riskLevel       RiskLevel     @default(LOW)
   status          SubjectStatus @default(DRAFT)
   slugHistory     String[]      @default([])
