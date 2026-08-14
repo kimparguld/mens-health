@@ -27,6 +27,7 @@ export type PipelineVideoInput = {
 export type GenerateSummaryAndClaimsResult = {
   summary: Summary;
   claims: Claim[];
+  claimExtractionFailed: boolean;
 };
 
 const RISK_RANK: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2 };
@@ -76,7 +77,7 @@ export async function generateSummaryAndClaims(
     console.warn(
       `Claim extraction failed for video ${video.id}: ${claimsResult.error.message}`,
     );
-    return { ok: true, value: { summary, claims: [] } };
+    return { ok: true, value: { summary, claims: [], claimExtractionFailed: true } };
   }
 
   const claims: Claim[] = [];
@@ -131,5 +132,5 @@ export async function generateSummaryAndClaims(
     });
   }
 
-  return { ok: true, value: { summary, claims } };
+  return { ok: true, value: { summary, claims, claimExtractionFailed: false } };
 }
