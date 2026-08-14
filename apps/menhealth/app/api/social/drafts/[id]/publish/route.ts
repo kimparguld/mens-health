@@ -57,6 +57,15 @@ export async function POST(
 
   const adapter = ADAPTERS[post.platform];
   if (!adapter) {
+    // No platform-visible side effect has happened yet, so it's safe to
+    // release the claim and return the post to its pre-claim status —
+    // otherwise it would be stuck in PUBLISHING forever (PUBLISHING isn't
+    // in the claim's WHERE clause, so no future publish attempt could ever
+    // re-claim it, and there's no sweep job to recover it).
+    await db.socialPost.update({
+      where: { id: post.id },
+      data: { status: post.status },
+    });
     return NextResponse.json(
       {
         error: `Direct publish is not available for ${post.platform}. Use Schedule (X) or the manual posting workflow.`,
@@ -67,6 +76,12 @@ export async function POST(
 
   const validation = await adapter.validate(post);
   if (!validation.ok) {
+    // Same reasoning as above — validation is local/pure, no platform API
+    // call has happened yet, so release the claim before returning.
+    await db.socialPost.update({
+      where: { id: post.id },
+      data: { status: post.status },
+    });
     return NextResponse.json(
       { error: validation.errors.join("; ") },
       { status: 422 },
