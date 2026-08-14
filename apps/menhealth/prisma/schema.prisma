@@ -298,6 +298,7 @@ model AdminReview {
   note                 String?
   acknowledgedHighRisk Boolean      @default(false)
   acknowledgedBy       String?
+  reviewerEmail        String?
   createdAt            DateTime     @default(now())
 
   video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)

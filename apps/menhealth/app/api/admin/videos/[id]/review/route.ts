@@ -102,6 +102,7 @@ export async function POST(
         note,
         acknowledgedHighRisk: isHighRiskAck,
         acknowledgedBy: isHighRiskAck ? session?.user?.email : null,
+        reviewerEmail: session?.user?.email,
       },
     }),
   ];
