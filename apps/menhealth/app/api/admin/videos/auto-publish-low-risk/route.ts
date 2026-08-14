@@ -16,7 +16,7 @@ export async function POST(_request: NextRequest) {
   // never eligible, enforced inside the gate itself.
   const [candidates, pendingLowRiskCount] = await Promise.all([
     db.video.findMany({
-      where: { status: "PROCESSED", summaries: { some: {} } },
+      where: { status: "PROCESSED", summaries: { some: {} }, claimExtractionFailed: false },
       select: {
         id: true,
         riskLevel: true,

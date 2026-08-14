@@ -95,6 +95,7 @@ model Video {
   trendScore      Float         @default(0)
   relevanceScore  Float         @default(0)
   evidenceScore   Float?
+  claimExtractionFailed Boolean @default(false)
   riskLevel       RiskLevel     @default(LOW)
   status          PublishStatus @default(PENDING)
   slug            String        @unique

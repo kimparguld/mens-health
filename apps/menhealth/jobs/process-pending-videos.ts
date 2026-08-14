@@ -125,7 +125,7 @@ export async function processPendingVideos(options?: {
 
       await db.video.update({
         where: { id: video.id },
-        data: { status: finalStatus, evidenceScore },
+        data: { status: finalStatus, evidenceScore, claimExtractionFailed },
       });
 
       if (finalStatus === "PUBLISHED") {
