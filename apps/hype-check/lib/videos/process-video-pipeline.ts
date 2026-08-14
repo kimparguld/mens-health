@@ -39,6 +39,7 @@ export type PipelineVideoInput = {
 export type GenerateSummaryAndClaimsResult = {
   summary: Summary;
   claims: Claim[];
+  claimExtractionFailed: boolean;
   warningSigns: WarningSignOutput[];
   costItems: CostItemOutput[];
   disclosures: DisclosureOutput[];
@@ -222,6 +223,13 @@ export async function generateSummaryAndClaims(
 
   return {
     ok: true,
-    value: { summary, claims, warningSigns, costItems, disclosures },
+    value: {
+      summary,
+      claims,
+      claimExtractionFailed: !claimsResult.ok,
+      warningSigns,
+      costItems,
+      disclosures,
+    },
   };
 }

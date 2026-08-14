@@ -3,6 +3,7 @@ import { db } from "@/lib/db/prisma";
 import { generateSummaryAndClaims } from "@/lib/videos/process-video-pipeline";
 import { generateEditorialTitle } from "@/lib/ai/generate-editorial-title";
 import { isEligibleForAutoPublish } from "@/lib/publishing/auto-publish-gate";
+import { decideAutoPublishStatus } from "@/lib/videos/decide-auto-publish-status";
 import { submitUrlsToIndexNow } from "@menhealth/core-seo";
 import { notifyCreatorIfApplicable } from "@/lib/creators/notify";
 import { env } from "@/env";
@@ -92,7 +93,7 @@ export async function processPendingVideos(options?: {
         throw new Error(`Summary failed: ${pipelineResult.error.message}`);
       }
 
-      const { claims } = pipelineResult.value;
+      const { claims, claimExtractionFailed } = pipelineResult.value;
 
       // --- Generate an SEO-friendly editorial title (raw YouTube title is kept as-is) ---
       const editorialTitleResult = await generateEditorialTitle({
@@ -117,12 +118,13 @@ export async function processPendingVideos(options?: {
         select: { riskLevel: true },
       });
 
-      const finalStatus = isEligibleForAutoPublish(
-        { riskLevel: latestSubject?.riskLevel ?? subject.riskLevel },
-        claims,
-      )
-        ? "PUBLISHED"
-        : "REVIEW";
+      const finalStatus = decideAutoPublishStatus(
+        claimExtractionFailed,
+        isEligibleForAutoPublish(
+          { riskLevel: latestSubject?.riskLevel ?? subject.riskLevel },
+          claims,
+        ),
+      );
 
       const evidenceScore = deriveEvidenceScore(claims);
 
