@@ -110,6 +110,32 @@ describe("createAiClient JSON-mode enforcement", () => {
     expect(body.response_format).toEqual({ type: "json_object" });
   });
 
+  // Reproduces the reported bug: OpenRouter's free-tier model rotation
+  // includes reasoning-capable models (e.g. nemotron-3-ultra), and unlike
+  // Groq's gpt-oss (which got `reasoning_effort: 'low'` above), the
+  // OpenRouter branch asked for `response_format: json_object` but never
+  // capped reasoning. A reasoning model can spend the entire max_tokens
+  // budget on visible chain-of-thought prose and get cut off before ever
+  // emitting the JSON object, even though json_object mode was requested.
+  it("caps OpenRouter reasoning effort so it can't consume the whole output budget", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: "{}" } }] }),
+    });
+
+    const client = createAiClient({ openRouterApiKey: "or-key" });
+    await client.anthropic.messages.create({
+      model: "unused",
+      max_tokens: 100,
+      messages: [{ role: "user", content: "Respond ONLY with a JSON object: {}" }],
+    });
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body as string) as {
+      reasoning?: unknown;
+    };
+    expect(body.reasoning).toEqual({ effort: "low", exclude: true });
+  });
+
   it("asks OpenAI for JSON-object output", async () => {
     fetchMock.mockResolvedValue({
       ok: true,

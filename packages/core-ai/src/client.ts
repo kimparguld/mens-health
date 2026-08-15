@@ -54,6 +54,15 @@ async function callOpenRouter(
       max_tokens: maxTokens,
       messages,
       response_format: { type: 'json_object' },
+      // Free-tier OpenRouter models rotate in reasoning-capable ones (e.g.
+      // nemotron-3-ultra). Unlike Groq's gpt-oss, OpenRouter's unified API
+      // doesn't stop a reasoning model's chain-of-thought from landing in
+      // the visible `content` field just because json_object mode is set —
+      // it can burn the whole max_tokens budget on visible reasoning prose
+      // and get cut off before ever emitting the JSON object. `effort: low`
+      // caps how much it spends on reasoning; `exclude: true` keeps any
+      // reasoning that does happen out of the response content.
+      reasoning: { effort: 'low', exclude: true },
     }),
   });
   if (!res.ok) {
