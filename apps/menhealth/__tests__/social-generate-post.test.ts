@@ -131,6 +131,44 @@ describe("generateSocialPost", () => {
 
     expect(result.ok).toBe(false);
   });
+
+  it("extracts JSON when the AI prefixes its response with reasoning prose", async () => {
+    // Reproduces the reported bug: a free-tier reasoning model leaks its
+    // chain-of-thought ("The user wants...") before the JSON object instead
+    // of returning JSON only.
+    mockAiCreate.mockResolvedValue({
+      content: [
+        {
+          type: "text",
+          text: `The user wants a punchy X post about this video. Here it is:\n${JSON.stringify(VALID_AI_OUTPUT)}`,
+        },
+      ],
+    });
+    mockSocialPostCreate.mockResolvedValue({ id: "post_3" });
+
+    const result = await generateSocialPost({
+      videoId: "video_1",
+      platform: "X",
+    });
+
+    expect(result.ok).toBe(true);
+  });
+
+  it("fails with a clear error (not a raw SyntaxError) when the AI response has no JSON at all", async () => {
+    mockAiCreate.mockResolvedValue({
+      content: [{ type: "text", text: "The user wants a punchy X post about this video." }],
+    });
+
+    const result = await generateSocialPost({
+      videoId: "video_1",
+      platform: "X",
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected failure result");
+    expect(result.error.message).not.toMatch(/Unexpected token/i);
+    expect(result.error.message).toMatch(/AI response was not valid JSON/i);
+  });
 });
 
 describe("regenerateSocialPost", () => {

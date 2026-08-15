@@ -97,6 +97,37 @@ export function isConflictError(error: Error): boolean {
 }
 
 /**
+ * Extracts a JSON object from raw AI text. Providers are asked for JSON-only
+ * output, but that's a best-effort request, not a guarantee — a model can
+ * still prepend reasoning prose (e.g. "The user wants...") or wrap the
+ * object in a markdown code fence. Falls back to the first `{...}` substring
+ * before giving up, so a leaked preamble doesn't fail generation outright.
+ */
+function extractJsonObject(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    // fall through to substring extraction below
+  }
+
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error(
+      `AI response was not valid JSON (received: ${JSON.stringify(text.slice(0, 80))}${text.length > 80 ? "..." : ""})`,
+    );
+  }
+
+  try {
+    return JSON.parse(text.slice(start, end + 1));
+  } catch {
+    throw new Error(
+      `AI response was not valid JSON (received: ${JSON.stringify(text.slice(0, 80))}${text.length > 80 ? "..." : ""})`,
+    );
+  }
+}
+
+/**
  * Binds the social-post generator to this site's DB, AI client, brand name,
  * canonical URL, and compliance data, so callers keep calling
  * `generateSocialPost(input)` exactly as before (see
@@ -140,7 +171,7 @@ export function createSocialPostGenerator(config: SocialPostGeneratorConfig) {
         return { ok: false, error: new Error("No text block in AI response") };
       }
 
-      const parsed = JSON.parse(textBlock.text) as unknown;
+      const parsed = extractJsonObject(textBlock.text);
       const validated = SocialPostAiOutputSchema.safeParse(parsed);
       if (!validated.success) {
         return {

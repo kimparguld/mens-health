@@ -53,6 +53,7 @@ async function callOpenRouter(
       model,
       max_tokens: maxTokens,
       messages,
+      response_format: { type: 'json_object' },
     }),
   });
   if (!res.ok) {
@@ -79,6 +80,7 @@ async function callOpenAI(messages: AiMessage[], maxTokens: number, model: strin
       model,
       max_tokens: maxTokens,
       messages,
+      response_format: { type: 'json_object' },
     }),
   });
   if (!res.ok) {
@@ -103,7 +105,7 @@ async function callGemini(messages: AiMessage[], maxTokens: number, apiKey: stri
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: userMessage?.content ?? '' }] }],
-        generationConfig: { maxOutputTokens: maxTokens },
+        generationConfig: { maxOutputTokens: maxTokens, responseMimeType: 'application/json' },
       }),
     },
   );
@@ -176,6 +178,7 @@ export function createAiClient(config: AiClientConfig): AiClient {
                 // content (finish_reason "length"). "low" keeps enough budget
                 // free for the actual JSON output.
                 reasoning_effort: 'low',
+                response_format: { type: 'json_object' },
                 messages: messages as Groq.Chat.ChatCompletionMessageParam[],
               });
               const text = completion.choices[0]?.message?.content ?? '';

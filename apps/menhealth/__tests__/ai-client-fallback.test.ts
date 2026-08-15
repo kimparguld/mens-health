@@ -59,3 +59,92 @@ describe("createAiClient Groq empty-response fallback", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe("createAiClient JSON-mode enforcement", () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", fetchMock);
+    fetchMock.mockReset();
+    mockGroqCreate.mockReset();
+  });
+
+  // Every caller of createAiClient() JSON.parse()s the response text (see
+  // generate-social-post.ts, pipeline.ts, discover-candidates.ts). Without
+  // requesting structured output, a reasoning-capable free-tier model can
+  // return prose (its own chain-of-thought) instead of JSON, which fails
+  // JSON.parse downstream. Providers that support it should be asked for
+  // JSON mode so this happens at the API level instead.
+  it("asks Groq for JSON-object output", async () => {
+    mockGroqCreate.mockResolvedValue({
+      choices: [{ message: { content: "{}" }, finish_reason: "stop" }],
+    });
+
+    const client = createAiClient({ groqApiKey: "groq-key" });
+    await client.anthropic.messages.create({
+      model: "unused",
+      max_tokens: 100,
+      messages: [{ role: "user", content: "Respond ONLY with a JSON object: {}" }],
+    });
+
+    const callArgs = mockGroqCreate.mock.calls[0]?.[0] as { response_format?: unknown };
+    expect(callArgs.response_format).toEqual({ type: "json_object" });
+  });
+
+  it("asks OpenRouter for JSON-object output", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: "{}" } }] }),
+    });
+
+    const client = createAiClient({ openRouterApiKey: "or-key" });
+    await client.anthropic.messages.create({
+      model: "unused",
+      max_tokens: 100,
+      messages: [{ role: "user", content: "Respond ONLY with a JSON object: {}" }],
+    });
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body as string) as {
+      response_format?: unknown;
+    };
+    expect(body.response_format).toEqual({ type: "json_object" });
+  });
+
+  it("asks OpenAI for JSON-object output", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: "{}" } }] }),
+    });
+
+    const client = createAiClient({ openAiApiKey: "oa-key" });
+    await client.anthropic.messages.create({
+      model: "unused",
+      max_tokens: 100,
+      messages: [{ role: "user", content: "Respond ONLY with a JSON object: {}" }],
+    });
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body as string) as {
+      response_format?: unknown;
+    };
+    expect(body.response_format).toEqual({ type: "json_object" });
+  });
+
+  it("asks Gemini for application/json output", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ candidates: [{ content: { parts: [{ text: "{}" }] } }] }),
+    });
+
+    const client = createAiClient({ geminiApiKey: "gem-key" });
+    await client.anthropic.messages.create({
+      model: "unused",
+      max_tokens: 100,
+      messages: [{ role: "user", content: "Respond ONLY with a JSON object: {}" }],
+    });
+
+    const body = JSON.parse(fetchMock.mock.calls[0]![1].body as string) as {
+      generationConfig?: { responseMimeType?: string };
+    };
+    expect(body.generationConfig?.responseMimeType).toBe("application/json");
+  });
+});
